@@ -36,7 +36,7 @@ insert_serverinfo()
 
 cmd="mkdir -p .cmake_zonedb && \
 cd .cmake_zonedb && \
-cmake /data/mmorpg/server-res/res/db -DZONEDB=${ZONE_ID} >> /dev/null && \
+cmake -Wno-dev /data/mmorpg/server-res/res/db -DZONEDB=${ZONE_ID} >> /dev/null && \
 cat zone_init_${ZONE_ID}.sql"
 
 docker run --rm \
@@ -51,7 +51,7 @@ docker run --rm \
 -e ZONE_MYSQL_URL=${ZONE_MYSQL_URL} \
 -e ZONE_OPEN_TIME=${ZONE_OPEN_TIME} \
 -v /${root_dir}/server-res:/data/mmorpg/server-res \
--it mmo-server-base:18.04 sh -c "${cmd}" \
+-it mmo-server-base:20.04 sh -c "${cmd}" \
 | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" serverinfo"
 }
 

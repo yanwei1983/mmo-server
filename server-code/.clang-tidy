@@ -6,17 +6,7 @@
 #
 ---
 # See https://clang.llvm.org/extra/clang-tidy/#using-clang-tidy for all possible checks
-Checks: '-*,
-clang-analyzer-core*,
-clang-analyzer-cplusplus*,
-clang-analyzer-optin.cplusplus*,
-bugprone-*,
--bugprone-narrowing-conversions,
--bugprone-macro-parentheses,
--bugprone-exception-escape,
--bugprone-branch-clone,
-performance-*,
-readability-identifier-naming*'
+Checks: '-*,clang-analyzer-core*,clang-analyzer-cplusplus*,clang-analyzer-optin.cplusplus*,bugprone-*,-bugprone-narrowing-conversions,-bugprone-macro-parentheses,-bugprone-exception-escape,-bugprone-branch-clone,performance-*,readability-identifier-naming*'
 
 HeaderFilterRegex: '^?!(.*/depends/.*|.*/build/.*)$'
 FormatStyle: file
