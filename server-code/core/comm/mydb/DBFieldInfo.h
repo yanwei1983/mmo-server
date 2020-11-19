@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "BaseCode.h"
-#include "mysql/mysql.h"
+
 
 enum DB_FIELD_TYPES
 {
@@ -56,100 +56,7 @@ struct MYSQL_FIELD_COPY : public CDBFieldInfo
     enum DB_FIELD_TYPES m_field_type; /* Type of field. See mysql_com.h for types */
     bool                m_isPriKey;
     uint32_t            m_idx;
-    MYSQL_FIELD_COPY(MYSQL_FIELD* pField, uint32_t idx)
-    {
-        m_name     = (pField->name ? pField->name : "");
-        m_table    = (pField->table ? pField->table : "");
-        m_isPriKey = IS_PRI_KEY(pField->flags);
-        m_idx      = idx;
-        switch(pField->type)
-        {
-            case MYSQL_TYPE_TINY:
-            {
-                if(pField->flags & UNSIGNED_FLAG)
-                {
-                    m_field_type = DB_FIELD_TYPE_TINY_UNSIGNED;
-                }
-                else
-                {
-                    m_field_type = DB_FIELD_TYPE_TINY;
-                }
-            }
-            break;
-            case MYSQL_TYPE_SHORT:
-            {
-                if(pField->flags & UNSIGNED_FLAG)
-                {
-                    m_field_type = DB_FIELD_TYPE_SHORT_UNSIGNED;
-                }
-                else
-                {
-                    m_field_type = DB_FIELD_TYPE_SHORT;
-                }
-            }
-            break;
-            case MYSQL_TYPE_LONG:
-            case MYSQL_TYPE_INT24:
-            {
-                if(pField->flags & UNSIGNED_FLAG)
-                {
-                    m_field_type = DB_FIELD_TYPE_LONG_UNSIGNED;
-                }
-                else
-                {
-                    m_field_type = DB_FIELD_TYPE_LONG;
-                }
-            }
-            break;
-            case MYSQL_TYPE_LONGLONG:
-            {
-                if(pField->flags & UNSIGNED_FLAG)
-                {
-                    m_field_type = DB_FIELD_TYPE_LONGLONG_UNSIGNED;
-                }
-                else
-                {
-                    m_field_type = DB_FIELD_TYPE_LONGLONG;
-                }
-            }
-            break;
-            case MYSQL_TYPE_BIT:
-            {
-                m_field_type = DB_FIELD_TYPE_LONGLONG_UNSIGNED;
-            }
-            break;
-            case MYSQL_TYPE_FLOAT:
-            {
-                m_field_type = DB_FIELD_TYPE_FLOAT;
-            }
-            break;
-            case MYSQL_TYPE_DOUBLE:
-            {
-                m_field_type = DB_FIELD_TYPE_DOUBLE;
-            }
-            break;
-            case MYSQL_TYPE_VARCHAR:
-            case MYSQL_TYPE_VAR_STRING:
-            case MYSQL_TYPE_STRING:
-            {
-                m_field_type = DB_FIELD_TYPE_VARCHAR;
-            }
-            break;
-            case MYSQL_TYPE_BLOB:
-            case MYSQL_TYPE_TINY_BLOB:
-            case MYSQL_TYPE_MEDIUM_BLOB:
-            case MYSQL_TYPE_LONG_BLOB:
-            {
-                m_field_type = DB_FIELD_TYPE_BLOB;
-            }
-            break;
-            default:
-            {
-                m_field_type = DB_FIELD_TYPE_UNSUPPORED;
-            }
-            break;
-        }
-    }
+    MYSQL_FIELD_COPY(MYSQL_FIELD* pField, uint32_t idx);
 
     virtual const char*    GetTableName() const override { return m_table.c_str(); }
     virtual const char*    GetFieldName() const override { return m_name.c_str(); }
@@ -165,30 +72,10 @@ public:
     CMysqlFieldInfoList(MYSQL_RES* res);
     ~CMysqlFieldInfoList();
 
-    virtual const CDBFieldInfo* operator[](size_t idx) const
-    {
-        CHECKF_V(idx < size(), idx);
-        return m_FieldInfos[idx].get();
-    }
-    virtual const CDBFieldInfo* get(size_t idx) const
-    {
-        CHECKF_V(idx < size(), idx);
-        return m_FieldInfos[idx].get();
-    }
-    virtual size_t              size() const { return m_FieldInfos.size(); }
-    virtual const CDBFieldInfo* find_field(const std::string& name)
-    {
-        auto it_find = std::find_if(m_FieldInfos.begin(), m_FieldInfos.end(), [name](const std::unique_ptr<CDBFieldInfo>& v) {
-            return name == v->GetFieldName();
-        });
-
-        if(it_find != m_FieldInfos.end())
-        {
-            return (*it_find).get();
-        }
-        return nullptr;
-    }
-
+    virtual const CDBFieldInfo* operator[](size_t idx) const;
+    virtual const CDBFieldInfo* get(size_t idx) const;
+    virtual size_t              size() const;
+    virtual const CDBFieldInfo* find_field(const std::string& name);
 protected:
     std::vector<std::unique_ptr<CDBFieldInfo> > m_FieldInfos;
 };

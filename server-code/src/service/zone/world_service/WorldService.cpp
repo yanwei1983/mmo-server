@@ -124,7 +124,7 @@ bool CWorldService::Init(const ServerPort& nServerPort)
         auto row_result = result_playercount->fetch_row(false);
         if(row_result)
         {
-            m_nCurPlayerMaxID = row_result->Field(0).get<int64_t>();
+            m_nCurPlayerMaxID = row_result->Field(0).get<uint64_t>();
             m_nCurPlayerMaxID++;
         }
     }

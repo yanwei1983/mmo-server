@@ -108,6 +108,7 @@ protected:
     void         OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDe);
     void         OnAOIProcess_PosUpdate();
     void         SendAOIChangeToAI(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActorAdd);
+    virtual bool NeedSyncAOIToAIService() const {return IsMonster() || IsPlayer();}
 private:
     void BroadcastShowTo(const VirtualSocketMap_t& VSMap);
 

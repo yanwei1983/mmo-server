@@ -190,20 +190,3 @@ const char* CDBField::GetFieldName() const
 {
     return m_pFieldInfo ? m_pFieldInfo->GetFieldName() : "";
 }
-
-CMysqlFieldInfoList::CMysqlFieldInfoList(MYSQL_RES* res)
-{
-    int32_t nFields = mysql_num_fields(res);
-    for(uint32_t i = 0; i < nFields; i++)
-    {
-        auto pField = mysql_fetch_field(res);
-        if(pField == nullptr)
-        {
-            LOGDBERROR("mysql_fetch_field Error:{}", i);
-            continue;
-        }
-        m_FieldInfos.push_back(std::make_unique<MYSQL_FIELD_COPY>(pField, i));
-    }
-}
-
-CMysqlFieldInfoList::~CMysqlFieldInfoList() {}

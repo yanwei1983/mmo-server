@@ -88,7 +88,7 @@ void CActor::SendRoomMessage(const proto_msg_t& msg, bool bIncludeSelf /*= true*
     SceneService()->SendProtoMsgTo(setSocketMap, msg);
     auto cmd = msg_to_cmd(msg);
     // send message to ai_service
-    if((IsMonster() || IsPlayer()) && (cmd == CMD_SC_AOI_UPDATE || cmd == CMD_SC_CASTSKILL || cmd == CMD_SC_ATTRIB_CHANGE))
+    if(NeedSyncAOIToAIService() && (cmd == CMD_SC_AOI_UPDATE || cmd == CMD_SC_CASTSKILL || cmd == CMD_SC_ATTRIB_CHANGE))
     {
         SceneService()->SendProtoMsgToAIService(msg);
     }

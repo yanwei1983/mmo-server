@@ -168,7 +168,7 @@ public:
 
         __LEAVE_FUNCTION
 
-        LOGDBERROR("Field {}.{} get/set type error.", m_pFieldInfo->GetTableName(), m_pFieldInfo->GetFieldName());
+        LOGDBERROR("Field {}.{} get/set type[{}->{}]error .", m_pFieldInfo->GetTableName(), m_pFieldInfo->GetFieldName(), m_pFieldInfo->GetFieldType(), nameof::nameof_type<T>());
         LOGDBERROR("CallStack：{}", GetStackTraceString(CallFrameMap(3, 7)));
         return false;
     }

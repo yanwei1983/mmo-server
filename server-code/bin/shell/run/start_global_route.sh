@@ -4,6 +4,7 @@ cd ../..
 DIR_file=`pwd`
 
 mkdir -p binary
+mkdir -p .pid
 mkdir -p /data/log
 cd binary
 

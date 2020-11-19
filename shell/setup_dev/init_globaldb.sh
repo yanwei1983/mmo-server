@@ -17,13 +17,13 @@ source $env_file
 
 create_serverinfodb()
 {
-echo "create database IF NOT EXISTS ${SERVERINFO_MYSQL_NAME};" | docker exec -i mysql-global sh -c "exec mysql -v -uroot -p\"${MYSQL_PASSWD}\""
+echo "create database IF NOT EXISTS ${SERVERINFO_MYSQL_NAME};" | docker exec -i mysql-global sh -c "exec mysql -v --default-character-set=utf8mb4 -uroot -p\"${MYSQL_PASSWD}\""
 cat ../../server-res/res/db/db_proto/serverinfodb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
 }
 
 create_globaldb()
 {
-echo "create database IF NOT EXISTS ${GLOBAL_MYSQL_NAME};" | docker exec -i mysql-global sh -c "exec mysql -v -uroot -p\"${MYSQL_PASSWD}\""
+echo "create database IF NOT EXISTS ${GLOBAL_MYSQL_NAME};" | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\""
 cat ../../server-res/res/db/db_proto/globaldb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${GLOBAL_MYSQL_NAME}"
 }
 
@@ -39,6 +39,7 @@ init_serverinfodb()
 cmd="mkdir -p .cmake_globaldb && cd .cmake_globaldb && cmake -Wno-dev -DGLOBALDB=ON /data/mmorpg/server-res/res/db >> /dev/null && cat init_globalservice.sql"
 
 
+mkdir -p sql
 
 docker run --rm --privileged=true \
 -e GLOBAL_IP=${GLOBAL_IP} \
@@ -47,8 +48,9 @@ docker run --rm --privileged=true \
 -e GLOBAL_MYSQL_URL=${GLOBAL_MYSQL_URL}  \
 -e SERVERINFO_MYSQL_NAME=${SERVERINFO_MYSQL_NAME} \
 -v /${root_dir}/server-res:/data/mmorpg/server-res \
--it mmo-server-base:20.04 sh -c "${cmd}" \
-| docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
+-it mmo-server-base:20.04 sh -c "${cmd}" > sql/init_globalservice.sql
+
+cat  sql/init_globalservice.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
 }
 
 

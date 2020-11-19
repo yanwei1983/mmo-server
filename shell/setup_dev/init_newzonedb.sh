@@ -17,12 +17,13 @@ fi
 MYSQL_PASSWD=test12345
 source $env_file
 
+
 create_db()
 {
-echo "create database IF NOT EXISTS ${ZONE_NAME};" | docker exec -i ${MYSQL_DOCKER_NAME} sh -c "exec mysql -v -uroot -p\"${MYSQL_PASSWD}\""
+echo "create database IF NOT EXISTS ${ZONE_NAME};" | docker exec -i ${MYSQL_DOCKER_NAME} sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\""
 
 set -e
-sql_cmd="exec mysql -v -uroot -p\"${MYSQL_PASSWD}\" ${ZONE_NAME}"
+sql_cmd="exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${ZONE_NAME}"
 cat ../../server-res/res/db/db_proto/gamedb.pb.sql | docker exec -i ${MYSQL_DOCKER_NAME} sh -c "${sql_cmd}"
 }
 
@@ -33,6 +34,8 @@ insert_serverinfo()
 #cmd="m4 -DZONE_ID=${ZONE_ID} -DZONE_NAME=${ZONE_NAME} -DZONE_IP=${ZONE_IP} \
 #-DPORT_START=${PORT_START} -DZONE_OUT_IP=${ZONE_OUT_IP} -DOUT_PORT_START=${OUT_PORT_START} -DZONE_MYSQL_IP=${ZONE_MYSQL_IP} \
 #-DMYSQL_PASSWD=${MYSQL_PASSWD} -DZONE_OPEN_TIME=${ZONE_OPEN_TIME} /data/mmorpg/server-res/res/db/db_protoadd_new_server.sql.template"
+
+mkdir -p sql
 
 cmd="mkdir -p .cmake_zonedb && \
 cd .cmake_zonedb && \
@@ -51,8 +54,9 @@ docker run --rm \
 -e ZONE_MYSQL_URL=${ZONE_MYSQL_URL} \
 -e ZONE_OPEN_TIME=${ZONE_OPEN_TIME} \
 -v /${root_dir}/server-res:/data/mmorpg/server-res \
--it mmo-server-base:20.04 sh -c "${cmd}" \
-| docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" serverinfo"
+-it mmo-server-base:20.04 sh -c "${cmd}" > sql/zone_init_${ZONE_ID}.sql
+
+cat sql/zone_init_${ZONE_ID}.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" serverinfo"
 }
 
 show_serverinfodb()

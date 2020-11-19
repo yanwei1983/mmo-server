@@ -45,7 +45,7 @@ public:
     export_lua void CallBack();
 
     void Save();
-
+    
 public:
     OBJECTHEAP_DECLARATION(s_heap);
 

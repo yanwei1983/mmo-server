@@ -282,6 +282,10 @@ void CActor::OnAOIProcess(const BROADCAST_SET& setBCActorDel, const BROADCAST_SE
 
 void CActor::SendAOIChangeToAI(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActorAdd)
 {
+    if(NeedSyncAOIToAIService() == false)
+        return;
+    if(setBCActorDel.empty() && setBCActorAdd.empty())
+        return;
     ServerMSG::AOIChange msg;
     msg.set_scene_idx(GetCurrentScene()->GetSceneIdx());
     msg.set_actor_id(GetID());

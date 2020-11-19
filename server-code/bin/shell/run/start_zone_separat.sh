@@ -9,6 +9,7 @@ if [ ! -n "$1" ] ;then
 fi 
 
 mkdir -p binary
+mkdir -p .pid
 mkdir -p /data/log
 cd binary
 ln -sf ../service_loader z${serverid}_world

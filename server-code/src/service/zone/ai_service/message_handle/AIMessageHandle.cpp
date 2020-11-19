@@ -21,7 +21,7 @@ ON_MSG(CAIService, SC_AOI_UPDATE)
 {
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
-    CHECK_FMT(pActor, "actorid:{}", msg.actor_id());
+    CHECK_FMT(pActor, "actorid:{} not find", msg.actor_id());
     CHECK(pActor->GetCurrentScene());
     CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx() );
 
@@ -40,7 +40,7 @@ ON_SERVERMSG(CAIService, AOIChange)
 {
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
-    CHECK_FMT(pActor, "actorid:{}", msg.actor_id());
+    CHECK_FMT(pActor, "actorid:{} not find", msg.actor_id());
     CHECK(pActor->GetCurrentScene());
     CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx() );
 

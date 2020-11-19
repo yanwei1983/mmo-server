@@ -96,20 +96,25 @@ bool CMysqlConnection::Connect(const std::string& host,
     if(h == nullptr || h != m_pHandle.get())
     {
         // log error
-        LOGDBFATAL("mysql connect to {}:{} {} fail.", host.c_str(), port, db.c_str());
+        LOGDBFATAL("mysql connect to {}:{} {} fail.", host, port, db);
         return false;
     }
-    LOGDBDEBUG("mysql connect to {}:{} {} succ.", host.c_str(), port, db.c_str());
-    // std::string query = "show variables like '%char%'";
-    // auto result = UnionQuery(query);
-    // for (uint32_t i = 0; i < result->get_num_row(); i++)
-    //{
-    //	auto row = result->fetch_row(false);
-    //	std::string name = row->Field(0);
-    //	std::string val = row->Field(1);
-    //	int32_t k = 0;
-    //}
-    // result.reset();
+    LOGDBDEBUG("mysql connect to {}:{} {} succ.", host, port, db);
+    
+    constexpr bool g_test_charset = false;
+    if(g_test_charset)
+    {
+        std::string query = "show variables like '%char%'";
+        auto result = UnionQuery(query);
+        for (uint32_t i = 0; i < result->get_num_row(); i++)
+        {
+            auto row = result->fetch_row(false);
+            std::string name = row->Field(0);
+            std::string val = row->Field(1);
+            LOGDBDEBUG("mysql_char {}:{}", name, val);
+        }
+        result.reset();
+    }
 
     if(bCreateAsync)
     {
@@ -153,10 +158,10 @@ bool CMysqlConnection::Connect(const std::string& host,
                                               client_flag | CLIENT_REMEMBER_OPTIONS);
                 if(h == nullptr || h != m_pAsyncHandle.get())
                 {
-                    LOGDBFATAL("mysql async connect to {}:{} {} fail.", host.c_str(), port, db.c_str());
+                    LOGDBFATAL("mysql async connect to {}:{} {} fail.", host, port, db);
                     // log error
                 }
-                LOGDBDEBUG("mysql async_connect to {}:{} {} succ.", host.c_str(), port, db.c_str());
+                LOGDBDEBUG("mysql async_connect to {}:{} {} succ.", host, port, db);
                 __LEAVE_FUNCTION
             },
             []() { BaseCode::ClearNdc(); });
@@ -196,7 +201,7 @@ void CMysqlConnection::AsyncExec(const std::string& s)
                     {
                         const char* error_str = mysql_error(m_pHandle.get());
                         // log error
-                        LOGDBERROR("mysql_error:{} when async_exec {}.", error_str, s.c_str());
+                        LOGDBERROR("mysql_error:{} when async_exec {}.", error_str, s);
                         return;
                     }
                     else
