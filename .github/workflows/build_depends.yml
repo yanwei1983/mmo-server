@@ -16,7 +16,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
       
       - name: build_base
-        run: bash shell/build_image/build_base2004_image.sh
+        run: bash server-docker/shell/build_image/build_base2004_image.sh
       
       - name: Push image
         run: |
@@ -46,7 +46,7 @@ jobs:
           docker tag docker.pkg.github.com/${{ github.repository }}/mmo-server-base:20.04 mmo-server-base:20.04
 
       - name: build_depends
-        run: bash shell/build_image/build_mmo-server-depends.sh
+        run: bash server-docker/shell/build_image/build_mmo-server-depends.sh
 
       - name: Push image
         run: |

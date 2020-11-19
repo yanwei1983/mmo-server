@@ -3,7 +3,7 @@ set -e
 cd `dirname $0`
 DIR_file=`pwd`
 
-cd ../..
+cd ../../..
 root_dir=`pwd`
 cd -
 
@@ -18,13 +18,13 @@ source $env_file
 create_serverinfodb()
 {
 echo "create database IF NOT EXISTS ${SERVERINFO_MYSQL_NAME};" | docker exec -i mysql-global sh -c "exec mysql -v --default-character-set=utf8mb4 -uroot -p\"${MYSQL_PASSWD}\""
-cat ../../server-res/res/db/db_proto/serverinfodb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
+cat {$root_dir}/server-res/res/db/db_proto/serverinfodb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
 }
 
 create_globaldb()
 {
 echo "create database IF NOT EXISTS ${GLOBAL_MYSQL_NAME};" | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\""
-cat ../../server-res/res/db/db_proto/globaldb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${GLOBAL_MYSQL_NAME}"
+cat {$root_dir}/server-res/res/db/db_proto/globaldb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${GLOBAL_MYSQL_NAME}"
 }
 
 create_db()

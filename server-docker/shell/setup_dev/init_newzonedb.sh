@@ -3,7 +3,7 @@
 cd `dirname $0`
 DIR_file=`pwd`
 
-cd ../..
+cd ../../..
 root_dir=`pwd`
 cd -
 
@@ -24,7 +24,7 @@ echo "create database IF NOT EXISTS ${ZONE_NAME};" | docker exec -i ${MYSQL_DOCK
 
 set -e
 sql_cmd="exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${ZONE_NAME}"
-cat ../../server-res/res/db/db_proto/gamedb.pb.sql | docker exec -i ${MYSQL_DOCKER_NAME} sh -c "${sql_cmd}"
+cat {$root_dir}/server-res/res/db/db_proto/gamedb.pb.sql | docker exec -i ${MYSQL_DOCKER_NAME} sh -c "${sql_cmd}"
 }
 
 

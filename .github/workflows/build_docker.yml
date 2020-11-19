@@ -26,7 +26,7 @@ jobs:
           
       - name: build_publish
         run: |
-          bash shell/build_image/build_publish_image.sh lastest
+          bash server-docker/shell/build_image/build_publish_image.sh lastest
 
       - name: Push image
         run: |

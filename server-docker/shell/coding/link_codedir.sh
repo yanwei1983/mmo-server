@@ -2,7 +2,7 @@
 cd `dirname $0`
 DIR_file=`pwd`
 
-cd ../..
+cd ../../..
 root_dir=`pwd`
 cd -
 
