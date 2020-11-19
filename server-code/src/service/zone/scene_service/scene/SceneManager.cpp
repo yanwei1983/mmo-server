@@ -17,8 +17,10 @@ CSceneManager::~CSceneManager()
 
 bool CSceneManager::Init(uint32_t idZone)
 {
+    __ENTER_FUNCTION
     //将所有归属于本Zone的非副本地图进行加载
-    MapManager()->ForEach([pThis = this, idZone](CGameMap* pMap) {
+    MapManager()->ForEach([pThis = this, idZone](CGameMap* pMap)
+    {
         //如果不是本Zone的Map, 不会读取MapData,  副本地图也不需要创建
         if(pMap->IsZoneMap(idZone) == false || pMap->IsDynaMap() == true)
             return;
@@ -27,20 +29,24 @@ bool CSceneManager::Init(uint32_t idZone)
     });
 
     return true;
+    __LEAVE_FUNCTION
 }
 
 void CSceneManager::Destory()
 {
+    __ENTER_FUNCTION
     for(auto& [k, v]: m_mapScene)
     {
         v->Destory();
         SAFE_DELETE(v);
     }
     m_mapScene.clear();
+    __LEAVE_FUNCTION
 }
 
 CPhase* CSceneManager::CreatePhase(uint16_t idMap, uint16_t idPhaseType, uint64_t idPhase)
 {
+    __ENTER_FUNCTION
     const CGameMap* pMap = MapManager()->QueryMap(idMap);
     CHECKF(pMap && pMap->IsZoneMap(SceneService()->GetZoneID()));
     CScene* pScene = QueryScene(idMap);
@@ -59,10 +65,13 @@ CPhase* CSceneManager::CreatePhase(uint16_t idMap, uint16_t idPhaseType, uint64_
 
         return pScene->QueryPhase(idPhase);
     }
+    __LEAVE_FUNCTION
+    return nullptr;
 }
 
 CScene* CSceneManager::_CreateStaticScene(uint16_t idMap)
 {
+    __ENTER_FUNCTION
     const CGameMap* pMap = MapManager()->QueryMap(idMap);
     CHECKF(pMap && pMap->IsDynaMap() == false);
 
@@ -74,10 +83,13 @@ CScene* CSceneManager::_CreateStaticScene(uint16_t idMap)
 
     m_nStaticScene++;
     return pScene;
+    __LEAVE_FUNCTION
+    return nullptr;
 }
 
 CPhase* CSceneManager::QueryPhase(const SceneIdx& idxScene)
 {
+    __ENTER_FUNCTION
     CScene* pScene = QueryScene(idxScene.GetMapID());
     if(pScene == nullptr)
     {
@@ -85,13 +97,17 @@ CPhase* CSceneManager::QueryPhase(const SceneIdx& idxScene)
     }
     auto pPhase = pScene->QueryPhaseByIdx(idxScene.GetPhaseIdx());
     return pPhase;
+    __LEAVE_FUNCTION
+    return nullptr;
 }
 
 CScene* CSceneManager::QueryScene(uint16_t idMap)
 {
+    __ENTER_FUNCTION
     auto itFind = m_mapScene.find(idMap);
     if(itFind != m_mapScene.end())
         return itFind->second;
+    __LEAVE_FUNCTION
     return nullptr;
 }
 

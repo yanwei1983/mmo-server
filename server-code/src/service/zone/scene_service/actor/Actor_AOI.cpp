@@ -181,6 +181,7 @@ void CActor::SendShowTo(CPlayer* pPlayer)
 
 bool CActor::ViewTest(CSceneObject* pActor)
 {
+    __ENTER_FUNCTION
     //所有actor 可以看到 位面id与自己一样的的对象
     if(GetPhaseID() == pActor->GetPhaseID())
     {
@@ -215,7 +216,7 @@ bool CActor::ViewTest(CSceneObject* pActor)
     {
         return fun_check_player(pActor, this);
     }
- 
+    __LEAVE_FUNCTION
     return false;
 }
 
@@ -266,6 +267,7 @@ bool CActor::IsMustAddToViewList(CSceneObject* pActor)
 
 void CActor::OnAOIProcess(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActor, const BROADCAST_SET& setBCActorAdd)
 {
+    __ENTER_FUNCTION
     // step4: 需要离开视野的角色Remove
     OnAOIProcess_ActorRemoveFromAOI(setBCActorDel);
 
@@ -278,10 +280,12 @@ void CActor::OnAOIProcess(const BROADCAST_SET& setBCActorDel, const BROADCAST_SE
     OnAOIProcess_ActorAddToAOI(setBCActorAdd);
 
     SendAOIChangeToAI(setBCActorDel, setBCActorAdd);
+    __LEAVE_FUNCTION
 }
 
 void CActor::SendAOIChangeToAI(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActorAdd)
 {
+    __ENTER_FUNCTION
     if(NeedSyncAOIToAIService() == false)
         return;
     if(setBCActorDel.empty() && setBCActorAdd.empty())
@@ -298,6 +302,7 @@ void CActor::SendAOIChangeToAI(const BROADCAST_SET& setBCActorDel, const BROADCA
         msg.add_actor_add(v);
     }
     SceneService()->SendProtoMsgToAIService(msg);
+    __LEAVE_FUNCTION
 }
 
 void CActor::OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDel)

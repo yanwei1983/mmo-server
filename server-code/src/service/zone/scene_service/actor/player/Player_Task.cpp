@@ -4,16 +4,19 @@
 #include "server_msg/server_side.pb.h"
 bool CPlayer::CheckTaskPhase(uint64_t idPhase)
 {
+    __ENTER_FUNCTION
     auto it = m_TaskPhase.find(idPhase);
     if(it != m_TaskPhase.end())
     {
         return it->second == 0;
     }
+    __LEAVE_FUNCTION
     return false;
 }
 
 void CPlayer::AddTaskPhase(uint64_t idPhase, bool bNotify /* = true*/)
 {
+    __ENTER_FUNCTION
     auto& refData = m_TaskPhase[idPhase];
     refData++;
     // notify ai
@@ -24,10 +27,12 @@ void CPlayer::AddTaskPhase(uint64_t idPhase, bool bNotify /* = true*/)
         msg.set_task_phase_id(idPhase);
         SceneService()->SendProtoMsgToAIService(msg);
     }
+    __LEAVE_FUNCTION
 }
 
 void CPlayer::RemoveTaskPhase(uint64_t idPhase, bool bNotify /* = true*/)
 {
+    __ENTER_FUNCTION
     auto& refData = m_TaskPhase[idPhase];
     refData--;
     if(refData == 0)
@@ -42,4 +47,5 @@ void CPlayer::RemoveTaskPhase(uint64_t idPhase, bool bNotify /* = true*/)
         msg.set_task_phase_id(idPhase);
         SceneService()->SendProtoMsgToAIService(msg);
     }
+    __LEAVE_FUNCTION
 }

@@ -8,6 +8,7 @@ CStoragePackage::~CStoragePackage() {}
 
 void CStoragePackage::CheckIn(uint32_t nGridInPackage)
 {
+    __ENTER_FUNCTION
     CItem* pItem = m_pOwner->GetBag()->PopItemByGrid(nGridInPackage, true);
     if(pItem == nullptr)
         return;
@@ -23,10 +24,12 @@ void CStoragePackage::CheckIn(uint32_t nGridInPackage)
         pItem->DelRecord();
         SAFE_DELETE(pItem);
     }
+    __LEAVE_FUNCTION
 }
 
 void CStoragePackage::CheckOut(uint32_t nGridInStorage)
 {
+    __ENTER_FUNCTION
     CItem* pItem = PopItemByGrid(nGridInStorage, true);
     if(pItem == nullptr)
         return;
@@ -41,4 +44,5 @@ void CStoragePackage::CheckOut(uint32_t nGridInStorage)
         pItem->DelRecord();
         SAFE_DELETE(pItem);
     }
+    __LEAVE_FUNCTION
 }

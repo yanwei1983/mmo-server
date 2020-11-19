@@ -22,6 +22,7 @@ void CTeamInfo::OnSetLeader(OBJID idLeader)
 
 void CTeamInfo::OnAddMember(OBJID idMember)
 {
+    __ENTER_FUNCTION
     CActor* pActor = ActorManager()->QueryActor(idMember);
     if(pActor)
     {
@@ -29,10 +30,12 @@ void CTeamInfo::OnAddMember(OBJID idMember)
         pPlayer->SetTeamID(m_idTeam);
     }
     m_setMemberID.push_back(idMember);
+    __LEAVE_FUNCTION
 }
 
 void CTeamInfo::OnDelMember(OBJID idMember)
 {
+    __ENTER_FUNCTION
     CActor* pActor = ActorManager()->QueryActor(idMember);
     if(pActor)
     {
@@ -40,10 +43,12 @@ void CTeamInfo::OnDelMember(OBJID idMember)
         pPlayer->SetTeamID(0);
     }
     m_setMemberID.erase(std::find(m_setMemberID.begin(), m_setMemberID.end(), idMember));
+    __LEAVE_FUNCTION
 }
 
 void CTeamInfo::OnDestory()
 {
+    __ENTER_FUNCTION
     for(OBJID idActor: m_setMemberID)
     {
         CActor* pActor = ActorManager()->QueryActor(idActor);
@@ -53,6 +58,8 @@ void CTeamInfo::OnDestory()
         CPlayer* pPlayer = pActor->CastTo<CPlayer>();
         pPlayer->SetTeamID(0);
     }
+
+    __LEAVE_FUNCTION
 }
 
 size_t CTeamInfo::GetMemeberAmount() const
@@ -62,8 +69,11 @@ size_t CTeamInfo::GetMemeberAmount() const
 
 OBJID CTeamInfo::GetMemberIDByIdx(uint32_t idx)
 {
+    __ENTER_FUNCTION
     CHECKF_V(idx < m_setMemberID.size(), idx);
     return m_setMemberID[idx];
+    __LEAVE_FUNCTION
+    return idx;
 }
 
 bool CTeamInfo::IsTeamMember(OBJID idActor) const
@@ -91,14 +101,17 @@ bool CTeamInfoManager::Init()
 
 CTeamInfo* CTeamInfoManager::OnCreateTeam(uint64_t idTeam, uint64_t idLeader)
 {
+    __ENTER_FUNCTION
     auto pTeam = CTeamInfo::CreateNew(idTeam, idLeader);
     CHECKF(pTeam);
     m_setTeam[idTeam] = pTeam;
     return pTeam;
+    __LEAVE_FUNCTION
 }
 
 void CTeamInfoManager::OnDestoryTeam(uint64_t idTeam)
 {
+    __ENTER_FUNCTION
     auto it = m_setTeam.find(idTeam);
     if(it == m_setTeam.end())
         return;
@@ -108,13 +121,16 @@ void CTeamInfoManager::OnDestoryTeam(uint64_t idTeam)
         pTeamInfo->OnDestory();
     }
     m_setTeam.erase(it);
+    __LEAVE_FUNCTION
 }
 
 CTeamInfo* CTeamInfoManager::QueryTeam(uint64_t idTeam)
 {
+    __ENTER_FUNCTION
     auto it = m_setTeam.find(idTeam);
     if(it != m_setTeam.end())
         return it->second;
+    __LEAVE_FUNCTION
     return nullptr;
 }
 

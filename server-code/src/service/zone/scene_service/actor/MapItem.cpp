@@ -24,10 +24,14 @@ CMapItem::~CMapItem()
 
 bool CMapItem::Init(uint32_t idType)
 {
+    __ENTER_FUNCTION
     m_idType = idType;
     SetID(ActorManager()->GenMapItemID());
     CHECKF(CActor::Init());
     return true;
+    
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CMapItem::MakeShowData(SC_AOI_NEW& msg)
@@ -43,6 +47,8 @@ void CMapItem::MakeShowData(SC_AOI_NEW& msg)
     msg.set_name(GetName());
     msg.set_hp(GetHP());
     msg.set_hpmax(GetHPMax());
+
+    
 }
 
 void CMapItem::OnEnterMap(CSceneBase* pScene)

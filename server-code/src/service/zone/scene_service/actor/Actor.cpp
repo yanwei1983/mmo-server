@@ -24,6 +24,7 @@ CActor::~CActor() {}
 
 bool CActor::Init()
 {
+    __ENTER_FUNCTION
     m_pStatusSet.reset(CActorStatusSet::CreateNew(this));
     CHECKF(m_pStatusSet.get());
     m_SkillFSM.reset(CSkillFSM::CreateNew(this));
@@ -36,6 +37,8 @@ bool CActor::Init()
     CHECKF(m_EventQueue.get());
 
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CActor::DelThis()
@@ -55,34 +58,43 @@ void CActor::DelThis()
 
 void CActor::AddHide()
 {
+    __ENTER_FUNCTION
     CSceneObject::AddHide();
 
     ServerMSG::ActorSetHide msg;
     msg.set_actor_id(GetID());
     msg.set_hide_count(m_nHideCount);
     SceneService()->SendProtoMsgToAIService(msg);
+    __LEAVE_FUNCTION
 }
 
 void CActor::RemoveHide()
 {
+    __ENTER_FUNCTION
     CSceneObject::RemoveHide();
 
     ServerMSG::ActorSetHide msg;
     msg.set_actor_id(GetID());
     msg.set_hide_count(m_nHideCount);
     SceneService()->SendProtoMsgToAIService(msg);
+    __LEAVE_FUNCTION
 }
 
 void CActor::SetCampID(uint32_t id, uint32_t nSync)
 {
+    __ENTER_FUNCTION
     SetProperty(PROP_CAMP, id, nSync);
+    __LEAVE_FUNCTION
 }
 
 CActor* CActor::QueryOwner() const
 {
+    __ENTER_FUNCTION
     if(GetOwnerID() == 0)
         return nullptr;
     return ActorManager()->QueryActor(GetOwnerID());
+    __LEAVE_FUNCTION
+    return nullptr;
 }
 
 void CActor::AddProperty(uint32_t nType, int32_t nVal, uint32_t nSync)

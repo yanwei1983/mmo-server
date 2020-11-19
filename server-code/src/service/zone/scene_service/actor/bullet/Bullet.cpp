@@ -27,6 +27,7 @@ CBullet::~CBullet()
 
 bool CBullet::Init(OBJID idOwner, const CBulletType* pType, OBJID idTarget, const Vector2& posTarget)
 {
+    __ENTER_FUNCTION
     CHECKF(pType);
     CHECKF(idOwner);
     m_idOwner = idOwner;
@@ -58,6 +59,9 @@ bool CBullet::Init(OBJID idOwner, const CBulletType* pType, OBJID idTarget, cons
     m_ActorAttrib->get_base(ATTRIB_MOVESPD) = pType->GetMoveSPD();
     ScheduleApply();
     return true;
+
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CBullet::MakeShowData(SC_AOI_NEW& msg)
@@ -107,9 +111,11 @@ void CBullet::OnLeaveMap(uint16_t idTargetMap)
 
 bool CBullet::CanDamage(CActor* pTarget) const
 {
+    __ENTER_FUNCTION
     CActor* pOwner = ActorManager()->QueryActor(m_idOwner);
     if(pOwner)
         return pOwner->CanDamage(pTarget);
+    __LEAVE_FUNCTION
     return false;
 }
 
@@ -117,14 +123,17 @@ void CBullet::BeKillBy(CActor* pAttacker) {}
 
 bool CBullet::IsEnemy(CSceneObject* pTarget) const
 {
+    __ENTER_FUNCTION
     CActor* pOwner = ActorManager()->QueryActor(m_idOwner);
     if(pOwner)
         return pOwner->IsEnemy(pTarget);
+    __LEAVE_FUNCTION
     return false;
 }
 
 void CBullet::ScheduleApply()
 {
+    __ENTER_FUNCTION
     if(m_pType->GetApplyTimes() == 0)
         return;
 
@@ -143,20 +152,24 @@ void CBullet::ScheduleApply()
     {
         DelThis();
     }
+    __LEAVE_FUNCTION
 }
 
 void CBullet::DoApply()
 {
+    __ENTER_FUNCTION
     if(m_pType->GetSkillID())
     {
         CSkillFSM::SkillEffectInRange(GetOwnerID(), m_pType->GetSkillID(), m_idTarget, GetPos(), m_nApplyTimes);
     }
 
     ScheduleApply();
+    __LEAVE_FUNCTION
 }
 
 void CBullet::MoveStep()
 {
+    __ENTER_FUNCTION
     if(m_pType->GetTargetType() == BULLET_TARGET_ACTOR)
     {
         CActor* pTarget = ActorManager()->QueryActor(m_idTarget);
@@ -178,4 +191,5 @@ void CBullet::MoveStep()
         Vector2 newPos = GetPos() + dir.normalisedCopy() * GetMoveSpeed() * 0.5f;
         MoveTo(newPos, false);
     }
+    __LEAVE_FUNCTION
 }

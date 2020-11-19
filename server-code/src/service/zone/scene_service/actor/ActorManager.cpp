@@ -12,7 +12,7 @@ CActorManager::~CActorManager()
 
 bool CActorManager::Init()
 {
-
+    __ENTER_FUNCTION
     m_ActorMap.reserve(GUESS_MAX_ACTOR_COUNT);
     m_PlayerRefMap.reserve(GUESS_MAX_PLAYER_COUNT);
 
@@ -21,10 +21,13 @@ bool CActorManager::Init()
     m_ActorInfos[ACT_MAPITEM].m_idPool.start(ACT_MAPITEM * ID_GEN_FACTOR + 1, ID_GEN_FACTOR);
     m_ActorInfos[ACT_BULLET].m_idPool.start(ACT_BULLET * ID_GEN_FACTOR + 1, ID_GEN_FACTOR);
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CActorManager::Destory()
 {
+    __ENTER_FUNCTION
     for(auto it = m_PlayerRefMap.begin(); it != m_PlayerRefMap.end(); it++)
     {
         CPlayer* pPlayer = it->second;
@@ -37,10 +40,12 @@ void CActorManager::Destory()
     }
     m_ActorMap.clear();
     m_PlayerRefMap.clear();
+    __LEAVE_FUNCTION
 }
 
 CActor* CActorManager::QueryActor(OBJID id) const
 {
+    __ENTER_FUNCTION
     auto itFind = m_ActorMap.find(id);
     if(itFind == m_ActorMap.end())
         return nullptr;
@@ -48,18 +53,24 @@ CActor* CActorManager::QueryActor(OBJID id) const
     if(itFind->second->IsDelThis())
         return nullptr;
     return itFind->second;
+    __LEAVE_FUNCTION
+    return nullptr;
 }
 
 CPlayer* CActorManager::QueryPlayer(const VirtualSocket& vs) const
 {
+    __ENTER_FUNCTION
     auto it = m_PlayerRefMap.find(vs);
     if(it == m_PlayerRefMap.end())
         return nullptr;
     return it->second;
+    __LEAVE_FUNCTION
+    return nullptr;
 }
 
 bool CActorManager::AddActor(CActor* pActor)
 {
+    __ENTER_FUNCTION
     auto itFind = m_ActorMap.find(pActor->GetID());
     if(itFind != m_ActorMap.end())
     {
@@ -98,6 +109,8 @@ bool CActorManager::AddActor(CActor* pActor)
     }
 
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 bool CActorManager::DelActor(CActor* pActor, bool bDelete /* = true*/)
@@ -107,6 +120,7 @@ bool CActorManager::DelActor(CActor* pActor, bool bDelete /* = true*/)
 
 bool CActorManager::DelActorByID(OBJID id, bool bDelete /* = true*/)
 {
+    __ENTER_FUNCTION
     auto itFind = m_ActorMap.find(id);
     if(itFind == m_ActorMap.end())
         return false;
@@ -134,6 +148,9 @@ bool CActorManager::DelActorByID(OBJID id, bool bDelete /* = true*/)
         SAFE_DELETE(pActor);
 
     return true;
+
+    __LEAVE_FUNCTION
+    return false;
 }
 
 OBJID CActorManager::GenNpcID()

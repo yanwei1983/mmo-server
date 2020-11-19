@@ -238,6 +238,7 @@ bool CPlayerAchievement::IsFinish(uint32_t idAchiType)
 
 bool CPlayerAchievement::_CheckAchiCondition(const CAchievementType* pType, uint32_t nVal0, uint32_t nVal1, uint32_t nVal2)
 {
+    __ENTER_FUNCTION
     switch(pType->GetCheckData().check_type())
     {
         case CONDITION_LEVEL:       //等级>=val0
@@ -315,6 +316,6 @@ bool CPlayerAchievement::_CheckAchiCondition(const CAchievementType* pType, uint
         default:
             break;
     }
-
+    __LEAVE_FUNCTION
     return false;
 }

@@ -63,6 +63,7 @@ void CLoadingThread::Destory()
 
 bool CLoadingThread::AddLoginPlayer(ST_LOADINGTHREAD_PROCESS_DATA&& data)
 {
+    __ENTER_FUNCTION
     auto pData = new ST_LOADINGTHREAD_PROCESS_DATA(std::move(data));
 
     m_nLoadingCount++;
@@ -74,10 +75,14 @@ bool CLoadingThread::AddLoginPlayer(ST_LOADINGTHREAD_PROCESS_DATA&& data)
         m_cv.notify_one();
     }
     return true;
+
+    __LEAVE_FUNCTION
+    return false;
 }
 
 bool CLoadingThread::AddClosePlayer(ST_LOADINGTHREAD_PROCESS_DATA&& data)
 {
+    __ENTER_FUNCTION
     auto pData = new ST_LOADINGTHREAD_PROCESS_DATA(std::move(data));
 
     m_nSaveingCount++;
@@ -90,6 +95,8 @@ bool CLoadingThread::AddClosePlayer(ST_LOADINGTHREAD_PROCESS_DATA&& data)
     }
 
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CLoadingThread::CancleOnReadyList(OBJID idPlayer)
@@ -173,6 +180,7 @@ void CLoadingThread::CancleOnWaitList(OBJID idPlayer)
 
 bool CLoadingThread::CancleWaiting(OBJID idPlayer)
 {
+    __ENTER_FUNCTION
     //这个函数必然是在主函数上调用的
     if(m_idCurProcess == idPlayer)
     {
@@ -184,6 +192,8 @@ bool CLoadingThread::CancleWaiting(OBJID idPlayer)
     CancleOnWaitList(idPlayer);
 
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CLoadingThread::OnThreadCreate()

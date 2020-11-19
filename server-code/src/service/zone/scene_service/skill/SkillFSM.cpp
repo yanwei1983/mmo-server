@@ -31,6 +31,7 @@ CSkillFSM::~CSkillFSM()
 
 bool CSkillFSM::CastSkill(uint32_t idSkill, OBJID idTarget, const Vector2& pos)
 {
+    __ENTER_FUNCTION
     const CSkillType* pSkillType = SkillTypeSet()->QueryObj(idSkill);
     if(pSkillType == nullptr)
         return false;
@@ -57,10 +58,13 @@ bool CSkillFSM::CastSkill(uint32_t idSkill, OBJID idTarget, const Vector2& pos)
 
     DoIntone(pSkillType);
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 bool CSkillFSM::CanIntone(const CSkillType* pSkillType, CActor* pTarget, const Vector2& target_pos)
 {
+    __ENTER_FUNCTION
     CHECKF(pSkillType);
     if(pSkillType->GetSkillType() == SKILLTYPE_PASSIVE || pSkillType->GetSkillType() == SKILLTYPE_NONE)
         return false;
@@ -132,10 +136,13 @@ bool CSkillFSM::CanIntone(const CSkillType* pSkillType, CActor* pTarget, const V
     }
 
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CSkillFSM::DoIntone(const CSkillType* pSkillType)
 {
+    __ENTER_FUNCTION
     LOGSKILLDEBUG(pSkillType->IsDebug(), "DoIntone ID:{}", m_pOwner->GetID());
 
     m_pCurSkillType = pSkillType;
@@ -159,10 +166,12 @@ void CSkillFSM::DoIntone(const CSkillType* pSkillType)
 
         EventManager()->ScheduleEvent(param, m_pEvent);
     }
+    __LEAVE_FUNCTION
 }
 
 bool CSkillFSM::BreakIntone()
 {
+    __ENTER_FUNCTION
     if(m_curState != SKILLSTATE_INTONE)
         return false;
     CHECKF(m_pCurSkillType);
@@ -170,10 +179,12 @@ bool CSkillFSM::BreakIntone()
         return false;
     LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "BreakIntone ID:{}", m_pOwner->GetID());
     return _BreakIntone();
+    __LEAVE_FUNCTION
 }
 
 bool CSkillFSM::_BreakIntone()
 {
+    __ENTER_FUNCTION
     if(m_curState != SKILLSTATE_INTONE)
         return false;
 
@@ -184,10 +195,13 @@ bool CSkillFSM::_BreakIntone()
     msg.set_actor_id(m_pOwner->GetID());
     m_pOwner->SendRoomMessage(msg);
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CSkillFSM::DoLaunch()
 {
+    __ENTER_FUNCTION
     LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "DoLaunch ID:{}", m_pOwner->GetID());
     m_curState    = SKILLSTATE_INTONE;
     m_nApplyTimes = 0;
@@ -207,10 +221,13 @@ void CSkillFSM::DoLaunch()
         SkillEffect();
     }
     ScheduleApply();
+    __LEAVE_FUNCTION
+
 }
 
 bool CSkillFSM::BreakLaunch()
 {
+    __ENTER_FUNCTION
     if(m_curState != SKILLSTATE_LAUNCH)
         return false;
     CHECKF(m_pCurSkillType);
@@ -218,9 +235,12 @@ bool CSkillFSM::BreakLaunch()
         return false;
     LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "BreakLaunch ID:{}", m_pOwner->GetID());
     return _BreakLaunch();
+    __LEAVE_FUNCTION
+    return false;
 }
 bool CSkillFSM::_BreakLaunch()
 {
+    __ENTER_FUNCTION
     if(m_curState != SKILLSTATE_LAUNCH)
         return false;
 
@@ -231,10 +251,13 @@ bool CSkillFSM::_BreakLaunch()
     msg.set_actor_id(m_pOwner->GetID());
     m_pOwner->SendRoomMessage(msg);
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CSkillFSM::SetTargetPos(const Vector2& posTarget)
 {
+    __ENTER_FUNCTION
     if(m_pCurSkillType == nullptr)
         return;
     if(HasFlag(m_pCurSkillType->GetFlag(), SKILLFLAG_CANCHANGE_DESTPOS) == false)
@@ -243,10 +266,12 @@ void CSkillFSM::SetTargetPos(const Vector2& posTarget)
     }
 
     m_posTarget = posTarget;
+    __LEAVE_FUNCTION
 }
 
 bool CanSkillAttackActor(const CSkillType* pSkillType, CActor* pAttacker, CActor* pTarget)
 {
+    __ENTER_FUNCTION
     CHECKF(pTarget);
     auto damage_flag = pSkillType->GetDamageFlag();
     if(pTarget->IsMonster() && HasFlag(damage_flag, STF_TARGET_MONSTER) == false)
@@ -267,10 +292,13 @@ bool CanSkillAttackActor(const CSkillType* pSkillType, CActor* pAttacker, CActor
     }
 
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CSkillFSM::FindTarget(CActor* pOwner, const CSkillType* pSkillType, OBJID idTarget, const Vector2& posTarget, std::vector<CActor*>& vecTarget)
 {
+    __ENTER_FUNCTION
     CHECK(pSkillType);
     CHECK(pOwner);
 
@@ -400,10 +428,13 @@ void CSkillFSM::FindTarget(CActor* pOwner, const CSkillType* pSkillType, OBJID i
         }
         break;
     }
+
+    __LEAVE_FUNCTION
 }
 
 void _SkillEffectInRange(CActor* pOwner, const CSkillType* pSkillType, OBJID idTarget, const Vector2& posTarget, uint32_t nApplyTimes)
 {
+    __ENTER_FUNCTION
     CHECK(pOwner);
     SC_SKILL_EFFACT send_msg;
     send_msg.set_scene_idx(pOwner->GetSceneIdx());
@@ -418,34 +449,42 @@ void _SkillEffectInRange(CActor* pOwner, const CSkillType* pSkillType, OBJID idT
     CSkillFSM::AttachStatus(pOwner, pSkillType, vecTarget);
     if(pSkillType->GetScirptID() != 0)
         ScriptManager()->TryExecScript<void>(pSkillType->GetScirptID(), SCB_SKILL_DOAPPLY, pOwner, idTarget, posTarget, pSkillType, nApplyTimes);
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::SkillEffectInRange(OBJID idCaster, uint32_t idSkillType, OBJID idTarget, const Vector2& posTarget, uint32_t nApplyTimes)
 {
+    __ENTER_FUNCTION
     CActor*           pOwner     = ActorManager()->QueryActor(idCaster);
     const CSkillType* pSkillType = SkillTypeSet()->QueryObj(idSkillType);
     CHECK(pSkillType);
     _SkillEffectInRange(pOwner, pSkillType, idTarget, posTarget, nApplyTimes);
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::SkillEffect()
 {
+    __ENTER_FUNCTION
     LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "SkillEffect ID:{}", m_pOwner->GetID());
 
     //技能作用
     _SkillEffectInRange(m_pOwner, m_pCurSkillType, m_idTarget, m_posTarget, m_nApplyTimes);
     if(m_pCurSkillType)
         m_pOwner->GetStatus()->OnSkill(m_pCurSkillType->GetSkillID());
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::DoApply()
 {
+    __ENTER_FUNCTION
     SkillEffect();
     ScheduleApply();
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::ScheduleApply()
 {
+    __ENTER_FUNCTION
     if(m_nApplyTimes < m_pCurSkillType->GetApplyTimes())
     {
         uint32_t next_apply_time = m_pCurSkillType->GetApplyMS() + m_pCurSkillType->GetApplyAdjMS() * m_nApplyTimes;
@@ -467,10 +506,12 @@ void CSkillFSM::ScheduleApply()
         }
         DoStun();
     }
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::DoStun()
 {
+    __ENTER_FUNCTION
     CHECK(m_pCurSkillType);
     LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "DoStun ID:{}", m_pOwner->GetID());
     SC_SKILL_STUN msg;
@@ -494,10 +535,12 @@ void CSkillFSM::DoStun()
         param.bPersist  = false;
         EventManager()->ScheduleEvent(param, m_pEvent);
     }
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::DoIdle()
 {
+    __ENTER_FUNCTION
     if(m_pCurSkillType)
     {
         LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "DoIdle ID:{}", m_pOwner->GetID());
@@ -506,24 +549,31 @@ void CSkillFSM::DoIdle()
     m_pCurSkillType = nullptr;
     m_curState      = SKILLSTATE_IDLE;
     m_pEvent.Cancel();
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::StartSkillCoolDown(uint32_t cdType, uint32_t cd_sec)
 {
+    __ENTER_FUNCTION
     if(m_pOwner->GetCDSet())
         m_pOwner->GetCDSet()->StartCoolDown(COOLDOWN_TYPE_SKILL, cdType, cd_sec);
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::ClearSkillCoolDown(uint32_t cdType)
 {
+    __ENTER_FUNCTION
     if(m_pOwner->GetCDSet())
         m_pOwner->GetCDSet()->ClearCoolDown(COOLDOWN_TYPE_SKILL, cdType);
+    __LEAVE_FUNCTION
 }
 
 bool CSkillFSM::IsSkillCoolDown(uint32_t cdType) const
 {
+    __ENTER_FUNCTION
     if(m_pOwner->GetCDSet())
         return m_pOwner->GetCDSet()->IsCoolDown(COOLDOWN_TYPE_SKILL, cdType, TimeGetMillisecond());
+    __LEAVE_FUNCTION
     return false;
 }
 
@@ -533,6 +583,7 @@ void CSkillFSM::DoMultiDamage(CActor*                     pOwner,
                               const Vector2&              posTarget,
                               const std::vector<CActor*>& vecTarget)
 {
+    __ENTER_FUNCTION
     CHECK(pOwner);
     CHECK(pSkillType);
     if(vecTarget.empty() == false)
@@ -560,10 +611,12 @@ void CSkillFSM::DoMultiDamage(CActor*                     pOwner,
         if(msg.damagelist_size() > 0)
             pOwner->SendMsg(msg);
     }
+    __LEAVE_FUNCTION
 }
 
 int32_t CSkillFSM::DoDamage(CActor* pOwner, const CSkillType* pSkillType, CActor* pTarget, OBJID idTarget, const Vector2& posTarget)
 {
+    __ENTER_FUNCTION
     CHECK_RET(pOwner, DR_NOTARGET);
     CHECK_RET(pSkillType, DR_NOTARGET);
     CHECK_RET(pTarget, DR_NOTARGET)
@@ -615,10 +668,13 @@ int32_t CSkillFSM::DoDamage(CActor* pOwner, const CSkillType* pSkillType, CActor
     }
 
     return nDamage;
+    __LEAVE_FUNCTION
+    return 0;
 }
 
 void CSkillFSM::AttachStatus(CActor* pOwner, const CSkillType* pSkillType, const std::vector<CActor*>& vecTarget)
 {
+    __ENTER_FUNCTION
     const auto& rowData = pSkillType->GetDataRef();
     for(int i = 0; i < rowData.detach_status_id_size(); i++)
     {
@@ -659,10 +715,12 @@ void CSkillFSM::AttachStatus(CActor* pOwner, const CSkillType* pSkillType, const
             pActor->GetStatus()->AttachStatus(status_id, pOwner->GetID());
         }
     }
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::AddBullet(CActor* pOwner, uint32_t idBulletType, OBJID idTarget, const Vector2& posTarget, const std::vector<CActor*>& vecTarget)
 {
+    __ENTER_FUNCTION
     if(idBulletType == 0)
         return;
 
@@ -717,6 +775,7 @@ void CSkillFSM::AddBullet(CActor* pOwner, uint32_t idBulletType, OBJID idTarget,
         }
         break;
     }
+    __LEAVE_FUNCTION
 }
 
 void CSkillFSM::Stop()

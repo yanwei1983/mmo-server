@@ -5,6 +5,7 @@
 
 void CPlayer::TeamCreate()
 {
+    __ENTER_FUNCTION
     if(HasTeam() == true)
         return;
 
@@ -12,10 +13,12 @@ void CPlayer::TeamCreate()
     msg.set_team_id(SceneService()->CreateUID());
     msg.set_leader_id(GetID());
     SceneService()->SendProtoMsgToWorld(GetWorldID(), msg);
+    __LEAVE_FUNCTION
 }
 
 void CPlayer::TeamInviteMember(OBJID idTarget)
 {
+    __ENTER_FUNCTION
     if(HasTeam() == false)
         return;
 
@@ -24,10 +27,12 @@ void CPlayer::TeamInviteMember(OBJID idTarget)
     msg.set_operator_id(GetID());
     msg.set_invitee_id(idTarget);
     SceneService()->SendProtoMsgToWorld(GetWorldID(), msg);
+    __LEAVE_FUNCTION
 }
 
 void CPlayer::TeamAcceptInvite(uint64_t idTeam, OBJID idInviter, bool bResult)
 {
+    __ENTER_FUNCTION
     if(HasTeam() == true)
         return;
 
@@ -37,10 +42,12 @@ void CPlayer::TeamAcceptInvite(uint64_t idTeam, OBJID idInviter, bool bResult)
     msg.set_invitee_id(GetID());
     msg.set_result(bResult);
     SceneService()->SendProtoMsgToWorld(GetWorldID(), msg);
+    __LEAVE_FUNCTION
 }
 
 void CPlayer::TeamApplyMember(OBJID idTarget)
 {
+    __ENTER_FUNCTION
     if(HasTeam() == false)
         return;
 
@@ -48,19 +55,23 @@ void CPlayer::TeamApplyMember(OBJID idTarget)
     msg.set_applicant_id(GetID());
     msg.set_respondent_id(idTarget);
     SceneService()->SendProtoMsgToWorld(GetWorldID(), msg);
+    __LEAVE_FUNCTION
 }
 
 void CPlayer::TeamAcceptApply(OBJID idApplicant, bool bResult)
 {
+    __ENTER_FUNCTION
     ServerMSG::TeamAcceptApply msg;
     msg.set_applicant_id(idApplicant);
     msg.set_respondent_id(GetID());
     msg.set_result(bResult);
     SceneService()->SendProtoMsgToWorld(GetWorldID(), msg);
+    __LEAVE_FUNCTION
 }
 
 void CPlayer::TeamQuit()
 {
+    __ENTER_FUNCTION
     if(HasTeam() == false)
         return;
 
@@ -68,10 +79,12 @@ void CPlayer::TeamQuit()
     msg.set_team_id(GetTeamID());
     msg.set_operator_id(GetID());
     SceneService()->SendProtoMsgToWorld(GetWorldID(), msg);
+    __LEAVE_FUNCTION
 }
 
 void CPlayer::TeamKickMember(OBJID idMember)
 {
+    __ENTER_FUNCTION
     if(HasTeam() == false)
         return;
     auto pTeam = TeamManager()->QueryTeam(GetTeamID());
@@ -87,10 +100,12 @@ void CPlayer::TeamKickMember(OBJID idMember)
     msg.set_operator_id(GetID());
     msg.set_kick_id(idMember);
     SceneService()->SendProtoMsgToWorld(GetWorldID(), msg);
+    __LEAVE_FUNCTION
 }
 
 void CPlayer::TeamChangeLeader(OBJID idMember)
 {
+    __ENTER_FUNCTION
     if(HasTeam() == false)
         return;
     auto pTeam = TeamManager()->QueryTeam(GetTeamID());
@@ -106,4 +121,5 @@ void CPlayer::TeamChangeLeader(OBJID idMember)
     msg.set_operator_id(GetID());
     msg.set_new_leader_id(idMember);
     SceneService()->SendProtoMsgToWorld(GetWorldID(), msg);
+    __LEAVE_FUNCTION
 }
