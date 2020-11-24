@@ -5,31 +5,17 @@
 #include "AOIPlayer.h"
 #include "AOIService.h"
 #include "server_msg/server_side.pb.h"
-bool CAOIActor::CanDamage(CAOIActor* pTarget) const
-{
-    auto pOwner = QueryOwner();
-    if(pOwner)
-        return pOwner->CanDamage(pTarget);
-    
 
-    return GetCampID() != pTarget->GetCampID();
-}
 
-bool CAOIActor::IsEnemy(CSceneObject* pActor) const
+bool CAOIActor::IsEnemy(CSceneObject* pTarget) const
 {
     __ENTER_FUNCTION
-    CHECKF(pActor);
-    if(this == pActor)
+    CHECKF(pTarget);
+    if(this == pTarget)
         return false;
-
-    if(m_idOwner != 0)
-    {
-        CAOIActor* pOwner = QueryOwner();
-        if(pOwner)
-            return pOwner->CanDamage(static_cast<CAOIActor*>(pActor));
-    }
-
-    return GetCampID() != static_cast<CAOIActor*>(pActor)->GetCampID();
+    auto pTargetActor = static_cast<CAOIActor*>(pTarget);
+    
+    return GetCampID() != pTargetActor->GetCampID();
     __LEAVE_FUNCTION
     return false;
 }
@@ -50,44 +36,83 @@ bool CAOIActor::UpdateViewList(bool bForce)
     return true;
 }
 
-bool CAOIActor::ViewTest(CSceneObject* pActor)const
+bool CAOIActor::ViewTest(CSceneObject* pTarget)const
 {
     __ENTER_FUNCTION
-    //所有actor 可以看到 位面id与自己一样的的对象
-    if(GetPhaseID() == pActor->GetPhaseID())
-    {
-        //怪物之间，额外通过敌我判断
-        if(IsMonster() && pActor->IsMonster())
-            return IsEnemy(pActor);
-        return true;
-    } 
-
     //如果有Owner，看看Owner能不能看见对方，一般来说Owner能看见，自己就能看见
     CAOIActor* pThisOwner = QueryOwner();
     if(pThisOwner)
     {
-        return ViewTest(pActor);
+        return pThisOwner->ViewTest(pTarget);
     }
+    
+
+    //所有actor 可以看到 位面id与自己一样的的对象
+    if(GetPhaseID() == pTarget->GetPhaseID())
+    {
+        //怪物之间，额外通过敌我判断
+        if(IsMonster())
+        {
+            if(pTarget->IsMonster())
+                return IsEnemy(pTarget);
+            else if(pTarget->IsPlayer())
+                return true;
+                
+            return false;
+        }
+        else if(IsNpc())
+        {
+            if(pTarget->IsPlayer())
+                return true;
+            return false;
+        }
+        else if(IsPet())
+        {
+            if(pTarget->IsMonster())
+                return true;
+            else if(pTarget->IsPlayer())
+                return true;
+            else if(pTarget->IsBullet())
+                return true;
+            return false;
+        }
+        else if(IsPlayer())
+        {
+            return true;
+        }
+        else if(IsBullet())
+        {
+            if(pTarget->IsPlayer())
+                return true;
+            else if(pTarget->IsPet())
+                return true;
+            return false;
+        }
+        
+        return false;
+    } 
     
     //玩家 可以看到 位面id=自己ID 的其他对象   (专属怪刷新在专属位面内)
     //玩家 可以看到 inTaskList(位面id)的NPC/monster   (任务位面用来展开不同的NPC/monster)
-    auto fun_check_player = [](const CSceneObject* pSelf,const CSceneObject* pActor)->bool
+    auto fun_check_player = [](const CAOIPlayer* pPlayer, const CSceneObject* pTarget)->bool
     {
-        if(pSelf->GetID() == pActor->GetPhaseID())
+        if(pPlayer->GetID() == pTarget->GetPhaseID())
             return true;
-        const CAOIPlayer* pPlayer = pSelf->CastTo<const CAOIPlayer>();
+        
         CHECKF(pPlayer);
-        if(pPlayer->CheckTaskPhase(pActor->GetPhaseID()) == true)
+        if(pPlayer->CheckTaskPhase(pTarget->GetPhaseID()) == true)
             return true;
         return false;
     };
     if(IsPlayer())
     {
-        return fun_check_player(this, pActor);
+        auto pPlayer = CastTo<CAOIPlayer>();
+        return fun_check_player(pPlayer, pTarget);
     }
-    if(pActor->IsPlayer())
+    if(pTarget->IsPlayer())
     {
-        return fun_check_player(pActor, this);
+        auto pPlayer = pTarget->CastTo<CAOIPlayer>();
+        return fun_check_player(pPlayer, this);
     }
     __LEAVE_FUNCTION
     return false;
@@ -112,15 +137,11 @@ bool CAOIActor::IsMustAddToViewList(CSceneObject* pSceneObj) const
     }
 
     //必须加入视野的, BOSS怪, 组队成员
-    if(pActor->IsMonster())
+    if(pActor->m_bMustSee)
     {
-        if(pActor->m_bMustSee)
-        {
-            return true;
-        }
-
-        return false;
+        return true;
     }
+
 
     if(pActor->IsPlayer())
     {

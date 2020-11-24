@@ -267,7 +267,7 @@ void CMonsterGenerator::OnMonsterBorn(CAIMonster* pMonster)
     if(pData == nullptr)
         return;
     pData->m_setMonster.insert(pMonster);
-    LOGDEBUG("MonsterGen:{} - {} MonsterBorn:{}", m_pMap->GetMapID(), pData->nIdxGen, pMonster->Type()->GetID());
+    LOGDEBUG("MonsterGen:{} - {} MonsterBorn:{} ID:{}", m_pMap->GetMapID(), pData->nIdxGen, pMonster->Type()->GetID(), pMonster->GetID());
 
     __LEAVE_FUNCTION
 }

@@ -66,3 +66,19 @@ CAOIActor* CAOIActor::QueryOwner() const
     __LEAVE_FUNCTION
     return nullptr;
 }
+
+uint32_t CAOIActor::GetCampID() const
+{
+    __ENTER_FUNCTION
+    if(GetOwnerID() == 0)
+        return m_idCamp;
+    
+    auto pOwner = QueryOwner();
+    if(pOwner == nullptr)
+        return m_idCamp;
+
+    return pOwner->GetCampID();
+    __LEAVE_FUNCTION
+    return m_idCamp;
+} 
+

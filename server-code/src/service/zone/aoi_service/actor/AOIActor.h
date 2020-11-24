@@ -24,7 +24,7 @@ public:
 
 public:    
     export_lua virtual ActorType GetActorType() const override{ return m_nType;};
-    export_lua uint32_t GetCampID() const { return m_idCamp; }
+    export_lua uint32_t GetCampID() const;
     export_lua void     SetCampID(uint32_t id) { m_idCamp = id; };
     virtual uint64_t    GetOwnerID() const override { return m_idOwner; }
     void                SetOwnerID(uint64_t val) { m_idOwner = val; }
@@ -46,7 +46,7 @@ public:
     CAOIActor*   QueryOwner() const;
     virtual bool ViewTest(CSceneObject* pActor) const override;
     virtual bool IsEnemy(CSceneObject* pActor) const override;
-    virtual bool CanDamage(CAOIActor* pTarget) const;
+    
     virtual bool UpdateViewList(bool bForce) override;
     virtual bool IsMustAddToViewList(CSceneObject* pSceneObj) const override;
     virtual void OnAOIProcess(const BROADCAST_SET& setBCAOIActorDel, const BROADCAST_SET& setBCAOIActor, const BROADCAST_SET& setBCAOIActorAdd) override;

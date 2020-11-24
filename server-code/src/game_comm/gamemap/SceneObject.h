@@ -46,7 +46,9 @@ public:
     export_lua bool IsMonster() const { return GetActorType() == ACT_MONSTER; }
     export_lua bool IsNpc() const { return GetActorType() == ACT_NPC; }
     export_lua bool IsPet() const { return GetActorType() == ACT_PET; }
-
+    export_lua bool IsMapItem() const { return GetActorType() == ACT_MAPITEM; }
+    export_lua bool IsBullet() const { return GetActorType() == ACT_BULLET; }
+    
     export_lua CSceneBase* GetCurrentScene() const { return m_pScene; }
     export_lua CSceneTile* GetSceneTile() const { return m_pSceneTile; }
     export_lua CSceneCollisionTile* GetCollisionTile() const { return m_pCollisionTile; }

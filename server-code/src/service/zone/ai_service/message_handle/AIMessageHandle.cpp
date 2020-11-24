@@ -60,6 +60,8 @@ ON_SERVERMSG(CAIService, AOIChange)
         {
             pTarget->RemoveFromViewList(pActor, pActor->GetID(), true);
         }
+
+        LOGAIDEBUG(true, pActor->GetID(), "Actor:{} ViewListDel del:{}", pActor->GetID(), id);
     }
     for(const auto& id: msg.actor_add())
     {
@@ -69,8 +71,16 @@ ON_SERVERMSG(CAIService, AOIChange)
             pActor->AddToViewList(pTarget);
             pTarget->AddToViewList(pActor);
         }
-    }
 
+        LOGAIDEBUG(true, pActor->GetID(), "Actor:{} ViewListAdd del:{}", pActor->GetID(), id);
+    }
+    LOGAIDEBUG(true,
+               pActor->GetID(),
+               "Actor:{} ViewListChange cur:{} add:{} del:{}",
+               pActor->GetID(),
+               pActor->GetCurrentViewActorCount(),
+               msg.actor_add_size(),
+               msg.actor_del_size());
     __LEAVE_FUNCTION
 }
 
