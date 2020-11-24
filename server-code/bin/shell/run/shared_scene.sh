@@ -19,41 +19,78 @@ export LSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_lsan
 export UBSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_ubsan
 export TSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_tsan
 
-scene1()
+start_scene1()
 {
 ${DIR_file}/binary/shared_scene_1 --worldid=0 --start=SCENE_SERVICE-51,AI_SERVICE-51,AOI_SERVICE-51 --logpath=/data/log/global/shared_scene_1 -d 
 }
 
-scene2()
+start_scene2()
 {
 ${DIR_file}/binary/shared_scene_2 --worldid=0 --start=SCENE_SERVICE-52,AI_SERVICE-52,AOI_SERVICE-52 --logpath=/data/log/global/shared_scene_2 -d 
 }
 
-scene3()
+start_scene3()
 {
 ${DIR_file}/binary/shared_scene_3 --worldid=0 --start=SCENE_SERVICE-53,AI_SERVICE-53,AOI_SERVICE-53 --logpath=/data/log/global/shared_scene_3 -d 
 }
 
-scene4()
+start_scene4()
 {
 ${DIR_file}/binary/shared_scene_4 --worldid=0 --start=SCENE_SERVICE-54,AI_SERVICE-54,AOI_SERVICE-54 --logpath=/data/log/global/shared_scene_4 -d 
 }
 
-scene5()
+start_scene5()
 {
 ${DIR_file}/binary/shared_scene_5 --worldid=0 --start=SCENE_SERVICE-55,AI_SERVICE-55,AOI_SERVICE-55 --logpath=/data/log/global/shared_scene_5 -d 
 }
 
 
+stop_scene1()
+{
+${DIR_file}/binary/shared_scene_1 --worldid=0 --stop=SCENE_SERVICE-51,AI_SERVICE-51,AOI_SERVICE-51
+}
 
+stop_scene2()
+{
+${DIR_file}/binary/shared_scene_2 --worldid=0 --stop=SCENE_SERVICE-52,AI_SERVICE-52,AOI_SERVICE-52
+}
+
+stop_scene3()
+{
+${DIR_file}/binary/shared_scene_3 --worldid=0 --stop=SCENE_SERVICE-53,AI_SERVICE-53,AOI_SERVICE-53
+}
+
+stop_scene4()
+{
+${DIR_file}/binary/shared_scene_4 --worldid=0 --stop=SCENE_SERVICE-54,AI_SERVICE-54,AOI_SERVICE-54
+}
+
+stop_scene5()
+{
+${DIR_file}/binary/shared_scene_5 --worldid=0 --stop=SCENE_SERVICE-55,AI_SERVICE-55,AOI_SERVICE-55
+}
+
+start()
+{
+    start_scene1;
+    start_scene2;
+    start_scene3;
+    start_scene4;
+    start_scene5;
+}
+
+stop()
+{
+    stop_scene1;
+    stop_scene2;
+    stop_scene3;
+    stop_scene4;
+    stop_scene5;
+}
 
 if [ $1 ];
 then
     $1;
 else
-    scene1;
-    scene2;
-    scene3;
-    scene4;
-    scene5;
+    echo "$0 [start|stop]";   
 fi
