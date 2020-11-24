@@ -301,42 +301,25 @@ enum LogDataType
 struct LoggerInfo
 {
     //! attribute
-    std::string _key;            // logger key
-    std::string _name;           // one logger one name.
-    std::string _path;           // path for log file.
-    int32_t     _level;          // filter level
-    bool        _display;        // display to screen
-    bool        _outfile;        // output to file
-    bool        _monthdir;       // create directory per month
-    uint32_t    _limitsize;      // limit file's size, unit Million byte.
-    bool        _enable;         // logger is enable
-    bool        _fileLine;       // enable/disable the log's suffix.(file name:line number)
-    time_t      _logReserveTime; // log file reserve time. unit is time second.
+    std::string _key;                                       // logger key
+    std::string _name;                                      // one logger one name.
+    std::string _path           = LOG4Z_DEFAULT_PATH;       // path for log file.
+    int32_t     _level          = LOG4Z_DEFAULT_LEVEL;      // filter level
+    bool        _display        = LOG4Z_DEFAULT_DISPLAY;    // display to screen
+    bool        _outfile        = LOG4Z_DEFAULT_OUTFILE;    // output to file
+    bool        _monthdir       = LOG4Z_DEFAULT_MONTHDIR;   // create directory per month
+    uint32_t    _limitsize      = LOG4Z_DEFAULT_LIMITSIZE;  // limit file's size, unit Million byte.
+    bool        _enable         = false;                    // logger is enable
+    bool        _fileLine       = LOG4Z_DEFAULT_SHOWSUFFIX; // enable/disable the log's suffix.(file name:line number)
+    time_t      _logReserveTime = 0;                        // log file reserve time. unit is time second.
     //! runtime info
-    time_t           _curFileCreateTime; // file create time
-    uint32_t         _curFileIndex;      // rolling file index
-    uint32_t         _curWriteLen;       // current file length
-    Log4zFileHandler _handle;            // file handle.
+    time_t                _curFileCreateTime = 0; // file create time
+    uint32_t              _curFileIndex      = 0; // rolling file index
+    uint32_t              _curWriteLen       = 0; // current file length
+    Log4zFileHandler      _handle;                // file handle.
+    std::atomic<uint64_t> _logCount = 0;          // output_line_count;
     //! history
     std::list<std::pair<time_t, std::string>> _historyLogs;
-
-    LoggerInfo()
-    {
-        _enable  = false;
-        _path    = LOG4Z_DEFAULT_PATH;
-        _level   = LOG4Z_DEFAULT_LEVEL;
-        _display = LOG4Z_DEFAULT_DISPLAY;
-        _outfile = LOG4Z_DEFAULT_OUTFILE;
-
-        _monthdir  = LOG4Z_DEFAULT_MONTHDIR;
-        _limitsize = LOG4Z_DEFAULT_LIMITSIZE;
-        _fileLine  = LOG4Z_DEFAULT_SHOWSUFFIX;
-
-        _curFileCreateTime = 0;
-        _curFileIndex      = 0;
-        _curWriteLen       = 0;
-        _logReserveTime    = 0;
-    }
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -372,6 +355,7 @@ public:
     virtual bool     setLoggerLimitsize(LoggerId id, uint32_t limitsize);
     virtual bool     setLoggerMonthdir(LoggerId id, bool enable);
     virtual bool     setLoggerReserveTime(LoggerId id, time_t sec);
+    virtual uint64_t getLoggerLogCount(LoggerId id);
     virtual bool     setAutoUpdate(int32_t interval);
     virtual bool     updateConfig();
     virtual bool     isLoggerEnable(LoggerId id);
@@ -581,14 +565,13 @@ static bool parseConfigLine(const std::string& line, int32_t curLineNum, std::st
                 key = "Main";
             }
         }
-        std::map<std::string, LoggerInfo>::iterator iter = outInfo.find(key);
+        auto iter = outInfo.find(key);
         if(iter == outInfo.end())
         {
-            LoggerInfo li;
+            LoggerInfo& li = outInfo[key];
             li._enable = true;
             li._key    = key;
             li._name   = key;
-            outInfo.insert(std::make_pair(li._key, li));
         }
         else
         {
@@ -598,7 +581,7 @@ static bool parseConfigLine(const std::string& line, int32_t curLineNum, std::st
     }
     trimLogConfig(kv.first);
     trimLogConfig(kv.second);
-    std::map<std::string, LoggerInfo>::iterator iter = outInfo.find(key);
+    auto iter = outInfo.find(key);
     if(iter == outInfo.end())
     {
         fmt::printf("log4z configure warning: not found current logger name:[%s] at line:%d, key=%s, value=%s \r\n",
@@ -1521,6 +1504,14 @@ bool LogerManager::setAutoUpdate(int32_t interval)
     _hotUpdateInterval = interval;
     return true;
 }
+
+uint64_t LogerManager::getLoggerLogCount(LoggerId id) 
+{
+    if(id < 0 || id > _lastId)
+        return false;
+    return _loggers[id]._logCount;
+}
+
 bool LogerManager::updateConfig()
 {
     if(_configFile.empty())
@@ -1740,6 +1731,7 @@ void LogerManager::run()
 
                 curLogger._handle.write(pLog->_content.c_str(), pLog->_content.size());
                 curLogger._curWriteLen += (uint32_t)pLog->_content.size();
+                curLogger._logCount++;
                 needFlush[pLog->_id]++;
                 _ullStatusTotalWriteFileCount++;
                 _ullStatusTotalWriteFileBytes += pLog->_content.size();

@@ -90,18 +90,6 @@ bool CGuildService::Init(const ServerPort& nServerPort)
     return true;
 }
 
-void CGuildService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
-{
-    if(m_pNetMsgProcess->Process(pNetworkMsg) == false)
-    {
-        LOGERROR("CMD {} from {} to {} forward_size {} didn't have ProcessHandler",
-                 pNetworkMsg->GetCmd(),
-                 pNetworkMsg->GetFrom(),
-                 pNetworkMsg->GetTo(),
-                 pNetworkMsg->GetForward().size());
-    }
-}
-
 void CGuildService::OnLogicThreadProc()
 {
     CServiceCommon::OnLogicThreadProc();

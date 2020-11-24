@@ -97,6 +97,7 @@ void CBullet::OnEnterMap(CSceneBase* pScene)
     aoi_msg.set_posx(GetPosX());
     aoi_msg.set_posy(GetPosY());
     aoi_msg.set_ownerid(GetOwnerID());
+    aoi_msg.set_need_sync_ai(NeedSyncAI());
     SceneService()->SendProtoMsgToAOIService(aoi_msg);
 
     //aoi_msg.set_hp(GetHP());

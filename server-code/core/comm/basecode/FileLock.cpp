@@ -25,7 +25,7 @@ bool file_lock::kill(int32_t sig)
     int32_t fd = open(m_pid_file.c_str(), O_TRUNC | O_RDWR);
     if(fd < 0)
     {
-        BaseCode::PrintfError("file_lock::kill open fd = {}, {}, {}", fd, sig, m_pid_file.c_str());
+        //BaseCode::PrintfError("file_lock::kill open fd = {}, {}, {}", fd, sig, m_pid_file.c_str());
         return false;
     }
 

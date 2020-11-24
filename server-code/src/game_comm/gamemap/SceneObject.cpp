@@ -19,8 +19,12 @@ void CSceneObject::SetPos(const Vector2& pos)
     m_Pos = pos;
     if(m_pScene)
     {
-        SetSceneTile(m_pScene->GetSceneTree()->GetSceneTileByPos(GetPosX(), GetPosY()));
-        SetCollisionTile(m_pScene->GetSceneTree()->GetCollisionTileByPos(GetPosX(), GetPosY(), GetActorType()));
+        auto pSceneTree = m_pScene->GetSceneTree();
+        if(pSceneTree)
+        {
+            SetSceneTile(pSceneTree->GetSceneTileByPos(GetPosX(), GetPosY()));
+            SetCollisionTile(pSceneTree->GetCollisionTileByPos(GetPosX(), GetPosY(), GetActorType()));
+        }
     }
     __LEAVE_FUNCTION
 }
@@ -35,9 +39,11 @@ void CSceneObject::OnEnterMap(CSceneBase* pScene)
 {
     m_pScene = pScene;
     auto scene_tree = pScene->GetSceneTree();
-    CHECK(scene_tree);
-    SetSceneTile(scene_tree->GetSceneTileByPos(GetPosX(), GetPosY()));
-    SetCollisionTile(scene_tree->GetCollisionTileByPos(GetPosX(), GetPosY(), GetActorType()));
+    if(scene_tree)
+    {
+        SetSceneTile(scene_tree->GetSceneTileByPos(GetPosX(), GetPosY()));
+        SetCollisionTile(scene_tree->GetCollisionTileByPos(GetPosX(), GetPosY(), GetActorType()));
+    }
 }
 
 void CSceneObject::OnLeaveMap(uint16_t idTargetMap)
@@ -53,9 +59,11 @@ void CSceneObject::SetHideCoude(int32_t nHideCount)
     {
         m_nHideCount = nHideCount;
         auto scene_tree = GetCurrentScene()->GetSceneTree();
-        CHECK(scene_tree);
-        SetSceneTile(scene_tree->GetSceneTileByPos(GetPosX(), GetPosY()));
-        SetCollisionTile(scene_tree->GetCollisionTileByPos(GetPosX(), GetPosY(), GetActorType()));
+        if(scene_tree)
+        {
+            SetSceneTile(scene_tree->GetSceneTileByPos(GetPosX(), GetPosY()));
+            SetCollisionTile(scene_tree->GetCollisionTileByPos(GetPosX(), GetPosY(), GetActorType()));
+        }
     }
     else
     {
@@ -78,8 +86,12 @@ void CSceneObject::RemoveHide()
     m_nHideCount--;
     if(m_nHideCount == 0)
     {
-        SetSceneTile(m_pScene->GetSceneTree()->GetSceneTileByPos(GetPosX(), GetPosY()));
-        SetCollisionTile(m_pScene->GetSceneTree()->GetCollisionTileByPos(GetPosX(), GetPosY(), GetActorType()));
+        auto scene_tree = GetCurrentScene()->GetSceneTree();
+        if(scene_tree)
+        {
+            SetSceneTile(scene_tree->GetSceneTileByPos(GetPosX(), GetPosY()));
+            SetCollisionTile(scene_tree->GetCollisionTileByPos(GetPosX(), GetPosY(), GetActorType()));
+        }
     }
 }
 
@@ -241,8 +253,12 @@ bool CSceneObject::UpdateViewList(bool bForce)
     //只有当自己的位置变化大于x，才主动刷新视野列表，否则由他人触发
     CHECKF(GetCurrentScene());
     CHECKF(GetSceneTile());
-    float view_change_min = GetCurrentScene()->GetSceneTree()->GetViewChangeMin();
-    auto  use_manhattan   = GetCurrentScene()->GetSceneTree()->IsViewManhattanDistance();
+    auto pSceneTree = GetCurrentScene()->GetSceneTree();
+    if(pSceneTree == nullptr)
+        return false;
+
+    float view_change_min = pSceneTree->GetViewChangeMin();
+    auto  use_manhattan   = pSceneTree->IsViewManhattanDistance();
     if(bForce || ((use_manhattan) ? GameMath::manhattanDistance(m_LastUpdateViewPos, m_Pos) >= view_change_min
                                   : GameMath::simpleDistance(m_LastUpdateViewPos, m_Pos) >= view_change_min))
     {
@@ -274,7 +290,7 @@ bool CSceneObject::_UpdateViewList()
     ACTOR_MAP_BY_DIS actor_viewin_withdis;
     ACTOR_MAP_BY_DIS actor_viewout_withdis;
     auto             scene_tree = GetCurrentScene()->GetSceneTree();
-
+    CHECKF(scene_tree);
     uint32_t viewcount_max         = scene_tree->GetViewCount();
     uint32_t use_manhattan         = scene_tree->IsViewManhattanDistance();
     uint32_t view_range_in_square  = scene_tree->GetViewRangeInSquare();

@@ -28,7 +28,6 @@ public:
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadExit() override;
 
-    virtual void OnProcessMessage(CNetworkMessage*) override;
 
     CGuildManager*    GetGuildManager() const { return m_pGuildManager.get(); }
     CMysqlConnection* GetGlobalDB() const { return m_pGlobalDB.get(); }

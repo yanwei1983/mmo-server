@@ -188,7 +188,7 @@ void CActor::_SetProperty(uint32_t nType, uint32_t nVal, uint32_t nSync)
         auto attr = msg.add_datalist();
         attr->set_actype(nType);
         attr->set_val(nVal);
-        SendRoomMessage(msg, true);
+        SendRoomMessage(msg);
     }
     else if(nSync == SYNC_ALL_DELAY)
     {
@@ -311,7 +311,7 @@ void CActor::SendDelayAttribChage()
         pInfo->set_actype(k);
         pInfo->set_val(v);
     }
-    SendRoomMessage(msg, true);
+    SendRoomMessage(msg);
     m_DelayAttribChangeMap.clear();
     __LEAVE_FUNCTION
 }

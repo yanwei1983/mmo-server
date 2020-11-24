@@ -17,6 +17,7 @@ bool CAOIActor::Init(const ServerMSG::ActorCreate& msg)
     SetID(msg.actor_id());
     
     m_nMoveSPD = msg.movespd();
+    m_bNeedSyncAI = msg.need_sync_ai();
     SetName(msg.name());
     SetCampID(msg.campid());
     SetOwnerID(msg.ownerid());

@@ -95,7 +95,7 @@ bool CMonster::SendMsg(const proto_msg_t& msg) const
 {
     __ENTER_FUNCTION
     auto cmd = msg_to_cmd(msg);
-    if(cmd == CMD_SC_SKILL_STUN || cmd == CMD_SC_AOI_UPDATE || cmd == CMD_SC_ATTRIB_CHANGE)
+    if(cmd == CMD_SC_SKILL_STUN || cmd == CMD_SC_ATTRIB_CHANGE)
     {
         return SceneService()->SendProtoMsgToAIService(msg);
     }
@@ -258,6 +258,8 @@ void CMonster::OnEnterMap(CSceneBase* pScene)
     aoi_msg.set_posy(GetPosY());
     aoi_msg.set_monster_gen_id(m_idGen);
     aoi_msg.set_ownerid(GetOwnerID());
+    aoi_msg.set_need_sync_ai(NeedSyncAI());
+    aoi_msg.set_must_see(IsBoss());
     SceneService()->SendProtoMsgToAOIService(aoi_msg);
 
 

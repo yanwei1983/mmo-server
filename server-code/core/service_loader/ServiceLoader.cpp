@@ -96,7 +96,7 @@ bool ServiceLoader::_StartService(const std::string& dll_name, WorldID_t idWorld
         LOGFATAL("ServiceCreateFunc null {} fail:{}", idServiceType, dll_name.c_str());
         return false;
     }
-    LOGDEBUG("{} : ServiceCreate start ", dll_name);
+    LOGINFO("{} : ServiceCreate start ", dll_name);
     IService* pService = func(idWorld, idServiceType, idServiceIdx);
     if(pService)
     {

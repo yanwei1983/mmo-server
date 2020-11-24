@@ -42,7 +42,7 @@ public:
     virtual ~CSceneTree();
     CreateNewImpl(CSceneTree);
 
-    bool Init(const CGameMap* pMap, const CPos2D& vBasePos, float fWidth, float fHeight, uint32_t nTileGridRange = 0);
+    bool Init(const CGameMap* pMap, const CPos2D& vBasePos, float fWidth, float fHeight, uint32_t nTileGridRange = 0, bool bDynamicSetLev = false);
 
     const CGameMap* GetMap() const { return m_pMap; }
 
@@ -83,7 +83,7 @@ public:
     bool foreach_SceneTileInSight(float x, float y, std::function<void(CSceneTile*)>&& func);
 
     void CheckNeedResizeSceneTile(uint32_t nPlayerCount);
-
+    void SetDynamicAdjustTileLevel(bool v){m_bDynamicAdjustTileLevel = v;}
     export_lua CSceneCollisionTile* GetCollisionTileByPos(float x, float y, uint32_t actor_type);
     export_lua bool                 CollisionTest(float x, float y, uint32_t actor_type) const;
 

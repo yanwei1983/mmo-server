@@ -199,17 +199,17 @@
 typedef int32_t LoggerId;
 
 //! the invalid logger id. DO NOT TOUCH
-const int32_t LOG4Z_INVALID_LOGGER_ID = -1;
+constexpr int32_t LOG4Z_INVALID_LOGGER_ID = -1;
 
 //! the main logger id. DO NOT TOUCH
 //! can use this id to set the main logger's attribute.
 //! example:
 //! ILog4zManager::getPtr()->setLoggerLevel(LOG4Z_MAIN_LOGGER_ID, LOG_LEVEL_WARN);
 //! ILog4zManager::getPtr()->setLoggerDisplay(LOG4Z_MAIN_LOGGER_ID, false);
-const int32_t LOG4Z_MAIN_LOGGER_ID = 0;
+constexpr int32_t LOG4Z_MAIN_LOGGER_ID = 0;
 
 //! the main logger name. DO NOT TOUCH
-const char* const LOG4Z_MAIN_LOGGER_KEY = "Main";
+constexpr const char* LOG4Z_MAIN_LOGGER_KEY = "Main";
 
 //! check VC VERSION. DO NOT TOUCH
 //! format micro cannot support VC6 or VS2003, please use stream input log, like LOGI, LOGD, LOG_DEBUG, LOG_STREAM ...
@@ -237,37 +237,37 @@ enum ENUM_LOG_LEVEL
 //! -----------------default logger config, can change on this.-----------
 //////////////////////////////////////////////////////////////////////////
 //! the max logger count.
-const int32_t LOG4Z_LOGGER_MAX = 1024;
+constexpr int32_t LOG4Z_LOGGER_MAX = 1024;
 //! the max log content length.
-const int32_t LOG4Z_LOG_BUF_SIZE = 1024 * 8;
+constexpr int32_t LOG4Z_LOG_BUF_SIZE = 1024 * 8;
 //! the max stl container depth.
-const int32_t LOG4Z_LOG_CONTAINER_DEPTH = 5;
+constexpr int32_t LOG4Z_LOG_CONTAINER_DEPTH = 5;
 //! the log queue length limit size.
-const int32_t LOG4Z_LOG_QUEUE_LIMIT_SIZE = 20000;
+constexpr int32_t LOG4Z_LOG_QUEUE_LIMIT_SIZE = 20000;
 
 //! all logger synchronous output or not
-const bool LOG4Z_ALL_SYNCHRONOUS_OUTPUT = false;
+constexpr bool LOG4Z_ALL_SYNCHRONOUS_OUTPUT = false;
 //! all logger synchronous display to the windows debug output
-const bool LOG4Z_ALL_DEBUGOUTPUT_DISPLAY = false;
+constexpr bool LOG4Z_ALL_DEBUGOUTPUT_DISPLAY = false;
 
 //! default logger output file.
-const char* const LOG4Z_DEFAULT_PATH = "./log/";
+constexpr const char* LOG4Z_DEFAULT_PATH = "./log/";
 //! default log filter level
-const int32_t LOG4Z_DEFAULT_LEVEL = LOG_LEVEL_DEBUG;
+constexpr int32_t LOG4Z_DEFAULT_LEVEL = LOG_LEVEL_DEBUG;
 //! default logger display
-const bool LOG4Z_DEFAULT_DISPLAY = true;
+constexpr bool LOG4Z_DEFAULT_DISPLAY = true;
 //! default logger output to file
-const bool LOG4Z_DEFAULT_OUTFILE = true;
+constexpr bool LOG4Z_DEFAULT_OUTFILE = true;
 //! default logger month dir used status
-const bool LOG4Z_DEFAULT_MONTHDIR = false;
+constexpr bool LOG4Z_DEFAULT_MONTHDIR = false;
 //! default logger output file limit size, unit M byte.
-const int32_t LOG4Z_DEFAULT_LIMITSIZE = 2000;
+constexpr int32_t LOG4Z_DEFAULT_LIMITSIZE = 2000;
 //! default logger show suffix (file name and line number)
-const bool LOG4Z_DEFAULT_SHOWSUFFIX = true;
+constexpr bool LOG4Z_DEFAULT_SHOWSUFFIX = true;
 //! support ANSI->OEM console conversion on Windows
 #undef LOG4Z_OEM_CONSOLE
 //! default logger force reserve log file count.
-const size_t LOG4Z_FORCE_RESERVE_FILE_COUNT = 7;
+constexpr size_t LOG4Z_FORCE_RESERVE_FILE_COUNT = 7;
 
 ///////////////////////////////////////////////////////////////////////////
 //! -----------------------------------------------------------------------
@@ -348,6 +348,7 @@ public:
     virtual bool setLoggerLimitsize(LoggerId id, uint32_t limitsize) = 0;
     virtual bool setLoggerMonthdir(LoggerId id, bool enable)         = 0;
     virtual bool setLoggerReserveTime(LoggerId id, time_t sec)       = 0;
+    virtual uint64_t getLoggerLogCount(LoggerId id)                  = 0;
 
     //! Update logger's attribute from config file, thread safe.
     virtual bool setAutoUpdate(int32_t interval /*per second, 0 is disable auto update*/) = 0;

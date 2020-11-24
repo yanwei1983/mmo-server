@@ -39,7 +39,7 @@ CAIScene* CAISceneManager::CreateScene(uint16_t idMap)
 
     m_mapScene[idMap] = pScene;
 
-    LOGINFO("AIScene {} Created", idMap);
+    LOGDEBUG("AIScene {} Created", idMap);
     m_nStaticScene++;
     return pScene;
     __LEAVE_FUNCTION

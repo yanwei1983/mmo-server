@@ -32,7 +32,7 @@ public:
     void                SetTeamID(uint64_t val) { m_idTeam = val; }
     uint64_t            GetGuildID() const  { return m_idGuild; }
     void                SetGuildID(uint64_t val) { m_idGuild = val; }
-
+    bool                NeedSyncAI()const {return m_bNeedSyncAI;}
     export_lua float GetMoveSpeed() const;
 
     export_lua const std::string& GetName() const { return m_name; }
@@ -64,5 +64,6 @@ protected:
     uint32_t    m_nMoveSPD = 0;
     uint32_t    m_idTeam   = 0;
     uint64_t    m_idGuild  = 0;
+    bool        m_bNeedSyncAI = false;
 };
 #endif /* AOIACTOR_H */

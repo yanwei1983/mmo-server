@@ -54,7 +54,7 @@ bool CSkillFSM::CastSkill(uint32_t idSkill, OBJID idTarget, const Vector2& pos)
     msg.set_target_id(m_idTarget);
     msg.set_x(m_posTarget.x);
     msg.set_y(m_posTarget.y);
-    m_pOwner->SendRoomMessage(msg, true);
+    m_pOwner->SendRoomMessage(msg);
 
     DoIntone(pSkillType);
     return true;
@@ -194,7 +194,7 @@ bool CSkillFSM::_BreakIntone()
     SC_SKILL_BREAK msg;
     msg.set_scene_idx(m_pOwner->GetSceneIdx());
     msg.set_actor_id(m_pOwner->GetID());
-    m_pOwner->SendRoomMessage(msg,true);
+    m_pOwner->SendRoomMessage(msg);
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -250,7 +250,7 @@ bool CSkillFSM::_BreakLaunch()
     SC_SKILL_BREAK msg;
     msg.set_scene_idx(m_pOwner->GetSceneIdx());
     msg.set_actor_id(m_pOwner->GetID());
-    m_pOwner->SendRoomMessage(msg,true);
+    m_pOwner->SendRoomMessage(msg);
     return true;
     __LEAVE_FUNCTION
     return false;

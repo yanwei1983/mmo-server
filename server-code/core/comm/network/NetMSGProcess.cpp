@@ -11,13 +11,14 @@ bool CNetMSGProcess::Process(CNetworkMessage* pMsg) const
     {
         if(m_funcDefault)
         {
+            LOGTRACE("MSGPROC_DEFAULT: cmd:{} from:{}", pMsg->GetCmd(), pMsg->GetFrom());
             m_funcDefault(pMsg->GetCmd(), pMsg);
             return true;
         }
 
         return false;
     }
-
+    LOGTRACE("MSGPROC: cmd:{} from:{}", pMsg->GetCmd(), pMsg->GetFrom());
     (itFind->second)(pMsg);
     return true;
     __LEAVE_FUNCTION

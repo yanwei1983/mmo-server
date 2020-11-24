@@ -80,41 +80,31 @@ uint64_t CActor::GetSceneIdx() const
     return 0;
 }
 
-void CActor::SendRoomMessageExcludeSelf(const proto_msg_t& msg, bool notify_other_service /*= false*/)
+void CActor::SendRoomMessageExcludeSelf(const proto_msg_t& msg)
 {
     __ENTER_FUNCTION
-    SendRoomMessage(msg, GetID(), notify_other_service);
+    SendRoomMessage(msg, GetID());
     __LEAVE_FUNCTION
 }
 
-void CActor::SendRoomMessage(const proto_msg_t& msg, bool notify_other_service /*= false*/)
+void CActor::SendRoomMessage(const proto_msg_t& msg)
 {
     __ENTER_FUNCTION
-    SendRoomMessage(msg, 0, notify_other_service);
+    SendRoomMessage(msg, 0);
     __LEAVE_FUNCTION
 }
 
-void CActor::SendRoomMessage(const proto_msg_t& msg, uint64_t idExclude,bool notify_other_service /*= false*/)
+void CActor::SendRoomMessage(const proto_msg_t& msg, uint64_t idExclude)
 {
     __ENTER_FUNCTION
     SendShowToDealyList();
     auto setSocketMap = SceneService()->IDList2VSMap(m_ViewActorsByType[ACT_PLAYER], idExclude);
     SceneService()->SendProtoMsgTo(setSocketMap, msg);
     auto cmd = msg_to_cmd(msg);
-    // send message to ai_service
-    if(notify_other_service)
+    if(NeedSyncAI() &&  (cmd == CMD_SC_CASTSKILL || cmd == CMD_SC_SKILL_BREAK || cmd == CMD_SC_AOI_UPDATE) )
     {
-        if(cmd == CMD_SC_CASTSKILL || cmd == CMD_SC_ATTRIB_CHANGE)
-        {
-            SceneService()->SendProtoMsgToAIService(msg);
-        }
-        else
-        {
-            SceneService()->SendProtoMsgToAIService(msg);
-            SceneService()->SendProtoMsgToAOIService(msg);
-        }
+        SceneService()->SendProtoMsgToAIService(msg);
     }
-
     __LEAVE_FUNCTION
 }
 

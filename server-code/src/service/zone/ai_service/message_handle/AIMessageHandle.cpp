@@ -21,7 +21,11 @@ ON_MSG(CAIService, SC_AOI_UPDATE)
 {
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
-    CHECK_FMT(pActor, "actorid:{} not find", msg.actor_id());
+    if(pActor == nullptr)
+    {
+        LOGDEBUG("actorid:{} not find", msg.actor_id());
+        return;
+    }
     CHECK(pActor->GetCurrentScene());
     CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx() );
 
@@ -40,7 +44,11 @@ ON_SERVERMSG(CAIService, AOIChange)
 {
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
-    CHECK_FMT(pActor, "actorid:{} not find", msg.actor_id());
+    if(pActor == nullptr)
+    {
+        LOGDEBUG("actorid:{} not find", msg.actor_id());
+        return;
+    }
     CHECK(pActor->GetCurrentScene());
     CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx() );
 
@@ -173,7 +181,7 @@ ON_SERVERMSG(CAIService, ActorCreate)
     CAIPhase* pScene = AISceneManager()->QueryPhase(msg.scene_id());
     CHECK(pScene);
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
-    ;
+    
     CHECK(pActor == nullptr);
     switch(msg.actortype())
     {
@@ -239,6 +247,7 @@ ON_SERVERMSG(CAIService, ActorCastSkill_Fail)
 ON_SERVERMSG(CAIService, ServiceReady)
 {
     __ENTER_FUNCTION
+    LOGDEBUG("AIServer Start Running");
     AIService()->GetEventManager()->Pause(false);
     __LEAVE_FUNCTION
 }

@@ -6,8 +6,8 @@
 class CServerSocket : public CNetSocket
 {
 public:
-    CServerSocket(CNetworkService* pService, CNetEventHandler* pEventHandler, bool bReconnect = false);
-    ~CServerSocket();
+    CServerSocket(CNetworkService* pService, CNetEventHandler* pEventHandler, bool bReconnect);
+    virtual ~CServerSocket();
 
     // init by connect to
     virtual bool Init(bufferevent* pBufferEvent) override;

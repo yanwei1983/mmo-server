@@ -31,7 +31,7 @@ public:
     const CGameMap* GetMap() const { return m_pMap; }
     uint64_t        GetScriptID() const;
     CSceneTree*     GetSceneTree() const { return m_pSceneTree.get(); }
-    bool            InitSceneTree(const CPos2D& vBasePos, float fWidth, float fHeight, uint32_t nTileGridRange);
+    bool            InitSceneTree(const CPos2D& vBasePos, float fWidth, float fHeight, uint32_t nTileGridRange, bool bDynamicSetLev = false);
     bool            LinkSceneTree(CSceneBase* pLinkScene);
 
     virtual bool      EnterMap(CSceneObject* pActor, float fPosX, float fPosY, float fFace);

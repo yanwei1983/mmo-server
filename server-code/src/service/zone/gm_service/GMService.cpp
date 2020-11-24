@@ -223,17 +223,6 @@ const CGMService::HttpRequestHandleFunc* CGMService::QueryHttpRequestHandler(con
     return nullptr;
 }
 
-void CGMService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
-{
-    if(m_pNetMsgProcess->Process(pNetworkMsg) == false)
-    {
-        LOGERROR("CMD {} from {} to {} forward {} didn't have ProcessHandler",
-                 pNetworkMsg->GetCmd(),
-                 pNetworkMsg->GetFrom(),
-                 pNetworkMsg->GetTo(),
-                 pNetworkMsg->GetForward().size());
-    }
-}
 
 void CGMService::OnLogicThreadProc()
 {

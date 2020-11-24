@@ -284,18 +284,6 @@ ON_SERVERMSG(CGMProxyService, ServiceHttpResponse)
     LOGMESSAGE("response_send:{} code:{} res:{} tt:{}", msg.uid(), msg.response_code(), msg.response_reason().c_str(), msg.response_txt().c_str());
 }
 
-void CGMProxyService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
-{
-    if(m_pNetMsgProcess->Process(pNetworkMsg) == false)
-    {
-        LOGERROR("CMD {} from {} to {} forward_count {} didn't have ProcessHandler",
-                 pNetworkMsg->GetCmd(),
-                 pNetworkMsg->GetFrom(),
-                 pNetworkMsg->GetTo(),
-                 pNetworkMsg->GetForward().size());
-    }
-}
-
 void CGMProxyService::AddDelayResponse(uint64_t uid, struct evhttp_request* req)
 {
     m_RequestMap[uid] = req;

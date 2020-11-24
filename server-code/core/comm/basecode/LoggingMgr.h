@@ -33,7 +33,7 @@ namespace BaseCode
 
 namespace BaseCode
 {
-    void        InitLog(const std::string& path);
+    void        InitLog(const std::string& path, int32_t log_lev = LOG_LEVEL_DEBUG);
     void        InitMonitorLog(const std::string& logname);
     std::string SetNdc(const std::string& name);
     void        ClearNdc();

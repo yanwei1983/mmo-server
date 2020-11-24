@@ -185,6 +185,11 @@ int32_t main(int32_t argc, char* argv[])
     {
         logpath = opt["--logpath"];
     }
+    int32_t log_lev = LOG_LEVEL_DEBUG;
+    if(opt.has("--loglev"))
+    {
+        log_lev = std::atoi(opt["--loglev"].c_str());
+    }
 
     if(opt.has("--stop"))
     {
@@ -198,7 +203,7 @@ int32_t main(int32_t argc, char* argv[])
         exit(0);
     }
 
-    BaseCode::InitLog(logpath);
+    BaseCode::InitLog(logpath, log_lev);
     BaseCode::SetNdc("service_loader");
     g_pLoader = new ServiceLoader();
 

@@ -102,7 +102,7 @@ bool CPlayer::FlyMap(uint16_t idMap, uint16_t idPhaseType, uint16_t _nPhaseType,
 
     //通过原始Mapid查找所在Zone
     const CGameMap* pMap = MapManager()->QueryMap(idMap);
-    CHECKF_M(pMap, fmt::format(FMT_STRING("can't find map {}"), idMap).c_str())
+    CHECKF_FMT(pMap, "can't find map {}", idMap);
 
     TargetSceneID idTargetScene(pMap->GetZoneID(), idMap, idPhaseType, _nPhaseType);
 
@@ -337,6 +337,7 @@ void CPlayer::OnEnterMap(CSceneBase* pScene)
         aoi_msg.set_ownerid(GetOwnerID());
         aoi_msg.set_guild_id(GetGuildID());
         aoi_msg.set_team_id(GetTeamID());
+        aoi_msg.set_need_sync_ai(NeedSyncAI());
         SceneService()->SendProtoMsgToAOIService(aoi_msg);
 
 

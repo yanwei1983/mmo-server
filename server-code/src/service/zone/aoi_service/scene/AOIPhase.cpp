@@ -42,16 +42,16 @@ bool CAOIPhase::Init(CAOIScene* pScene, const SceneIdx& idxScene, uint64_t idPha
             CPos2D vBasePos{pPhaseData->left(), pPhaseData->top()};
             float  fWidth  = pPhaseData->right() - pPhaseData->left();
             float  fHeight = pPhaseData->bottom() - pPhaseData->top();
-            CHECKF(InitSceneTree(vBasePos, fWidth, fHeight, pPhaseData->viewgrid_width()));
+            CHECKF(InitSceneTree(vBasePos, fWidth, fHeight, pPhaseData->viewgrid_width(), true));
         }
     }
     else if(idPhase == 0)
     {
-        CHECKF(InitSceneTree({0.0f, 0.0f}, 0.0f, 0.0f, 0));
+        CHECKF(InitSceneTree({0.0f, 0.0f}, 0.0f, 0.0f, 0, true));
     }
     else
     {
-        CHECKF(InitSceneTree({0.0f, 0.0f}, 0.0f, 0.0f, 0));
+        CHECKF(InitSceneTree({0.0f, 0.0f}, 0.0f, 0.0f, 0, true));
     }
 
     LOGDEBUG("CAOIPhase {} Created Map:{} Idx:{}", idPhase, idxScene.GetMapID(), idxScene.GetPhaseIdx());

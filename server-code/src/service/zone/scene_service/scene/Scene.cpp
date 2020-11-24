@@ -47,6 +47,7 @@ bool CScene::Init(uint16_t idMap, uint16_t idMainPhaseType, uint64_t idPhase)
     ServerMSG::SceneCreate msg;
     msg.set_scene_id(idMap);
     SceneService()->SendProtoMsgToAIService(msg);
+    SceneService()->SendProtoMsgToAOIService(msg);
 
     //创建静态位面
     CreatePhase(idMainPhaseType,idPhase);
@@ -60,7 +61,7 @@ bool CScene::Init(uint16_t idMap, uint16_t idMainPhaseType, uint64_t idPhase)
 
    
 
-    LOGINFO("Scene {} Created", idMap);
+    LOGDEBUG("Scene {} Created", idMap);
 
     return true;
     __LEAVE_FUNCTION
@@ -160,6 +161,7 @@ bool CScene::DestoryPhase(uint64_t idPhase)
     msg.set_scene_id(idxSceneIdx);
     msg.set_phase_id(idPhase);
     SceneService()->SendProtoMsgToAIService(msg);
+    SceneService()->SendProtoMsgToAOIService(msg);
 
     return true;
 }

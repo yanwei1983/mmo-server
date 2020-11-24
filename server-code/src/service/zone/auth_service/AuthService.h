@@ -29,7 +29,6 @@ public:
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadExit() override;
 
-    virtual void OnProcessMessage(CNetworkMessage*) override;
 
 public:
     CGMManager*   GetGMManager() const { return m_pGMManager.get(); }

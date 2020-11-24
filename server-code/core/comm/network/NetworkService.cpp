@@ -477,7 +477,7 @@ void CNetworkService::RunOnce()
 
 CServerSocket* CNetworkService::CreateServerSocket(CNetEventHandler* pHandle)
 {
-    return new CServerSocket(this, pHandle);
+    return new CServerSocket(this, pHandle, false);
 }
 CClientSocket* CNetworkService::CreateClientSocket(CNetEventHandler* pHandle)
 {

@@ -211,7 +211,10 @@ void CAOIActor::SendAOIChangeToOther(const BROADCAST_SET& setBCAOIActorDel, cons
     msg.set_posy(GetPosY());
     msg.mutable_actor_del()->Add(setBCAOIActorDel.begin(), setBCAOIActorDel.end());
     msg.mutable_actor_add()->Add(setBCAOIActorAdd.begin(), setBCAOIActorAdd.end());
-    AOIService()->SendProtoMsgToAIService(msg);
+    if(NeedSyncAI())
+    {
+        AOIService()->SendProtoMsgToAIService(msg);
+    }
     AOIService()->SendProtoMsgToSceneService(msg);
     __LEAVE_FUNCTION
 }

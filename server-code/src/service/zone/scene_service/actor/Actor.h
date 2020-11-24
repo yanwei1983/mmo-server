@@ -76,9 +76,9 @@ public:
 
 public:
     // AOI相关
-    export_lua void SendRoomMessage(const proto_msg_t& msg, bool notify_other_service = false);
-    export_lua void SendRoomMessageExcludeSelf(const proto_msg_t& msg, bool notify_other_service = false);
-    export_lua void SendRoomMessage(const proto_msg_t& msg, uint64_t idExclude, bool notify_other_service = false);
+    export_lua void SendRoomMessage(const proto_msg_t& msg);
+    export_lua void SendRoomMessageExcludeSelf(const proto_msg_t& msg);
+    export_lua void SendRoomMessage(const proto_msg_t& msg, uint64_t idExclude);
 
     export_lua void SendWorldMessage(const proto_msg_t& msg);
 

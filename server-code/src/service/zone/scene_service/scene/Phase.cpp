@@ -88,6 +88,7 @@ bool CPhase::Init(CScene* pScene, const SceneIdx& idxScene, uint64_t idPhase, co
     msg.set_scene_id(idxScene);
     msg.set_phase_id(idPhase);
     SceneService()->SendProtoMsgToAIService(msg);
+    SceneService()->SendProtoMsgToAOIService(msg);
 
     if(GetScriptID() != 0)
         ScriptManager()->TryExecScript<void>(GetScriptID(), SCB_MAP_ONCREATE, this);

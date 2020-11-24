@@ -19,7 +19,7 @@ bool CActor::NeedSyncAI() const
 bool CActor::UpdateViewList(bool bForce)
 {
     //通知AOIServer, 位置变更
-    SC_AOI_UPDATE ntc;
+    ServerMSG::AOIChange ntc;
     ntc.set_scene_idx(GetSceneIdx());
     ntc.set_actor_id(GetID());
     ntc.set_posx(GetPosX());

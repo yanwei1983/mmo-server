@@ -33,8 +33,6 @@ public:
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadExit() override;
 
-    virtual void OnProcessMessage(CNetworkMessage*) override;
-
     //发送消息给AIService
     bool SendProtoMsgToScene(const proto_msg_t& msg);
 

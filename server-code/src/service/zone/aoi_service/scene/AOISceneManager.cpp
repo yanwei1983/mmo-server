@@ -39,7 +39,7 @@ CAOIScene* CAOISceneManager::CreateScene(uint16_t idMap)
 
     m_mapScene[idMap] = pScene;
 
-    LOGINFO("AOIScene {} Created", idMap);
+    LOGDEBUG("AOIScene {} Created", idMap);
     m_nStaticScene++;
     return pScene;
     __LEAVE_FUNCTION

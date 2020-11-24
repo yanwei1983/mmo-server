@@ -90,7 +90,7 @@ protected:
                 this->AddObj(pData);
             }
         }
-        LOGINFO("Init {} Succ.", GET_NAME());
+        LOGDEBUG("Init {} Succ.", GET_NAME());
         return true;
     }
 

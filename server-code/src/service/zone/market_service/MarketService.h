@@ -25,7 +25,6 @@ public:
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadExit() override;
 
-    virtual void OnProcessMessage(CNetworkMessage*) override;
 };
 
 CMarketService* MarketService();

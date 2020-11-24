@@ -22,13 +22,13 @@ bool CSceneBase::Init(const SceneIdx& idxScene, CMapManager* pMapManager)
     return true;
 }
 
-bool CSceneBase::InitSceneTree(const CPos2D& vBasePos, float fWidth, float fHeight, uint32_t nTileGridRange)
+bool CSceneBase::InitSceneTree(const CPos2D& vBasePos, float fWidth, float fHeight, uint32_t nTileGridRange, bool bDynamicSetLev)
 {
     if(m_pSceneTree)
     {
         return false;
     }
-    CSceneTree* pSceneTree = CSceneTree::CreateNew(m_pMap, vBasePos, fWidth, fHeight, nTileGridRange);
+    CSceneTree* pSceneTree = CSceneTree::CreateNew(m_pMap, vBasePos, fWidth, fHeight, nTileGridRange, bDynamicSetLev);
     CHECKF(pSceneTree);
     m_pSceneTree.reset(pSceneTree);
     return true;
@@ -141,7 +141,7 @@ bool CSceneBase::IsPassDisable(float x, float y, uint32_t actor_type) const
     // Collision layer
     if(m_pMap->HasMapFlag(MAPFLAG_COLLISION_ENABLE) == true)
     {
-        if(m_pSceneTree->CollisionTest(x, y, actor_type) == true)
+        if(m_pSceneTree && m_pSceneTree->CollisionTest(x, y, actor_type) == true)
             return false;
     }
 
@@ -197,7 +197,7 @@ bool CSceneBase::IsDropDisable(float x, float y) const
         return true;
 
     // Drop layer
-    if(m_pSceneTree->CollisionTest(x, y, ActorType::ACT_MAPITEM) == true)
+    if(m_pSceneTree && m_pSceneTree->CollisionTest(x, y, ActorType::ACT_MAPITEM) == true)
         return false;
 
     return false;
@@ -224,7 +224,7 @@ bool CSceneBase::IsStallDisable(float x, float y) const
     if(it != m_DynaRegionDataSet.end() && it->second.IsIntersect(x, y) == true)
         return true;
 
-    if(m_pSceneTree->CollisionTest(x, y, ActorType::ACT_NPC) == true)
+    if(m_pSceneTree && m_pSceneTree->CollisionTest(x, y, ActorType::ACT_NPC) == true)
         return false;
 
     return false;
@@ -239,7 +239,7 @@ bool CSceneBase::IsPlaceDisable(float x, float y) const
     if(it != m_DynaRegionDataSet.end() && it->second.IsIntersect(x, y) == true)
         return true;
 
-    if(m_pSceneTree->CollisionTest(x, y, ActorType::ACT_NPC) == true)
+    if(m_pSceneTree && m_pSceneTree->CollisionTest(x, y, ActorType::ACT_NPC) == true)
         return false;
 
     return false;

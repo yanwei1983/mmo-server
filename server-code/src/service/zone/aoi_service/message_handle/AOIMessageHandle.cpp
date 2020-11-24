@@ -12,6 +12,7 @@
 #include "server_msg/server_side.pb.h"
 
 
+
 ON_MSG(CAOIService, SC_ATTRIB_CHANGE)
 {
     __ENTER_FUNCTION
@@ -22,6 +23,17 @@ ON_MSG(CAOIService, SC_ATTRIB_CHANGE)
         const auto& data = msg.datalist(i);
         pActor->SetProperty(data.actype(), data.val());
     }
+    __LEAVE_FUNCTION
+}
+
+
+ON_SERVERMSG(CAOIService, AOIChange)
+{
+    __ENTER_FUNCTION
+    CAOIActor* pActor = AOIActorManager()->QueryActor(msg.actor_id());
+    CHECK(pActor);
+    pActor->SetPos(Vector2(msg.posx(), msg.posy()));
+    pActor->UpdateViewList(false);
     __LEAVE_FUNCTION
 }
 

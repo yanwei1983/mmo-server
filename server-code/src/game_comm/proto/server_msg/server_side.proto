@@ -359,6 +359,7 @@ message ActorCreate
     bool   must_see       = 22;
     uint32 team_id        = 23;
     uint64 guild_id       = 24;
+    bool   need_sync_ai   = 25;
 };
 
 message ActorDestory

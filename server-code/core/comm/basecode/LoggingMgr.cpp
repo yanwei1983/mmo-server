@@ -61,7 +61,7 @@ void BaseCode::MyLogMsgX(const char* pszName, const char* pszBuffer)
     fclose(fp);
 }
 
-void BaseCode::InitLog(const std::string& path)
+void BaseCode::InitLog(const std::string& path, int32_t log_lev)
 {
     using namespace zsummer::log4z;
     BaseCode::s_debug_logger   = ILog4zManager::getRef().createLogger("debug");
@@ -99,19 +99,36 @@ void BaseCode::InitLog(const std::string& path)
         g_logPath = path;
     }
 
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_debug_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_error_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_message_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_warning_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_fatal_logger, false);
+    {
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_debug_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_error_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_message_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_warning_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_fatal_logger, false);
 
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_network_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_db_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_stack_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_lua_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_ai_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_login_logger, false);
-    ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_gm_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_network_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_db_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_stack_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_lua_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_ai_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_login_logger, false);
+        ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_gm_logger, false);
+    }
+    {
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_debug_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_error_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_message_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_warning_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_fatal_logger, log_lev);
+
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_network_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_db_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_stack_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_lua_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_ai_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_login_logger, log_lev);
+        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_gm_logger, log_lev);
+    }
 
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_lua_logger, false);
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_gm_logger, false);
@@ -124,6 +141,37 @@ void BaseCode::InitLog(const std::string& path)
 void BaseCode::StopLog()
 {
     using namespace zsummer::log4z;
+
+    const char* end_line = "======================================================================";
+    if(ILog4zManager::getRef().getLoggerLogCount(s_debug_logger) > 0)
+    {
+        ZLOGFMT_DEBUG(s_debug_logger, end_line);
+    }
+    if(ILog4zManager::getRef().getLoggerLogCount(s_error_logger) > 0)
+    {
+        ZLOGFMT_DEBUG(s_error_logger, end_line);
+    }
+    if(ILog4zManager::getRef().getLoggerLogCount(s_message_logger) > 0)
+    {
+        ZLOGFMT_DEBUG(s_message_logger, end_line);
+    }
+    if(ILog4zManager::getRef().getLoggerLogCount(s_warning_logger) > 0)
+    {
+        ZLOGFMT_DEBUG(s_warning_logger, end_line);
+    }
+    if(ILog4zManager::getRef().getLoggerLogCount(s_fatal_logger) > 0)
+    {
+        ZLOGFMT_DEBUG(s_fatal_logger, end_line);
+
+    }
+    if(ILog4zManager::getRef().getLoggerLogCount(s_network_logger) > 0)
+    {
+        ZLOGFMT_DEBUG(s_network_logger, end_line);
+    }
+    if(ILog4zManager::getRef().getLoggerLogCount(s_db_logger) > 0)
+    {
+        ZLOGFMT_DEBUG(s_db_logger, end_line);
+    }
 
     ILog4zManager::getRef().stop();
 }

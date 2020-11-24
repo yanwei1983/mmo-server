@@ -129,7 +129,17 @@ void CServiceCommon::StopLogicThread()
     __LEAVE_FUNCTION
 }
 
-void CServiceCommon::OnProcessMessage(CNetworkMessage*) {}
+void CServiceCommon::OnProcessMessage(CNetworkMessage* pNetworkMsg)
+{
+    if(m_pNetMsgProcess->Process(pNetworkMsg) == false)
+    {
+        LOGERROR("CMD {} from {} to {} forward_count {} didn't have ProcessHandler",
+                 pNetworkMsg->GetCmd(),
+                 pNetworkMsg->GetFrom(),
+                 pNetworkMsg->GetTo(),
+                 pNetworkMsg->GetForward().size());
+    }
+}
 
 void CServiceCommon::OnLogicThreadProc()
 {
