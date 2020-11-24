@@ -324,8 +324,12 @@ message AOIChange
     option (server_cmd).id = MsgID_AOIChange;
     uint64 actor_id  = 1;
     uint64 scene_idx  = 2;
-    repeated uint64 actor_add = 3;
-    repeated uint64 actor_del = 4;
+    float posx = 3;
+    float posy = 4;
+    repeated uint64 actor_add = 5;
+    repeated uint64 actor_del = 6;
+
+
 };
 
 message ActorCreate
@@ -345,13 +349,16 @@ message ActorCreate
     uint32 mpmax     = 13;
     uint32 movespd   = 14;
     uint64 ownerid   = 15;
-
+    
     float posx = 16;
     float posy = 17;
     float face = 18;
 
     uint32 monster_gen_id = 20;
     uint64 phase_id       = 21;
+    bool   must_see       = 22;
+    uint32 team_id        = 23;
+    uint64 guild_id       = 24;
 };
 
 message ActorDestory

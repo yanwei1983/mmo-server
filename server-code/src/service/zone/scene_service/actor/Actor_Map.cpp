@@ -40,12 +40,12 @@ void CActor::OnLeaveMap(uint16_t idTargetMap)
 {
     __ENTER_FUNCTION
     SendDelayAttribChage();
-
-    if(IsMonster() || IsPlayer())
+    ServerMSG::ActorDestory ai_msg;
+    ai_msg.set_actor_id(GetID());
+    ai_msg.set_dead(IsDead());
+    SceneService()->SendProtoMsgToAOIService(ai_msg);
+    if(NeedSyncAI())
     {
-        ServerMSG::ActorDestory ai_msg;
-        ai_msg.set_actor_id(GetID());
-        ai_msg.set_dead(IsDead());
         SceneService()->SendProtoMsgToAIService(ai_msg);
     }
 
@@ -80,17 +80,39 @@ uint64_t CActor::GetSceneIdx() const
     return 0;
 }
 
-void CActor::SendRoomMessage(const proto_msg_t& msg, bool bIncludeSelf /*= true*/)
+void CActor::SendRoomMessageExcludeSelf(const proto_msg_t& msg, bool notify_other_service /*= false*/)
+{
+    __ENTER_FUNCTION
+    SendRoomMessage(msg, GetID(), notify_other_service);
+    __LEAVE_FUNCTION
+}
+
+void CActor::SendRoomMessage(const proto_msg_t& msg, bool notify_other_service /*= false*/)
+{
+    __ENTER_FUNCTION
+    SendRoomMessage(msg, 0, notify_other_service);
+    __LEAVE_FUNCTION
+}
+
+void CActor::SendRoomMessage(const proto_msg_t& msg, uint64_t idExclude,bool notify_other_service /*= false*/)
 {
     __ENTER_FUNCTION
     SendShowToDealyList();
-    auto setSocketMap = SceneService()->IDList2VSMap(m_ViewActorsByType[ACT_PLAYER], (bIncludeSelf) ? GetID() : 0);
+    auto setSocketMap = SceneService()->IDList2VSMap(m_ViewActorsByType[ACT_PLAYER], idExclude);
     SceneService()->SendProtoMsgTo(setSocketMap, msg);
     auto cmd = msg_to_cmd(msg);
     // send message to ai_service
-    if(NeedSyncAOIToAIService() && (cmd == CMD_SC_AOI_UPDATE || cmd == CMD_SC_CASTSKILL || cmd == CMD_SC_ATTRIB_CHANGE))
+    if(notify_other_service)
     {
-        SceneService()->SendProtoMsgToAIService(msg);
+        if(cmd == CMD_SC_CASTSKILL || cmd == CMD_SC_ATTRIB_CHANGE)
+        {
+            SceneService()->SendProtoMsgToAIService(msg);
+        }
+        else
+        {
+            SceneService()->SendProtoMsgToAIService(msg);
+            SceneService()->SendProtoMsgToAOIService(msg);
+        }
     }
 
     __LEAVE_FUNCTION

@@ -13,3 +13,4 @@ void SceneMessageHandlerRegister()
 
     __LEAVE_FUNCTION
 }
+

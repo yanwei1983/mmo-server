@@ -24,7 +24,7 @@ echo "create database IF NOT EXISTS ${ZONE_NAME};" | docker exec -i ${MYSQL_DOCK
 
 set -e
 sql_cmd="exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${ZONE_NAME}"
-cat {$root_dir}/server-res/res/db/db_proto/gamedb.pb.sql | docker exec -i ${MYSQL_DOCKER_NAME} sh -c "${sql_cmd}"
+cat ${root_dir}/server-res/res/db/db_proto/gamedb.pb.sql | docker exec -i ${MYSQL_DOCKER_NAME} sh -c "${sql_cmd}"
 }
 
 
@@ -64,12 +64,21 @@ show_serverinfodb()
     echo "select * from tbld_servicedetail where worldid=${ZONE_ID};" | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -uroot -p\"${MYSQL_PASSWD}\" serverinfo"
 }
 
+
+all()
+{
+    create_db;
+    insert_serverinfo;
+    show_serverinfodb;
+}
+
 if [ $2 ];
 then
     $2;
 else
-    create_db;
-    insert_serverinfo;
-    show_serverinfodb;
+    echo "all";
+    echo "create_db";
+    echo "insert_serverinfo";
+    echo "show_serverinfodb";
     
 fi

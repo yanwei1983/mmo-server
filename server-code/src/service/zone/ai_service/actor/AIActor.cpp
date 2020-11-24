@@ -5,6 +5,8 @@
 #include "AIScene.h"
 #include "AIService.h"
 #include "AISkill.h"
+#include "server_msg/server_side.pb.h"
+
 CAIActor::CAIActor() {}
 
 CAIActor::~CAIActor() {}

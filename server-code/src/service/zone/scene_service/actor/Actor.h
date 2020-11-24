@@ -76,8 +76,12 @@ public:
 
 public:
     // AOI相关
-    export_lua void         SendRoomMessage(const proto_msg_t& msg, bool bIncludeSelf = true);
-    export_lua void         SendWorldMessage(const proto_msg_t& msg);
+    export_lua void SendRoomMessage(const proto_msg_t& msg, bool notify_other_service = false);
+    export_lua void SendRoomMessageExcludeSelf(const proto_msg_t& msg, bool notify_other_service = false);
+    export_lua void SendRoomMessage(const proto_msg_t& msg, uint64_t idExclude, bool notify_other_service = false);
+
+    export_lua void SendWorldMessage(const proto_msg_t& msg);
+
     export_lua virtual bool SendMsg(const proto_msg_t& msg) const { return false; }
 
     void         BroadcastMessageTo(const proto_msg_t& msg, const VirtualSocketMap_t& setSocketMap);
@@ -91,24 +95,20 @@ public:
     // AOI相关
     export_lua virtual bool IsEnemy(CSceneObject* pTarget) const override { return false; }
     
-    virtual void            OnBeforeClearViewList(bool bSendMsgToSelf) override;
+    virtual void OnBeforeClearViewList(bool bSendMsgToSelf) override;
     virtual void RemoveFromViewList(CSceneObject* pActor, OBJID idActor, bool bErase) override;
-    virtual void AddToViewList(CSceneObject* pActor) override;
+    virtual bool UpdateViewList(bool bForce)override;
+    void         OnReciveAOIUpdate(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActorAdd);
 protected:
-    void         _AddToAOIRemoveMessage(SC_AOI_REMOVE& removeMsg, OBJID id);
-    void         _TrySendAOIRemoveMessage(const SC_AOI_REMOVE& removeMsg);
     void         AddDelaySendShowTo(OBJID id);
     void         RemoveDelaySendShowTo(OBJID id);
-
-    virtual bool ViewTest(CSceneObject* pActor) override;
-    virtual bool IsMustAddToViewList(CSceneObject* pActor) override;
-
-    virtual void OnAOIProcess(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActor, const BROADCAST_SET& setBCActorAdd) override;
+   
     void         OnAOIProcess_ActorAddToAOI(const BROADCAST_SET& setBCActorAdd);
     void         OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDe);
     void         OnAOIProcess_PosUpdate();
-    void         SendAOIChangeToAI(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActorAdd);
-    virtual bool NeedSyncAOIToAIService() const {return IsMonster() || IsPlayer();}
+    
+    
+    virtual bool NeedSyncAI() const;
 private:
     void BroadcastShowTo(const VirtualSocketMap_t& VSMap);
 

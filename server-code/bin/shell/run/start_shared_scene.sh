@@ -21,27 +21,27 @@ export TSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_tsan
 
 scene1()
 {
-${DIR_file}/binary/shared_scene_1 --worldid=0 --start=SCENE_SERVICE-51,AI_SERVICE-51 --logpath=/data/log/global/shared_scene_1 -d 
+${DIR_file}/binary/shared_scene_1 --worldid=0 --start=SCENE_SERVICE-51,AI_SERVICE-51,AOI_SERVICE-51 --logpath=/data/log/global/shared_scene_1 -d 
 }
 
 scene2()
 {
-${DIR_file}/binary/shared_scene_2 --worldid=0 --start=SCENE_SERVICE-52,AI_SERVICE-52 --logpath=/data/log/global/shared_scene_2 -d 
+${DIR_file}/binary/shared_scene_2 --worldid=0 --start=SCENE_SERVICE-52,AI_SERVICE-52,AOI_SERVICE-52 --logpath=/data/log/global/shared_scene_2 -d 
 }
 
 scene3()
 {
-${DIR_file}/binary/shared_scene_3 --worldid=0 --start=SCENE_SERVICE-53,AI_SERVICE-53 --logpath=/data/log/global/shared_scene_3 -d 
+${DIR_file}/binary/shared_scene_3 --worldid=0 --start=SCENE_SERVICE-53,AI_SERVICE-53,AOI_SERVICE-53 --logpath=/data/log/global/shared_scene_3 -d 
 }
 
 scene4()
 {
-${DIR_file}/binary/shared_scene_4 --worldid=0 --start=SCENE_SERVICE-54,AI_SERVICE-54 --logpath=/data/log/global/shared_scene_4 -d 
+${DIR_file}/binary/shared_scene_4 --worldid=0 --start=SCENE_SERVICE-54,AI_SERVICE-54,AOI_SERVICE-54 --logpath=/data/log/global/shared_scene_4 -d 
 }
 
 scene5()
 {
-${DIR_file}/binary/shared_scene_5 --worldid=0 --start=SCENE_SERVICE-55,AI_SERVICE-55 --logpath=/data/log/global/shared_scene_5 -d 
+${DIR_file}/binary/shared_scene_5 --worldid=0 --start=SCENE_SERVICE-55,AI_SERVICE-55,AOI_SERVICE-55 --logpath=/data/log/global/shared_scene_5 -d 
 }
 
 

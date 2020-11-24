@@ -107,6 +107,7 @@ CTeamInfo* CTeamInfoManager::OnCreateTeam(uint64_t idTeam, uint64_t idLeader)
     m_setTeam[idTeam] = pTeam;
     return pTeam;
     __LEAVE_FUNCTION
+    return nullptr;
 }
 
 void CTeamInfoManager::OnDestoryTeam(uint64_t idTeam)

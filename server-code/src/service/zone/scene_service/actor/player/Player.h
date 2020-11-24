@@ -189,7 +189,7 @@ private:
     void OnLevUp(uint32_t nLev);
 
 public:
-    bool CheckTaskPhase(uint64_t idPhase);
+    bool CheckTaskPhase(uint64_t idPhase) const;
     void AddTaskPhase(uint64_t idPhase, bool bNotify = true);
     void RemoveTaskPhase(uint64_t idPhase, bool bNotify = true);
 

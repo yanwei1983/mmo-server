@@ -47,14 +47,10 @@ ON_SERVERMSG(CAIService, AOIChange)
     for(const auto& id: msg.actor_del())
     {
         CAIActor* pTarget = AIActorManager()->QueryActor(id);
+        pActor->RemoveFromViewList(pTarget, id, true);
         if(pTarget)
         {
             pTarget->RemoveFromViewList(pActor, pActor->GetID(), true);
-            pActor->RemoveFromViewList(pTarget, pTarget->GetID(), true);
-        }
-        else
-        {
-            pActor->RemoveFromViewList(nullptr, id, true);
         }
     }
     for(const auto& id: msg.actor_add())
@@ -240,51 +236,14 @@ ON_SERVERMSG(CAIService, ActorCastSkill_Fail)
     __LEAVE_FUNCTION
 }
 
-ON_SERVERMSG(CAIService, ActorSetHide)
+ON_SERVERMSG(CAIService, ServiceReady)
 {
     __ENTER_FUNCTION
-    CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
-    CHECK(pActor);
-    pActor->SetHideCoude(msg.hide_count());
+    AIService()->GetEventManager()->Pause(false);
     __LEAVE_FUNCTION
 }
 
-ON_SERVERMSG(CAIService, SyncTaskPhase)
-{
-    __ENTER_FUNCTION
-    auto pActor = AIActorManager()->QueryActor(msg.player_id());
-    CHECK(pActor);
-    CAIPlayer* pPlayer = pActor->CastTo<CAIPlayer>();
-    CHECK(pPlayer);
-    pPlayer->ClearTaskPhase();
-    for(int32_t i = 0; i < msg.task_phase_id_size(); i++)
-    {
-        pPlayer->AddTaskPhase(msg.task_phase_id(i));
-    }
-    __LEAVE_FUNCTION
-}
 
-ON_SERVERMSG(CAIService, AddTaskPhase)
-{
-    __ENTER_FUNCTION
-    auto pActor = AIActorManager()->QueryActor(msg.player_id());
-    CHECK(pActor);
-    CAIPlayer* pPlayer = pActor->CastTo<CAIPlayer>();
-    CHECK(pPlayer);
-    pPlayer->AddTaskPhase(msg.task_phase_id());
-    __LEAVE_FUNCTION
-}
-
-ON_SERVERMSG(CAIService, RemoveTaskPhase)
-{
-    __ENTER_FUNCTION
-    auto pActor = AIActorManager()->QueryActor(msg.player_id());
-    CHECK(pActor);
-    CAIPlayer* pPlayer = pActor->CastTo<CAIPlayer>();
-    CHECK(pPlayer);
-    pPlayer->RemoveTaskPhase(msg.task_phase_id());
-    __LEAVE_FUNCTION
-}
 
 void AIServiceMessageHandlerRegister()
 {

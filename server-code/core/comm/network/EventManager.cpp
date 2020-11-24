@@ -99,7 +99,7 @@ void CEventManager::Destory()
 
 void CEventManager::OnTimer()
 {
-    if(m_bOwnBase)
+    if(m_bOwnBase && m_bPause == false)
     {
         event_base_loop(m_pBase, EVLOOP_ONCE | EVLOOP_NONBLOCK);
         ScheduleWait();

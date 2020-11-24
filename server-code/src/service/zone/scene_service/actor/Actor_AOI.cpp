@@ -11,33 +11,24 @@
 #include "server_msg/server_side.pb.h"
 
 
-void CActor::_AddToAOIRemoveMessage(SC_AOI_REMOVE& removeMsg, OBJID id)
+bool CActor::NeedSyncAI() const
 {
-    __ENTER_FUNCTION
-    if(GetActorType() == ACT_PLAYER)
-    {
-        removeMsg.add_idlist(id);
-        //为了加速前端处理,以及避免单个包过大,每个包中允许缓冲64个aoi_info
-        constexpr int32_t MAX_AOI_SIZE_IN_ONE_PACKET = 64;
-        if(removeMsg.idlist_size() > MAX_AOI_SIZE_IN_ONE_PACKET)
-        {
-            SendMsg(removeMsg);
-            removeMsg.clear_idlist();
-        }
-    }
+    return IsMonster() || IsPlayer();
+}
+//////////////////////////////////////////////////////////////////////
+bool CActor::UpdateViewList(bool bForce)
+{
+    //通知AOIServer, 位置变更
+    SC_AOI_UPDATE ntc;
+    ntc.set_scene_idx(GetSceneIdx());
+    ntc.set_actor_id(GetID());
+    ntc.set_posx(GetPosX());
+    ntc.set_posy(GetPosY());
 
-    __LEAVE_FUNCTION
+    SceneService()->SendProtoMsgToAOIService(ntc);
+    return true;
 }
 
-void CActor::_TrySendAOIRemoveMessage(const SC_AOI_REMOVE& removeMsg)
-{
-    __ENTER_FUNCTION
-    if(removeMsg.idlist_size() > 0)
-    {
-        SendMsg(removeMsg);
-    }
-    __LEAVE_FUNCTION
-}
 
 //////////////////////////////////////////////////////////////////////
 void CActor::RemoveFromViewList(CSceneObject* pActor, OBJID idActor, bool bErase)
@@ -62,37 +53,21 @@ void CActor::RemoveFromViewList(CSceneObject* pActor, OBJID idActor, bool bErase
 }
 
 //////////////////////////////////////////////////////////////////////
-void CActor::AddToViewList(CSceneObject* pActor)
-{
-    __ENTER_FUNCTION
-    CSceneObject::AddToViewList(pActor);
-
-    //如果自己是怪物
-    if(IsMonster())
-    {
-        CastTo<CMonster>()->SetIsAISleep(false);
-    }
-    __LEAVE_FUNCTION
-}
-
-//////////////////////////////////////////////////////////////////////
 void CActor::OnBeforeClearViewList(bool bSendMsgToSelf)
 {
     __ENTER_FUNCTION
     //发送删除包
-    SC_AOI_REMOVE ntc_aoiInfo;
-    ntc_aoiInfo.set_scene_idx(GetSceneIdx());
-    ntc_aoiInfo.add_idlist(GetID());
-    SendRoomMessage(ntc_aoiInfo, false);
+    SC_AOI_REMOVE remove_msg_to_other;
+    remove_msg_to_other.set_scene_idx(GetSceneIdx());
+    remove_msg_to_other.add_idlist(GetID());
+    SendRoomMessageExcludeSelf(remove_msg_to_other);
 
     if(bSendMsgToSelf)
     {
-        SC_AOI_REMOVE hold_info;
-        for(uint64_t id: m_ViewActors)
-        {
-            _AddToAOIRemoveMessage(hold_info, id);
-        }
-        _TrySendAOIRemoveMessage(hold_info);
+        SC_AOI_REMOVE remove_msg_to_self;
+        remove_msg_to_self.set_scene_idx(GetSceneIdx());
+        remove_msg_to_self.mutable_idlist()->Add(m_ViewActors.begin(), m_ViewActors.end());
+        SendMsg(remove_msg_to_self);
     }
 
     if(m_setDealySendShow.empty() == false)
@@ -179,138 +154,33 @@ void CActor::SendShowTo(CPlayer* pPlayer)
     __LEAVE_FUNCTION
 }
 
-bool CActor::ViewTest(CSceneObject* pActor)
-{
-    __ENTER_FUNCTION
-    //所有actor 可以看到 位面id与自己一样的的对象
-    if(GetPhaseID() == pActor->GetPhaseID())
-    {
-        //怪物之间，额外通过敌我判断
-        if(IsMonster() && pActor->IsMonster())
-            return IsEnemy(pActor);
-        return true;
-    } 
-
-    //如果有Owner，看看Owner能不能看见对方，一般来说Owner能看见，自己就能看见
-    CActor* pThisOwner = QueryOwner();
-    if(pThisOwner)
-    {
-        return ViewTest(pActor);
-    }
-    
-    //玩家 可以看到 位面id=自己ID 的其他对象   (专属怪刷新在专属位面内)
-    //玩家 可以看到 inTaskList(位面id)的NPC/monster   (任务位面用来展开不同的NPC/monster)
-    auto fun_check_player = [](CSceneObject* pSelf, CSceneObject* pActor)->bool
-    {
-        if(pSelf->GetID() == pActor->GetPhaseID())
-            return true;
-        CPlayer* pPlayer = pSelf->CastTo<CPlayer>();
-        CHECKF(pPlayer);
-        return pPlayer->CheckTaskPhase(pActor->GetPhaseID());
-    };
-    if(IsPlayer())
-    {
-        return fun_check_player(this, pActor);
-    }
-    if(pActor->IsPlayer())
-    {
-        return fun_check_player(pActor, this);
-    }
-    __LEAVE_FUNCTION
-    return false;
-}
-
-bool CActor::IsMustAddToViewList(CSceneObject* pActor)
-{
-    __ENTER_FUNCTION
-    CHECKF(pActor);
-    //自己召唤出来的,必然可见
-    if(pActor->GetOwnerID() == GetID())
-    {
-        return true;
-    }
-    //私有位面的,必定可见
-    if(pActor->GetPhaseID() != 0 && pActor->GetPhaseID() == GetID())
-    {
-        return true;
-    }
-
-    //必须加入视野的, BOSS怪, 组队成员
-    if(pActor->IsMonster())
-    {
-        CMonster* pMonster = pActor->CastTo<CMonster>();
-        CHECKF(pMonster);
-        if(pMonster->IsBoss())
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    if(pActor->IsPlayer())
-    {
-        CPlayer* pPlayer = pActor->CastTo<CPlayer>();
-        CHECKF(pPlayer);
-
-        //队友必然可见
-        if(IsPlayer())
-        {
-            CPlayer* pThisPlayer = CastTo<CPlayer>();
-            CHECKF(pThisPlayer);
-            return (pThisPlayer->GetTeamID() != 0 && pPlayer->GetTeamID() == pThisPlayer->GetTeamID());
-        }
-    }
-    __LEAVE_FUNCTION
-    return false;
-}
-
-void CActor::OnAOIProcess(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActor, const BROADCAST_SET& setBCActorAdd)
+void CActor::OnReciveAOIUpdate(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActorAdd)
 {
     __ENTER_FUNCTION
     // step4: 需要离开视野的角色Remove
     OnAOIProcess_ActorRemoveFromAOI(setBCActorDel);
 
     // 设置角色广播集=当前广播集-离开视野的差集
-    m_ViewActors = setBCActor;
     OnAOIProcess_PosUpdate();
 
     //////////////////////////////////////////////////////////////////////////
     // step5: 新进入视野的角色和地图物品Add
     OnAOIProcess_ActorAddToAOI(setBCActorAdd);
 
-    SendAOIChangeToAI(setBCActorDel, setBCActorAdd);
-    __LEAVE_FUNCTION
-}
-
-void CActor::SendAOIChangeToAI(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActorAdd)
-{
-    __ENTER_FUNCTION
-    if(NeedSyncAOIToAIService() == false)
-        return;
-    if(setBCActorDel.empty() && setBCActorAdd.empty())
-        return;
-    ServerMSG::AOIChange msg;
-    msg.set_scene_idx(GetCurrentScene()->GetSceneIdx());
-    msg.set_actor_id(GetID());
-    for(const auto& v: setBCActorDel)
-    {
-        msg.add_actor_del(v);
-    }
-    for(const auto& v: setBCActorAdd)
-    {
-        msg.add_actor_add(v);
-    }
-    SceneService()->SendProtoMsgToAIService(msg);
     __LEAVE_FUNCTION
 }
 
 void CActor::OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDel)
 {
     __ENTER_FUNCTION
-    SC_AOI_REMOVE hold_info;
-    hold_info.set_scene_idx(GetSceneIdx());
-
+    if(GetActorType() == ACT_PLAYER)
+    {
+        //通知自己删除del列表
+        SC_AOI_REMOVE remove_msg;
+        remove_msg.set_scene_idx(GetSceneIdx());
+        remove_msg.mutable_idlist()->Add(setBCActorDel.begin(), setBCActorDel.end());
+        SendMsg(remove_msg);
+    }
     //////////////////////////////////////////////////////////////////////////
     // step4: 需要离开视野的角色Remove
     {
@@ -318,24 +188,20 @@ void CActor::OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDel)
         for(const auto& id: setBCActorDel)
         {
             CActor* pActor = static_cast<CActor*>(GetCurrentScene()->QuerySceneObj(id));
-            if(pActor == nullptr)
-            {
-                continue;
-            }
             // 通知自己对方消失
-            //不需要从自己的m_ViewActors移除,因为等下会一次性移除,
-            RemoveFromViewList(pActor, id, false);
-            // 通知对方自己消失,
-            pActor->RemoveFromViewList(this, this->GetID(), true);
-
-            //为了减少发送次数,发送给自己的移除消息一次性发送
-            _AddToAOIRemoveMessage(hold_info, id);
-
-            //如果目标是Player，需要收到删除我的广播
-            if(pActor->GetActorType() == ACT_PLAYER)
+            RemoveFromViewList(pActor, id, true);
+            if(pActor)
             {
-                setBCActorDelPlayer.insert(id);
+                // 通知对方自己消失
+                pActor->RemoveFromViewList(this, this->GetID(), true);
+                //如果目标是Player，需要收到删除我的广播
+                if(pActor->GetActorType() == ACT_PLAYER)
+                {
+                    setBCActorDelPlayer.insert(id);
+                }
             }
+
+            
         }
 
         //通知Del列表删除自己
@@ -349,8 +215,7 @@ void CActor::OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDel)
             SceneService()->SendProtoMsgTo(setSocketMap, ntc_aoiInfo);
         }
     }
-    //通知自己删除del列表
-    _TrySendAOIRemoveMessage(hold_info);
+    
     __LEAVE_FUNCTION
 }
 

@@ -37,7 +37,7 @@ public:
     virtual void OnLogicThreadExit() override;
 
     virtual void OnProcessMessage(CNetworkMessage*) override;
-
+    virtual void OnAllWaitedServiceReady()override;
 public:
     uint64_t CreatePlayerID();
     void     RecyclePlayerID(OBJID idPlayer);
@@ -65,7 +65,7 @@ private:
     CUIDFactory                   m_UIDFactory;
     uint64_t                      m_nCurPlayerMaxID;
     std::deque<OBJID>             m_setPlayerIDPool;
-    std::unordered_set<ServiceID> m_setServiceNeedReady;
+    
 
     std::unique_ptr<CMysqlConnection> m_pGameDB;
 

@@ -5,9 +5,8 @@
 #include "DBRecord.h"
 #include "game_common_def.h"
 #include "gamedb.h"
-#include "msg/zone_service.pb.h"
-#include "server_msg/server_side.pb.h"
 
+class GuildMemberInfoDetail;
 class CGuildMemberInfo
 {
     CGuildMemberInfo();

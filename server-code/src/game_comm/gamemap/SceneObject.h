@@ -30,7 +30,15 @@ public:
         else
             return nullptr;
     }
-    export_lua virtual bool CanCastTo(ActorType actor_type) { return GetActorType() == actor_type; }
+    template<typename T>
+    const T* CastTo() const
+    {
+        if(CanCastTo(T::GetActorTypeStatic()) == true)
+            return static_cast<const T*>(this);
+        else
+            return nullptr;
+    }
+    export_lua virtual bool CanCastTo(ActorType actor_type) const { return GetActorType() == actor_type; }
 
     export_lua virtual ActorType GetActorType() const = 0;
 
@@ -99,8 +107,8 @@ protected:
     // AOI
     virtual void OnAOIProcess(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActor, const BROADCAST_SET& setBCActorAdd);
 
-    virtual bool ViewTest(CSceneObject* pActor) { return false; }
-    virtual bool IsMustAddToViewList(CSceneObject* pActor) { return false; }
+    virtual bool ViewTest(CSceneObject* pActor) const { return false; }
+    virtual bool IsMustAddToViewList(CSceneObject* pActor) const { return false; }
 
 public:
     virtual void OnEnterMap(CSceneBase* pScene);

@@ -2,7 +2,7 @@
 #include "PlayerTask.h"
 #include "SceneService.h"
 #include "server_msg/server_side.pb.h"
-bool CPlayer::CheckTaskPhase(uint64_t idPhase)
+bool CPlayer::CheckTaskPhase(uint64_t idPhase) const
 {
     __ENTER_FUNCTION
     auto it = m_TaskPhase.find(idPhase);

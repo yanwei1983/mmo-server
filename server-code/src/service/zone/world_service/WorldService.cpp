@@ -146,12 +146,14 @@ bool CWorldService::Init(const ServerPort& nServerPort)
 
     //设置等待哪些服ready
     GetMessageRoute()->ForeachServiceInfoByWorldID(GetWorldID(), false, [this](const ServerAddrInfo* info) {
-        if(info->idServiceType == WORLD_SERVICE || info->idServiceType == AI_SERVICE || info->idServiceType == AUTH_SERVICE)
+        ServiceType_t idServiceType =  info->idServiceType;
+        ServiceIdx_t idxService =  info->idServiceIdx;
+        if(idServiceType == WORLD_SERVICE || idServiceType == AI_SERVICE || idServiceType == AOI_SERVICE || idServiceType == AUTH_SERVICE)
         {
             return true;
         }
 
-        m_setServiceNeedReady.emplace(info->idServiceType, info->idServiceIdx);
+        AddWaitServiceReady(ServiceID{idServiceType, idxService});
         return true;
     });
 
@@ -275,38 +277,26 @@ void CWorldService::RecyclePlayerID(OBJID idPlayer)
     m_setPlayerIDPool.push_back(idPlayer);
 }
 
-void CWorldService::SetServiceReady(const ServerPort& server_port)
+void CWorldService::OnAllWaitedServiceReady()
 {
     __ENTER_FUNCTION
-    const auto& idService = server_port.GetServiceID();
-    if(m_setServiceNeedReady.empty())
-        return;
-
-    m_setServiceNeedReady.erase(idService);
-    LOGMESSAGE("ServiceReady:{}  left_need:{}", ::GetServiceName(idService), m_setServiceNeedReady.size());
-    if(m_setServiceNeedReady.empty() == true)
     {
-        LOGMESSAGE("AllServiceReady");
-        {
-            {
-                ServerMSG::ServiceRegister send_msg;
-                send_msg.set_serverport(GetServerPort());
-                send_msg.set_update_time(TimeGetSecond());
-                WorldService()->SendProtoMsgToZonePort(ServerPort(GetWorldID(), ROUTE_SERVICE, 0), send_msg);
-            }
-
-            {
-                ServerMSG::SocketStartAccept send_msg;
-                // send notify to socket
-                auto serverport_list = GetMessageRoute()->GetServerPortListByWorldIDAndServiceType(GetWorldID(), SOCKET_SERVICE, false);
-                for(const auto& serverport: serverport_list)
-                {
-                    SendProtoMsgToZonePort(serverport, send_msg);
-                }
-            }
-        }
+        ServerMSG::ServiceRegister send_msg;
+        send_msg.set_serverport(GetServerPort());
+        send_msg.set_update_time(TimeGetSecond());
+        WorldService()->SendProtoMsgToZonePort(ServerPort(GetWorldID(), ROUTE_SERVICE, 0), send_msg);
     }
 
+    {
+        ServerMSG::SocketStartAccept send_msg;
+        // send notify to socket
+        auto serverport_list = GetMessageRoute()->GetServerPortListByWorldIDAndServiceType(GetWorldID(), SOCKET_SERVICE, false);
+        for(const auto& serverport: serverport_list)
+        {
+            SendProtoMsgToZonePort(serverport, send_msg);
+        }
+    }
+    
     __LEAVE_FUNCTION
 }
 

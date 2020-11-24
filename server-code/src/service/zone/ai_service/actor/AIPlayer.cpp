@@ -1,5 +1,5 @@
 #include "AIPlayer.h"
-
+#include "server_msg/server_side.pb.h"
 OBJECTHEAP_IMPLEMENTATION(CAIPlayer, s_heap);
 CAIPlayer::CAIPlayer() {}
 
@@ -25,35 +25,4 @@ bool CAIPlayer::Init(const ServerMSG::ActorCreate& msg)
     return true;
     __LEAVE_FUNCTION
     return false;
-}
-
-void CAIPlayer::ClearTaskPhase()
-{
-    m_TaskPhase.clear();
-}
-
-bool CAIPlayer::CheckTaskPhase(uint64_t idPhase)
-{
-    auto it = m_TaskPhase.find(idPhase);
-    if(it != m_TaskPhase.end())
-    {
-        return it->second == 0;
-    }
-    return false;
-}
-
-void CAIPlayer::AddTaskPhase(uint64_t idPhase)
-{
-    auto& refData = m_TaskPhase[idPhase];
-    refData++;
-}
-
-void CAIPlayer::RemoveTaskPhase(uint64_t idPhase)
-{
-    auto& refData = m_TaskPhase[idPhase];
-    refData--;
-    if(refData == 0)
-    {
-        m_TaskPhase.erase(idPhase);
-    }
 }

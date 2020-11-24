@@ -30,6 +30,7 @@ bool CSceneManager::Init(uint32_t idZone)
 
     return true;
     __LEAVE_FUNCTION
+    return false;
 }
 
 void CSceneManager::Destory()

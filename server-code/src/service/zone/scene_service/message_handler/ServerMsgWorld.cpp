@@ -5,6 +5,7 @@
 #include "MsgSceneProcess.h"
 #include "Player.h"
 #include "SceneService.h"
+#include "Scene.h"
 #include "msg/ts_cmd.pb.h"
 #include "msg/zone_service.pb.h"
 #include "server_msg/server_side.pb.h"
@@ -110,6 +111,7 @@ ON_SERVERMSG(CSceneService, PlayerLogout)
 
 ON_SERVERMSG(CSceneService, ServiceRegister)
 {
+    //reciver from route
     __ENTER_FUNCTION
 
     ServerPort server_port{msg.serverport()};
@@ -117,4 +119,23 @@ ON_SERVERMSG(CSceneService, ServiceRegister)
     GetMessageRoute()->ReloadServiceInfo(msg.update_time(), server_port.GetWorldID());
 
     __LEAVE_FUNCTION
+}
+
+ON_SERVERMSG(CSceneService, ServiceReady)
+{
+    //recive from ai/aoi
+    SceneService()->OnWaitedServiceReady(ServerPort(msg.serverport()).GetServiceID());
+}
+
+ON_SERVERMSG(CSceneService, AOIChange)
+{
+    //recive from aoi
+    CActor* pActor = ActorManager()->QueryActor(msg.actor_id());
+    CHECK_FMT(pActor, "actorid:{} not find", msg.actor_id());
+    CHECK(pActor->GetCurrentScene());
+    CHECK(msg.scene_idx() == pActor->GetSceneIdx() );
+    BROADCAST_SET setBCActorDel{msg.actor_del().begin(), msg.actor_del().end()};
+    BROADCAST_SET setBCActorAdd{msg.actor_add().begin(), msg.actor_add().end()};
+    
+    pActor->OnReciveAOIUpdate(setBCActorDel, setBCActorAdd);
 }

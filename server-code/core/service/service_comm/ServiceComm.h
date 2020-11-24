@@ -123,6 +123,12 @@ public:
     static std::unique_ptr<db::tbld_dbinfo>  QueryDBInfo(uint16_t nWorldID, CMysqlConnection* pServerInfoDB);
     static std::unique_ptr<CMysqlConnection> ConnectDB(const db::tbld_dbinfo* pInfo);
 
+
+public:
+    void AddWaitServiceReady(ServiceID&& service_id);
+    void OnWaitedServiceReady(const ServiceID& service_id);
+    virtual void OnAllWaitedServiceReady(){}
+    virtual void OnServiceReadyFromCrash(const ServiceID& service_id){}
 protected:
     std::unique_ptr<CNetworkService> m_pNetworkService;
     CMessagePort*                    m_pMessagePort;
@@ -135,6 +141,8 @@ protected:
     std::string                      m_ServiceName;
     uint32_t                         m_nMessageProcess = 0;
     std::unique_ptr<CMonitorMgr>     m_pMonitorMgr;
+
+    std::unordered_set<ServiceID>    m_setWaitServiceReady;
 };
 
 #endif /* SERVICECOMM_H */

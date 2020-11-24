@@ -243,26 +243,32 @@ void CMonster::OnEnterMap(CSceneBase* pScene)
     __ENTER_FUNCTION
     CActor::OnEnterMap(pScene);
 
-    ServerMSG::ActorCreate ai_msg;
-    ai_msg.set_actor_id(GetID());
-    ai_msg.set_scene_id(GetSceneIdx());
-    ai_msg.set_actortype(ACT_MONSTER);
-    ai_msg.set_prof(GetTypeID());
-    ai_msg.set_lev(GetLev());
-    ai_msg.set_campid(GetCampID());
-    ai_msg.set_phase_id(GetPhaseID());
-    ai_msg.set_name(GetName());
-    ai_msg.set_hp(GetHP());
-    ai_msg.set_hpmax(GetHPMax());
-    ai_msg.set_mp(GetMP());
-    ai_msg.set_mpmax(GetMPMax());
-    ai_msg.set_movespd(GetAttrib().get(ATTRIB_MOVESPD));
-    ai_msg.set_posx(GetPosX());
-    ai_msg.set_posy(GetPosY());
-    ai_msg.set_monster_gen_id(m_idGen);
-    ai_msg.set_ownerid(GetOwnerID());
+    ServerMSG::ActorCreate aoi_msg;
+    aoi_msg.set_actor_id(GetID());
+    aoi_msg.set_scene_id(GetSceneIdx());
+    aoi_msg.set_actortype(ACT_MONSTER);
+    aoi_msg.set_prof(GetTypeID());
+    aoi_msg.set_lev(GetLev());
+    aoi_msg.set_campid(GetCampID());
+    aoi_msg.set_phase_id(GetPhaseID());
+    aoi_msg.set_name(GetName());
+    
+    aoi_msg.set_movespd(GetAttrib().get(ATTRIB_MOVESPD));
+    aoi_msg.set_posx(GetPosX());
+    aoi_msg.set_posy(GetPosY());
+    aoi_msg.set_monster_gen_id(m_idGen);
+    aoi_msg.set_ownerid(GetOwnerID());
+    SceneService()->SendProtoMsgToAOIService(aoi_msg);
 
-    SceneService()->SendProtoMsgToAIService(ai_msg);
+
+
+    aoi_msg.set_hp(GetHP());
+    aoi_msg.set_hpmax(GetHPMax());
+    aoi_msg.set_mp(GetMP());
+    aoi_msg.set_mpmax(GetMPMax());
+    SceneService()->SendProtoMsgToAIService(aoi_msg);
+
+    
     __LEAVE_FUNCTION
 }
 

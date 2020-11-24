@@ -19,7 +19,7 @@
 #include "NetMSGProcess.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
-
+#include "server_msg/server_side.pb.h"
 
 static thread_local CAIService* tls_pService;
 CAIService*                     AIService()
@@ -120,7 +120,7 @@ bool CAIService::Init(const ServerPort& nServerPort)
     uint32_t FrameInterval = 1000 / FrameCount;
     if(CreateService(FrameInterval) == false)
         return false;
-
+    EventManager()->Pause(true);
     ServerMSG::ServiceReady msg;
     msg.set_serverport(GetServerPort());
 

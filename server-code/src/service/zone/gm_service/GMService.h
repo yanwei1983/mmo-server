@@ -9,11 +9,16 @@
 #include "NetSocket.h"
 #include "ServiceComm.h"
 #include "UIDFactory.h"
-#include "server_msg/server_side.pb.h"
+
 
 struct event;
 class CNetMSGProcess;
 class CRPCService;
+namespace ServerMSG
+{
+    class ServiceHttpRequest;
+};
+
 class CGMService : public IService, public CServiceCommon
 {
     CGMService();

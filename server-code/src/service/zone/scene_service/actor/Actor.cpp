@@ -64,7 +64,7 @@ void CActor::AddHide()
     ServerMSG::ActorSetHide msg;
     msg.set_actor_id(GetID());
     msg.set_hide_count(m_nHideCount);
-    SceneService()->SendProtoMsgToAIService(msg);
+    SceneService()->SendProtoMsgToAOIService(msg);
     __LEAVE_FUNCTION
 }
 
@@ -76,7 +76,7 @@ void CActor::RemoveHide()
     ServerMSG::ActorSetHide msg;
     msg.set_actor_id(GetID());
     msg.set_hide_count(m_nHideCount);
-    SceneService()->SendProtoMsgToAIService(msg);
+    SceneService()->SendProtoMsgToAOIService(msg);
     __LEAVE_FUNCTION
 }
 
@@ -188,7 +188,7 @@ void CActor::_SetProperty(uint32_t nType, uint32_t nVal, uint32_t nSync)
         auto attr = msg.add_datalist();
         attr->set_actype(nType);
         attr->set_val(nVal);
-        SendRoomMessage(msg);
+        SendRoomMessage(msg, true);
     }
     else if(nSync == SYNC_ALL_DELAY)
     {
@@ -311,7 +311,7 @@ void CActor::SendDelayAttribChage()
         pInfo->set_actype(k);
         pInfo->set_val(v);
     }
-    SendRoomMessage(msg);
+    SendRoomMessage(msg, true);
     m_DelayAttribChangeMap.clear();
     __LEAVE_FUNCTION
 }

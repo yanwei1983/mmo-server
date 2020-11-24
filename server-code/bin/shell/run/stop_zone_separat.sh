@@ -29,27 +29,27 @@ ${DIR_file}/binary/z${serverid}_route --worldid=${serverid} --stop=ROUTE_SERVICE
 
 scene1()
 {
-    ${DIR_file}/binary/z${serverid}_scene1 --worldid=${serverid} --stop=SCENE_SERVICE-1,AI_SERVICE-1
+    ${DIR_file}/binary/z${serverid}_scene1 --worldid=${serverid} --stop=SCENE_SERVICE-1,AI_SERVICE-1,AOI_SERVICE-1
 }
 
 scene2()
 {
-    ${DIR_file}/binary/z${serverid}_scene2 --worldid=${serverid} --stop=SCENE_SERVICE-2,AI_SERVICE-2
+    ${DIR_file}/binary/z${serverid}_scene2 --worldid=${serverid} --stop=SCENE_SERVICE-2,AI_SERVICE-2,AOI_SERVICE-2
 }
 
 scene3()
 {
-    ${DIR_file}/binary/z${serverid}_scene3 --worldid=${serverid} --stop=SCENE_SERVICE-3,AI_SERVICE-3
+    ${DIR_file}/binary/z${serverid}_scene3 --worldid=${serverid} --stop=SCENE_SERVICE-3,AI_SERVICE-3,AOI_SERVICE-3
 }
 
 scene4()
 {
-    ${DIR_file}/binary/z${serverid}_scene4 --worldid=${serverid} --stop=SCENE_SERVICE-4,AI_SERVICE-4
+    ${DIR_file}/binary/z${serverid}_scene4 --worldid=${serverid} --stop=SCENE_SERVICE-4,AI_SERVICE-4,AOI_SERVICE-4
 }
 
 scene5()
 {
-    ${DIR_file}/binary/z${serverid}_scene5 --worldid=${serverid} --stop=SCENE_SERVICE-5,AI_SERVICE-5
+    ${DIR_file}/binary/z${serverid}_scene5 --worldid=${serverid} --stop=SCENE_SERVICE-5,AI_SERVICE-5,AOI_SERVICE-5
 }
 
 socket1()

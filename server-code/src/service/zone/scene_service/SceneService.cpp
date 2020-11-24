@@ -200,6 +200,9 @@ bool CSceneService::Init(const ServerPort& nServerPort)
         m_pGlobalDB.reset(pGlobalDB.release());
     }
 
+    AddWaitServiceReady(ServiceID{AI_SERVICE, GetServiceID().GetServiceIdx()});
+    AddWaitServiceReady(ServiceID{AOI_SERVICE, GetServiceID().GetServiceIdx()});
+
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -364,6 +367,11 @@ bool CSceneService::SendProtoMsgToAIService(const proto_msg_t& msg) const
     return SendProtoMsgToZonePort(GetAIServerPort(), msg);
 }
 
+bool CSceneService::SendProtoMsgToAOIService(const proto_msg_t& msg) const
+{
+    return SendProtoMsgToZonePort(GetAOIServerPort(), msg);
+}
+
 void CSceneService::_ID2VS(OBJID id, VirtualSocketMap_t& VSMap) const
 {
     __ENTER_FUNCTION
@@ -502,4 +510,33 @@ void CSceneService::OnLogicThreadCreate()
 void CSceneService::OnLogicThreadExit()
 {
     CServiceCommon::OnLogicThreadExit();
+}
+
+
+void CSceneService::OnAllWaitedServiceReady()
+{
+    __ENTER_FUNCTION
+    
+    if(SceneService()->IsSharedZone() == false)
+    {
+        ServerMSG::ServiceReady send;
+        send.set_serverport(SceneService()->GetServerPort());
+        SceneService()->SendProtoMsgToWorld(SceneService()->GetWorldID(), send);
+        SceneService()->SendProtoMsgToAIService(send); 
+    }
+    else
+    {
+        ServerMSG::ServiceReady send;
+        send.set_serverport(SceneService()->GetServerPort());
+        SceneService()->SendProtoMsgToAIService(send); 
+    }
+
+       
+        
+    __LEAVE_FUNCTION
+}
+
+void CSceneService::OnServiceReadyFromCrash(const ServiceID& service_id)
+{
+    //ai/aoi奔溃重启后，需要进行数据重建
 }

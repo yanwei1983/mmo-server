@@ -9,6 +9,7 @@
 #include "MapManager.h"
 #include "MonsterType.h"
 #include "config/Cfg_Scene_MonsterGenerator.pb.h"
+#include "server_msg/server_side.pb.h"
 
 MonsterGenData::MonsterGenData(const Cfg_Scene_MonsterGenerator& _gen_data)
     : gen_data(_gen_data)

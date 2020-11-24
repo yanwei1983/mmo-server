@@ -15,13 +15,14 @@ export_lua enum SERVICE_TYPE {
     UNKNOW_SERVICE = 0,
     WORLD_SERVICE  = 1, //单服单个, 重要节点,奔溃需重启整组服务, 登录服务, 单服内全局事件, 排行榜, 公会, 组队
     SCENE_SERVICE  = 2, //单服多个, 游戏服务,负载场景
-    AI_SERVICE     = 3, //单服多个, 与zone联动, ai服务,每个ai服务对应一个zone
+    AI_SERVICE     = 3, //单服多个, 与scene联动, ai服务,每个ai服务对应一个scene
+    AOI_SERVICE    = 4, //单服多个, 与scene联动, aoi服务,每个aoi服务对应一个scene
 
     MARKET_SERVICE = 5, //单服单个, 拍卖行
     GM_SERVICE     = 6, //单服单个, 无状态, 后台调用, 充值调用
 
     SOCKET_SERVICE = 7, //单服多个, 连接服务, 网关, 广播, 组播
-    AUTH_SERVICE   = 8, //单服多个/单个, 无状态, 验证登录
+    AUTH_SERVICE   = 8, //单服多个/单个, 无状态, 验证登录, 与socket联动
 
     GUILD_SERVICE = 9,  //单服单个
     ROUTE_SERVICE = 10, //单服单个, 无状态, 用来转发连接多个zone

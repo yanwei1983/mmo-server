@@ -143,6 +143,7 @@ bool CSocketService::Init(const ServerPort& nServerPort)
         }
     }
 
+    AddWaitServiceReady(ServiceID{AUTH_SERVICE, GetServiceID().GetServiceIdx()});
     return true;
 
     __LEAVE_FUNCTION
@@ -295,17 +296,21 @@ void CSocketService::OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len)
     __LEAVE_FUNCTION
 }
 
+void CSocketService::OnAllWaitedServiceReady()
+{
+    __ENTER_FUNCTION
+    
+        
+        ServerMSG::ServiceReady send;
+        send.set_serverport(SocketService()->GetServerPort());
+        SocketService()->SendProtoMsgToZonePort(ServerPort(GetWorldID(), WORLD_SERVICE, 0), send);
+        
+    __LEAVE_FUNCTION
+}
+
 ON_SERVERMSG(CSocketService, ServiceReady)
 {
-    ServerPort ready_server_port(msg.serverport());
-    LOGDEBUG("recv service {}  is ready", ready_server_port);
-    if(ready_server_port.GetServiceType() == AUTH_SERVICE)
-    {
-        LOGDEBUG("auth_service {} is ready, send ready to world", ready_server_port);
-        ServerMSG::ServiceReady msg;
-        msg.set_serverport(SocketService()->GetServerPort());
-        SocketService()->SendProtoMsgToZonePort(ServerPort(SocketService()->GetWorldID(), WORLD_SERVICE, 0), msg);
-    }
+    SocketService()->OnWaitedServiceReady(ServerPort(msg.serverport()).GetServiceID());
 }
 
 ON_SERVERMSG(CSocketService, SocketStartAccept)

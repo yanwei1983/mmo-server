@@ -43,27 +43,27 @@ ${DIR_file}/binary/z${serverid}_route --worldid=${serverid} --start=ROUTE_SERVIC
 
 scene1()
 {
-    ${DIR_file}/binary/z${serverid}_scene1 --worldid=${serverid} --start=SCENE_SERVICE-1,AI_SERVICE-1 --logpath=/data/log/zone_${serverid}/scene1 -d
+    ${DIR_file}/binary/z${serverid}_scene1 --worldid=${serverid} --start=SCENE_SERVICE-1,AI_SERVICE-1,AOI_SERVICE-1 --logpath=/data/log/zone_${serverid}/scene1 -d
 }
 
 scene2()
 {
-    ${DIR_file}/binary/z${serverid}_scene2 --worldid=${serverid} --start=SCENE_SERVICE-2,AI_SERVICE-2 --logpath=/data/log/zone_${serverid}/scene2 -d
+    ${DIR_file}/binary/z${serverid}_scene2 --worldid=${serverid} --start=SCENE_SERVICE-2,AI_SERVICE-2,AOI_SERVICE-2 --logpath=/data/log/zone_${serverid}/scene2 -d
 }
 
 scene3()
 {
-    ${DIR_file}/binary/z${serverid}_scene3 --worldid=${serverid} --start=SCENE_SERVICE-3,AI_SERVICE-3 --logpath=/data/log/zone_${serverid}/scene3 -d
+    ${DIR_file}/binary/z${serverid}_scene3 --worldid=${serverid} --start=SCENE_SERVICE-3,AI_SERVICE-3,AOI_SERVICE-3 --logpath=/data/log/zone_${serverid}/scene3 -d
 }
 
 scene4()
 {
-    ${DIR_file}/binary/z${serverid}_scene4 --worldid=${serverid} --start=SCENE_SERVICE-4,AI_SERVICE-4 --logpath=/data/log/zone_${serverid}/scene4 -d
+    ${DIR_file}/binary/z${serverid}_scene4 --worldid=${serverid} --start=SCENE_SERVICE-4,AI_SERVICE-4,AOI_SERVICE-4 --logpath=/data/log/zone_${serverid}/scene4 -d
 }
 
 scene5()
 {
-    ${DIR_file}/binary/z${serverid}_scene5 --worldid=${serverid} --start=SCENE_SERVICE-5,AI_SERVICE-5 --logpath=/data/log/zone_${serverid}/scene5 -d
+    ${DIR_file}/binary/z${serverid}_scene5 --worldid=${serverid} --start=SCENE_SERVICE-5,AI_SERVICE-5,AOI_SERVICE-5 --logpath=/data/log/zone_${serverid}/scene5 -d
 }
 
 socket1()

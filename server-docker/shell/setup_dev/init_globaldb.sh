@@ -18,13 +18,13 @@ source $env_file
 create_serverinfodb()
 {
 echo "create database IF NOT EXISTS ${SERVERINFO_MYSQL_NAME};" | docker exec -i mysql-global sh -c "exec mysql -v --default-character-set=utf8mb4 -uroot -p\"${MYSQL_PASSWD}\""
-cat {$root_dir}/server-res/res/db/db_proto/serverinfodb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
+cat ${root_dir}/server-res/res/db/db_proto/serverinfodb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
 }
 
 create_globaldb()
 {
 echo "create database IF NOT EXISTS ${GLOBAL_MYSQL_NAME};" | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\""
-cat {$root_dir}/server-res/res/db/db_proto/globaldb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${GLOBAL_MYSQL_NAME}"
+cat ${root_dir}/server-res/res/db/db_proto/globaldb.pb.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${GLOBAL_MYSQL_NAME}"
 }
 
 create_db()
@@ -50,7 +50,7 @@ docker run --rm --privileged=true \
 -v /${root_dir}/server-res:/data/mmorpg/server-res \
 -it mmo-server-base:20.04 sh -c "${cmd}" > sql/init_globalservice.sql
 
-cat  sql/init_globalservice.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
+cat  sql/init_globalservice.sql | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
 }
 
 
@@ -59,14 +59,20 @@ show_serverinfodb()
 echo "select * from tbld_servicedetail where worldid=0;" | docker exec -i mysql-global sh -c "exec mysql --default-character-set=utf8mb4 -v -uroot -p\"${MYSQL_PASSWD}\" ${SERVERINFO_MYSQL_NAME}"
 }
 
-
+all()
+{
+    create_db;
+    init_serverinfodb;
+    show_serverinfodb;
+}
 if [ $2 ];
 then
     $2;
 else
-    create_db;
-    init_serverinfodb;
-    show_serverinfodb;
+    echo "all";
+    echo "create_db";
+    echo "init_serverinfodb";
+    echo "show_serverinfodb";
     
 fi
 

@@ -33,6 +33,7 @@ public:
 public:
     export_lua uint16_t   GetZoneID() const { return GetServiceID().GetServiceIdx(); }
     export_lua ServerPort GetAIServerPort() const { return ServerPort(GetWorldID(), AI_SERVICE, GetServiceID().GetServiceIdx()); }
+    export_lua ServerPort GetAOIServerPort() const { return ServerPort(GetWorldID(), AOI_SERVICE, GetServiceID().GetServiceIdx()); }
     export_lua bool       IsSharedZone() const { return GetWorldID() == 0; }
     export_lua uint64_t   CreateUID();
 
@@ -42,7 +43,8 @@ public:
     virtual void OnLogicThreadExit() override;
 
     virtual void OnProcessMessage(CNetworkMessage*) override;
-
+    virtual void OnAllWaitedServiceReady()override;
+    virtual void OnServiceReadyFromCrash(const ServiceID& service_id) override;
 public:
     void                          CreateSocketMessagePool(const VirtualSocket& vs);
     void                          DelSocketMessagePool(const VirtualSocket& vs);
@@ -61,6 +63,9 @@ public:
 
     //发送消息给AIService
     export_lua bool SendProtoMsgToAIService(const proto_msg_t& msg) const;
+    
+    //发送消息给AOIService
+    export_lua bool SendProtoMsgToAOIService(const proto_msg_t& msg) const;
 
     //发送广播包给玩家
     void _ID2VS(OBJID id, VirtualSocketMap_t& VSMap) const override;

@@ -455,3 +455,28 @@ std::unique_ptr<CMysqlConnection> CServiceCommon::ConnectServerInfoDB()
     }
     return pServerInfoDB;
 }
+
+void CServiceCommon::AddWaitServiceReady(ServiceID&& service_id)
+{
+    m_setWaitServiceReady.emplace(service_id);
+}
+
+void CServiceCommon::OnWaitedServiceReady(const ServiceID& service_id)
+{
+    __ENTER_FUNCTION
+    if(m_setWaitServiceReady.empty())
+    {
+        OnServiceReadyFromCrash(service_id);
+        return;
+    }
+
+    m_setWaitServiceReady.erase(service_id);
+    LOGMESSAGE("WaitedServiceReady:{}  left_need:{}", ::GetServiceName(service_id), m_setWaitServiceReady.size());
+    if(m_setWaitServiceReady.empty() == true)
+    {
+        LOGMESSAGE("AllWaitedServiceReady");
+        OnAllWaitedServiceReady();
+    }
+
+    __LEAVE_FUNCTION
+}

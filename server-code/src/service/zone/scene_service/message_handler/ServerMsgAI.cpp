@@ -106,22 +106,3 @@ ON_SERVERMSG(CSceneService, ActorCastSkill)
     __LEAVE_FUNCTION
 }
 
-ON_SERVERMSG(CSceneService, ServiceReady)
-{
-    __ENTER_FUNCTION
-    ServerPort ready_server_port(msg.serverport());
-    LOGDEBUG("recv service {}  is ready is ready", ready_server_port);
-    // send message to world, notify zone ready
-    if(ready_server_port.GetServiceType() == AI_SERVICE)
-    {
-        if(SceneService()->IsSharedZone() == false)
-        {
-            LOGDEBUG("ai_service {} is ready, send ready to world", ready_server_port);
-            ServerMSG::ServiceReady send;
-            send.set_serverport(SceneService()->GetServerPort());
-            SceneService()->SendProtoMsgToWorld(SceneService()->GetWorldID(), send);
-        }
-    }
-
-    __LEAVE_FUNCTION
-}

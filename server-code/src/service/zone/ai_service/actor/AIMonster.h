@@ -2,7 +2,10 @@
 #define AIMONSTER_H
 
 #include "AIActor.h"
-#include "server_msg/server_side.pb.h"
+namespace ServerMSG
+{
+    class ActorCreate;
+}
 class CActorAI;
 class CMonsterType;
 class CAIType;
