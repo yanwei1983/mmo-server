@@ -8,6 +8,7 @@
 #include "NetSocket.h"
 #include "NormalCrypto.h"
 #include "serverinfodb.h"
+#include "GlobalSetting.h"
 #include <fstream>
 
 
@@ -76,31 +77,15 @@ void CMessageRoute::Destory()
     __LEAVE_FUNCTION
 }
 
-bool CMessageRoute::LoadServiceSetting(const std::string& filename, WorldID_t nWorldID)
+bool CMessageRoute::LoadServiceSetting(WorldID_t nWorldID)
 {
     __ENTER_FUNCTION
-    if(filename.empty() == false)
-    {
-        std::ifstream infile(filename);
-        infile >> m_setDataMap;
-        
-        if(m_setDataMap.is_discarded())
-        {
-            LOGFATAL("CMessageRoute::LoadServiceSetting {} is not a json");
-            return false;
-        }
-
-    }
-    else
-    {
-        m_setDataMap["ServerInfoMYSQL"]["url"] = std::getenv("ServerInfoMYSQL_URL");
-    }
-
     SetWorldID(nWorldID);
 
     //读取全服IP表
     {
-        const auto& sql_url = m_setDataMap["ServerInfoMYSQL"]["url"];
+        const auto& data_map = GetGlobalSetting()->GetData();
+        const auto& sql_url = data_map["ServerInfoMYSQL"]["url"];
         if(ConnectServerInfoDB(sql_url) == false)
         {
             LOGFATAL("CMessageRoute::LoadServiceSetting ConnectServerInfoDB fail");

@@ -39,6 +39,7 @@ bool CSkillFSM::CastSkill(uint32_t idSkill, OBJID idTarget, const Vector2& pos)
     if(CanIntone(pSkillType, pTarget, pos) == false)
         return false;
     LOGSKILLDEBUG(pSkillType->IsDebug(),
+                    m_pOwner->GetID(),
                   "SkillCast ID:{} Skill:{}, Target:{} Pos:{:01f} {:01f}",
                   m_pOwner->GetID(),
                   idSkill,
@@ -71,7 +72,7 @@ bool CSkillFSM::CanIntone(const CSkillType* pSkillType, CActor* pTarget, const V
 
     if(IsSkillCoolDown(pSkillType->GetCDType()))
     {
-        LOGSKILLDEBUG(pSkillType->IsDebug(), "Actor {} SkillCoolDown:{}", m_pOwner->GetID(), pSkillType->GetSkillID());
+        LOGSKILLDEBUG(pSkillType->IsDebug(), m_pOwner->GetID(),"Actor {} SkillCoolDown:{}", m_pOwner->GetID(), pSkillType->GetSkillID());
         return false;
     }
 
@@ -81,7 +82,7 @@ bool CSkillFSM::CanIntone(const CSkillType* pSkillType, CActor* pTarget, const V
 
     if(bCanIntone == false)
     {
-        LOGSKILLDEBUG(pSkillType->IsDebug(), "Actor {} SkillCannptIntone:{}", m_pOwner->GetID(), pSkillType->GetSkillID());
+        LOGSKILLDEBUG(pSkillType->IsDebug(), m_pOwner->GetID(),"Actor {} SkillCannptIntone:{}", m_pOwner->GetID(), pSkillType->GetSkillID());
         return false;
     }
 
@@ -122,14 +123,14 @@ bool CSkillFSM::CanIntone(const CSkillType* pSkillType, CActor* pTarget, const V
         CPlayer* pPlayer = m_pOwner->CastTo<CPlayer>();
         if(pPlayer->CheckItem(pSkillType->GetUseItemType(), 1) == false)
         {
-            LOGSKILLDEBUG(pSkillType->IsDebug(), "Actor {} SkillCheckItemFail:{}", m_pOwner->GetID(), pSkillType->GetSkillID());
+            LOGSKILLDEBUG(pSkillType->IsDebug(), m_pOwner->GetID(),"Actor {} SkillCheckItemFail:{}", m_pOwner->GetID(), pSkillType->GetSkillID());
             return false;
         }
         if(HasFlag(pSkillType->GetFlag(), SKILLFLAG_SPENDITEM) == true)
         {
             if(pPlayer->SpendItem(LOGITEM_SKILL, pSkillType->GetUseItemType(), 1) == false)
             {
-                LOGSKILLDEBUG(pSkillType->IsDebug(), "Actor {} SkillSpendItemFail:{}", m_pOwner->GetID(), pSkillType->GetSkillID());
+                LOGSKILLDEBUG(pSkillType->IsDebug(), m_pOwner->GetID(),"Actor {} SkillSpendItemFail:{}", m_pOwner->GetID(), pSkillType->GetSkillID());
                 return false;
             }
         }
@@ -143,7 +144,7 @@ bool CSkillFSM::CanIntone(const CSkillType* pSkillType, CActor* pTarget, const V
 void CSkillFSM::DoIntone(const CSkillType* pSkillType)
 {
     __ENTER_FUNCTION
-    LOGSKILLDEBUG(pSkillType->IsDebug(), "DoIntone ID:{}", m_pOwner->GetID());
+    LOGSKILLDEBUG(pSkillType->IsDebug(), m_pOwner->GetID(),"DoIntone ID:{}", m_pOwner->GetID());
 
     m_pCurSkillType = pSkillType;
     m_curState      = SKILLSTATE_INTONE;
@@ -177,7 +178,7 @@ bool CSkillFSM::BreakIntone()
     CHECKF(m_pCurSkillType);
     if(HasFlag(m_pCurSkillType->GetFlag(), SKILLFLAG_INTONE_CANBREAK) == false)
         return false;
-    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "BreakIntone ID:{}", m_pOwner->GetID());
+    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), m_pOwner->GetID(),"BreakIntone ID:{}", m_pOwner->GetID());
     return _BreakIntone();
     __LEAVE_FUNCTION
     return false;
@@ -203,7 +204,7 @@ bool CSkillFSM::_BreakIntone()
 void CSkillFSM::DoLaunch()
 {
     __ENTER_FUNCTION
-    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "DoLaunch ID:{}", m_pOwner->GetID());
+    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), m_pOwner->GetID(),"DoLaunch ID:{}", m_pOwner->GetID());
     m_curState    = SKILLSTATE_INTONE;
     m_nApplyTimes = 0;
 
@@ -234,7 +235,7 @@ bool CSkillFSM::BreakLaunch()
     CHECKF(m_pCurSkillType);
     if(HasFlag(m_pCurSkillType->GetFlag(), SKILLFLAG_LAUNCH_CANBREAK) == false)
         return false;
-    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "BreakLaunch ID:{}", m_pOwner->GetID());
+    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), m_pOwner->GetID(),"BreakLaunch ID:{}", m_pOwner->GetID());
     return _BreakLaunch();
     __LEAVE_FUNCTION
     return false;
@@ -466,7 +467,7 @@ void CSkillFSM::SkillEffectInRange(OBJID idCaster, uint32_t idSkillType, OBJID i
 void CSkillFSM::SkillEffect()
 {
     __ENTER_FUNCTION
-    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "SkillEffect ID:{}", m_pOwner->GetID());
+    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), m_pOwner->GetID(),"SkillEffect ID:{}", m_pOwner->GetID());
 
     //技能作用
     _SkillEffectInRange(m_pOwner, m_pCurSkillType, m_idTarget, m_posTarget, m_nApplyTimes);
@@ -514,7 +515,7 @@ void CSkillFSM::DoStun()
 {
     __ENTER_FUNCTION
     CHECK(m_pCurSkillType);
-    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "DoStun ID:{}", m_pOwner->GetID());
+    LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), m_pOwner->GetID(),"DoStun ID:{}", m_pOwner->GetID());
     SC_SKILL_STUN msg;
     msg.set_scene_idx(m_pOwner->GetSceneIdx());
     msg.set_actor_id(m_pOwner->GetID());
@@ -544,7 +545,7 @@ void CSkillFSM::DoIdle()
     __ENTER_FUNCTION
     if(m_pCurSkillType)
     {
-        LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), "DoIdle ID:{}", m_pOwner->GetID());
+        LOGSKILLDEBUG(m_pCurSkillType->IsDebug(), m_pOwner->GetID(),"DoIdle ID:{}", m_pOwner->GetID());
     }
 
     m_pCurSkillType = nullptr;

@@ -30,7 +30,7 @@ ON_MSG(CAIService, SC_AOI_UPDATE)
     CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx() );
 
     pActor->SetPos(Vector2(msg.posx(), msg.posy()));
-    LOGAIDEBUG(true,
+    LOGACTORDEBUG(
                pActor->GetID(),
                "Actor:{} MoveTo {} {:.2f}, {:.2f}",
                pActor->GetID(),
@@ -61,7 +61,7 @@ ON_SERVERMSG(CAIService, AOIChange)
             pTarget->RemoveFromViewList(pActor, pActor->GetID(), true);
         }
 
-        LOGAIDEBUG(true, pActor->GetID(), "Actor:{} ViewListDel del:{}", pActor->GetID(), id);
+        LOGACTORDEBUG(pActor->GetID(), "Actor:{} ViewListDel del:{}", pActor->GetID(), id);
     }
     for(const auto& id: msg.actor_add())
     {
@@ -72,9 +72,9 @@ ON_SERVERMSG(CAIService, AOIChange)
             pTarget->AddToViewList(pActor);
         }
 
-        LOGAIDEBUG(true, pActor->GetID(), "Actor:{} ViewListAdd del:{}", pActor->GetID(), id);
+        LOGACTORDEBUG(pActor->GetID(), "Actor:{} ViewListAdd del:{}", pActor->GetID(), id);
     }
-    LOGAIDEBUG(true,
+    LOGACTORDEBUG(
                pActor->GetID(),
                "Actor:{} ViewListChange cur:{} add:{} del:{}",
                pActor->GetID(),
@@ -198,12 +198,13 @@ ON_SERVERMSG(CAIService, ActorCreate)
         case ACT_MONSTER:
         {
             pActor = CAIMonster::CreateNew(msg);
+            LOGACTORDEBUG(pActor->GetID(), "Create AIMonster id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;
         case ACT_PLAYER:
         {
             pActor = CAIPlayer::CreateNew(msg);
-            LOGDEBUG("Create AIPlayer id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
+            LOGACTORDEBUG(pActor->GetID(), "Create AIPlayer id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;
         case ACT_PET:
@@ -230,7 +231,7 @@ ON_SERVERMSG(CAIService, ActorDestory)
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
-    LOGDEBUG("ActorDestory id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
+    LOGACTORDEBUG(pActor->GetID(),"ActorDestory id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
 
     if(msg.dead())
     {

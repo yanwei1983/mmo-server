@@ -40,6 +40,7 @@ namespace BaseCode
     NDC*        getNdc();
     std::string getNdcStr();
     void        StopLog();
+    void        CreateExtLogDir();
 
     extern int32_t              s_default_logger;
     extern int32_t              s_debug_logger;
@@ -51,10 +52,15 @@ namespace BaseCode
     extern int32_t              s_db_logger;
     extern int32_t              s_stack_logger;
     extern int32_t              s_lua_logger;
-    extern thread_local int32_t s_monitor_logger;
     extern int32_t              s_ai_logger;
     extern int32_t              s_login_logger;
     extern int32_t              s_gm_logger;
+
+    extern thread_local int32_t s_monitor_logger;
+
+    extern bool g_log_aidebug;
+    extern bool g_log_actordebug;
+    extern bool g_log_skilldebug;
 } // namespace BaseCode
 
 #define LOGTRACE(...)  ZLOGFMT_TRACE(BaseCode::s_debug_logger, ##__VA_ARGS__)
@@ -62,16 +68,25 @@ namespace BaseCode
 #define LOGASSERT(...) ZLOGFMT_DEBUG(BaseCode::s_debug_logger, ##__VA_ARGS__)
 
 #define LOGAIDEBUG(expr, role_id, fmtr, ...)                                                      \
-    if(expr)                                                                                      \
+    if(expr && BaseCode::g_log_aidebug)                                                                                      \
     {                                                                                             \
         BaseCode::MyLogMsg(fmt::format("aidebug/role_{}", role_id).c_str(), fmtr, ##__VA_ARGS__); \
     }
 
-#define LOGSKILLDEBUG(expr, ...)                                \
-    if(expr)                                                    \
+#define LOGACTORDEBUG(role_id, fmtr, ...)                                 \
+    if(BaseCode::g_log_actordebug)                                                    \
     {                                                           \
-        ZLOGFMT_DEBUG(BaseCode::s_debug_logger, ##__VA_ARGS__); \
+        BaseCode::MyLogMsg(fmt::format("actordebug/role_{}", role_id).c_str(), fmtr, ##__VA_ARGS__); \
     }
+
+#define LOGSKILLDEBUG(expr, role_id, fmtr, ...)                                 \
+    if(expr && BaseCode::g_log_skilldebug)                                                    \
+    {                                                           \
+        BaseCode::MyLogMsg(fmt::format("skilldebug/role_{}", role_id).c_str(), fmtr, ##__VA_ARGS__); \
+    }
+
+
+
 
 #define LOGNETDEBUG(...) ZLOGFMT_DEBUG(BaseCode::s_network_logger, ##__VA_ARGS__)
 #define LOGNETINFO(...)  ZLOGFMT_INFO(BaseCode::s_network_logger, ##__VA_ARGS__)

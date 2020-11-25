@@ -91,7 +91,7 @@ bool CAIService::Init(const ServerPort& nServerPort)
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
     };
-
+    BaseCode::CreateExtLogDir();
     extern void export_to_lua(lua_State*, void*);
     m_pScriptManager.reset(CLUAScriptManager::CreateNew(std::string("AIScript") + std::to_string(GetServerPort().GetServiceID()),
                                                         &export_to_lua,

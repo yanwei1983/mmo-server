@@ -10,20 +10,26 @@
 
 namespace BaseCode
 {
-    int32_t              s_default_logger = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_network_logger = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_db_logger      = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_stack_logger   = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_debug_logger   = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_error_logger   = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_message_logger = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_warning_logger = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_fatal_logger   = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_lua_logger     = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_default_logger = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_network_logger = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_db_logger      = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_stack_logger   = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_debug_logger   = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_error_logger   = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_message_logger = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_warning_logger = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_fatal_logger   = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_lua_logger     = LOG4Z_MAIN_LOGGER_ID;
+
+    int32_t s_ai_logger    = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_login_logger = LOG4Z_MAIN_LOGGER_ID;
+    int32_t s_gm_logger    = LOG4Z_MAIN_LOGGER_ID;
+
     thread_local int32_t s_monitor_logger = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_ai_logger      = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_login_logger   = LOG4Z_MAIN_LOGGER_ID;
-    int32_t              s_gm_logger      = LOG4Z_MAIN_LOGGER_ID;
+
+    bool g_log_aidebug = false;
+    bool g_log_actordebug = false;
+    bool g_log_skilldebug = false;
 } // namespace BaseCode
 
 static std::string g_logPath;
@@ -133,9 +139,18 @@ void BaseCode::InitLog(const std::string& path, int32_t log_lev)
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_lua_logger, false);
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_gm_logger, false);
 
-    createRecursionDir(g_logPath + "/aidebug");
 
     ILog4zManager::getRef().start();
+}
+
+void BaseCode::CreateExtLogDir()
+{
+    if(g_log_aidebug)
+        createRecursionDir(g_logPath + "/aidebug");
+    if(g_log_skilldebug)
+        createRecursionDir(g_logPath + "/skilldebug");
+    if(g_log_actordebug)
+        createRecursionDir(g_logPath + "/actordebug");
 }
 
 void BaseCode::StopLog()

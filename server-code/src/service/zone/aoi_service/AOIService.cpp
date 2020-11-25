@@ -86,7 +86,7 @@ bool CAOIService::Init(const ServerPort& nServerPort)
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
     };
-
+    BaseCode::CreateExtLogDir();
 
     m_pMapManager.reset(CMapManager::CreateNew(GetZoneID()));
     CHECKF(m_pMapManager.get());

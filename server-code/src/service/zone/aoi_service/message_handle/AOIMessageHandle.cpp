@@ -75,12 +75,13 @@ ON_SERVERMSG(CAOIService, ActorCreate)
         case ACT_PLAYER:
         {
             pActor = CAOIPlayer::CreateNew(msg);
-            LOGDEBUG("Create AOIPlayer id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
+            LOGACTORDEBUG(pActor->GetID(),"Create AOIPlayer id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;
         default:
         {
             pActor = CAOIActor::CreateNew(msg);
+            LOGACTORDEBUG(pActor->GetID(),"Create AOIActor id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;
     }
@@ -100,7 +101,7 @@ ON_SERVERMSG(CAOIService, ActorDestory)
     __ENTER_FUNCTION
     CAOIActor* pActor = AOIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
-    LOGDEBUG("ActorDestory id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
+    LOGACTORDEBUG(pActor->GetID(),"ActorDestory id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
 
 
     if(pActor->GetCurrentScene())
@@ -117,6 +118,7 @@ ON_SERVERMSG(CAOIService, ActorSetHide)
     CAOIActor* pActor = AOIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
     pActor->SetHideCoude(msg.hide_count());
+    LOGACTORDEBUG(pActor->GetID(),"SetHideCoude id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
     __LEAVE_FUNCTION
 }
 

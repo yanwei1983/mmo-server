@@ -11,7 +11,7 @@
 #include "BaseCode.h"
 #include "NetworkDefine.h"
 
-#include "json.hpp"
+
 
 class CMessagePort;
 class CNetworkService;
@@ -38,7 +38,7 @@ public:
 
 public:
     //从配置文件读取数据库地址,并重读配置
-    bool LoadServiceSetting(const std::string& filename, WorldID_t nWorldID);
+    bool LoadServiceSetting(WorldID_t nWorldID);
     //创建所有本地端口
     bool CreateAllMessagePort(WorldID_t nWorldID, const std::set<ServiceID>& create_service_set);
     //从数据库读取Service配置
@@ -83,8 +83,6 @@ public:
     }
 
 public:
-    nlohmann::json&       GetSettingMap() { return m_setDataMap; }
-    const nlohmann::json& GetSettingMap() const { return m_setDataMap; }
     CEventManager*     GetEventManager() const { return m_pEventManager.get(); }
     CMysqlConnection*  GetServerInfoDB() const { return m_pServerInfoDB.get(); }
 
@@ -100,7 +98,7 @@ protected:
     void OnServerAddrInfoChange(const ServerPort& serverport, const ServerAddrInfo& new_info);
 
 protected:
-    nlohmann::json m_setDataMap;
+
     WorldID_t   m_nWorldID;
 
     std::mutex                                    m_mutex;

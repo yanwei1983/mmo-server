@@ -10,6 +10,7 @@
 #include "MonitorMgr.h"
 #include "MysqlConnection.h"
 #include "NormalCrypto.h"
+#include "GlobalSetting.h"
 #include "serverinfodb.h"
 #include "serverinfodb.pb.h"
 
@@ -455,7 +456,7 @@ std::unique_ptr<CMysqlConnection> CServiceCommon::ConnectGlobalDB()
 
 std::unique_ptr<CMysqlConnection> CServiceCommon::ConnectServerInfoDB()
 {
-    const auto& settings            = GetMessageRoute()->GetSettingMap();
+    const auto& settings            = GetGlobalSetting()->GetData();
     auto        pServerInfoDB       = std::make_unique<CMysqlConnection>();
     auto        mysql_url           = settings["ServerInfoMYSQL"]["url"];
     auto        real_mysql_url      = NormalCrypto::default_instance().Decode(mysql_url);

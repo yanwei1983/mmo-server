@@ -2,5 +2,11 @@
   "ServerInfoMYSQL":
   {
     "url":"D218FC3A49560830F772758FF4A570654700E1F51C61FE2381AD3FE3BE6037BD188B09040539896F2DD6736B7BB609C75E"
+  },
+  "debug":
+  {
+    "log_aidebug":true,
+    "log_actordebug":true,
+    "log_skilldebug":true
   }
 }
