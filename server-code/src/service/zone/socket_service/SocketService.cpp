@@ -24,7 +24,7 @@ CGameClient::CGameClient()
     : m_nDestServerPort(0, AUTH_SERVICE, 0)
     , m_nMessageAllowBegin(CMD_CS_LOGIN) // only accept CS_AUTH
     , m_nMessageAllowEnd(CMD_CS_LOGIN)   // only accept CS_AUTH
-    , m_idUser(0)
+    
 {
 }
 
@@ -135,13 +135,7 @@ bool CSocketService::Init(const ServerPort& nServerPort)
         return false;
 
     // SetIPCheck(true);
-    {
-        auto pNetMsgProcess = GetNetMsgProcess();
-        for(const auto& [k, v]: MsgProcRegCenter<CSocketService>::instance().m_MsgProc)
-        {
-            pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
-        }
-    }
+    RegisterAllMsgProcess<CSocketService>();
 
     AddWaitServiceReady(ServiceID{AUTH_SERVICE, GetServiceID().GetServiceIdx()});
     return true;
@@ -220,7 +214,7 @@ void CSocketService::RemoveClient(const VirtualSocket& vs)
         {
             ServerMSG::SocketClose msg;
             msg.set_vs(vs);
-            SendProtoMsgToZonePort(ServerPort(GetServerPort().GetWorldID(), AUTH_SERVICE, 0), msg);
+            SendProtoMsgToZonePort(ServerPort(GetServerPort().GetWorldID(), AUTH_SERVICE, GetServerPort().GetServiceIdx()), msg);
         }
 
         SAFE_DELETE(pClient);
@@ -245,7 +239,7 @@ void CSocketService::OnAccepted(CNetSocket* pSocket)
 
     CGameClient* pClient = new CGameClient();
     pClient->SetService(this);
-    pClient->SetDestServerPort(ServerPort(GetServerPort().GetWorldID(), AUTH_SERVICE, 0));
+    pClient->SetDestServerPort(ServerPort(GetServerPort().GetWorldID(), AUTH_SERVICE, GetServerPort().GetServiceIdx()));
     pClient->SetVirtualSocket(VirtualSocket::CreateVirtualSocket(GetServerPort(), pSocket->GetSocketIdx()));
     pClient->SetSocketAddr(pSocket->GetAddrString());
     pClient->SetSocketPort(pSocket->GetPort());

@@ -564,8 +564,6 @@ CMessagePort* CMessageRoute::_ConnectRemoteServer(const ServerPort& nServerPort,
         LOGFATAL("CMessageRoute::ConnectRemoteServer AsyncConnectTo {}:{} fail", info.route_addr.c_str(), info.route_port);
         return nullptr;
     }
-    pRemoteSocket->SetReconnect(true);
-    pRemoteSocket->SetLogWriteHighWateMark(100 * 1024 * 1024);
     pMessagePort->SetRemoteSocket(pRemoteSocket);
 
     LOGMESSAGE("CMessageRoute::ConnectRemoteServer:{}, {}:{}", nServerPort, info.route_addr.c_str(), info.route_port);

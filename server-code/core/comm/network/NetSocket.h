@@ -44,16 +44,8 @@ public:
 
     bool SendNetworkMessage(CNetworkMessage&& msg);
     bool SendNetworkMessage(const CNetworkMessage& msg , bool bNeedDuplicate = true);
-    void InitDecryptor(uint32_t seed)
-    {
-        m_pDecryptor = std::make_unique<CDecryptor>();
-        m_pDecryptor->Init(seed);
-    }
-    void InitEncryptor(uint32_t seed)
-    {
-        m_pEncryptor = std::make_unique<CEncryptor>();
-        m_pEncryptor->Init(seed);
-    }
+    void InitDecryptor(uint32_t seed);
+    void InitEncryptor(uint32_t seed);
 
 public:
     virtual void OnDisconnected();

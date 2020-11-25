@@ -3,6 +3,7 @@
 #include "BaseCode.h"
 #include "EventManager.h"
 #include "NetMSGProcess.h"
+#include "MsgProcessRegister.h"
 #include "NetworkService.h"
 #include "ServiceDefine.h"
 #include "UIDFactory.h"
@@ -124,6 +125,17 @@ public:
     static std::unique_ptr<CMysqlConnection> ConnectDB(const db::tbld_dbinfo* pInfo);
 
 
+
+public:
+    template<class Service_T>
+    inline void RegisterAllMsgProcess()
+    {
+        auto pNetMsgProcess = GetNetMsgProcess();
+        for(const auto& [k, v]: MsgProcRegCenter<Service_T>::instance().m_MsgProc)
+        {
+            pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
+        }
+    }
 public:
     void AddWaitServiceReady(ServiceID&& service_id);
     void OnWaitedServiceReady(const ServiceID& service_id);

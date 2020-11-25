@@ -107,7 +107,7 @@ void CMonsterGenerator::_GenMonster(MonsterGenData* pData, uint64_t idPhase)
         AIService()->SendProtoMsgToScene(msg);
         pData->nCurGen++;
     }
-    LOGDEBUG("MonsterGen:{} {} - {} GenOnce", m_idxScene.GetMapID(), m_idxScene.GetPhaseIdx(), pData->nIdxGen);
+    LOGDEBUG("MonsterGen: map:{} phase:{} - idx:{} GenOnce", m_idxScene.GetMapID(), m_idxScene.GetPhaseIdx(), pData->nIdxGen);
 
     __LEAVE_FUNCTION
 }
@@ -267,7 +267,7 @@ void CMonsterGenerator::OnMonsterBorn(CAIMonster* pMonster)
     if(pData == nullptr)
         return;
     pData->m_setMonster.insert(pMonster);
-    LOGDEBUG("MonsterGen:{} - {} MonsterBorn:{} ID:{}", m_pMap->GetMapID(), pData->nIdxGen, pMonster->Type()->GetID(), pMonster->GetID());
+    LOGDEBUG("MonsterGen: map:{} phase:{} idx:{} MonsterBorn:{} ID:{}", m_pMap->GetMapID(), pMonster->GetPhaseID(), pData->nIdxGen, pMonster->Type()->GetID(), pMonster->GetID());
 
     __LEAVE_FUNCTION
 }
@@ -282,7 +282,7 @@ void CMonsterGenerator::OnMonsterDead(CAIMonster* pMonster)
     pData->m_setMonster.erase(pMonster);
     pData->nCurGen--;
 
-    LOGDEBUG("MonsterGen:{} - {} MonsterDead:{}", m_pMap->GetMapID(), pData->nIdxGen, pMonster->Type()->GetID());
+    LOGDEBUG("MonsterGen: map:{} phase:{} idx:{} MonsterDead:{}", m_pMap->GetMapID(), pMonster->GetPhaseID(), pData->nIdxGen, pMonster->Type()->GetID());
 
     __LEAVE_FUNCTION
 }

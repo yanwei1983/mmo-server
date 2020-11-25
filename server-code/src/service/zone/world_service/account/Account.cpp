@@ -148,7 +148,7 @@ bool CAccount::CreateActor(const std::string& name, uint32_t dwProf, uint32_t dw
         auto  db_record_ptr = pDB->MakeRecord(TBLD_PLAYER::table_name());
         OBJID idPlayer      = WorldService()->CreatePlayerID();
         db_record_ptr->Field(TBLD_PLAYER::ID).set(idPlayer);
-        db_record_ptr->Field(TBLD_PLAYER::WORLDID).set(WorldService()->GetServerPort().GetWorldID());
+        db_record_ptr->Field(TBLD_PLAYER::WORLDID).set<uint32_t>(WorldService()->GetServerPort().GetWorldID());
         db_record_ptr->Field(TBLD_PLAYER::ORIWORLDID).set(WorldService()->GetServerPort().GetWorldID());
         db_record_ptr->Field(TBLD_PLAYER::OPENID).set(m_openid);
         db_record_ptr->Field(TBLD_PLAYER::NAME).set(szName);

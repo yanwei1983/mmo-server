@@ -3,6 +3,7 @@
 #include "CheckUtil.h"
 #include "MessageRoute.h"
 #include "NetSocket.h"
+#include "NetServerSocket.h"
 #include "NetworkMessage.h"
 #include "msg_internal.pb.h"
 
@@ -62,6 +63,9 @@ void CMessagePort::OnConnected(CNetSocket* pSocket)
     pSocket->_SendMsg((byte*)&msg, sizeof(msg));
     //服务器间通信扩充recv缓冲区大小
     pSocket->SetPacketSizeMax(_MAX_MSGSIZE * 10);
+    static_cast<CServerSocket*>(pSocket)->SetReconnect(true);
+    pSocket->SetLogWriteHighWateMark(100 * 1024 * 1024);
+    
     LOGNETDEBUG("MessagePort:{} OnConnected {}:{}",
                 GetServerPort().GetServiceID(),
                 pSocket->GetAddrString().c_str(),
@@ -110,6 +114,7 @@ void CMessagePort::OnAccepted(CNetSocket* pSocket)
                 pSocket->GetPort());
     //服务器间通信扩充recv缓冲区大小
     pSocket->SetPacketSizeMax(_MAX_MSGSIZE * 10);
+    pSocket->SetLogWriteHighWateMark(100 * 1024 * 1024);
     if(auto pHandler = m_pPortEventHandler.load())
     {
         pHandler->OnPortAccepted(pSocket);
@@ -121,8 +126,6 @@ void CMessagePort::SetRemoteSocket(CNetSocket* pSocket)
 {
     __ENTER_FUNCTION
     m_pRemoteServerSocket = pSocket;
-    //服务器间通信扩充recv缓冲区大小
-    m_pRemoteServerSocket->SetPacketSizeMax(_MAX_MSGSIZE * 10);
     __LEAVE_FUNCTION
 }
 

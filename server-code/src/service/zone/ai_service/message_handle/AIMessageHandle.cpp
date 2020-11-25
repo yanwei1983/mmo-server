@@ -264,12 +264,3 @@ ON_SERVERMSG(CAIService, ServiceReady)
 
 
 
-void AIServiceMessageHandlerRegister()
-{
-    auto pNetMsgProcess = AIService()->GetNetMsgProcess();
-
-    for(const auto& [k, v]: MsgProcRegCenter<CAIService>::instance().m_MsgProc)
-    {
-        pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
-    }
-}

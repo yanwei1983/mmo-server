@@ -11,14 +11,20 @@ add_executable(robotclient ${SRCS})
 
 #指定库输出路径
 SET(EXECUTABLE_OUTPUT_PATH ${BINARIES})
-ADD_DEPENDENCIES(robotclient basecode network script myproto)
+ADD_DEPENDENCIES(robotclient basecode pb_util crypto_comm network script myproto)
 
 # 指定额外的链接库
 TARGET_LINK_LIBRARIES(robotclient
+ libevent.so
+ libevent_core.so
+ libevent_pthreads.so
+ libevent_extra.so
  libbasecode.so
  libnetwork.so
  libscript.so
  libmyproto.so
+ crypto_comm
+ pb_util
  protobuf
  ${JEMALLOC_LIB_NAME}
  dl

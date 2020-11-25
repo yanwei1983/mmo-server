@@ -285,9 +285,9 @@ static void call_stack(lua_State* L, int32_t n)
         }
 
         if(ar.name)
-            lua_tinker::print_error(L, "%s%s() : line %d [%s : line %d]", indent, ar.name, ar.currentline, ar.source, ar.linedefined);
+            lua_tinker::print_error(L, "%s%s():line %d[%s:%d]", indent, ar.name, ar.currentline, ar.source, ar.linedefined);
         else
-            lua_tinker::print_error(L, "%sunknown : line %d [%s : line %d]", indent, ar.currentline, ar.source, ar.linedefined);
+            lua_tinker::print_error(L, "%sunknown:line %d[%s:%d]", indent, ar.currentline, ar.source, ar.linedefined);
 
         call_stack(L, n + 1);
     }

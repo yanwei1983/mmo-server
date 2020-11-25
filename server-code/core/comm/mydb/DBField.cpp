@@ -110,44 +110,61 @@ std::string CDBField::GetValString() const
         case DB_FIELD_TYPE_SHORT_UNSIGNED:
         case DB_FIELD_TYPE_LONG_UNSIGNED:
         {
-            return std::to_string(std::get<uint32_t>(m_Val));
+            if(auto pval = std::get_if<uint32_t>(&m_Val))
+                return std::to_string(*pval);
         }
         break;
         case DB_FIELD_TYPE_TINY:
         case DB_FIELD_TYPE_SHORT:
         case DB_FIELD_TYPE_LONG:
         {
-            return std::to_string(std::get<int32_t>(m_Val));
+            if(auto pval = std::get_if<int32_t>(&m_Val))
+                return std::to_string(*pval);
+            
         }
         break;
         case DB_FIELD_TYPE_LONGLONG_UNSIGNED:
         {
-            return std::to_string(std::get<uint64_t>(m_Val));
+            if(auto pval = std::get_if<uint64_t>(&m_Val))
+                return std::to_string(*pval);
         }
         break;
         case DB_FIELD_TYPE_LONGLONG:
         {
-            return std::to_string(std::get<int64_t>(m_Val));
+            if(auto pval = std::get_if<int64_t>(&m_Val))
+                return std::to_string(*pval);
+           
         }
         break;
         case DB_FIELD_TYPE_FLOAT:
         {
-            return std::to_string(std::get<float>(m_Val));
+            if(auto pval = std::get_if<float>(&m_Val))
+                return std::to_string(*pval);            
         }
         break;
         case DB_FIELD_TYPE_DOUBLE:
         {
-            return std::to_string(std::get<double>(m_Val));
+            if(auto pval = std::get_if<double>(&m_Val))
+                return std::to_string(*pval);
         }
         break;
         case DB_FIELD_TYPE_VARCHAR:
         case DB_FIELD_TYPE_BLOB:
         {
-            const std::string& tmp = std::get<std::string>(m_Val);
-            std::unique_ptr<char[]> szBuff = std::make_unique<char[]>(tmp.size() * 2 + 1);
-            mysql_real_escape_string(m_pDBRecord->_GetMysqlConnection()->_GetHandle(), szBuff.get(), tmp.c_str(), tmp.size());
+             
+            if(auto pval = std::get_if<std::string>(&m_Val))
+            {
+                const std::string& tmp = *pval;
+                std::unique_ptr<char[]> szBuff = std::make_unique<char[]>(tmp.size() * 2 + 1);
+                mysql_real_escape_string(m_pDBRecord->_GetMysqlConnection()->_GetHandle(), szBuff.get(), tmp.c_str(), tmp.size());
 
-            return "'" + std::string(szBuff.get()) + "'";
+                return "'" + std::string(szBuff.get()) + "'";
+            }
+            else
+            {
+                return "''";
+            }
+            
         }
         break;
         default:

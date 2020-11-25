@@ -108,7 +108,7 @@ bool CWorldService::Init(const ServerPort& nServerPort)
     m_pTeamManager.reset(CTeamManager::CreateNew());
     CHECKF(m_pTeamManager.get());
 
-    RegisterWorldMessageHandler();
+    RegisterAllMsgProcess<CWorldService>();
 
     auto pGlobalDB = ConnectGlobalDB(GetMessageRoute()->GetServerInfoDB());
     CHECKF(pGlobalDB.get());

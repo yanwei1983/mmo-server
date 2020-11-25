@@ -143,35 +143,16 @@ void BaseCode::StopLog()
     using namespace zsummer::log4z;
 
     const char* end_line = "======================================================================";
-    if(ILog4zManager::getRef().getLoggerLogCount(s_debug_logger) > 0)
+    uint32_t max_log = ILog4zManager::getRef().getStatusActiveLoggers();
+    for(uint32_t log_id = 0; log_id < max_log; log_id++)
     {
-        ZLOGFMT_DEBUG(s_debug_logger, end_line);
+        if(ILog4zManager::getRef().getLoggerLogCount(log_id) > 0)
+        {
+            ZLOGFMT_DEBUG(log_id, end_line);
+        }
     }
-    if(ILog4zManager::getRef().getLoggerLogCount(s_error_logger) > 0)
-    {
-        ZLOGFMT_DEBUG(s_error_logger, end_line);
-    }
-    if(ILog4zManager::getRef().getLoggerLogCount(s_message_logger) > 0)
-    {
-        ZLOGFMT_DEBUG(s_message_logger, end_line);
-    }
-    if(ILog4zManager::getRef().getLoggerLogCount(s_warning_logger) > 0)
-    {
-        ZLOGFMT_DEBUG(s_warning_logger, end_line);
-    }
-    if(ILog4zManager::getRef().getLoggerLogCount(s_fatal_logger) > 0)
-    {
-        ZLOGFMT_DEBUG(s_fatal_logger, end_line);
 
-    }
-    if(ILog4zManager::getRef().getLoggerLogCount(s_network_logger) > 0)
-    {
-        ZLOGFMT_DEBUG(s_network_logger, end_line);
-    }
-    if(ILog4zManager::getRef().getLoggerLogCount(s_db_logger) > 0)
-    {
-        ZLOGFMT_DEBUG(s_db_logger, end_line);
-    }
+   
 
     ILog4zManager::getRef().stop();
 }

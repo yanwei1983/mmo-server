@@ -37,6 +37,7 @@ public:
     void _OnAuthFail(uint64_t call_id, const std::string& str_detail);
     void _OnAuthSucc(uint64_t call_id);
     void _AddResult(std::function<void()>&& result_func);
+    void CancleAuth(const VirtualSocket& vs);
     void PorcessResult();
 
     void OnAuthThreadCreate();
@@ -46,7 +47,8 @@ public:
 
 private:
     //等待认证列表
-    std::unordered_map<std::string, uint64_t> m_AuthList;
+    std::unordered_map<std::string, uint64_t> m_AuthList;   
+    std::unordered_map<VirtualSocket, uint64_t> m_AuthVSList;
     struct ST_AUTH_DATA
     {
         std::string   open_id;

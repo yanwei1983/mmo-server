@@ -96,8 +96,7 @@ bool CAOIService::Init(const ServerPort& nServerPort)
     m_pAOIActorManager.reset(CAOIActorManager::CreateNew());
     CHECKF(m_pAOIActorManager.get());
 
-    extern void AOIServiceMessageHandlerRegister();
-    AOIServiceMessageHandlerRegister();
+    RegisterAllMsgProcess<CAOIService>();
 
     constexpr uint32_t FrameCount    = 20;
     constexpr uint32_t FrameInterval = 1000 / FrameCount;

@@ -70,19 +70,16 @@ bool CAuthService::Init(const ServerPort& nServerPort)
     auto pGlobalDB = ConnectGlobalDB(GetMessageRoute()->GetServerInfoDB());
     CHECKF(pGlobalDB.get());
 
+    m_pAuthManager.reset(CAuthManager::CreateNew(this));
+    CHECKF(m_pAuthManager.get());
+
     m_pGMManager.reset(CGMManager::CreateNew(pGlobalDB.get()));
     CHECKF(m_pGMManager.get());
 
     if(CreateService(100) == false)
         return false;
     //注册消息
-    {
-        auto pNetMsgProcess = GetNetMsgProcess();
-        for(const auto& [k, v]: MsgProcRegCenter<CAuthService>::instance().m_MsgProc)
-        {
-            pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
-        }
-    }
+    RegisterAllMsgProcess<CAuthService>();
 
     ServerMSG::ServiceReady msg;
     msg.set_serverport(GetServerPort());

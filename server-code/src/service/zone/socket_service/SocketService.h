@@ -48,10 +48,10 @@ private:
     uint16_t      m_nMessageAllowBegin;
     uint16_t      m_nMessageAllowEnd;
     std::string   m_SocketAddr;
-    uint32_t      m_nSocketPort;
+    uint32_t      m_nSocketPort = 0;
 
-    OBJID           m_idUser;
-    bool            m_bAuth;
+    OBJID           m_idUser   = 0;
+    bool            m_bAuth    = false;
     CSocketService* m_pService = nullptr;
 };
 

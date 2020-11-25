@@ -102,6 +102,17 @@ bool CNetSocket::SendNetworkMessage(const CNetworkMessage& msg, bool bNeedDuplic
     return false;
 }
 
+void CNetSocket::InitDecryptor(uint32_t seed)
+{
+    m_pDecryptor = std::make_unique<CDecryptor>();
+    m_pDecryptor->Init(seed);
+}
+void CNetSocket::InitEncryptor(uint32_t seed)
+{
+    m_pEncryptor = std::make_unique<CEncryptor>();
+    m_pEncryptor->Init(seed);
+}
+
 void CNetSocket::PostSend()
 {
     __ENTER_FUNCTION

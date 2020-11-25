@@ -79,13 +79,7 @@ bool CGuildService::Init(const ServerPort& nServerPort)
         return false;
 
     //注册消息
-    {
-        auto pNetMsgProcess = GetNetMsgProcess();
-        for(const auto& [k, v]: MsgProcRegCenter<CGuildService>::instance().m_MsgProc)
-        {
-            pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
-        }
-    }
+    RegisterAllMsgProcess<CGuildService>();
 
     return true;
 }

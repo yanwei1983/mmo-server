@@ -68,6 +68,8 @@ bool CPlayer::Init(OBJID idPlayer, const VirtualSocket& socket)
     m_pRecord = result_ptr->fetch_row(true);
     CHECKF(m_pRecord);
 
+    CHECKF(GetWorldID() != 0);
+
     CHECKF(CActor::Init());
 
     //初始化其他模块

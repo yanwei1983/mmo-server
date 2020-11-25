@@ -176,7 +176,7 @@ bool CSceneService::Init(const ServerPort& nServerPort)
     m_pSceneManager.reset(CSceneManager::CreateNew(GetZoneID()));
     CHECKF(m_pSceneManager.get());
 
-    SceneMessageHandlerRegister();
+    RegisterAllMsgProcess<CSceneService>();
 
     if(IsSharedZone() == false)
     {

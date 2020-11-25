@@ -64,14 +64,8 @@ bool CMarketService::Init(const ServerPort& nServerPort)
         return false;
 
     //注册消息
-    {
-        auto pNetMsgProcess = GetNetMsgProcess();
-        for(const auto& [k, v]: MsgProcRegCenter<CMarketService>::instance().m_MsgProc)
-        {
-            pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
-        }
-    }
-
+    RegisterAllMsgProcess<CMarketService>();
+    
     ServerMSG::ServiceReady msg;
     msg.set_serverport(GetServerPort());
 

@@ -113,8 +113,7 @@ bool CAIService::Init(const ServerPort& nServerPort)
     m_pAIActorManager.reset(CAIActorManager::CreateNew());
     CHECKF(m_pAIActorManager.get());
 
-    extern void AIServiceMessageHandlerRegister();
-    AIServiceMessageHandlerRegister();
+    RegisterAllMsgProcess<CAIService>();
 
     uint32_t FrameCount    = 20;
     uint32_t FrameInterval = 1000 / FrameCount;

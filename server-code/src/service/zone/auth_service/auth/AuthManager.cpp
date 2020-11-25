@@ -64,6 +64,7 @@ bool CAuthManager::Auth(const std::string& openid, const std::string& auth, cons
     cntl->request_attachment().append(post_data);
     auto call_id       = cntl->call_id().value;
     m_AuthList[openid] = call_id;
+    m_AuthVSList[vs] = call_id;
     auto& auth_data    = m_AuthDataList[call_id];
     auth_data.open_id  = openid;
     auth_data.from     = vs;
@@ -133,6 +134,7 @@ void CAuthManager::_OnAuthFail(uint64_t call_id, const std::string& str_detail)
     AuthService()->SendMsgToVirtualSocket(auth_data.from, msg);
 
     m_AuthList.erase(auth_data.open_id);
+    m_AuthVSList.erase(auth_data.from);
     m_AuthDataList.erase(it);
 }
 
@@ -157,7 +159,31 @@ void CAuthManager::_OnAuthSucc(uint64_t call_id)
     AuthService()->SendMsgToVirtualSocket(auth_data.from, result_msg);
 
     m_AuthList.erase(auth_data.open_id);
+    m_AuthVSList.erase(auth_data.from);
     m_AuthDataList.erase(it);
+}
+
+void CAuthManager::CancleAuth(const VirtualSocket& vs)
+{
+    auto it = m_AuthVSList.find(vs);
+    if(it == m_AuthVSList.end())
+        return;
+    
+    auto call_id = it->second;
+    auto it_data = m_AuthDataList.find(call_id);
+    if(it_data == m_AuthDataList.end())
+        return;
+    
+    const auto& open_id = it_data->second.open_id;
+    auto it_auth = m_AuthList.find(open_id);
+    if(it_auth == m_AuthList.end())
+        return;
+    LOGLOGIN("Actor:{} AuthCancle.", open_id);
+    m_AuthVSList.erase(it);
+    m_AuthList.erase(it_auth);
+    m_AuthDataList.erase(it_data);
+
+    
 }
 
 void CAuthManager::OnAuthThreadCreate() {}
@@ -167,6 +193,11 @@ void CAuthManager::OnAuthThreadFinish() {}
 bool CAuthManager::CheckProgVer(const std::string& prog_ver) const
 {
     return true;
+}
+
+ON_SERVERMSG(CAuthService, SocketClose)
+{
+    AuthManager()->CancleAuth(msg.vs());
 }
 
 ON_MSG(CAuthService, CS_LOGIN)

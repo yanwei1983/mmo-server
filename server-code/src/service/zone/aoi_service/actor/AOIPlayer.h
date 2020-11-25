@@ -12,6 +12,7 @@ class CAOIPlayer : public CAOIActor
 
 public:
     ~CAOIPlayer();
+    CreateNewImpl(CAOIPlayer);
 
     virtual ActorType GetActorType() const override { return ActorType::ACT_PLAYER; }
     static ActorType  GetActorTypeStatic() { return ActorType::ACT_PLAYER; }

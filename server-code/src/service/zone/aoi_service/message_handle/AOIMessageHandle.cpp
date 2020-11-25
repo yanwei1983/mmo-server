@@ -157,12 +157,3 @@ ON_SERVERMSG(CAOIService, RemoveTaskPhase)
     __LEAVE_FUNCTION
 }
 
-void AOIServiceMessageHandlerRegister()
-{
-    auto pNetMsgProcess = AOIService()->GetNetMsgProcess();
-
-    for(const auto& [k, v]: MsgProcRegCenter<CAOIService>::instance().m_MsgProc)
-    {
-        pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
-    }
-}

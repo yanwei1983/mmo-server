@@ -51,16 +51,3 @@ ON_SERVERMSG(CWorldService, SocketClose)
     AccountManager()->Logout(msg.vs());
 }
 
-//////////////////////////////////////////////////////////////////////////
-void RegisterWorldMessageHandler()
-{
-    __ENTER_FUNCTION
-
-    auto pNetMsgProcess = WorldService()->GetNetMsgProcess();
-    for(const auto& [k, v]: MsgProcRegCenter<CWorldService>::instance().m_MsgProc)
-    {
-        pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
-    }
-
-    __LEAVE_FUNCTION
-}

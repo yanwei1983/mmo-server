@@ -115,9 +115,9 @@ bool CDBRecord::Update(bool bSync)
             if(insert_id != 0)
             {
                 if(field.GetType() == DB_FIELD_TYPE_LONG)
-                    field = static_cast<uint32_t>(insert_id);
+                    field.set<uint32_t>(insert_id);
                 else
-                    field = insert_id;
+                    field.set<uint64_t>(insert_id);
             }
 
             m_strPriKeyBuf += field.GetFieldInfo()->GetFieldName();
@@ -237,10 +237,12 @@ std::string CDBRecord::BuildUpdateSQL()
             auto ref_field_info_ptr = (*m_pDBFieldInfo)[i];
             if(szKeyBuf.empty() == false)
                 szKeyBuf += ",";
+            std::string val_string = pField->GetValString();
+            CHECK_RETTYPE_V(val_string.empty() == false,  std::string, i);
 
             szKeyBuf += ref_field_info_ptr->GetFieldName();
             szKeyBuf += "=";
-            szKeyBuf += pField->GetValString();
+            szKeyBuf += val_string;
         }
     }
     if(szKeyBuf.empty() || m_strPriKeyBuf.empty() || m_TableName.empty())
@@ -266,9 +268,12 @@ std::string CDBRecord::DumpInsertSQL() const
             szKeyNameBuf += ",";
             szKeyValBuf += ",";
         }
-
-        szKeyNameBuf += ref_field_info_ptr->GetFieldName();
-        szKeyValBuf += pField->GetValString();
+        std::string val_string = pField->GetValString();
+        if(val_string.empty() == false)
+        {
+            szKeyNameBuf += ref_field_info_ptr->GetFieldName();
+            szKeyValBuf += val_string;
+        }
     }
     if(szKeyNameBuf.empty() || szKeyValBuf.empty() || m_TableName.empty())
         return std::string();
@@ -298,9 +303,12 @@ std::string CDBRecord::BuildInsertSQL()
                 szKeyNameBuf += ",";
                 szKeyValBuf += ",";
             }
-
-            szKeyNameBuf += ref_field_info_ptr->GetFieldName();
-            szKeyValBuf += pField->GetValString();
+            std::string val_string = pField->GetValString();
+            if(val_string.empty() == false)
+            {
+                szKeyNameBuf += ref_field_info_ptr->GetFieldName();
+                szKeyValBuf += val_string;
+            }
         }
     }
     if(szKeyNameBuf.empty() || szKeyValBuf.empty() || m_TableName.empty())

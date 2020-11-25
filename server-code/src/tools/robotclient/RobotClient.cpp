@@ -8,7 +8,7 @@
 #include "msg/world_service.pb.h"
 #include "msg/zone_service.pb.h"
 #include "pb_luahelper.h"
-
+#include "protomsg_to_cmd.h"
 RobotClient::RobotClient(RobotClientManager* pManager)
     : m_pManager(pManager)
     , m_pServerSocket(nullptr)

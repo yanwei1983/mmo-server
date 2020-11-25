@@ -121,8 +121,17 @@ public:
     }
 
     template<class T>
-    CDBField& set(T v)
+    CDBField& set(const T& v)
     {
+        if constexpr(std::is_same<T, uint8_t>::value || std::is_same<T, uint16_t>::value)
+        {
+            return set<uint32_t>(v);
+        }
+        else if constexpr(std::is_same<T, int8_t>::value || std::is_same<T, int16_t>::value)
+        {
+            return set<int32_t>(v);
+        }
+
         if(CanModify() == true)
         {
             if(get<T>() == v)

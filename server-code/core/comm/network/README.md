@@ -1,0 +1,5 @@
+ServerSocket 是通过Connect到远端得到的， 连接的另一方对自己来说是Server
+ClientSocket 是通过Accpet得到的，连接的另一方对自己来说是Client
+
+AsyncConnectTo执行之后， 因为是异步的，所以不要直接对该Socket进行操作，避免出现多线程竞争问题,  必要的操作可以再EventHanler的OnConnected函数中去做
+
