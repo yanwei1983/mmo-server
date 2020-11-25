@@ -18,6 +18,33 @@
 #include "msg/zone_service.pb.h"
 #include "server_msg/server_side.pb.h"
 #include "server_share/game_common_def.h"
+
+bool IsObservePropertyChange(uint32_t nType, uint32_t nService)
+{
+    struct OBSERVE_PROPERTY_T 
+    {
+        OBSERVE_PROPERTY_T()
+        {
+            auto& ref_ai = data[AI_SERVICE];
+            ref_ai.insert(PROP_HP);
+            ref_ai.insert(PROP_MP);
+            ref_ai.insert(PROP_FP);
+            ref_ai.insert(PROP_CAMP);
+
+            auto& ref_aoi = data[AOI_SERVICE];
+            ref_aoi.insert(PROP_CAMP);
+        }
+
+        std::unordered_map<uint32_t, std::unordered_set<uint32_t>> data;
+    };
+    static const OBSERVE_PROPERTY_T OBSERVE_PROPERTY;
+    auto it = OBSERVE_PROPERTY.data.find(nService);
+    if(it == OBSERVE_PROPERTY.data.end())
+        return false;
+    return it->second.count(nType) > 0;
+}
+
+
 CActor::CActor() {}
 
 CActor::~CActor() {}
@@ -173,22 +200,38 @@ void CActor::_SetProperty(uint32_t nType, uint32_t nVal, uint32_t nSync)
     if(nSync == SYNC_TRUE)
     {
         // send msg to self
-        SC_ATTRIB_CHANGE msg;
+        SC_PROPERTY_CHANGE msg;
         msg.set_actor_id(GetID());
         auto attr = msg.add_datalist();
         attr->set_actype(nType);
         attr->set_val(nVal);
         SendMsg(msg);
+        if(IsObservePropertyChange(nType, AI_SERVICE))
+        {
+            SceneService()->SendProtoMsgToAIService(msg);
+        }
+        if(IsObservePropertyChange(nType, AOI_SERVICE))
+        {
+            SceneService()->SendProtoMsgToAOIService(msg);
+        }
     }
     else if(nSync == SYNC_ALL)
     {
         // broadcastmsg to viewplayer and self
-        SC_ATTRIB_CHANGE msg;
+        SC_PROPERTY_CHANGE msg;
         msg.set_actor_id(GetID());
         auto attr = msg.add_datalist();
         attr->set_actype(nType);
         attr->set_val(nVal);
         SendRoomMessage(msg);
+        if(IsObservePropertyChange(nType, AI_SERVICE))
+        {
+            SceneService()->SendProtoMsgToAIService(msg);
+        }
+        if(IsObservePropertyChange(nType, AOI_SERVICE))
+        {
+            SceneService()->SendProtoMsgToAOIService(msg);
+        }
     }
     else if(nSync == SYNC_ALL_DELAY)
     {
@@ -198,6 +241,7 @@ void CActor::_SetProperty(uint32_t nType, uint32_t nVal, uint32_t nSync)
 
     __LEAVE_FUNCTION
 }
+
 
 uint32_t CActor::GetHPMax() const
 {
@@ -302,16 +346,31 @@ void CActor::SendDelayAttribChage()
     __ENTER_FUNCTION
     if(m_DelayAttribChangeMap.empty())
         return;
-
-    SC_ATTRIB_CHANGE msg;
+    bool send_to_ai = false;
+    bool send_to_aoi = false;
+    SC_PROPERTY_CHANGE msg;
     msg.set_actor_id(GetID());
     for(const auto& [k, v]: m_DelayAttribChangeMap)
     {
         auto pInfo = msg.add_datalist();
         pInfo->set_actype(k);
         pInfo->set_val(v);
+        if(send_to_ai == false && IsObservePropertyChange(k, AI_SERVICE))
+            send_to_ai = true;
+        if(send_to_aoi == false && IsObservePropertyChange(k, AOI_SERVICE))
+            send_to_aoi = true;
     }
     SendRoomMessage(msg);
+
+    if(send_to_ai)
+    {
+        SceneService()->SendProtoMsgToAIService(msg);
+    }
+    if(send_to_aoi)
+    {
+        SceneService()->SendProtoMsgToAOIService(msg);
+    }
+
     m_DelayAttribChangeMap.clear();
     __LEAVE_FUNCTION
 }

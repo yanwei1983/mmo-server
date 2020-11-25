@@ -13,7 +13,7 @@
 
 
 
-ON_MSG(CAOIService, SC_ATTRIB_CHANGE)
+ON_MSG(CAOIService, SC_PROPERTY_CHANGE)
 {
     __ENTER_FUNCTION
     CAOIActor* pActor = AOIActorManager()->QueryActor(msg.actor_id());

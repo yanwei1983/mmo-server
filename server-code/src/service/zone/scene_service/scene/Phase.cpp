@@ -52,6 +52,7 @@ bool CPhase::Init(CScene* pScene, const SceneIdx& idxScene, uint64_t idPhase, co
 {
     __ENTER_FUNCTION
     CHECKF(pScene);
+    m_idPhase = idPhase;
     m_pScene = pScene;
     m_pMapValSet.reset(CMapValSet::CreateNew(this));
     CHECKF(CSceneBase::Init(idxScene, MapManager()));

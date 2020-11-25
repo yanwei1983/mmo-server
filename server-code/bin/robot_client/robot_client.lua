@@ -5,7 +5,7 @@ robot_manager:RegisterCMD(CMD_SC_LOADMAP, "OnRecv_SC_LOADMAP");
 robot_manager:RegisterCMD(CMD_SC_ENTERMAP, "OnRecv_SC_ENTERMAP");
 robot_manager:RegisterCMD(CMD_SC_PLAYERINFO, "OnRecv_SC_PLAYERINFO");
 robot_manager:RegisterCMD(CMD_SC_AOI_UPDATE, "OnRecv_SC_AOI_UPDATE");
-robot_manager:RegisterCMD(CMD_SC_ATTRIB_CHANGE, "OnRecv_SC_ATTRIB_CHANGE");
+robot_manager:RegisterCMD(CMD_SC_PROPERTY_CHANGE, "OnRecv_SC_PROPERTY_CHANGE");
 robot_manager:RegisterCMD(CMD_SC_DEAD, "OnRecv_SC_DEAD");
 robot_manager:RegisterCMD(CMD_SC_DAMAGE, "OnRecv_SC_DAMAGE");
 
@@ -128,10 +128,10 @@ function OnRecv_SC_PLAYERINFO(client, buffer, size)
 		
 end
 
-function OnRecv_SC_ATTRIB_CHANGE(client, buffer, size)
-	local msg = ProtobufMessageWarp("SC_ATTRIB_CHANGE");
+function OnRecv_SC_PROPERTY_CHANGE(client, buffer, size)
+	local msg = ProtobufMessageWarp("SC_PROPERTY_CHANGE");
 	if(GetProtobufMessagePtr(msg):ParseFromArray(buffer,size) == false) then
-		error("SC_ATTRIB_CHANGE ParseFromArray fail");
+		error("SC_PROPERTY_CHANGE ParseFromArray fail");
 		return;
 	end
 	local info = g_clientinfo[client:GetClientID()];

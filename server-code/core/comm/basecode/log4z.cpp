@@ -94,13 +94,13 @@ _ZSUMMER_LOG4Z_BEGIN
 OBJECTHEAP_IMPLEMENTATION(LogData, s_heap);
 
 constexpr const char* LOG_STRING[] = {
-    "LOG_TRACE",
-    "LOG_DEBUG",
-    "LOG_INFO ",
-    "LOG_WARN ",
-    "LOG_ERROR",
-    "LOG_ALARM",
-    "LOG_FATAL",
+    "TRACE",
+    "DEBUG",
+    "INFO ",
+    "WARN ",
+    "ERROR",
+    "ALARM",
+    "FATAL",
 };
 
 #ifdef WIN32
@@ -1073,7 +1073,7 @@ LogData* LogerManager::makeLogData(LoggerId id, int32_t level)
 
         try
         {
-            pLog->_content = fmt::format("{:%Y-%m-%d %H:%M:%S}.{:03} {}[{}] ",
+            pLog->_content = fmt::format("{:%H:%M:%S}.{:03} {}[{}] ",
                                          tt,
                                          pLog->_precise,
                                          (pLog->_level < sizeOfArray(LOG_STRING)) ? LOG_STRING[pLog->_level] : "",

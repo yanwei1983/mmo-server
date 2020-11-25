@@ -95,7 +95,7 @@ bool CMonster::SendMsg(const proto_msg_t& msg) const
 {
     __ENTER_FUNCTION
     auto cmd = msg_to_cmd(msg);
-    if(cmd == CMD_SC_SKILL_STUN || cmd == CMD_SC_ATTRIB_CHANGE)
+    if(cmd == CMD_SC_SKILL_STUN || cmd == CMD_SC_PROPERTY_CHANGE)
     {
         return SceneService()->SendProtoMsgToAIService(msg);
     }

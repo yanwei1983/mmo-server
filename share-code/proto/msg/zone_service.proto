@@ -197,9 +197,9 @@ message SC_MAPVAL
 };
 
 //属性变化通知
-message SC_ATTRIB_CHANGE
+message SC_PROPERTY_CHANGE
 {
-	option (cmd).sc_cmd = CMD_SC_ATTRIB_CHANGE;
+	option (cmd).sc_cmd = CMD_SC_PROPERTY_CHANGE;
 	message Data
 	{
 		uint32 actype = 1;

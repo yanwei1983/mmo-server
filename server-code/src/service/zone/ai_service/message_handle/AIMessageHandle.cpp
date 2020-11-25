@@ -84,7 +84,7 @@ ON_SERVERMSG(CAIService, AOIChange)
     __LEAVE_FUNCTION
 }
 
-ON_MSG(CAIService, SC_ATTRIB_CHANGE)
+ON_MSG(CAIService, SC_PROPERTY_CHANGE)
 {
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
