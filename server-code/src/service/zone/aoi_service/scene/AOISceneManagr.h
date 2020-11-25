@@ -25,11 +25,11 @@ public:
 
     CAOIScene* QueryScene(const SceneIdx& idxScene);
     CAOIPhase* QueryPhase(const SceneIdx& idxScene);
-    void      OnTimer();
+    void       OnTimer();
 
 protected:
 private:
     std::unordered_map<uint16_t, CAOIScene*> m_mapScene;
-    size_t                                  m_nStaticScene;
+    size_t                                   m_nStaticScene;
 };
 #endif /* AOISCENEMANAGR_H */

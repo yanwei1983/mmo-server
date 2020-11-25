@@ -82,14 +82,15 @@ public:
     // 遍历自己视野内的SceneTile
     bool foreach_SceneTileInSight(float x, float y, std::function<void(CSceneTile*)>&& func);
 
-    void CheckNeedResizeSceneTile(uint32_t nPlayerCount);
-    void SetDynamicAdjustTileLevel(bool v){m_bDynamicAdjustTileLevel = v;}
+    void       CheckNeedResizeSceneTile(uint32_t nPlayerCount);
+    void       SetDynamicAdjustTileLevel(bool v) { m_bDynamicAdjustTileLevel = v; }
     export_lua CSceneCollisionTile* GetCollisionTileByPos(float x, float y, uint32_t actor_type);
     export_lua bool                 CollisionTest(float x, float y, uint32_t actor_type) const;
 
 private:
     void _SetSceneTileGridRange(uint32_t v);
     void SetTileDynamicLev(uint32_t new_level);
+
 public:
     OBJECTHEAP_DECLARATION(s_heap);
 

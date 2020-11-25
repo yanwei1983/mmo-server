@@ -23,7 +23,7 @@ public:
     void Destroy();
 
     CAOIActor* QueryActor(OBJID id) const;
-    bool      AddActor(CAOIActor* pActor);
+    bool       AddActor(CAOIActor* pActor);
 
     bool DelActor(CAOIActor* pActor, bool bDelete = true);
     bool DelActorByID(OBJID id, bool bDelete = true);

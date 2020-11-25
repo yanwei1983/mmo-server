@@ -20,7 +20,7 @@ export_lua class CNetworkMessage
 public:
     CNetworkMessage();
     ~CNetworkMessage();
-    CNetworkMessage(CNetworkMessage&& rht)noexcept;
+    CNetworkMessage(CNetworkMessage&& rht) noexcept;
     export_lua CNetworkMessage(const CNetworkMessage& rht);
     export_lua CNetworkMessage(byte* buf, size_t len, const VirtualSocket& from = 0, const VirtualSocket& to = 0);
     export_lua CNetworkMessage(uint16_t msg_cmd, byte* body, size_t body_len, const VirtualSocket& from = 0, const VirtualSocket& to = 0);
@@ -37,14 +37,13 @@ public:
     export_lua byte* GetMsgBody() { return GetBuf() + sizeof(MSG_HEAD); }
     export_lua const byte* GetMsgBody() const { return GetBuf() + sizeof(MSG_HEAD); }
 
-
     void Decryptor(class CDecryptor* pDec);
     void Encryptor(class CEncryptor* pEnc);
 
     export_lua const VirtualSocket& GetFrom() const { return m_nFrom; }
-    export_lua void          SetFrom(const VirtualSocket& val) { m_nFrom = val; }
+    export_lua void                 SetFrom(const VirtualSocket& val) { m_nFrom = val; }
     export_lua const VirtualSocket& GetTo() const { return m_nTo; }
-    export_lua void          SetTo(const VirtualSocket& val) { m_nTo = val; }
+    export_lua void                 SetTo(const VirtualSocket& val) { m_nTo = val; }
 
     export_lua const std::deque<VirtualSocket>& GetForward() const { return m_setForward; }
 
@@ -86,8 +85,8 @@ public:
     export_lua void          ClearBroadcast() { m_nBroadCastType = BROADCAST_NONE; }
 
     export_lua void CopyBuffer();
-    void DuplicateBuffer();
-    bool NeedDuplicateWhenEncryptor() const;
+    void            DuplicateBuffer();
+    bool            NeedDuplicateWhenEncryptor() const;
 
 private:
     void AllocBuffer(size_t len);

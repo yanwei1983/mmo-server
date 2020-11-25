@@ -26,7 +26,7 @@ public:
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadExit() override;
 
-    void         OnReciveHttp(struct evhttp_request* req);
+    void OnReciveHttp(struct evhttp_request* req);
 
     void                   AddDelayResponse(uint64_t uid, struct evhttp_request* req);
     struct evhttp_request* FindDelayResponse(uint64_t uid);

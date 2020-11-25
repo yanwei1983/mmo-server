@@ -338,17 +338,17 @@ public:
     virtual bool pushLog(LogData* pLog, const char* file = NULL, int32_t line = 0) = 0;
 
     //! set logger's attribute, thread safe.
-    virtual bool enableLogger(LoggerId id, bool enable)              = 0; // immediately when enable, and queue up when disable.
-    virtual bool setLoggerName(LoggerId id, const char* name)        = 0;
-    virtual bool setLoggerPath(LoggerId id, const char* path)        = 0;
-    virtual bool setLoggerLevel(LoggerId id, int32_t nLevel)         = 0; // immediately when enable, and queue up when disable.
-    virtual bool setLoggerFileLine(LoggerId id, bool enable)         = 0;
-    virtual bool setLoggerDisplay(LoggerId id, bool enable)          = 0;
-    virtual bool setLoggerOutFile(LoggerId id, bool enable)          = 0;
-    virtual bool setLoggerLimitsize(LoggerId id, uint32_t limitsize) = 0;
-    virtual bool setLoggerMonthdir(LoggerId id, bool enable)         = 0;
-    virtual bool setLoggerReserveTime(LoggerId id, time_t sec)       = 0;
-    virtual uint64_t getLoggerLogCount(LoggerId id)                  = 0;
+    virtual bool     enableLogger(LoggerId id, bool enable)              = 0; // immediately when enable, and queue up when disable.
+    virtual bool     setLoggerName(LoggerId id, const char* name)        = 0;
+    virtual bool     setLoggerPath(LoggerId id, const char* path)        = 0;
+    virtual bool     setLoggerLevel(LoggerId id, int32_t nLevel)         = 0; // immediately when enable, and queue up when disable.
+    virtual bool     setLoggerFileLine(LoggerId id, bool enable)         = 0;
+    virtual bool     setLoggerDisplay(LoggerId id, bool enable)          = 0;
+    virtual bool     setLoggerOutFile(LoggerId id, bool enable)          = 0;
+    virtual bool     setLoggerLimitsize(LoggerId id, uint32_t limitsize) = 0;
+    virtual bool     setLoggerMonthdir(LoggerId id, bool enable)         = 0;
+    virtual bool     setLoggerReserveTime(LoggerId id, time_t sec)       = 0;
+    virtual uint64_t getLoggerLogCount(LoggerId id)                      = 0;
 
     //! Update logger's attribute from config file, thread safe.
     virtual bool setAutoUpdate(int32_t interval /*per second, 0 is disable auto update*/) = 0;

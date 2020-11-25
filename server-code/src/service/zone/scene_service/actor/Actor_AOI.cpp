@@ -10,7 +10,6 @@
 #include "msg/zone_service.pb.h"
 #include "server_msg/server_side.pb.h"
 
-
 bool CActor::NeedSyncAI() const
 {
     return IsMonster() || IsPlayer();
@@ -28,7 +27,6 @@ bool CActor::UpdateViewList(bool bForce)
     SceneService()->SendProtoMsgToAOIService(ntc);
     return true;
 }
-
 
 //////////////////////////////////////////////////////////////////////
 void CActor::RemoveFromViewList(CSceneObject* pActor, OBJID idActor, bool bErase)
@@ -200,8 +198,6 @@ void CActor::OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDel)
                     setBCActorDelPlayer.insert(id);
                 }
             }
-
-            
         }
 
         //通知Del列表删除自己
@@ -215,7 +211,7 @@ void CActor::OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDel)
             SceneService()->SendProtoMsgTo(setSocketMap, ntc_aoiInfo);
         }
     }
-    
+
     __LEAVE_FUNCTION
 }
 

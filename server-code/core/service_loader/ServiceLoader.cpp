@@ -3,13 +3,12 @@
 #include <dlfcn.h>
 
 #include "BaseCode.h"
+#include "GlobalSetting.h"
 #include "IService.h"
 #include "LoggingMgr.h"
 #include "MemoryHelp.h"
 #include "MessageRoute.h"
-#include "GlobalSetting.h"
 #include "ObjectHeap.h"
-
 #include "event2/event.h"
 #include "event2/thread.h"
 //#include <brpc/global.h>

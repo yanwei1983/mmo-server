@@ -64,10 +64,10 @@ DEFINE_STRUCT_SCHEMA(TestNodeB,
                      DEFINE_STRUCT_FIELD(TestNodeB_b, "TestNodeB_b"),
                      DEFINE_STRUCT_FIELD_FUNC(TestNodeB_c, "TestNodeB_c", after_process_TestNodeB_c));
 
-DEFINE_META(TestNodeB, DEFINE_MEMBER(
-    META_MEMBER_TAG(TestNodeB_a, "TestNodeB_a", string_to_hash_tag),
-    META_MEMBER_FUNC(TestNodeB_c, "TestNodeB_c", after_process_TestNodeB_c),
-     META_MEMBER(TestNodeB_b, "TestNodeB_b")));
+DEFINE_META(TestNodeB,
+            DEFINE_MEMBER(META_MEMBER_TAG(TestNodeB_a, "TestNodeB_a", string_to_hash_tag),
+                          META_MEMBER_FUNC(TestNodeB_c, "TestNodeB_c", after_process_TestNodeB_c),
+                          META_MEMBER(TestNodeB_b, "TestNodeB_b")));
 
 struct AllNode
 {
@@ -104,9 +104,7 @@ inline void xml_value_to_field(tinyxml2::XMLElement* pVarE, FieldType* field)
 }
 
 template<class FieldType>
-inline void xml_value_to_field(tinyxml2::XMLElement*                                         pVarE,
-                               FieldType*                                                    field,
-                              void(*after_func)(tinyxml2::XMLElement*,FieldType*) )
+inline void xml_value_to_field(tinyxml2::XMLElement* pVarE, FieldType* field, void (*after_func)(tinyxml2::XMLElement*, FieldType*))
 {
     xml_value_to_field(pVarE, field);
     after_func(pVarE, field);
@@ -258,8 +256,7 @@ inline void xmlElement_to_struct_v2(tinyxml2::XMLElement* pE, T& refStruct)
     }
 }
 
-
-void after_process_TestNodeB_c(tinyxml2::XMLElement*,float* val)
+void after_process_TestNodeB_c(tinyxml2::XMLElement*, float* val)
 {
     *val *= 100;
 }

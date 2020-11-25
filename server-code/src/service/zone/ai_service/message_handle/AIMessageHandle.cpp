@@ -27,16 +27,15 @@ ON_MSG(CAIService, SC_AOI_UPDATE)
         return;
     }
     CHECK(pActor->GetCurrentScene());
-    CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx() );
+    CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx());
 
     pActor->SetPos(Vector2(msg.posx(), msg.posy()));
-    LOGACTORDEBUG(
-               pActor->GetID(),
-               "Actor:{} MoveTo {} {:.2f}, {:.2f}",
-               pActor->GetID(),
-               pActor->GetCurrentScene()->GetMapID(),
-               pActor->GetPosX(),
-               pActor->GetPosY());
+    LOGACTORDEBUG(pActor->GetID(),
+                  "Actor:{} MoveTo {} {:.2f}, {:.2f}",
+                  pActor->GetID(),
+                  pActor->GetCurrentScene()->GetMapID(),
+                  pActor->GetPosX(),
+                  pActor->GetPosY());
     __LEAVE_FUNCTION
 }
 
@@ -50,7 +49,7 @@ ON_SERVERMSG(CAIService, AOIChange)
         return;
     }
     CHECK(pActor->GetCurrentScene());
-    CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx() );
+    CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx());
 
     for(const auto& id: msg.actor_del())
     {
@@ -74,13 +73,12 @@ ON_SERVERMSG(CAIService, AOIChange)
 
         LOGACTORDEBUG(pActor->GetID(), "Actor:{} ViewListAdd del:{}", pActor->GetID(), id);
     }
-    LOGACTORDEBUG(
-               pActor->GetID(),
-               "Actor:{} ViewListChange cur:{} add:{} del:{}",
-               pActor->GetID(),
-               pActor->GetCurrentViewActorCount(),
-               msg.actor_add_size(),
-               msg.actor_del_size());
+    LOGACTORDEBUG(pActor->GetID(),
+                  "Actor:{} ViewListChange cur:{} add:{} del:{}",
+                  pActor->GetID(),
+                  pActor->GetCurrentViewActorCount(),
+                  msg.actor_add_size(),
+                  msg.actor_del_size());
     __LEAVE_FUNCTION
 }
 
@@ -191,7 +189,7 @@ ON_SERVERMSG(CAIService, ActorCreate)
     CAIPhase* pScene = AISceneManager()->QueryPhase(msg.scene_id());
     CHECK(pScene);
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
-    
+
     CHECK(pActor == nullptr);
     switch(msg.actortype())
     {
@@ -231,7 +229,7 @@ ON_SERVERMSG(CAIService, ActorDestory)
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
-    LOGACTORDEBUG(pActor->GetID(),"ActorDestory id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
+    LOGACTORDEBUG(pActor->GetID(), "ActorDestory id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
 
     if(msg.dead())
     {
@@ -262,6 +260,3 @@ ON_SERVERMSG(CAIService, ServiceReady)
     AIService()->GetEventManager()->Pause(false);
     __LEAVE_FUNCTION
 }
-
-
-

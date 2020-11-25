@@ -7,7 +7,6 @@
 
 #include <time.h>
 
-#include "PerSecondCount.h"
 #include "Decryptor.h"
 #include "Encryptor.h"
 #include "EventEntry.h"
@@ -15,6 +14,7 @@
 #include "NetworkDefine.h"
 #include "NetworkMessage.h"
 #include "ObjectHeap.h"
+#include "PerSecondCount.h"
 
 class CNetworkService;
 class CNetEventHandler;
@@ -43,7 +43,7 @@ public:
     virtual bool CreateByListener() const { return true; }
 
     bool SendNetworkMessage(CNetworkMessage&& msg);
-    bool SendNetworkMessage(const CNetworkMessage& msg , bool bNeedDuplicate = true);
+    bool SendNetworkMessage(const CNetworkMessage& msg, bool bNeedDuplicate = true);
     void InitDecryptor(uint32_t seed);
     void InitEncryptor(uint32_t seed);
 

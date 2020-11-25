@@ -24,7 +24,7 @@ public:
     void Destory();
 
     void OnTimer();
-    void Pause(bool bPause){m_bPause = bPause;}
+    void Pause(bool bPause) { m_bPause = bPause; }
     bool RemoveWait(CEventEntry* pEntry);
 
     bool ScheduleEvent(const CEventEntryCreateParam& param);
@@ -58,6 +58,6 @@ protected:
     std::set<CEventEntry*>             m_setWaitEntry;
     std::mutex                         m_mutex;
     struct event*                      m_pScheduleWaitEvent = nullptr;
-    bool                               m_bPause = false;
+    bool                               m_bPause             = false;
 };
 #endif // EventManager_h__

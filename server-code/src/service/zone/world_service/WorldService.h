@@ -37,7 +37,8 @@ public:
     virtual void OnLogicThreadExit() override;
 
     virtual void OnProcessMessage(CNetworkMessage*) override;
-    virtual void OnAllWaitedServiceReady()override;
+    virtual void OnAllWaitedServiceReady() override;
+
 public:
     uint64_t CreatePlayerID();
     void     RecyclePlayerID(OBJID idPlayer);
@@ -62,10 +63,9 @@ private:
     CMysqlConnection* _ConnectGameDB(uint16_t nWorldID, CMysqlConnection* pServerInfoDB);
 
 private:
-    CUIDFactory                   m_UIDFactory;
-    uint64_t                      m_nCurPlayerMaxID;
-    std::deque<OBJID>             m_setPlayerIDPool;
-    
+    CUIDFactory       m_UIDFactory;
+    uint64_t          m_nCurPlayerMaxID;
+    std::deque<OBJID> m_setPlayerIDPool;
 
     std::unique_ptr<CMysqlConnection> m_pGameDB;
 

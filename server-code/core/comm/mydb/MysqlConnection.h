@@ -13,9 +13,9 @@ class CMysqlConnection;
 class CMysqlStmt;
 class CMysqlResult;
 
-using CMysqlStmtPtr  = std::unique_ptr<CMysqlStmt>;
-using MYSQL_PTR      = std::unique_ptr<MYSQL, decltype(&mysql_close)>;
-using MYSQL_RES_PTR  = std::unique_ptr<MYSQL_RES, decltype(&mysql_free_result)>;
+using CMysqlStmtPtr = std::unique_ptr<CMysqlStmt>;
+using MYSQL_PTR     = std::unique_ptr<MYSQL, decltype(&mysql_close)>;
+using MYSQL_RES_PTR = std::unique_ptr<MYSQL_RES, decltype(&mysql_free_result)>;
 
 inline MYSQL_RES_PTR make_mysql_res_ptr(MYSQL_RES* res)
 {

@@ -41,8 +41,8 @@ public:
     virtual ~CPhase();
 
 public:
-    bool Init(CScene* pScene, const SceneIdx& idxScene, uint64_t idPhase, const Cfg_Phase* pPhaseData);
-    void Destory();
+    bool            Init(CScene* pScene, const SceneIdx& idxScene, uint64_t idPhase, const Cfg_Phase* pPhaseData);
+    void            Destory();
     export_lua bool NeedDestory() const;
     export_lua bool CanDestory();
 

@@ -7,7 +7,6 @@
 #include "Player.h"
 #include "SceneService.h"
 
-
 template<class MsgType, class FuncType>
 void ProcPlayerMsg(CNetworkMessage* pMsg, FuncType func)
 {

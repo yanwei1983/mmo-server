@@ -7,7 +7,11 @@ OBJECTHEAP_IMPLEMENTATION(CDBRecord, s_Heap);
 
 //////////////////////////////////////////////////////////////////////////
 
-CDBRecord::CDBRecord(CMysqlConnection* pMysqlConnection, const CDBFieldInfoListPtr& pDBFieldInfo, bool bCanModify, MYSQL_ROW row, unsigned long* lengths)
+CDBRecord::CDBRecord(CMysqlConnection*          pMysqlConnection,
+                     const CDBFieldInfoListPtr& pDBFieldInfo,
+                     bool                       bCanModify,
+                     MYSQL_ROW                  row,
+                     unsigned long*             lengths)
     : m_pMysqlConnection(pMysqlConnection)
     , m_pDBFieldInfo(pDBFieldInfo)
     , m_bCanModify(bCanModify)
@@ -38,7 +42,7 @@ CDBRecord::CDBRecord(CMysqlConnection* pMysqlConnection, const CDBFieldInfoListP
             }
             if(row == nullptr)
             {
-                auto pMysqlField  = std::make_unique<CDBField>(this, ref_field_info_ptr, nullptr, 0);
+                auto pMysqlField                                   = std::make_unique<CDBField>(this, ref_field_info_ptr, nullptr, 0);
                 m_FieldsByName[ref_field_info_ptr->GetFieldName()] = pMysqlField.get();
                 m_FieldsByIdx.push_back(std::move(pMysqlField));
 
@@ -51,7 +55,7 @@ CDBRecord::CDBRecord(CMysqlConnection* pMysqlConnection, const CDBFieldInfoListP
             else
             {
                 //有数据
-                auto pMysqlField = std::make_unique<CDBField>(this, ref_field_info_ptr, row[i], lengths[i]);
+                auto pMysqlField                                   = std::make_unique<CDBField>(this, ref_field_info_ptr, row[i], lengths[i]);
                 m_FieldsByName[ref_field_info_ptr->GetFieldName()] = pMysqlField.get();
 
                 if(CanModify())
@@ -73,7 +77,7 @@ CDBRecord::CDBRecord(CMysqlConnection* pMysqlConnection, const CDBFieldInfoListP
             }
         }
     }
-    
+
     __LEAVE_FUNCTION
 }
 
@@ -238,7 +242,7 @@ std::string CDBRecord::BuildUpdateSQL()
             if(szKeyBuf.empty() == false)
                 szKeyBuf += ",";
             std::string val_string = pField->GetValString();
-            CHECK_RETTYPE_V(val_string.empty() == false,  std::string, i);
+            CHECK_RETTYPE_V(val_string.empty() == false, std::string, i);
 
             szKeyBuf += ref_field_info_ptr->GetFieldName();
             szKeyBuf += "=";

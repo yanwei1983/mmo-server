@@ -48,7 +48,7 @@ public:
     export_lua bool IsPet() const { return GetActorType() == ACT_PET; }
     export_lua bool IsMapItem() const { return GetActorType() == ACT_MAPITEM; }
     export_lua bool IsBullet() const { return GetActorType() == ACT_BULLET; }
-    
+
     export_lua CSceneBase* GetCurrentScene() const { return m_pScene; }
     export_lua CSceneTile* GetSceneTile() const { return m_pSceneTile; }
     export_lua CSceneCollisionTile* GetCollisionTile() const { return m_pCollisionTile; }
@@ -87,7 +87,7 @@ public:
 public:
     // AOI
     export_lua virtual bool IsEnemy(CSceneObject* pTarget) const;
-    
+
     virtual void RemoveFromViewList(CSceneObject* pActor, OBJID idActor, bool bErase);
     virtual void AddToViewList(CSceneObject* pActor);
     virtual void _AddToViewList(uint32_t actor_type, uint64_t id);

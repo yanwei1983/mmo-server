@@ -160,20 +160,22 @@ namespace static_reflection_v2
         static_assert(std::tuple_size<decltype(meta_class.member_info_tuple)>::value != 0,
                       "MetaClass<T>() for type T should be specialized to return "
                       "FieldSchema tuples, like ((&T::field, field_name), ...)");
-        for_each_tuple(meta_class.member_info_tuple, [&fn, &value](const auto& field_info) constexpr {
-            if constexpr(is_member_ptr<decltype(field_info)>())
-            {
-                fn(field_info, value.*(field_info.ptr));
-            }
-            else if constexpr(is_member_ptr_tag<decltype(field_info)>())
-            {
-                fn(field_info, value.*(field_info.ptr), field_info.tag);
-            }
-            else if constexpr(is_member_ptr_func<decltype(field_info)>())
-            {
-                field_info.func(field_info, value.*(field_info.ptr));
-            }
-        });
+        for_each_tuple(
+            meta_class.member_info_tuple,
+            [&fn, &value](const auto& field_info) constexpr {
+                if constexpr(is_member_ptr<decltype(field_info)>())
+                {
+                    fn(field_info, value.*(field_info.ptr));
+                }
+                else if constexpr(is_member_ptr_tag<decltype(field_info)>())
+                {
+                    fn(field_info, value.*(field_info.ptr), field_info.tag);
+                }
+                else if constexpr(is_member_ptr_func<decltype(field_info)>())
+                {
+                    field_info.func(field_info, value.*(field_info.ptr));
+                }
+            });
     }
 
     template<typename T, typename Fn>
@@ -184,25 +186,27 @@ namespace static_reflection_v2
         static_assert(std::tuple_size<decltype(meta_class.member_info_tuple)>::value != 0,
                       "MetaClass<T>() for type T should be specialized to return "
                       "FieldSchema tuples, like ((&T::field, field_name), ...)");
-        find_if_tuple(meta_class.member_info_tuple, [&fn, &value, name_hash](const auto& field_info) constexpr -> bool {
-            if (field_info.field_name_hash != name_hash)
+        find_if_tuple(
+            meta_class.member_info_tuple,
+            [&fn, &value, name_hash](const auto& field_info) constexpr->bool {
+                if(field_info.field_name_hash != name_hash)
+                    return false;
+
+                if constexpr(is_member_ptr<decltype(field_info)>())
+                {
+                    return fn(field_info, value.*(field_info.ptr));
+                }
+                else if constexpr(is_member_ptr_tag<decltype(field_info)>())
+                {
+                    return fn(field_info, value.*(field_info.ptr), field_info.tag);
+                }
+                else if constexpr(is_member_ptr_func<decltype(field_info)>())
+                {
+                    return fn(field_info, value.*(field_info.ptr), field_info.func);
+                }
+
                 return false;
-
-            if constexpr(is_member_ptr<decltype(field_info)>())
-            {
-                return fn(field_info, value.*(field_info.ptr));
-            }
-            else if constexpr(is_member_ptr_tag<decltype(field_info)>())
-            {
-                return fn(field_info, value.*(field_info.ptr), field_info.tag);
-            }
-            else if constexpr(is_member_ptr_func<decltype(field_info)>())
-            {
-                return fn(field_info, value.*(field_info.ptr), field_info.func);
-            }
-
-            return false;
-        });
+            });
     }
 
 } // namespace static_reflection_v2

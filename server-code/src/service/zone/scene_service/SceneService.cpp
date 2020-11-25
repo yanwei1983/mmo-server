@@ -37,7 +37,6 @@
 #include "Scene.h"
 #include "SceneManager.h"
 #include "ScriptManager.h"
-
 #include "SkillType.h"
 #include "StatusType.h"
 #include "SuitEquip.h"
@@ -513,31 +512,28 @@ void CSceneService::OnLogicThreadExit()
     CServiceCommon::OnLogicThreadExit();
 }
 
-
 void CSceneService::OnAllWaitedServiceReady()
 {
     __ENTER_FUNCTION
-    
+
     if(SceneService()->IsSharedZone() == false)
     {
         ServerMSG::ServiceReady send;
         send.set_serverport(SceneService()->GetServerPort());
         SceneService()->SendProtoMsgToWorld(SceneService()->GetWorldID(), send);
-        SceneService()->SendProtoMsgToAIService(send); 
+        SceneService()->SendProtoMsgToAIService(send);
     }
     else
     {
         ServerMSG::ServiceReady send;
         send.set_serverport(SceneService()->GetServerPort());
-        SceneService()->SendProtoMsgToAIService(send); 
+        SceneService()->SendProtoMsgToAIService(send);
     }
 
-       
-        
     __LEAVE_FUNCTION
 }
 
 void CSceneService::OnServiceReadyFromCrash(const ServiceID& service_id)
 {
-    //ai/aoi奔溃重启后，需要进行数据重建
+    // ai/aoi奔溃重启后，需要进行数据重建
 }

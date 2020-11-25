@@ -27,7 +27,6 @@ public:
     export_lua virtual uint32_t  GetNP() const override { return m_nNP; };
     export_lua virtual OBJID     GetOwnerID() const override;
     export_lua uint32_t          GetPetTypeID() const;
-    
 
     export_lua virtual void _SetHP(uint32_t v) override { m_nHP = v; };
     export_lua virtual void _SetMP(uint32_t v) override { m_nMP = v; };
@@ -45,7 +44,7 @@ public:
     export_lua void CallBack();
 
     void Save();
-    
+
 public:
     OBJECTHEAP_DECLARATION(s_heap);
 

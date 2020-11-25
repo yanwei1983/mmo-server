@@ -27,7 +27,7 @@ NormalCrypto::NormalCrypto(const std::string& key_txt)
 {
 }
 
-NormalCrypto::NormalCrypto(NormalCrypto&& rht)noexcept
+NormalCrypto::NormalCrypto(NormalCrypto&& rht) noexcept
     : m_data(std::move(rht.m_data))
 {
 }

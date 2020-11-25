@@ -9,7 +9,7 @@ class NormalCrypto
 {
 public:
     NormalCrypto(const std::string& key_txt);
-    NormalCrypto(NormalCrypto&& rht)noexcept;
+    NormalCrypto(NormalCrypto&& rht) noexcept;
     ~NormalCrypto();
 
     std::string Encode(const std::string& plain);

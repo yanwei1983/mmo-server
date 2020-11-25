@@ -84,7 +84,7 @@ struct MysqlTableCheck
     static inline bool CheckAllTableImpl(CMysqlConnection* pDB, std::index_sequence<first, is...>)
     {
         using TableType = typename std::tuple_element<first, TupleType>::type;
-        auto result = CheckTable<TableType>(pDB);
+        auto result     = CheckTable<TableType>(pDB);
         if constexpr(sizeof...(is) > 0)
         {
             return result && CheckAllTableImpl<TupleType>(pDB, std::index_sequence<is...>{});
@@ -93,7 +93,6 @@ struct MysqlTableCheck
         {
             return result;
         }
-        
     }
 
     template<class type_list_Table>
@@ -148,17 +147,15 @@ struct MysqlTableCheck
     static inline bool CheckAllKeysAndFixImpl(CMysqlConnection* pDB, KeysTupleType&& KeysInfo, std::index_sequence<first, is...>)
     {
         auto key_info = std::get<first>(KeysInfo);
-        auto result = CheckKeysAndFix<TableType>(pDB, key_info);
+        auto result   = CheckKeysAndFix<TableType>(pDB, key_info);
         if constexpr(sizeof...(is) > 0)
         {
-            return result &&
-               CheckAllKeysAndFixImpl<TableType, KeysTupleType>(pDB, KeysInfo, std::index_sequence<is...>{});
+            return result && CheckAllKeysAndFixImpl<TableType, KeysTupleType>(pDB, KeysInfo, std::index_sequence<is...>{});
         }
         else
         {
             return result;
         }
-        
     }
     template<typename TableType>
     static inline bool CheckAllKeysAndFix(CMysqlConnection* pDB)
@@ -290,7 +287,7 @@ struct MysqlTableCheck
     static inline bool CheckAllTableAndFixImpl(CMysqlConnection* pDB, std::index_sequence<first, is...>)
     {
         using TableType = typename std::tuple_element<first, TupleType>::type;
-        auto result = CheckTableAndFix<TableType>(pDB);
+        auto result     = CheckTableAndFix<TableType>(pDB);
         if constexpr(sizeof...(is) > 0)
         {
             return result && CheckAllTableAndFixImpl<TupleType>(pDB, std::index_sequence<is...>{});
@@ -299,7 +296,6 @@ struct MysqlTableCheck
         {
             return result;
         }
-        
     }
 
     template<class type_list_Table>

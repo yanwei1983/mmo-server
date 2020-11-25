@@ -1,6 +1,8 @@
 #include "GlobalSetting.h"
-#include "LoggingMgr.h"
+
 #include <fstream>
+
+#include "LoggingMgr.h"
 
 static CGlobalSetting* g_pGlobalSetting = nullptr;
 CGlobalSetting*        GetGlobalSetting()
@@ -23,9 +25,8 @@ void ReleaseGlobalSetting()
     }
 }
 
-
-CGlobalSetting::CGlobalSetting(){}
-CGlobalSetting::~CGlobalSetting(){}
+CGlobalSetting::CGlobalSetting() {}
+CGlobalSetting::~CGlobalSetting() {}
 
 bool CGlobalSetting::Init()
 {
@@ -42,21 +43,19 @@ bool CGlobalSetting::LoadSetting(const std::string& filename)
     {
         std::ifstream infile(filename);
         infile >> m_setDataMap;
-        
+
         if(m_setDataMap.is_discarded())
         {
             LOGFATAL("CGlobalSetting::LoadSetting {} is not a json");
             return false;
         }
-
     }
     else
     {
         m_setDataMap["ServerInfoMYSQL"]["url"] = std::getenv("ServerInfoMYSQL_URL");
     }
 
-
-    BaseCode::g_log_aidebug = m_setDataMap["debug"]["log_aidebug"];
+    BaseCode::g_log_aidebug    = m_setDataMap["debug"]["log_aidebug"];
     BaseCode::g_log_actordebug = m_setDataMap["debug"]["log_actordebug"];
     BaseCode::g_log_skilldebug = m_setDataMap["debug"]["log_skilldebug"];
 

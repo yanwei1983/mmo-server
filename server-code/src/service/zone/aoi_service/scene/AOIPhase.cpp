@@ -2,13 +2,11 @@
 
 #include "AOIActor.h"
 #include "AOIActorManager.h"
-
 #include "AOIScene.h"
 #include "AOIService.h"
 #include "MapManager.h"
-
-#include "config/Cfg_Scene.pb.h"
 #include "config/Cfg_Phase.pb.h"
+#include "config/Cfg_Scene.pb.h"
 CAOIPhase::CAOIPhase() {}
 
 CAOIPhase::~CAOIPhase()
@@ -28,7 +26,6 @@ bool CAOIPhase::Init(CAOIScene* pScene, const SceneIdx& idxScene, uint64_t idPha
     m_idPhase = idPhase;
     CHECKF(CSceneBase::Init(idxScene, MapManager()));
 
-    
     if(pPhaseData)
     {
         uint16_t idPhaseLink = pPhaseData->link_phase();

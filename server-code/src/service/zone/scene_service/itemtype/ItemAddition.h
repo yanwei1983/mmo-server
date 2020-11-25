@@ -3,8 +3,8 @@
 
 #include "ActorAttrib.h"
 #include "BaseCode.h"
-#include "config/Cfg_ItemAddition.pb.h"
 #include "T_GameDataMap.h"
+#include "config/Cfg_ItemAddition.pb.h"
 
 class CItemAdditionData : public NoncopyableT<CItemAdditionData>
 {

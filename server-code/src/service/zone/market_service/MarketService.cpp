@@ -9,7 +9,6 @@
 #include "NetMSGProcess.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
-
 #include "server_msg/server_side.pb.h"
 
 static thread_local CMarketService* tls_pService = nullptr;
@@ -65,14 +64,13 @@ bool CMarketService::Init(const ServerPort& nServerPort)
 
     //注册消息
     RegisterAllMsgProcess<CMarketService>();
-    
+
     ServerMSG::ServiceReady msg;
     msg.set_serverport(GetServerPort());
 
     SendProtoMsgToZonePort(ServerPort(GetWorldID(), WORLD_SERVICE, 0), msg);
     return true;
 }
-
 
 void CMarketService::OnLogicThreadProc()
 {

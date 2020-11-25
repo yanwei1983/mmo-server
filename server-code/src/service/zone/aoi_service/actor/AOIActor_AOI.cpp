@@ -1,11 +1,10 @@
 #include "AOIActor.h"
-#include "AOIScene.h"
 #include "AOIPhase.h"
-#include "SceneTree.h"
 #include "AOIPlayer.h"
+#include "AOIScene.h"
 #include "AOIService.h"
+#include "SceneTree.h"
 #include "server_msg/server_side.pb.h"
-
 
 bool CAOIActor::IsEnemy(CSceneObject* pTarget) const
 {
@@ -14,7 +13,7 @@ bool CAOIActor::IsEnemy(CSceneObject* pTarget) const
     if(this == pTarget)
         return false;
     auto pTargetActor = static_cast<CAOIActor*>(pTarget);
-    
+
     return GetCampID() != pTargetActor->GetCampID();
     __LEAVE_FUNCTION
     return false;
@@ -22,7 +21,7 @@ bool CAOIActor::IsEnemy(CSceneObject* pTarget) const
 
 //////////////////////////////////////////////////////////////////////
 bool CAOIActor::UpdateViewList(bool bForce)
-{   
+{
     CHECKF(GetCurrentScene());
     CHECKF(GetSceneTile());
     float view_change_min = GetCurrentScene()->GetSceneTree()->GetViewChangeMin();
@@ -36,7 +35,7 @@ bool CAOIActor::UpdateViewList(bool bForce)
     return true;
 }
 
-bool CAOIActor::ViewTest(CSceneObject* pTarget)const
+bool CAOIActor::ViewTest(CSceneObject* pTarget) const
 {
     __ENTER_FUNCTION
     //如果有Owner，看看Owner能不能看见对方，一般来说Owner能看见，自己就能看见
@@ -45,7 +44,6 @@ bool CAOIActor::ViewTest(CSceneObject* pTarget)const
     {
         return pThisOwner->ViewTest(pTarget);
     }
-    
 
     //所有actor 可以看到 位面id与自己一样的的对象
     if(GetPhaseID() == pTarget->GetPhaseID())
@@ -57,7 +55,7 @@ bool CAOIActor::ViewTest(CSceneObject* pTarget)const
                 return IsEnemy(pTarget);
             else if(pTarget->IsPlayer())
                 return true;
-                
+
             return false;
         }
         else if(IsNpc())
@@ -88,17 +86,16 @@ bool CAOIActor::ViewTest(CSceneObject* pTarget)const
                 return true;
             return false;
         }
-        
+
         return false;
-    } 
-    
+    }
+
     //玩家 可以看到 位面id=自己ID 的其他对象   (专属怪刷新在专属位面内)
     //玩家 可以看到 inTaskList(位面id)的NPC/monster   (任务位面用来展开不同的NPC/monster)
-    auto fun_check_player = [](const CAOIPlayer* pPlayer, const CSceneObject* pTarget)->bool
-    {
+    auto fun_check_player = [](const CAOIPlayer* pPlayer, const CSceneObject* pTarget) -> bool {
         if(pPlayer->GetID() == pTarget->GetPhaseID())
             return true;
-        
+
         CHECKF(pPlayer);
         if(pPlayer->CheckTaskPhase(pTarget->GetPhaseID()) == true)
             return true;
@@ -117,8 +114,6 @@ bool CAOIActor::ViewTest(CSceneObject* pTarget)const
     __LEAVE_FUNCTION
     return false;
 }
-
-
 
 bool CAOIActor::IsMustAddToViewList(CSceneObject* pSceneObj) const
 {
@@ -142,7 +137,6 @@ bool CAOIActor::IsMustAddToViewList(CSceneObject* pSceneObj) const
         return true;
     }
 
-
     if(pActor->IsPlayer())
     {
         const CAOIPlayer* pPlayer = pActor->CastTo<CAOIPlayer>();
@@ -159,7 +153,6 @@ bool CAOIActor::IsMustAddToViewList(CSceneObject* pSceneObj) const
     __LEAVE_FUNCTION
     return false;
 }
-
 
 void CAOIActor::OnAOIProcess(const BROADCAST_SET& setBCAOIActorDel, const BROADCAST_SET& setBCAOIActor, const BROADCAST_SET& setBCAOIActorAdd)
 {
@@ -194,13 +187,10 @@ void CAOIActor::OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCAOIAct
                 // 通知对方自己消失,这里不用处理对方的sync消息，因为scene/ai收到变更消息,也会再执行1次Remove
                 pActor->RemoveFromViewList(this, this->GetID(), true);
             }
-            
-          
         }
     }
     __LEAVE_FUNCTION
 }
-
 
 void CAOIActor::OnAOIProcess_ActorAddToAOI(const BROADCAST_SET& setBCAOIActorAdd)
 {
@@ -215,7 +205,6 @@ void CAOIActor::OnAOIProcess_ActorAddToAOI(const BROADCAST_SET& setBCAOIActorAdd
 
         AddToViewList(pActor);
         pActor->AddToViewList(this);
-
     }
     __LEAVE_FUNCTION
 }

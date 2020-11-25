@@ -43,8 +43,9 @@ public:
     virtual void OnLogicThreadExit() override;
 
     virtual void OnProcessMessage(CNetworkMessage*) override;
-    virtual void OnAllWaitedServiceReady()override;
+    virtual void OnAllWaitedServiceReady() override;
     virtual void OnServiceReadyFromCrash(const ServiceID& service_id) override;
+
 public:
     void                          CreateSocketMessagePool(const VirtualSocket& vs);
     void                          DelSocketMessagePool(const VirtualSocket& vs);
@@ -63,7 +64,7 @@ public:
 
     //发送消息给AIService
     export_lua bool SendProtoMsgToAIService(const proto_msg_t& msg) const;
-    
+
     //发送消息给AOIService
     export_lua bool SendProtoMsgToAOIService(const proto_msg_t& msg) const;
 

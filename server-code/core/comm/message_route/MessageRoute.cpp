@@ -1,6 +1,9 @@
 #include "MessageRoute.h"
 
+#include <fstream>
+
 #include "EventManager.h"
+#include "GlobalSetting.h"
 #include "MessagePort.h"
 #include "MysqlTableCheck.h"
 #include "NetClientSocket.h"
@@ -8,9 +11,6 @@
 #include "NetSocket.h"
 #include "NormalCrypto.h"
 #include "serverinfodb.h"
-#include "GlobalSetting.h"
-#include <fstream>
-
 
 constexpr uint32_t SERVICE_LOAD_REDIS_TIMEOUT = 60 * 1000; // redis上的serviceload数据60秒丢弃
 constexpr uint32_t SERVICE_LOAD_TIMEOUT       = 30 * 1000; //每30秒发送1次service_load数据
@@ -85,7 +85,7 @@ bool CMessageRoute::LoadServiceSetting(WorldID_t nWorldID)
     //读取全服IP表
     {
         const auto& data_map = GetGlobalSetting()->GetData();
-        const auto& sql_url = data_map["ServerInfoMYSQL"]["url"];
+        const auto& sql_url  = data_map["ServerInfoMYSQL"]["url"];
         if(ConnectServerInfoDB(sql_url) == false)
         {
             LOGFATAL("CMessageRoute::LoadServiceSetting ConnectServerInfoDB fail");

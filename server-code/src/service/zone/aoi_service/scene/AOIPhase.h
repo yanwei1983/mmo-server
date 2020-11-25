@@ -22,13 +22,10 @@ public:
     virtual ~CAOIPhase();
 
 public:
-    
     export_lua uint64_t GetPhaseID() const { return m_idPhase; }
-    
 
 private:
-    uint64_t                           m_idPhase;
-    
+    uint64_t m_idPhase;
 };
 
 #endif /* AOIPHASE_H */

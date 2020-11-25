@@ -211,7 +211,7 @@ int32_t DayDiffLocal(time_t time1, time_t time2)
 
     // int32_t nLeapYear = isleap(tm2.tm_year) ? 1 : 0;
 
-    int32_t nDays  = tm2.tm_yday - tm1.tm_yday;
+    int32_t nDays = tm2.tm_yday - tm1.tm_yday;
     if(tm2.tm_year != tm1.tm_year)
     {
         //不同一年

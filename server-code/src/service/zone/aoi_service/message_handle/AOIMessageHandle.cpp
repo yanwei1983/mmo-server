@@ -11,8 +11,6 @@
 #include "msg/zone_service.pb.h"
 #include "server_msg/server_side.pb.h"
 
-
-
 ON_MSG(CAOIService, SC_PROPERTY_CHANGE)
 {
     __ENTER_FUNCTION
@@ -25,7 +23,6 @@ ON_MSG(CAOIService, SC_PROPERTY_CHANGE)
     }
     __LEAVE_FUNCTION
 }
-
 
 ON_SERVERMSG(CAOIService, AOIChange)
 {
@@ -68,20 +65,20 @@ ON_SERVERMSG(CAOIService, ActorCreate)
     CAOIPhase* pScene = AOISceneManager()->QueryPhase(msg.scene_id());
     CHECK(pScene);
     CAOIActor* pActor = AOIActorManager()->QueryActor(msg.actor_id());
-    
+
     CHECK(pActor == nullptr);
     switch(msg.actortype())
     {
         case ACT_PLAYER:
         {
             pActor = CAOIPlayer::CreateNew(msg);
-            LOGACTORDEBUG(pActor->GetID(),"Create AOIPlayer id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
+            LOGACTORDEBUG(pActor->GetID(), "Create AOIPlayer id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;
         default:
         {
             pActor = CAOIActor::CreateNew(msg);
-            LOGACTORDEBUG(pActor->GetID(),"Create AOIActor id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
+            LOGACTORDEBUG(pActor->GetID(), "Create AOIActor id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;
     }
@@ -94,15 +91,12 @@ ON_SERVERMSG(CAOIService, ActorCreate)
     __LEAVE_FUNCTION
 }
 
-
-
 ON_SERVERMSG(CAOIService, ActorDestory)
 {
     __ENTER_FUNCTION
     CAOIActor* pActor = AOIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
-    LOGACTORDEBUG(pActor->GetID(),"ActorDestory id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
-
+    LOGACTORDEBUG(pActor->GetID(), "ActorDestory id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
 
     if(pActor->GetCurrentScene())
         pActor->GetCurrentScene()->LeaveMap(pActor);
@@ -111,14 +105,13 @@ ON_SERVERMSG(CAOIService, ActorDestory)
     __LEAVE_FUNCTION
 }
 
-
 ON_SERVERMSG(CAOIService, ActorSetHide)
 {
     __ENTER_FUNCTION
     CAOIActor* pActor = AOIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
     pActor->SetHideCoude(msg.hide_count());
-    LOGACTORDEBUG(pActor->GetID(),"SetHideCoude id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
+    LOGACTORDEBUG(pActor->GetID(), "SetHideCoude id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
     __LEAVE_FUNCTION
 }
 
@@ -158,4 +151,3 @@ ON_SERVERMSG(CAOIService, RemoveTaskPhase)
     pPlayer->RemoveTaskPhase(msg.task_phase_id());
     __LEAVE_FUNCTION
 }
-

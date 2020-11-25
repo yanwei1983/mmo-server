@@ -22,6 +22,5 @@ public:
 
 public:
     OBJECTHEAP_DECLARATION(s_heap);
-
 };
 #endif /* AIPLAYER_H */

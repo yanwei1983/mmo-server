@@ -84,7 +84,7 @@ bool CSceneBase::EnterMap(CSceneObject* pActor, float fPosX, float fPosY, float 
     m_setActor[pActor->GetID()] = pActor;
     pActor->SetPos(Vector2(fPosX, fPosY));
     pActor->SetFace(fFace);
-    
+
     pActor->OnEnterMap(this);
     pActor->UpdateViewList(true);
     m_pSceneTree->CheckNeedResizeSceneTile(m_setPlayer.size());
@@ -106,8 +106,7 @@ void CSceneBase::_LeaveMap(CSceneObject* pActor, uint16_t idTargetMap /*= 0*/)
     //将玩家从场景树移除
     pActor->ClearViewList(true);
     pActor->OnLeaveMap(idTargetMap);
-    
-    
+
     m_pSceneTree->CheckNeedResizeSceneTile(m_setPlayer.size());
 }
 

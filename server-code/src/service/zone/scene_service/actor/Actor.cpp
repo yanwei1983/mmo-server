@@ -21,7 +21,7 @@
 
 bool IsObservePropertyChange(uint32_t nType, uint32_t nService)
 {
-    struct OBSERVE_PROPERTY_T 
+    struct OBSERVE_PROPERTY_T
     {
         OBSERVE_PROPERTY_T()
         {
@@ -38,12 +38,11 @@ bool IsObservePropertyChange(uint32_t nType, uint32_t nService)
         std::unordered_map<uint32_t, std::unordered_set<uint32_t>> data;
     };
     static const OBSERVE_PROPERTY_T OBSERVE_PROPERTY;
-    auto it = OBSERVE_PROPERTY.data.find(nService);
+    auto                            it = OBSERVE_PROPERTY.data.find(nService);
     if(it == OBSERVE_PROPERTY.data.end())
         return false;
     return it->second.count(nType) > 0;
 }
-
 
 CActor::CActor() {}
 
@@ -242,7 +241,6 @@ void CActor::_SetProperty(uint32_t nType, uint32_t nVal, uint32_t nSync)
     __LEAVE_FUNCTION
 }
 
-
 uint32_t CActor::GetHPMax() const
 {
     return GetAttrib().get(ATTRIB_HP_MAX);
@@ -346,8 +344,8 @@ void CActor::SendDelayAttribChage()
     __ENTER_FUNCTION
     if(m_DelayAttribChangeMap.empty())
         return;
-    bool send_to_ai = false;
-    bool send_to_aoi = false;
+    bool               send_to_ai  = false;
+    bool               send_to_aoi = false;
     SC_PROPERTY_CHANGE msg;
     msg.set_actor_id(GetID());
     for(const auto& [k, v]: m_DelayAttribChangeMap)

@@ -24,7 +24,7 @@ public:
     virtual void                 MakeShowData(SC_AOI_NEW& msg) override;
     virtual void                 OnEnterMap(CSceneBase* pScene) override;
     virtual void                 OnLeaveMap(uint16_t idTargetMap) override;
-    
+
     export_lua virtual bool  CanDamage(CActor* pTarget) const override;
     export_lua virtual void  BeKillBy(CActor* pAttacker) override;
     export_lua virtual bool  IsEnemy(CSceneObject* pTarget) const override;

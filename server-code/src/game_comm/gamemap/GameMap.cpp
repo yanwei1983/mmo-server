@@ -2,13 +2,13 @@
 
 #include "GameMapDef.h"
 #include "MapData.h"
+#include "config/Cfg_Phase.pb.h"
 #include "config/Cfg_Scene.pb.h"
 #include "config/Cfg_Scene_EnterPoint.pb.h"
 #include "config/Cfg_Scene_LeavePoint.pb.h"
 #include "config/Cfg_Scene_MonsterGenerator.pb.h"
 #include "config/Cfg_Scene_Patrol.pb.h"
 #include "config/Cfg_Scene_Reborn.pb.h"
-#include "config/Cfg_Phase.pb.h"
 CGameMap::CGameMap() {}
 
 CGameMap::~CGameMap() {}
@@ -302,18 +302,15 @@ Vector2 CGameMap::FindPosNearby(const Vector2& pos, float range) const
     return pos;
 }
 
-
 void CGameMap::_AddData(const Cfg_Scene_EnterPoint& iter)
 {
     m_EnterPointSet[iter.idx()] = std::make_unique<Cfg_Scene_EnterPoint>(iter);
 }
 
-
 void CGameMap::_AddData(const Cfg_Scene_LeavePoint& iter)
 {
     m_LeavePointSet[iter.idx()] = std::make_unique<Cfg_Scene_LeavePoint>(iter);
 }
-
 
 void CGameMap::_AddData(const Cfg_Scene_Reborn& iter)
 {

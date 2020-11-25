@@ -47,7 +47,7 @@ public:
     CreateNewImpl(CBornPosSet);
 
 public:
-    ~CBornPosSet() {  }
+    ~CBornPosSet() {}
 
 public:
     const CBornPos* RandGet(uint32_t dwProf) const

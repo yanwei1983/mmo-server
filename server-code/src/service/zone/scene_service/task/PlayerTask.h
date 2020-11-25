@@ -49,7 +49,6 @@ public:
     void OnDelTaskItem(uint32_t idItemType, uint32_t nNum);
     void OnFinishAchi(uint32_t idAchi);
 
-
 private:
     void AddTaskPhase(CPlayerTaskData* pData);
     void RemoveTaskPhase(CPlayerTaskData* pData);

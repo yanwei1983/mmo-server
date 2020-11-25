@@ -30,7 +30,7 @@ export_lua enum MAP_FLAG {
     MAPFLAG_HOME_DISABLE   = 0x02000000, // 禁止记录回城点
     MAPFLAG_DISABLE_STALL  = 0x04000000, // 禁止摆摊
     MAPFLAG_DISABLE_PLACE  = 0x08000000, // 禁止放置地面物品
-    
+
 };
 
 export_lua enum PARTOL_TYPE { PARTOL_ONCE, PARTOL_RING, PARTOL_BACK };
@@ -45,6 +45,5 @@ export_lua enum REBORN_TYPE {
     REBORN_MAPPOS,
     REBORN_STANDPOS,
 };
-
 
 #endif /* GAMEMAPDEF_H */

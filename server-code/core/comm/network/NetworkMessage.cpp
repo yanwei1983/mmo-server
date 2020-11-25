@@ -65,10 +65,10 @@ CNetworkMessage::CNetworkMessage(uint16_t msg_cmd, const proto_msg_t& msg, const
     msg.SerializeToArray(GetMsgBody(), nDataSize);
 
     MSG_HEAD* pHead = GetMsgHead();
-    pHead->msg_size   = nDataSize + sizeof(MSG_HEAD);
-    pHead->msg_cmd    = msg_cmd;
-    pHead->is_ciper   = FALSE;
-    pHead->reserved   = 0;
+    pHead->msg_size = nDataSize + sizeof(MSG_HEAD);
+    pHead->msg_cmd  = msg_cmd;
+    pHead->is_ciper = FALSE;
+    pHead->reserved = 0;
     // pHead->msg_cmd =  = msg.GetDescriptor()->options().GetExtension(NetMSG::msgid);
 
     // static auto desp = google::protobuf::DescriptorPool::generated_pool()->FindEnumTypeByName(std::string("MSGID"));
@@ -85,10 +85,10 @@ CNetworkMessage::CNetworkMessage(uint16_t msg_cmd, byte* body, size_t body_len, 
     AllocBuffer(body_len + sizeof(MSG_HEAD));
     memcpy(GetMsgBody(), body, body_len);
     MSG_HEAD* pHead = GetMsgHead();
-    pHead->msg_size   = body_len + sizeof(MSG_HEAD);
-    pHead->msg_cmd    = msg_cmd;
-    pHead->is_ciper   = FALSE;
-    pHead->reserved   = 0;
+    pHead->msg_size = body_len + sizeof(MSG_HEAD);
+    pHead->msg_cmd  = msg_cmd;
+    pHead->is_ciper = FALSE;
+    pHead->reserved = 0;
 }
 
 void CNetworkMessage::CopyRawMessage(const CNetworkMessage& rht)
@@ -210,13 +210,13 @@ void CNetworkMessage::DuplicateBuffer()
     if(m_pBuffer == nullptr)
     {
         CopyBuffer();
-    }   
+    }
     else
     {
-        auto new_buffer  = std::shared_ptr<byte>(new byte[m_nBufSize], [](byte* p) { delete[] p; });
+        auto new_buffer = std::shared_ptr<byte>(new byte[m_nBufSize], [](byte* p) { delete[] p; });
         memcpy(new_buffer.get(), m_pBuffer.get(), m_nBufSize);
         m_pBuffer = new_buffer;
-    } 
+    }
 }
 
 bool CNetworkMessage::NeedDuplicateWhenEncryptor() const
@@ -233,11 +233,11 @@ void CNetworkMessage::Encryptor(CEncryptor* pEnc)
     if(pEnc && GetMsgHead()->is_ciper == FALSE)
     {
         constexpr size_t sizeof_HEAD = sizeof(MSG_HEAD);
-        size_t buff_len = GetBodySize();
-        byte* plain_buff = GetMsgBody();
-        size_t cipher_len = pEnc->Encryptor(plain_buff, buff_len, plain_buff, buff_len);
-        GetMsgHead()->msg_size = cipher_len + sizeof_HEAD;
-        GetMsgHead()->is_ciper = TRUE;
+        size_t           buff_len    = GetBodySize();
+        byte*            plain_buff  = GetMsgBody();
+        size_t           cipher_len  = pEnc->Encryptor(plain_buff, buff_len, plain_buff, buff_len);
+        GetMsgHead()->msg_size       = cipher_len + sizeof_HEAD;
+        GetMsgHead()->is_ciper       = TRUE;
     }
 }
 
@@ -246,10 +246,10 @@ void CNetworkMessage::Decryptor(CDecryptor* pDec)
     if(pDec && GetMsgHead()->is_ciper == TRUE)
     {
         constexpr size_t sizeof_HEAD = sizeof(MSG_HEAD);
-        size_t buff_len = GetBodySize();
-        byte* cipher_buff = GetMsgBody();
-        size_t plain_len = pDec->Decryptor(cipher_buff, buff_len, cipher_buff, buff_len);
-        GetMsgHead()->msg_size = plain_len + sizeof_HEAD;
-        GetMsgHead()->is_ciper = FALSE;
+        size_t           buff_len    = GetBodySize();
+        byte*            cipher_buff = GetMsgBody();
+        size_t           plain_len   = pDec->Decryptor(cipher_buff, buff_len, cipher_buff, buff_len);
+        GetMsgHead()->msg_size       = plain_len + sizeof_HEAD;
+        GetMsgHead()->is_ciper       = FALSE;
     }
 }

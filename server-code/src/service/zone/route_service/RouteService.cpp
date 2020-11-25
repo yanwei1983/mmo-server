@@ -10,7 +10,6 @@
 #include "NetMSGProcess.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
-
 #include "server_msg/server_side.pb.h"
 
 static thread_local CRouteService* tls_pService = nullptr;

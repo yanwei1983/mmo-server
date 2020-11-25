@@ -6,8 +6,8 @@
 #include "GameMap.h"
 #include "MapManager.h"
 #include "NetMSGProcess.h"
-#include "config/Cfg_Scene.pb.h"
 #include "config/Cfg_Phase.pb.h"
+#include "config/Cfg_Scene.pb.h"
 CAOIScene::CAOIScene() {}
 
 CAOIScene::~CAOIScene()
@@ -27,7 +27,7 @@ CAOIPhase* CAOIScene::CreatePhase(const SceneIdx& idxScene, uint64_t idPhase)
     __ENTER_FUNCTION
     auto pMap = MapManager()->QueryMap(m_idMap);
     CHECKF(pMap);
-    auto      pPhaseData = pMap->GetPhaseDataById(idPhase);
+    auto       pPhaseData = pMap->GetPhaseDataById(idPhase);
     CAOIPhase* pPhase     = CAOIPhase::CreateNew(this, idxScene, idPhase, pPhaseData);
     CHECKF(pPhase);
     m_pPhaseSet[idPhase].reset(pPhase);

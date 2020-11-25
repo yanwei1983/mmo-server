@@ -1,9 +1,8 @@
 #include "AOIActor.h"
 
+#include "AOIActorManager.h"
 #include "AOIPlayer.h"
 #include "AOIScene.h"
-#include "AOIActorManager.h"
-
 #include "AOIService.h"
 #include "server_msg/server_side.pb.h"
 CAOIActor::CAOIActor() {}
@@ -15,8 +14,8 @@ bool CAOIActor::Init(const ServerMSG::ActorCreate& msg)
     __ENTER_FUNCTION
     m_nType = static_cast<ActorType>(msg.actortype());
     SetID(msg.actor_id());
-    
-    m_nMoveSPD = msg.movespd();
+
+    m_nMoveSPD    = msg.movespd();
     m_bNeedSyncAI = msg.need_sync_ai();
     SetName(msg.name());
     SetCampID(msg.campid());
@@ -24,9 +23,9 @@ bool CAOIActor::Init(const ServerMSG::ActorCreate& msg)
     SetTeamID(msg.team_id());
     SetGuildID(msg.guild_id());
     _SetPhaseID(msg.phase_id());
-   
+
     SetPos(Vector2(msg.posx(), msg.posy()));
-    
+
     m_bMustSee = msg.must_see();
     return true;
     __LEAVE_FUNCTION
@@ -72,7 +71,7 @@ uint32_t CAOIActor::GetCampID() const
     __ENTER_FUNCTION
     if(GetOwnerID() == 0)
         return m_idCamp;
-    
+
     auto pOwner = QueryOwner();
     if(pOwner == nullptr)
         return m_idCamp;
@@ -80,5 +79,4 @@ uint32_t CAOIActor::GetCampID() const
     return pOwner->GetCampID();
     __LEAVE_FUNCTION
     return m_idCamp;
-} 
-
+}

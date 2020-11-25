@@ -19,8 +19,7 @@ bool CSceneManager::Init(uint32_t idZone)
 {
     __ENTER_FUNCTION
     //将所有归属于本Zone的非副本地图进行加载
-    MapManager()->ForEach([pThis = this, idZone](CGameMap* pMap)
-    {
+    MapManager()->ForEach([pThis = this, idZone](CGameMap* pMap) {
         //如果不是本Zone的Map, 不会读取MapData,  副本地图也不需要创建
         if(pMap->IsZoneMap(idZone) == false || pMap->IsDynaMap() == true)
             return;

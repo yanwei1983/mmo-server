@@ -2,8 +2,8 @@
 #define ITEMUPGRADE_H
 
 #include "BaseCode.h"
-#include "config/Cfg_ItemUpgrade.pb.h"
 #include "T_GameDataMap.h"
+#include "config/Cfg_ItemUpgrade.pb.h"
 
 //////////////////////////////////////////////////////////////////////
 class CItemUpgradeData : public NoncopyableT<CItemUpgradeData>

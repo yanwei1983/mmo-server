@@ -12,7 +12,6 @@
 #include "NetMSGProcess.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
-
 #include "server_msg/server_side.pb.h"
 
 static thread_local CAuthService* tls_pService = nullptr;
@@ -87,8 +86,6 @@ bool CAuthService::Init(const ServerPort& nServerPort)
     SendProtoMsgToZonePort(ServerPort(GetWorldID(), SOCKET_SERVICE, GetServiceIdx()), msg);
     return true;
 }
-
-
 
 void CAuthService::OnLogicThreadProc()
 {

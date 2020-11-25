@@ -36,7 +36,7 @@ public:
 
     virtual bool      EnterMap(CSceneObject* pActor, float fPosX, float fPosY, float fFace);
     virtual void      LeaveMap(CSceneObject* pActor, uint16_t idTargetMap = 0);
-    void _LeaveMap(CSceneObject* pActor, uint16_t idTargetMap = 0);
+    void              _LeaveMap(CSceneObject* pActor, uint16_t idTargetMap = 0);
     export_lua size_t GetActorCount() const { return m_setActor.size(); }
     export_lua size_t GetPlayerCount() const { return m_setPlayer.size(); }
 

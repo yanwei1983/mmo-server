@@ -2,8 +2,8 @@
 #define SERVICECOMM_H
 #include "BaseCode.h"
 #include "EventManager.h"
-#include "NetMSGProcess.h"
 #include "MsgProcessRegister.h"
+#include "NetMSGProcess.h"
 #include "NetworkService.h"
 #include "ServiceDefine.h"
 #include "UIDFactory.h"
@@ -124,8 +124,6 @@ public:
     static std::unique_ptr<db::tbld_dbinfo>  QueryDBInfo(uint16_t nWorldID, CMysqlConnection* pServerInfoDB);
     static std::unique_ptr<CMysqlConnection> ConnectDB(const db::tbld_dbinfo* pInfo);
 
-
-
 public:
     template<class Service_T>
     inline void RegisterAllMsgProcess()
@@ -136,11 +134,13 @@ public:
             pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
         }
     }
+
 public:
-    void AddWaitServiceReady(ServiceID&& service_id);
-    void OnWaitedServiceReady(const ServiceID& service_id);
-    virtual void OnAllWaitedServiceReady(){}
-    virtual void OnServiceReadyFromCrash(const ServiceID& service_id){}
+    void         AddWaitServiceReady(ServiceID&& service_id);
+    void         OnWaitedServiceReady(const ServiceID& service_id);
+    virtual void OnAllWaitedServiceReady() {}
+    virtual void OnServiceReadyFromCrash(const ServiceID& service_id) {}
+
 protected:
     std::unique_ptr<CNetworkService> m_pNetworkService;
     CMessagePort*                    m_pMessagePort;
@@ -154,7 +154,7 @@ protected:
     uint32_t                         m_nMessageProcess = 0;
     std::unique_ptr<CMonitorMgr>     m_pMonitorMgr;
 
-    std::unordered_set<ServiceID>    m_setWaitServiceReady;
+    std::unordered_set<ServiceID> m_setWaitServiceReady;
 };
 
 #endif /* SERVICECOMM_H */

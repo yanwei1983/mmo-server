@@ -82,7 +82,7 @@ void CBullet::MakeShowData(SC_AOI_NEW& msg)
 void CBullet::OnEnterMap(CSceneBase* pScene)
 {
     CActor::OnEnterMap(pScene);
-    
+
     ServerMSG::ActorCreate aoi_msg;
     aoi_msg.set_actor_id(GetID());
     aoi_msg.set_scene_id(GetSceneIdx());
@@ -92,7 +92,7 @@ void CBullet::OnEnterMap(CSceneBase* pScene)
     aoi_msg.set_phase_id(GetPhaseID());
     aoi_msg.set_campid(GetCampID());
     aoi_msg.set_name(GetName());
-    
+
     aoi_msg.set_movespd(GetAttrib().get(ATTRIB_MOVESPD));
     aoi_msg.set_posx(GetPosX());
     aoi_msg.set_posy(GetPosY());
@@ -100,13 +100,12 @@ void CBullet::OnEnterMap(CSceneBase* pScene)
     aoi_msg.set_need_sync_ai(NeedSyncAI());
     SceneService()->SendProtoMsgToAOIService(aoi_msg);
 
-    //aoi_msg.set_hp(GetHP());
-    //aoi_msg.set_hpmax(GetHPMax());
-    //aoi_msg.set_mp(GetMP());
-    //aoi_msg.set_mpmax(GetMPMax());
-    //AI暂时不需要Bullet
-    //SceneService()->SendProtoMsgToAIService(aoi_msg);
-    
+    // aoi_msg.set_hp(GetHP());
+    // aoi_msg.set_hpmax(GetHPMax());
+    // aoi_msg.set_mp(GetMP());
+    // aoi_msg.set_mpmax(GetMPMax());
+    // AI暂时不需要Bullet
+    // SceneService()->SendProtoMsgToAIService(aoi_msg);
 }
 
 void CBullet::OnLeaveMap(uint16_t idTargetMap)

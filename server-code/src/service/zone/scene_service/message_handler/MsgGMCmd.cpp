@@ -30,11 +30,11 @@ void OnGMCMD_chgmap(CPlayer* pPlayer, const std::vector<std::string>& vecCMD)
     if(vecCMD.size() < 3)
         return;
 
-    uint32_t idMapID = std::stoul(vecCMD[1]);
-    uint32_t posx    = std::stoul(vecCMD[2]);
-    uint32_t posy    = std::stoul(vecCMD[3]);
-    uint16_t  idPhase = std::stol(vecCMD[4]);
-    uint16_t  nPhaseType = std::stol(vecCMD[5]);
+    uint32_t idMapID    = std::stoul(vecCMD[1]);
+    uint32_t posx       = std::stoul(vecCMD[2]);
+    uint32_t posy       = std::stoul(vecCMD[3]);
+    uint16_t idPhase    = std::stol(vecCMD[4]);
+    uint16_t nPhaseType = std::stol(vecCMD[5]);
 
     pPlayer->FlyMap(idMapID, idPhase, nPhaseType, posx, posy, 0, 0);
     __LEAVE_FUNCTION

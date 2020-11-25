@@ -1,9 +1,8 @@
 #include "MysqlConnection.h"
 
-#include "MysqlUrl.h"
 #include "MysqlStmt.h"
+#include "MysqlUrl.h"
 #include "mysql/errmsg.h"
-
 
 constexpr int32_t MAX_PING_TIMES_PER_QUERY = 10;
 std::mutex        g_mysql_init_mutex;
@@ -71,8 +70,8 @@ bool CMysqlConnection::Connect(const std::string& host,
     constexpr int32_t nConnectTimeOut = 10;
     constexpr int32_t nWriteTimeOut   = 5;
     constexpr int32_t nReadTimeOut    = 5;
-    constexpr bool bReconnect         = true;
-    int32_t nError = 0;
+    constexpr bool    bReconnect      = true;
+    int32_t           nError          = 0;
     // mysql_options(m_pHandle.get(), MYSQL_SET_CHARSET_NAME, MYSQL_AUTODETECT_CHARSET_NAME);
     nError |= mysql_options(m_pHandle.get(), MYSQL_SET_CHARSET_NAME, "utf8mb4");
     nError |= mysql_set_character_set(m_pHandle.get(), "utf8mb4");
@@ -100,17 +99,17 @@ bool CMysqlConnection::Connect(const std::string& host,
         return false;
     }
     LOGDBDEBUG("mysql connect to {}:{} {} succ.", host, port, db);
-    
+
     constexpr bool g_test_charset = false;
     if(g_test_charset)
     {
-        std::string query = "show variables like '%char%'";
-        auto result = UnionQuery(query);
-        for (uint32_t i = 0; i < result->get_num_row(); i++)
+        std::string query  = "show variables like '%char%'";
+        auto        result = UnionQuery(query);
+        for(uint32_t i = 0; i < result->get_num_row(); i++)
         {
-            auto row = result->fetch_row(false);
+            auto        row  = result->fetch_row(false);
             std::string name = row->Field(0);
-            std::string val = row->Field(1);
+            std::string val  = row->Field(1);
             LOGDBDEBUG("mysql_char {}:{}", name, val);
         }
         result.reset();
@@ -124,18 +123,17 @@ bool CMysqlConnection::Connect(const std::string& host,
                 __ENTER_FUNCTION
                 LOGMESSAGE("ThreadID:{}", get_cur_thread_id());
 
-                
                 {
                     std::unique_lock lock(g_mysql_init_mutex);
                     m_pAsyncHandle.reset(mysql_init(0));
                 }
                 // mysql_options(m_pAsyncHandle.get(), MYSQL_SET_CHARSET_NAME, MYSQL_AUTODETECT_CHARSET_NAME);
-                
+
                 constexpr int32_t nConnectTimeOut = 10;
                 constexpr int32_t nWriteTimeOut   = 5;
                 constexpr int32_t nReadTimeOut    = 5;
-                constexpr bool bReconnect         = true;
-                int32_t nError = 0;
+                constexpr bool    bReconnect      = true;
+                int32_t           nError          = 0;
                 nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_SET_CHARSET_NAME, "utf8mb4");
                 nError |= mysql_set_character_set(m_pAsyncHandle.get(), "utf8mb4");
                 nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_OPT_CONNECT_TIMEOUT, &nConnectTimeOut);
@@ -252,7 +250,6 @@ CMysqlResultPtr CMysqlConnection::UnionQuery(const std::string& query)
     {
         NextResult();
     }
-    
 
     for(int32_t i = 0; i < MAX_PING_TIMES_PER_QUERY; i++)
     {
@@ -293,7 +290,7 @@ uint64_t CMysqlConnection::Insert(const std::string& query)
     {
         NextResult();
     }
-    
+
     for(int32_t i = 0; i < MAX_PING_TIMES_PER_QUERY; i++)
     {
         int32_t nError = mysql_real_query(m_pHandle.get(), query.c_str(), query.size());

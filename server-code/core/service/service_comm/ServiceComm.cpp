@@ -5,12 +5,12 @@
 #include "CheckUtil.h"
 #include "DB2PB.h"
 #include "EventManager.h"
+#include "GlobalSetting.h"
 #include "MessagePort.h"
 #include "MessageRoute.h"
 #include "MonitorMgr.h"
 #include "MysqlConnection.h"
 #include "NormalCrypto.h"
-#include "GlobalSetting.h"
 #include "serverinfodb.h"
 #include "serverinfodb.pb.h"
 
@@ -456,10 +456,10 @@ std::unique_ptr<CMysqlConnection> CServiceCommon::ConnectGlobalDB()
 
 std::unique_ptr<CMysqlConnection> CServiceCommon::ConnectServerInfoDB()
 {
-    const auto& settings            = GetGlobalSetting()->GetData();
-    auto        pServerInfoDB       = std::make_unique<CMysqlConnection>();
-    auto        mysql_url           = settings["ServerInfoMYSQL"]["url"];
-    auto        real_mysql_url      = NormalCrypto::default_instance().Decode(mysql_url);
+    const auto& settings       = GetGlobalSetting()->GetData();
+    auto        pServerInfoDB  = std::make_unique<CMysqlConnection>();
+    auto        mysql_url      = settings["ServerInfoMYSQL"]["url"];
+    auto        real_mysql_url = NormalCrypto::default_instance().Decode(mysql_url);
     if(pServerInfoDB->Connect(real_mysql_url) == false)
     {
         return nullptr;

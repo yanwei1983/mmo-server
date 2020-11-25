@@ -29,7 +29,7 @@ bool CMapItem::Init(uint32_t idType)
     SetID(ActorManager()->GenMapItemID());
     CHECKF(CActor::Init());
     return true;
-    
+
     __LEAVE_FUNCTION
     return false;
 }
@@ -47,14 +47,12 @@ void CMapItem::MakeShowData(SC_AOI_NEW& msg)
     msg.set_name(GetName());
     msg.set_hp(GetHP());
     msg.set_hpmax(GetHPMax());
-
-    
 }
 
 void CMapItem::OnEnterMap(CSceneBase* pScene)
 {
     CActor::OnEnterMap(pScene);
-    
+
     ServerMSG::ActorCreate aoi_msg;
     aoi_msg.set_actor_id(GetID());
     aoi_msg.set_scene_id(GetSceneIdx());
@@ -72,14 +70,13 @@ void CMapItem::OnEnterMap(CSceneBase* pScene)
 
     SceneService()->SendProtoMsgToAOIService(aoi_msg);
 
-    //aoi_msg.set_hp(GetHP());
-    //aoi_msg.set_hpmax(GetHPMax());
-    //aoi_msg.set_mp(GetMP());
-    //aoi_msg.set_mpmax(GetMPMax());
-    
+    // aoi_msg.set_hp(GetHP());
+    // aoi_msg.set_hpmax(GetHPMax());
+    // aoi_msg.set_mp(GetMP());
+    // aoi_msg.set_mpmax(GetMPMax());
+
     // AI暂时不需要MapItem
     // SceneService()->SendProtoMsgToAIService(aoi_msg);
-    
 }
 
 void CMapItem::OnLeaveMap(uint16_t idTargetMap)

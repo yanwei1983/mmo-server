@@ -6,14 +6,13 @@
 #include "GameMapDef.h"
 #include "MapData.h"
 #include "ProtobuffUtil.h"
+#include "config/Cfg_Phase.pb.h"
 #include "config/Cfg_Scene.pb.h"
 #include "config/Cfg_Scene_EnterPoint.pb.h"
 #include "config/Cfg_Scene_LeavePoint.pb.h"
 #include "config/Cfg_Scene_MonsterGenerator.pb.h"
 #include "config/Cfg_Scene_Patrol.pb.h"
 #include "config/Cfg_Scene_Reborn.pb.h"
-#include "config/Cfg_Phase.pb.h"
-
 #include "game_common_def.h"
 CMapManager::CMapManager() {}
 
@@ -40,7 +39,6 @@ bool LoadCfg(const std::string& filename, CMapManager* pMapManager)
     LOGDEBUG("{} LoadSucc.", filename);
     return true;
 }
-
 
 bool CMapManager::Init(uint16_t idZone)
 {
@@ -82,14 +80,12 @@ bool CMapManager::Init(uint16_t idZone)
         }
     }
 
-    LoadCfg<Cfg_Scene_EnterPoint>( "Cfg_Scene_EnterPoint.bytes", this);
-    LoadCfg<Cfg_Scene_LeavePoint>( "Cfg_Scene_LeavePoint.bytes", this);
-    LoadCfg<Cfg_Scene_MonsterGenerator>( "Cfg_Scene_MonsterGenerator.bytes", this);
-    LoadCfg<Cfg_Scene_Patrol>( "Cfg_Scene_Patrol.bytes", this);
-    LoadCfg<Cfg_Scene_Reborn>( "Cfg_Scene_Reborn.bytes", this);
+    LoadCfg<Cfg_Scene_EnterPoint>("Cfg_Scene_EnterPoint.bytes", this);
+    LoadCfg<Cfg_Scene_LeavePoint>("Cfg_Scene_LeavePoint.bytes", this);
+    LoadCfg<Cfg_Scene_MonsterGenerator>("Cfg_Scene_MonsterGenerator.bytes", this);
+    LoadCfg<Cfg_Scene_Patrol>("Cfg_Scene_Patrol.bytes", this);
+    LoadCfg<Cfg_Scene_Reborn>("Cfg_Scene_Reborn.bytes", this);
     LoadCfg<Cfg_Phase>("Cfg_Phase.bytes", this);
-
-   
 
     LOGDEBUG("MapManager LoadSucc.");
     return true;

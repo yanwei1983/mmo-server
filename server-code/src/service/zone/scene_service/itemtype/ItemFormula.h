@@ -2,8 +2,8 @@
 #define ITEMFORMULA_H
 
 #include "BaseCode.h"
-#include "config/Cfg_ItemFormula.pb.h"
 #include "T_GameDataMap.h"
+#include "config/Cfg_ItemFormula.pb.h"
 
 //////////////////////////////////////////////////////////////////////
 class CItemFormulaData : public NoncopyableT<CItemFormulaData>

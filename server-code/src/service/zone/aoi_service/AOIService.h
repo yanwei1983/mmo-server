@@ -5,7 +5,6 @@
 #include "IService.h"
 #include "MyTimer.h"
 #include "NetSocket.h"
-
 #include "ServiceComm.h"
 #include "UIDFactory.h"
 
@@ -28,38 +27,35 @@ public:
     ServerPort GetSceneServerPort() const { return ServerPort(GetWorldID(), SCENE_SERVICE, GetZoneID()); }
     uint16_t   GetZoneID() const { return GetServiceID().GetServiceIdx(); }
     ServerPort GetAIServerPort() const { return ServerPort(GetWorldID(), AI_SERVICE, GetServiceID().GetServiceIdx()); }
-    
+
 public:
     virtual void OnLogicThreadProc() override;
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadExit() override;
 
-
     //发送消息给AOIService
     bool SendProtoMsgToSceneService(const proto_msg_t& msg) const;
     bool SendProtoMsgToAIService(const proto_msg_t& msg) const;
+
 public:
-    
-    CAOISceneManager*   GetAOISceneManager() const { return m_pAOISceneManager.get(); }
-    CAOIActorManager*   GetAOIActorManager() const { return m_pAOIActorManager.get(); }
-    CMapManager*       GetMapManager() const { return m_pMapManager.get(); }
+    CAOISceneManager* GetAOISceneManager() const { return m_pAOISceneManager.get(); }
+    CAOIActorManager* GetAOIActorManager() const { return m_pAOIActorManager.get(); }
+    CMapManager*      GetMapManager() const { return m_pMapManager.get(); }
 
 private:
     CMyTimer m_tLastDisplayTime;
 
-    
-    std::unique_ptr<CAOISceneManager>   m_pAOISceneManager;
-    std::unique_ptr<CAOIActorManager>   m_pAOIActorManager;
-    std::unique_ptr<CMapManager>       m_pMapManager;
+    std::unique_ptr<CAOISceneManager> m_pAOISceneManager;
+    std::unique_ptr<CAOIActorManager> m_pAOIActorManager;
+    std::unique_ptr<CMapManager>      m_pMapManager;
 
 public:
     //配置文件
-
 };
 
 CAOIService* AOIService();
-void        SetAOIServicePtr(CAOIService* ptr);
-inline auto EventManager()
+void         SetAOIServicePtr(CAOIService* ptr);
+inline auto  EventManager()
 {
     return AOIService()->GetEventManager();
 }

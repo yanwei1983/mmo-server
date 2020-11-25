@@ -117,8 +117,6 @@ inline constexpr bool find_if_tupleImpl(Tuple&& tuple, Lambda&& lambda, std::ind
     {
         return result;
     }
-    
-    
 }
 
 template<typename Lambda, typename Tuple>
@@ -136,14 +134,12 @@ inline constexpr bool find_if_tuple_indexImpl(Tuple&& tuple, Lambda&& lambda, st
     auto result = lambda(std::integral_constant<std::size_t, first>(), std::forward<Tuple>(tuple));
     if constexpr(sizeof...(is) > 0)
     {
-        return result ||
-           find_if_tuple_indexImpl(std::forward<Tuple>(tuple), std::forward<Lambda>(lambda), std::index_sequence<is...>{});
+        return result || find_if_tuple_indexImpl(std::forward<Tuple>(tuple), std::forward<Lambda>(lambda), std::index_sequence<is...>{});
     }
     else
     {
         return result;
     }
-    
 }
 
 template<typename Lambda, typename Tuple>

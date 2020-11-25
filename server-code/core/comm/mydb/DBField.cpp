@@ -75,7 +75,6 @@ CDBField::CDBField(CDBRecord* pDBRecord, const CDBFieldInfo* pFieldInfo, char* p
         break;
         default:
         {
-            
         }
         break;
     }
@@ -120,7 +119,6 @@ std::string CDBField::GetValString() const
         {
             if(auto pval = std::get_if<int32_t>(&m_Val))
                 return std::to_string(*pval);
-            
         }
         break;
         case DB_FIELD_TYPE_LONGLONG_UNSIGNED:
@@ -133,13 +131,12 @@ std::string CDBField::GetValString() const
         {
             if(auto pval = std::get_if<int64_t>(&m_Val))
                 return std::to_string(*pval);
-           
         }
         break;
         case DB_FIELD_TYPE_FLOAT:
         {
             if(auto pval = std::get_if<float>(&m_Val))
-                return std::to_string(*pval);            
+                return std::to_string(*pval);
         }
         break;
         case DB_FIELD_TYPE_DOUBLE:
@@ -151,10 +148,10 @@ std::string CDBField::GetValString() const
         case DB_FIELD_TYPE_VARCHAR:
         case DB_FIELD_TYPE_BLOB:
         {
-             
+
             if(auto pval = std::get_if<std::string>(&m_Val))
             {
-                const std::string& tmp = *pval;
+                const std::string&      tmp    = *pval;
                 std::unique_ptr<char[]> szBuff = std::make_unique<char[]>(tmp.size() * 2 + 1);
                 mysql_real_escape_string(m_pDBRecord->_GetMysqlConnection()->_GetHandle(), szBuff.get(), tmp.c_str(), tmp.size());
 
@@ -164,7 +161,6 @@ std::string CDBField::GetValString() const
             {
                 return "''";
             }
-            
         }
         break;
         default:

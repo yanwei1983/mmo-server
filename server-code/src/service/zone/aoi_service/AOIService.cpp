@@ -114,7 +114,6 @@ bool CAOIService::Init(const ServerPort& nServerPort)
     return false;
 }
 
-
 void CAOIService::OnLogicThreadProc()
 {
     __ENTER_FUNCTION
@@ -151,7 +150,6 @@ void CAOIService::OnLogicThreadExit()
 {
     CServiceCommon::OnLogicThreadExit();
 }
-
 
 bool CAOIService::SendProtoMsgToAIService(const proto_msg_t& msg) const
 {

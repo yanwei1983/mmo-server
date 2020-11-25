@@ -100,7 +100,7 @@ namespace pb_util
     {
         std::string json_txt;
         SaveToJsonTxt(pbm, json_txt);
-        
+
         std::ofstream ofs(filename.data(), std::ios::out | std::ios::trunc);
         if(ofs.is_open())
         {

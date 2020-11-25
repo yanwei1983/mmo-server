@@ -94,21 +94,22 @@ public:
 public:
     // AOI相关
     export_lua virtual bool IsEnemy(CSceneObject* pTarget) const override { return false; }
-    
+
     virtual void OnBeforeClearViewList(bool bSendMsgToSelf) override;
     virtual void RemoveFromViewList(CSceneObject* pActor, OBJID idActor, bool bErase) override;
-    virtual bool UpdateViewList(bool bForce)override;
+    virtual bool UpdateViewList(bool bForce) override;
     void         OnReciveAOIUpdate(const BROADCAST_SET& setBCActorDel, const BROADCAST_SET& setBCActorAdd);
+
 protected:
-    void         AddDelaySendShowTo(OBJID id);
-    void         RemoveDelaySendShowTo(OBJID id);
-   
-    void         OnAOIProcess_ActorAddToAOI(const BROADCAST_SET& setBCActorAdd);
-    void         OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDe);
-    void         OnAOIProcess_PosUpdate();
-    
-    
+    void AddDelaySendShowTo(OBJID id);
+    void RemoveDelaySendShowTo(OBJID id);
+
+    void OnAOIProcess_ActorAddToAOI(const BROADCAST_SET& setBCActorAdd);
+    void OnAOIProcess_ActorRemoveFromAOI(const BROADCAST_SET& setBCActorDe);
+    void OnAOIProcess_PosUpdate();
+
     virtual bool NeedSyncAI() const;
+
 private:
     void BroadcastShowTo(const VirtualSocketMap_t& VSMap);
 
@@ -127,9 +128,8 @@ public:
     export_lua virtual void RecalcAttrib(bool bClearCache = false);
 
 public:
-    virtual void            OnEnterMap(CSceneBase* pScene) override;
-    virtual void            OnLeaveMap(uint16_t idTargetMap) override;
-    
+    virtual void OnEnterMap(CSceneBase* pScene) override;
+    virtual void OnLeaveMap(uint16_t idTargetMap) override;
 
 public:
     export_lua int32_t BeAttack(CActor*  pAttacker,

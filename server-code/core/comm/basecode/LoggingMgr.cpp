@@ -27,7 +27,7 @@ namespace BaseCode
 
     thread_local int32_t s_monitor_logger = LOG4Z_MAIN_LOGGER_ID;
 
-    bool g_log_aidebug = false;
+    bool g_log_aidebug    = false;
     bool g_log_actordebug = false;
     bool g_log_skilldebug = false;
 } // namespace BaseCode
@@ -139,7 +139,6 @@ void BaseCode::InitLog(const std::string& path, int32_t log_lev)
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_lua_logger, false);
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_gm_logger, false);
 
-
     ILog4zManager::getRef().start();
 }
 
@@ -158,7 +157,7 @@ void BaseCode::StopLog()
     using namespace zsummer::log4z;
 
     const char* end_line = "======================================================================";
-    uint32_t max_log = ILog4zManager::getRef().getStatusActiveLoggers();
+    uint32_t    max_log  = ILog4zManager::getRef().getStatusActiveLoggers();
     for(uint32_t log_id = 0; log_id < max_log; log_id++)
     {
         if(ILog4zManager::getRef().getLoggerLogCount(log_id) > 0)
@@ -166,8 +165,6 @@ void BaseCode::StopLog()
             ZLOGFMT_DEBUG(log_id, end_line);
         }
     }
-
-   
 
     ILog4zManager::getRef().stop();
 }

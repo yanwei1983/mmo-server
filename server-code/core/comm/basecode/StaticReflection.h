@@ -63,8 +63,6 @@ namespace static_reflection
                 {
                     invoke_impl(std::forward<Info>(info), std::forward<Tuple>(t), std::index_sequence<is...>{});
                 }
-               
-                
             }
 
             template<typename Tuple>
@@ -101,7 +99,6 @@ namespace static_reflection
                     // invoke(FieldName, MemberPtr);
                     return fn(std::forward<Info>(info), value.*(std::get<0>(std::forward<Tuple>(t))));
                 }
-                
             }
 
             template<typename Info, typename Tuple>
@@ -128,7 +125,6 @@ namespace static_reflection
                 {
                     return bInvoke;
                 }
-                
             }
 
             template<typename Tuple>

@@ -70,7 +70,6 @@ int main(int argc, char** argv)
         }
     }
 
-
     CfgDataPack input;
     pb_util::LoadFromBinaryFile(in_file_name, input);
     std::string json_txt_all;
@@ -98,6 +97,4 @@ int main(int argc, char** argv)
             ofs.close();
         }
     }
-    
-    
 }

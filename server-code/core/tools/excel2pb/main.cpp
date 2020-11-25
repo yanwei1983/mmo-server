@@ -37,19 +37,19 @@ public:
 
 struct ProcessData
 {
-    std::string title;
-    size_t y;
-    size_t x;
+    std::string                                title;
+    size_t                                     y;
+    size_t                                     x;
     std::unique_ptr<google::protobuf::Message> pRow;
 };
 
-void process_excel(const get_opt& opt, const xlnt::workbook& wb,const google::protobuf::Message* message_const,std::vector<ProcessData>& vecMessage)
+void process_excel(const get_opt& opt, const xlnt::workbook& wb, const google::protobuf::Message* message_const, std::vector<ProcessData>& vecMessage)
 {
     for(const auto& ws: wb)
     {
-        auto rows      = ws.rows(false);
-        auto row_name  = rows.vector(0);
-        
+        auto rows     = ws.rows(false);
+        auto row_name = rows.vector(0);
+
         size_t x = 0;
         size_t y = 0;
         for(auto row: rows)
@@ -60,7 +60,7 @@ void process_excel(const get_opt& opt, const xlnt::workbook& wb,const google::pr
                 continue;
             }
             google::protobuf::Message* pPBRow  = message_const->New();
-            bool     bUpdate = false;
+            bool                       bUpdate = false;
             for(auto cell: row)
             {
                 if(x >= row_name.length())
@@ -68,7 +68,7 @@ void process_excel(const get_opt& opt, const xlnt::workbook& wb,const google::pr
                 auto cell_name = row_name[x];
                 if(cell_name.has_value() == false)
                     continue;
-                std::string name      = cell_name.to_string();
+                std::string name = cell_name.to_string();
                 if(name.empty() || name[0] == '#')
                 {
                     x++;
@@ -135,8 +135,8 @@ void process_excel(const get_opt& opt, const xlnt::workbook& wb,const google::pr
             {
                 ProcessData data;
                 data.title = ws.title();
-                data.y = y;
-                data.x = x;
+                data.y     = y;
+                data.x     = x;
                 data.pRow.reset(pPBRow);
                 vecMessage.emplace_back(std::move(data));
             }
@@ -191,22 +191,22 @@ int main(int argc, char** argv)
 
     DynamicMessageFactory factory;
 
-    const Message*        message_const   = factory.GetPrototype(desc);
-    
-    //auto                  pPBRowFieldDesc = message_const->GetDescriptor();
+    const Message* message_const = factory.GetPrototype(desc);
+
+    // auto                  pPBRowFieldDesc = message_const->GetDescriptor();
 
     std::vector<ProcessData> vecMessage;
-    std::string           debug_txt;
-    xlnt::workbook        wb;
+    std::string              debug_txt;
+    xlnt::workbook           wb;
     wb.load(execl_full_path);
 
     if(opt.has("--showexecl"))
     {
         for(const auto& ws: wb)
         {
-            auto rows      = ws.rows(false);
-            const auto& row_name  = rows.vector(0);
-            int32_t x = 0, y = 0;
+            auto        rows     = ws.rows(false);
+            const auto& row_name = rows.vector(0);
+            int32_t     x = 0, y = 0;
             for(auto row: rows)
             {
                 for(auto cell: row)
@@ -222,11 +222,10 @@ int main(int argc, char** argv)
     }
     process_excel(opt, wb, message_const, vecMessage);
 
-
     {
         CfgDataPack output;
         output.set_size(vecMessage.size());
-        for(const auto&[title,y,x,pRow]: vecMessage)
+        for(const auto& [title, y, x, pRow]: vecMessage)
         {
             auto data = output.add_data_set();
             pRow->SerializeToString(data);
@@ -237,7 +236,6 @@ int main(int argc, char** argv)
                 debug_txt += ",\n";
             debug_txt += std::string_view{json_txt.c_str(), json_txt.size() - 2};
             debug_txt += fmt::format(",\"__debug\":\"file:{} sheet:{} line:{}  \"\n}} ", execl_file_name, title, y + 1);
-            
         }
 
         pb_util::SaveToBinaryFile(output, out_file_name.c_str());
@@ -255,8 +253,6 @@ int main(int argc, char** argv)
             ofs.close();
         }
     }
-    
-   
 
     fmt::printf("write to file succ.\n");
 

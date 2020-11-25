@@ -65,7 +65,7 @@ public:
 
 public:
     virtual void AddToViewList(CSceneObject* pActor) override;
-    virtual bool UpdateViewList(bool bForce)override {return true;} //不需要自动更新ViewList，由Scene通知
+    virtual bool UpdateViewList(bool bForce) override { return true; } //不需要自动更新ViewList，由Scene通知
 protected:
     uint32_t m_idCamp = 0; //阵营ID
 

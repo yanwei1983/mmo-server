@@ -23,12 +23,12 @@ CSceneTree::~CSceneTree()
 bool CSceneTree::Init(const CGameMap* pMap, const CPos2D& vBasePos, float fWidth, float fHeight, uint32_t nTileGridRange, bool bDynamicSetLev)
 {
     CHECKF(pMap);
-    m_pMap        = pMap;
-    m_BasePos     = vBasePos;
-    m_fWidth      = fWidth;
-    m_fHeight     = fHeight;
+    m_pMap                    = pMap;
+    m_BasePos                 = vBasePos;
+    m_fWidth                  = fWidth;
+    m_fHeight                 = fHeight;
     m_bDynamicAdjustTileLevel = bDynamicSetLev;
-    auto pMapData = m_pMap->GetMapData();
+    auto pMapData             = m_pMap->GetMapData();
     CHECKF(pMapData);
     if(m_fWidth <= 0.0f || m_fWidth >= pMapData->GetWidthMap() - m_BasePos.x)
         m_fWidth = pMapData->GetWidthMap() - m_BasePos.x;
@@ -38,7 +38,7 @@ bool CSceneTree::Init(const CGameMap* pMap, const CPos2D& vBasePos, float fWidth
     m_nTileDefaultGridRange = nTileGridRange;
     if(m_nTileDefaultGridRange == 0)
         m_nTileDefaultGridRange = CONST_SCENE_TILE_GRIDRANGE;
-        
+
     SetTileDynamicLev(m_nCurTileDynamicLevel);
     if(m_pMap->HasMapFlag(MAPFLAG_COLLISION_ENABLE) == true)
     {

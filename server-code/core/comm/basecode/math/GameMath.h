@@ -111,7 +111,10 @@ export_lua namespace GameMath
 
     export_lua inline float distance2D(const Vector3& src, const Vector3& dest) { return distance(Vector2(src.x, src.z), Vector2(dest.x, dest.z)); }
 
-    export_lua inline float manhattanDistance(const Vector2& src, const Vector2& dest) { return std::fabs(src.x - dest.x) + std::fabs(src.y - dest.y); }
+    export_lua inline float manhattanDistance(const Vector2& src, const Vector2& dest)
+    {
+        return std::fabs(src.x - dest.x) + std::fabs(src.y - dest.y);
+    }
 
     export_lua inline Vector2 random_vector2(float _min, float _max) { return Vector2::UNIT_X().randomDeviant(1.0f) * random_float(_min, _max); }
 

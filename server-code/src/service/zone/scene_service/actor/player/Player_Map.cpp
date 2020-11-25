@@ -75,7 +75,7 @@ bool CPlayer::FlyToPhase(CSceneBase* pTargetScene, float fPosX, float fPosY, flo
     CHECKF(GetCurrentScene());
     if(GetCurrentScene()->GetMap()->HasMapFlag(MAPFLAG_DISABLE_FLYMAP) == true)
         return false;
-      
+
     //场景在本地
     //延迟调用真正的FlyMap
     CEventEntryCreateParam param;
@@ -86,7 +86,6 @@ bool CPlayer::FlyToPhase(CSceneBase* pTargetScene, float fPosX, float fPosY, flo
     EventManager()->ScheduleEvent(param, GetEventMapRef());
 
     return true;
-  
 
     __LEAVE_FUNCTION
     return false;
@@ -137,24 +136,23 @@ bool CPlayer::FlyMap(uint16_t idMap, uint16_t idPhaseType, uint16_t _nPhaseType,
     return false;
 }
 
-
 void CPlayer::_FlyMap(const TargetSceneID& idTargetScene, float fPosX, float fPosY, float fRange, float fFace)
 {
     __ENTER_FUNCTION
-    //查询是否有对应地图    
+    //查询是否有对应地图
     uint16_t idPhaseType = idTargetScene.GetPhaseTypeID();
-    uint64_t idPhase = idPhaseType;
+    uint64_t idPhase     = idPhaseType;
     if(idTargetScene.IsSelfPhaseID())
     {
         idPhase = GetID();
     }
     else if(idTargetScene.IsTeamPhaseID())
     {
-        //idPhase = GetTeamLeaderID();
+        // idPhase = GetTeamLeaderID();
     }
     else if(idTargetScene.IsGuildPhaseID())
     {
-        //idPhase = GetGuildLeaderID();
+        // idPhase = GetGuildLeaderID();
     }
 
     CPhase* pTargetPhase = SceneManager()->CreatePhase(idTargetScene.GetMapID(), idPhase, idPhase);
@@ -164,12 +162,9 @@ void CPlayer::_FlyMap(const TargetSceneID& idTargetScene, float fPosX, float fPo
         return;
     }
 
-    
-    _FlyPhase(pTargetPhase,fPosX, fPosY, fRange, fFace);
+    _FlyPhase(pTargetPhase, fPosX, fPosY, fRange, fFace);
     __LEAVE_FUNCTION
 }
-
-
 
 void CPlayer::_FlyPhase(CSceneBase* pTargetPhase, float fPosX, float fPosY, float fRange, float fFace)
 {
@@ -180,7 +175,7 @@ void CPlayer::_FlyPhase(CSceneBase* pTargetPhase, float fPosX, float fPosY, floa
     CHECK(pTargetPhase);
     auto idTargetMap = pTargetPhase->GetSceneIdx().GetMapID();
     LOGLOGIN("Player FlyMap:{} {} pos:{:.2f} {:.2f} {:.2f}", GetID(), idTargetMap, fPosX, fPosY, fRange);
-    
+
     pOldPhase->LeaveMap(this, idTargetMap);
     m_pScene = nullptr;
 
@@ -330,7 +325,7 @@ void CPlayer::OnEnterMap(CSceneBase* pScene)
         aoi_msg.set_campid(GetCampID());
         aoi_msg.set_phase_id(GetPhaseID());
         aoi_msg.set_name(GetName());
-        
+
         aoi_msg.set_movespd(GetAttrib().get(ATTRIB_MOVESPD));
         aoi_msg.set_posx(GetPosX());
         aoi_msg.set_posy(GetPosY());
@@ -340,13 +335,11 @@ void CPlayer::OnEnterMap(CSceneBase* pScene)
         aoi_msg.set_need_sync_ai(NeedSyncAI());
         SceneService()->SendProtoMsgToAOIService(aoi_msg);
 
-
         aoi_msg.set_hp(GetHP());
         aoi_msg.set_hpmax(GetHPMax());
         aoi_msg.set_mp(GetMP());
         aoi_msg.set_mpmax(GetMPMax());
         SceneService()->SendProtoMsgToAIService(aoi_msg);
-        
     }
 
     {
@@ -397,7 +390,6 @@ void CPlayer::OnLeaveMap(uint16_t idTargetMap)
     __LEAVE_FUNCTION
 }
 
-
 bool CPlayer::Reborn(uint32_t nRebornType)
 {
     __ENTER_FUNCTION
@@ -440,7 +432,8 @@ bool CPlayer::Reborn(uint32_t nRebornType)
             else
             {
                 FlyMap(pRebornData->reborn_map(),
-                       0,0,
+                       0,
+                       0,
                        pRebornData->reborn_x(),
                        pRebornData->reborn_y(),
                        pRebornData->reborn_range(),
@@ -470,4 +463,3 @@ bool CPlayer::Reborn(uint32_t nRebornType)
     __LEAVE_FUNCTION
     return false;
 }
-

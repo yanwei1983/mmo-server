@@ -138,7 +138,7 @@ void CPet::OnEnterMap(CSceneBase* pScene)
     // aoi_msg.set_mp(GetMP());
     // aoi_msg.set_mpmax(GetMPMax());
     // SceneService()->SendProtoMsgToAIService(aoi_msg);
-    
+
     __LEAVE_FUNCTION
 }
 

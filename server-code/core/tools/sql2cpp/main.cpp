@@ -184,8 +184,6 @@ int main(int argc, char** argv)
                             field_tuple += ",true";
                         else
                             field_tuple += ",false";
-
-                        
                     }
                     else if(std::regex_search(field_type_data.field_type, field_match, std::regex{R"((.*) (.*))"}))
                     {
@@ -259,8 +257,6 @@ int main(int argc, char** argv)
                             field_tuple += ",true";
                         else
                             field_tuple += ",false";
-
-                        
                     }
                 }
             }

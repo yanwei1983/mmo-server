@@ -17,7 +17,6 @@
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "RPCService.h"
-
 #include "event2/buffer.h"
 #include "event2/http.h"
 #include "event2/http_struct.h"

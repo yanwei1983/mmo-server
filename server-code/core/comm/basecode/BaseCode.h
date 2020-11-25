@@ -31,8 +31,6 @@
 #include "TimeUtil.h"
 #include "export_lua.h"
 
-
-
 export_lua enum SYNC_TYPE { SYNC_FALSE, SYNC_TRUE, SYNC_ALL, SYNC_ALL_DELAY };
 export_lua constexpr bool UPDATE_TRUE  = true;
 export_lua constexpr bool UPDATE_FALSE = false;

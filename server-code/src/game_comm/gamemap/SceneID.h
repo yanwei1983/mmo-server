@@ -72,15 +72,12 @@ struct fmt::formatter<SceneIdx> : public fmt::formatter<uint64_t>
     }
 };
 
-
-export_lua enum PhaseType
-{
+export_lua enum PhaseType {
     GlobalPhase = 0,
     SelfPhase   = 1,
     TeamPhase   = 2,
     GuildPhase  = 3,
 };
-
 
 export_lua struct TargetSceneID
 {
@@ -113,8 +110,6 @@ export_lua struct TargetSceneID
         TargetSceneIDData m_Data;
         uint64_t          data64;
     };
-
-
 
     operator uint64_t() const { return data64; }
 

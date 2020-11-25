@@ -6,7 +6,6 @@
 #include "BaseCode.h"
 #include "game_common_def.h"
 
-
 class CGuild;
 class CUser;
 class CNetworkMessage;

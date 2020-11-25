@@ -6,7 +6,6 @@
 
 #include "BaseCode.h"
 
-
 enum DB_FIELD_TYPES
 {
     DB_FIELD_TYPE_UNSUPPORED,
@@ -76,6 +75,7 @@ public:
     virtual const CDBFieldInfo* get(size_t idx) const;
     virtual size_t              size() const;
     virtual const CDBFieldInfo* find_field(const std::string& name);
+
 protected:
     std::vector<std::unique_ptr<CDBFieldInfo> > m_FieldInfos;
 };

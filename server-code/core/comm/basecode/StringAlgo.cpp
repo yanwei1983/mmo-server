@@ -14,22 +14,22 @@
 #include "FileUtil.h"
 
 const unsigned char PL_utf8skip[] = {
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* bogus */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* bogus */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* bogus */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* bogus */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,     /* scripts */
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,     /* scripts */
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,     /* cjk etc. */
-    4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6      /* cjk etc. */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* ascii */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* bogus */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* bogus */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* bogus */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, /* bogus */
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* scripts */
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, /* scripts */
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, /* cjk etc. */
+    4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6  /* cjk etc. */
 };
 
 bool UTF8_IS_ASCII(unsigned char c)
@@ -45,14 +45,12 @@ bool ASCII_IS_CTRL(unsigned char c)
 bool UTF8_IS_START(unsigned char c)
 {
     return c >= 0xc0 && c <= 0xfd;
-}	
-
+}
 
 bool UTF8_IS_CONTINUATION(unsigned char c)
 {
     return c >= 0x80 && c <= 0xbf;
 }
-
 
 bool UTF8_IS_CONTINUED(unsigned char c)
 {
@@ -110,7 +108,7 @@ bool is_utf8_none_control(const char* pszString, long nSize)
         unsigned char n = *pStart;
         if(UTF8_IS_ASCII(n)) //小于0x80的是ASCII字符
         {
-            if(ASCII_IS_CTRL(n) ) //小于32的是控制字符
+            if(ASCII_IS_CTRL(n)) //小于32的是控制字符
                 return false;
             pStart += 1;
         }
@@ -120,12 +118,12 @@ bool is_utf8_none_control(const char* pszString, long nSize)
         }
         else
         {
-            int len_need = PL_utf8skip[n]; //总字符需求
-            int extent_len = len_need - 1; //额外需要的字符 
+            int len_need   = PL_utf8skip[n]; //总字符需求
+            int extent_len = len_need - 1;   //额外需要的字符
             if(pStart >= pEnd - extent_len)
                 return false; //字符数量不够
             //取每个字符前两位，必须都是0x80
-            for(int i = 1 ; i < len_need; i++)
+            for(int i = 1; i < len_need; i++)
             {
                 if((pStart[i] & (0xC0)) != 0x80)
                 {
@@ -230,7 +228,7 @@ std::string get_fullpath(const std::string& szPath)
     std::string full_path(szFull);
 
     if(full_path[full_path.size() - 1] != '/')
-        full_path+='/';
+        full_path += '/';
     std::string s = full_path + szPath;
     trim_path(s);
     return s;

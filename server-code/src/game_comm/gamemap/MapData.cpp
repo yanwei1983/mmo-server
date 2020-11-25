@@ -3,9 +3,9 @@
 #include <fmt/format.h>
 
 #include "BaseCode.h"
-#include "config/Cfg_MapData.pb.h"
 #include "DataPack.h"
 #include "ProtobuffUtil.h"
+#include "config/Cfg_MapData.pb.h"
 CMapData::CMapData() {}
 
 CMapData::~CMapData() {}
@@ -17,7 +17,7 @@ bool CMapData::Init(uint32_t idMapTemplate)
     Cfg_MapData cfg;
     if(pb_util::LoadFromBinaryFile(file_path, cfg) == false)
     {
-        //try us json format
+        // try us json format
         if(pb_util::LoadFromJsonFile(file_path + ".json", cfg) == false)
         {
             LOGERROR("InitFromFile {} Fail.", file_path.c_str());

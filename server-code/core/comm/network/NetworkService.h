@@ -12,10 +12,10 @@
 #include <vector>
 
 #include "BaseCode.h"
-#include "PerSecondCount.h"
 #include "LockfreeQueue.h"
 #include "NetworkDefine.h"
 #include "NetworkMessage.h"
+#include "PerSecondCount.h"
 #include "Thread.h"
 
 struct event_base;
@@ -109,8 +109,8 @@ public:
     //主动关闭一个连接
     bool KickSocket(SOCKET _socket);
 
-    void                AddRecvByteCount(size_t len);
-    void                AddSendByteCount(size_t len);
+    void            AddRecvByteCount(size_t len);
+    void            AddSendByteCount(size_t len);
     PerSecondCount& GetRecvBPS() { return m_RecvBPS; }
     PerSecondCount& GetSendBPS() { return m_SendBPS; }
 
@@ -145,12 +145,12 @@ protected:
 
     std::unique_ptr<std::thread> m_pIOThread;
 
-    struct event*                m_pIOTimeOutEvent                 = nullptr;
-    struct event*                m_pCloseSocketEvent               = nullptr;
-    std::atomic<bool>            m_bWaitingProcessCloseSocketEvent = false;
-    
-    PerSecondCount           m_RecvBPS;
-    PerSecondCount           m_SendBPS;
+    struct event*     m_pIOTimeOutEvent                 = nullptr;
+    struct event*     m_pCloseSocketEvent               = nullptr;
+    std::atomic<bool> m_bWaitingProcessCloseSocketEvent = false;
+
+    PerSecondCount m_RecvBPS;
+    PerSecondCount m_SendBPS;
 
     std::atomic<bool>   m_bStop = false;
     std::vector<event*> m_setEvTimed;

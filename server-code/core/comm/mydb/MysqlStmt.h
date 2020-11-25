@@ -87,5 +87,4 @@ private:
     std::unique_ptr<MYSQL_BIND[]> m_Params;
 };
 
-
 #endif /* MYSQLSTMT_H */

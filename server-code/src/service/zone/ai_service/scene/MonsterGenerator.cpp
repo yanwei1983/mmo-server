@@ -267,7 +267,12 @@ void CMonsterGenerator::OnMonsterBorn(CAIMonster* pMonster)
     if(pData == nullptr)
         return;
     pData->m_setMonster.insert(pMonster);
-    LOGDEBUG("MonsterGen: map:{} phase:{} idx:{} MonsterBorn:{} ID:{}", m_pMap->GetMapID(), pMonster->GetPhaseID(), pData->nIdxGen, pMonster->Type()->GetID(), pMonster->GetID());
+    LOGDEBUG("MonsterGen: map:{} phase:{} idx:{} MonsterBorn:{} ID:{}",
+             m_pMap->GetMapID(),
+             pMonster->GetPhaseID(),
+             pData->nIdxGen,
+             pMonster->Type()->GetID(),
+             pMonster->GetID());
 
     __LEAVE_FUNCTION
 }
@@ -282,7 +287,11 @@ void CMonsterGenerator::OnMonsterDead(CAIMonster* pMonster)
     pData->m_setMonster.erase(pMonster);
     pData->nCurGen--;
 
-    LOGDEBUG("MonsterGen: map:{} phase:{} idx:{} MonsterDead:{}", m_pMap->GetMapID(), pMonster->GetPhaseID(), pData->nIdxGen, pMonster->Type()->GetID());
+    LOGDEBUG("MonsterGen: map:{} phase:{} idx:{} MonsterDead:{}",
+             m_pMap->GetMapID(),
+             pMonster->GetPhaseID(),
+             pData->nIdxGen,
+             pMonster->Type()->GetID());
 
     __LEAVE_FUNCTION
 }

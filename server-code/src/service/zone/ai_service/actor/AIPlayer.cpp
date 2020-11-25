@@ -1,4 +1,5 @@
 #include "AIPlayer.h"
+
 #include "server_msg/server_side.pb.h"
 OBJECTHEAP_IMPLEMENTATION(CAIPlayer, s_heap);
 CAIPlayer::CAIPlayer() {}

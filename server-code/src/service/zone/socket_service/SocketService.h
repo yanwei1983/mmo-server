@@ -81,8 +81,8 @@ public:
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadExit() override;
     virtual void OnLogicThreadProc() override;
-    virtual void OnAllWaitedServiceReady()override;
-    
+    virtual void OnAllWaitedServiceReady() override;
+
     CGameClient* QueryClient(const VirtualSocket& vs);
     void         AddClient(const VirtualSocket& vs, CGameClient* pClient);
     void         RemoveClient(const VirtualSocket& vs);

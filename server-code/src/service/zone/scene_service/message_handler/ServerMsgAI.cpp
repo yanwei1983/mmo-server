@@ -105,4 +105,3 @@ ON_SERVERMSG(CSceneService, ActorCastSkill)
 
     __LEAVE_FUNCTION
 }
-

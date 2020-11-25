@@ -3,8 +3,8 @@
 
 #include "ActorAttrib.h"
 #include "BaseCode.h"
-#include "config/Cfg_Item.pb.h"
 #include "T_GameDataMap.h"
+#include "config/Cfg_Item.pb.h"
 
 export_lua constexpr uint32_t MAX_ITEM_EXTRDATA_NUM = 10;
 

@@ -131,7 +131,6 @@ bool CAIService::Init(const ServerPort& nServerPort)
     return false;
 }
 
-
 bool CAIService::SendProtoMsgToScene(const proto_msg_t& msg)
 {
     return SendProtoMsgToZonePort(GetSceneServerPort(), msg);

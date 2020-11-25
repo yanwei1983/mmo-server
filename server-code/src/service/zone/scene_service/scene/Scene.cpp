@@ -17,10 +17,7 @@ OBJECTHEAP_IMPLEMENTATION(CScene, s_heap);
 
 CScene::CScene() {}
 
-CScene::~CScene()
-{
-
-}
+CScene::~CScene() {}
 
 void CScene::Destory()
 {
@@ -50,16 +47,14 @@ bool CScene::Init(uint16_t idMap, uint16_t idMainPhaseType, uint64_t idPhase)
     SceneService()->SendProtoMsgToAOIService(msg);
 
     //创建静态位面
-    CreatePhase(idMainPhaseType,idPhase);
+    CreatePhase(idMainPhaseType, idPhase);
     //创建静态位面
     const auto& phaseDataSet = pMap->GetPhaseData();
     for(const auto& [idPhaseType, v]: phaseDataSet)
     {
-        CreatePhase(idPhaseType,idPhaseType);
+        CreatePhase(idPhaseType, idPhaseType);
     }
     m_nStaticPhaseCount = phaseDataSet.size();
-
-   
 
     LOGDEBUG("Scene {} Created", idMap);
 

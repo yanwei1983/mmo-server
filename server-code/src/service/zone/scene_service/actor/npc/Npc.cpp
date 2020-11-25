@@ -77,7 +77,7 @@ void CNpc::OnEnterMap(CSceneBase* pScene)
     {
         ScriptManager()->TryExecScript<void>(m_pType->GetScriptID(), SCB_NPC_ONBORN, this);
     }
-    
+
     ServerMSG::ActorCreate aoi_msg;
     aoi_msg.set_actor_id(GetID());
     aoi_msg.set_scene_id(GetSceneIdx());
@@ -87,7 +87,7 @@ void CNpc::OnEnterMap(CSceneBase* pScene)
     aoi_msg.set_phase_id(GetPhaseID());
     aoi_msg.set_campid(GetCampID());
     aoi_msg.set_name(GetName());
-  
+
     aoi_msg.set_movespd(GetAttrib().get(ATTRIB_MOVESPD));
     aoi_msg.set_posx(GetPosX());
     aoi_msg.set_posy(GetPosY());
@@ -95,13 +95,11 @@ void CNpc::OnEnterMap(CSceneBase* pScene)
     aoi_msg.set_need_sync_ai(NeedSyncAI());
     SceneService()->SendProtoMsgToAOIService(aoi_msg);
 
-
     // aoi_msg.set_hp(GetHP());
     // aoi_msg.set_hpmax(GetHPMax());
     // aoi_msg.set_mp(GetMP());
     // aoi_msg.set_mpmax(GetMPMax());
     // SceneService()->SendProtoMsgToAIService(aoi_msg);
-    
 }
 
 void CNpc::OnLeaveMap(uint16_t idTargetMap)

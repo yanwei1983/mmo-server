@@ -10,7 +10,6 @@
 #include "ServiceComm.h"
 #include "UIDFactory.h"
 
-
 struct event;
 class CNetMSGProcess;
 class CRPCService;

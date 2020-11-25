@@ -22,17 +22,11 @@ public:
     export_lua const CGameMap* QueryMap(uint16_t idMap) const;
     export_lua const CMapData* QueryMapData(uint16_t idMapTemplate) const;
 
-
     CGameMap* _QueryMap(uint16_t idMap) const;
+
 private:
     std::unordered_map<uint16_t, std::unique_ptr<CGameMap>> m_vecMap;
     std::unordered_map<uint16_t, std::unique_ptr<CMapData>> m_vecMapData;
 };
-
-
-
-
-
-
 
 #endif /* MAPMANAGER_H */

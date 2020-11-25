@@ -569,9 +569,9 @@ static bool parseConfigLine(const std::string& line, int32_t curLineNum, std::st
         if(iter == outInfo.end())
         {
             LoggerInfo& li = outInfo[key];
-            li._enable = true;
-            li._key    = key;
-            li._name   = key;
+            li._enable     = true;
+            li._key        = key;
+            li._name       = key;
         }
         else
         {
@@ -1505,7 +1505,7 @@ bool LogerManager::setAutoUpdate(int32_t interval)
     return true;
 }
 
-uint64_t LogerManager::getLoggerLogCount(LoggerId id) 
+uint64_t LogerManager::getLoggerLogCount(LoggerId id)
 {
     if(id < 0 || id > _lastId)
         return false;

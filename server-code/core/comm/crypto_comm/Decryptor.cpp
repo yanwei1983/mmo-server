@@ -16,7 +16,7 @@ public:
     CDecryptorImpl() {}
     ~CDecryptorImpl() {}
 
-    void Init(uint32_t key) 
+    void Init(uint32_t key)
     {
         LC_RNG prng(key);
         prng.GenerateBlock(m_key, AES::DEFAULT_KEYLENGTH);
@@ -26,14 +26,17 @@ public:
 
     size_t Decryptor(byte* in_buffer, size_t in_len, byte* out_buffer, size_t out_len)
     {
-        ArraySink cs(out_buffer, out_len);
-        ArraySource as(in_buffer, in_len, true, new StreamTransformationFilter(m_dec, new Redirector(cs), CryptoPP::BlockPaddingSchemeDef::NO_PADDING));
+        ArraySink   cs(out_buffer, out_len);
+        ArraySource as(in_buffer,
+                       in_len,
+                       true,
+                       new StreamTransformationFilter(m_dec, new Redirector(cs), CryptoPP::BlockPaddingSchemeDef::NO_PADDING));
         return cs.TotalPutLength();
     }
 
 private:
-    byte m_key[ AES::DEFAULT_KEYLENGTH ];
-    byte m_iv[AES::BLOCKSIZE] = {};
+    byte                      m_key[AES::DEFAULT_KEYLENGTH];
+    byte                      m_iv[AES::BLOCKSIZE] = {};
     OFB_Mode<AES>::Decryption m_dec;
 };
 

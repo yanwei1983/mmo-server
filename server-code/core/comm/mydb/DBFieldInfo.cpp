@@ -1,4 +1,5 @@
 #include "DBFieldInfo.h"
+
 #include "mysql/mysql.h"
 
 MYSQL_FIELD_COPY::MYSQL_FIELD_COPY(MYSQL_FIELD* pField, uint32_t idx)
@@ -98,8 +99,6 @@ MYSQL_FIELD_COPY::MYSQL_FIELD_COPY(MYSQL_FIELD* pField, uint32_t idx)
     }
 }
 
-
-
 CMysqlFieldInfoList::CMysqlFieldInfoList(MYSQL_RES* res)
 {
     int32_t nFields = mysql_num_fields(res);
@@ -127,12 +126,14 @@ const CDBFieldInfo* CMysqlFieldInfoList::get(size_t idx) const
     CHECKF_V(idx < size(), idx);
     return m_FieldInfos[idx].get();
 }
-size_t              CMysqlFieldInfoList::size() const { return m_FieldInfos.size(); }
+size_t CMysqlFieldInfoList::size() const
+{
+    return m_FieldInfos.size();
+}
 const CDBFieldInfo* CMysqlFieldInfoList::find_field(const std::string& name)
 {
-    auto it_find = std::find_if(m_FieldInfos.begin(), m_FieldInfos.end(), [name](const std::unique_ptr<CDBFieldInfo>& v) {
-        return name == v->GetFieldName();
-    });
+    auto it_find =
+        std::find_if(m_FieldInfos.begin(), m_FieldInfos.end(), [name](const std::unique_ptr<CDBFieldInfo>& v) { return name == v->GetFieldName(); });
 
     if(it_find != m_FieldInfos.end())
     {

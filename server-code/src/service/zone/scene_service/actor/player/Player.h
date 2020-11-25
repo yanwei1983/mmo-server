@@ -33,7 +33,7 @@ public:
 
     export_lua bool FlyMap(uint16_t idMap, uint16_t idPhaseType, uint16_t _nPhaseType, float fPosX, float fPosY, float fRange, float fFace);
     export_lua bool FlyToPhase(CSceneBase* pTargetScene, float fPosX, float fPosY, float fRange, float fFace);
-    
+
 public:
     export_lua bool SendMsg(const proto_msg_t& msg) const override;
 

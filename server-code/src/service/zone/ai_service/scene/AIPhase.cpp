@@ -7,8 +7,8 @@
 #include "AIService.h"
 #include "MapManager.h"
 #include "MonsterGenerator.h"
-#include "config/Cfg_Scene.pb.h"
 #include "config/Cfg_Phase.pb.h"
+#include "config/Cfg_Scene.pb.h"
 CAIPhase::CAIPhase() {}
 
 CAIPhase::~CAIPhase()

@@ -16,9 +16,9 @@
 #include "SceneService.h"
 #include "ScriptCallBackType.h"
 #include "ScriptManager.h"
+#include "config/Cfg_Phase.pb.h"
 #include "config/Cfg_Scene.pb.h"
 #include "config/Cfg_Scene_Reborn.pb.h"
-#include "config/Cfg_Phase.pb.h"
 #include "msg/zone_service.pb.h"
 #include "server_msg/server_side.pb.h"
 
@@ -29,10 +29,7 @@ constexpr int32_t WAIT_DESTORY_MS        = 1 * 60 * 1000;
 
 CPhase::CPhase() {}
 
-CPhase::~CPhase()
-{
-
-}
+CPhase::~CPhase() {}
 
 void CPhase::Destory()
 {
@@ -53,7 +50,7 @@ bool CPhase::Init(CScene* pScene, const SceneIdx& idxScene, uint64_t idPhase, co
     __ENTER_FUNCTION
     CHECKF(pScene);
     m_idPhase = idPhase;
-    m_pScene = pScene;
+    m_pScene  = pScene;
     m_pMapValSet.reset(CMapValSet::CreateNew(this));
     CHECKF(CSceneBase::Init(idxScene, MapManager()));
     if(pPhaseData)
@@ -247,7 +244,8 @@ void CPhase::_KickPlayer(const char* pszReason, CPlayer* pPlayer)
         if(idNewMap != 0 && idNewMap != GetID())
         {
             pPlayer->FlyMap(idNewMap,
-                            0,0,
+                            0,
+                            0,
                             refRebornData->reborn_x(),
                             refRebornData->reborn_y(),
                             refRebornData->reborn_range(),
@@ -259,19 +257,15 @@ void CPhase::_KickPlayer(const char* pszReason, CPlayer* pPlayer)
     if(pPlayer->GetHomeSceneIdx() != GetSceneIdx())
     {
         //如果Home记录点不是本地图
-        pPlayer->FlyMap(pPlayer->GetHomeSceneIdx().GetMapID(),
-                        0,0,
-                        pPlayer->GetHomePosX(),
-                        pPlayer->GetHomePosY(),
-                        0.0f,
-                        pPlayer->GetHomeFace());
+        pPlayer->FlyMap(pPlayer->GetHomeSceneIdx().GetMapID(), 0, 0, pPlayer->GetHomePosX(), pPlayer->GetHomePosY(), 0.0f, pPlayer->GetHomeFace());
         return;
     }
     else if(pPlayer->GetRecordSceneIdx() != GetSceneIdx())
     {
         //如果Record记录点不是本地图
         pPlayer->FlyMap(pPlayer->GetRecordSceneIdx().GetMapID(),
-                        0,0,
+                        0,
+                        0,
                         pPlayer->GetRecordPosX(),
                         pPlayer->GetRecordPosY(),
                         0.0f,

@@ -9,7 +9,6 @@
 #include "MonitorMgr.h"
 #include "MsgProcessRegister.h"
 #include "NetSocket.h"
-
 #include "msg/ts_cmd.pb.h"
 #include "msg/world_service.pb.h"
 #include "protomsg_to_cmd.h"
@@ -24,7 +23,7 @@ CGameClient::CGameClient()
     : m_nDestServerPort(0, AUTH_SERVICE, 0)
     , m_nMessageAllowBegin(CMD_CS_LOGIN) // only accept CS_AUTH
     , m_nMessageAllowEnd(CMD_CS_LOGIN)   // only accept CS_AUTH
-    
+
 {
 }
 
@@ -293,12 +292,11 @@ void CSocketService::OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len)
 void CSocketService::OnAllWaitedServiceReady()
 {
     __ENTER_FUNCTION
-    
-        
-        ServerMSG::ServiceReady send;
-        send.set_serverport(SocketService()->GetServerPort());
-        SocketService()->SendProtoMsgToZonePort(ServerPort(GetWorldID(), WORLD_SERVICE, 0), send);
-        
+
+    ServerMSG::ServiceReady send;
+    send.set_serverport(SocketService()->GetServerPort());
+    SocketService()->SendProtoMsgToZonePort(ServerPort(GetWorldID(), WORLD_SERVICE, 0), send);
+
     __LEAVE_FUNCTION
 }
 
@@ -327,10 +325,7 @@ ON_SERVERMSG(CSocketService, SocketChangeDest)
         ServerPort destport{msg.destport()};
 
         pClient->SetDestServerPort(destport);
-        LOGNETDEBUG("SCK_CHG_DEST {}:{} To Service:{}",
-                    pClient->GetSocketAddr().c_str(),
-                    pClient->GetSocketPort(),
-                    destport.GetServiceID());
+        LOGNETDEBUG("SCK_CHG_DEST {}:{} To Service:{}", pClient->GetSocketAddr().c_str(), pClient->GetSocketPort(), destport.GetServiceID());
     }
 }
 
@@ -445,7 +440,7 @@ void CSocketService::OnLogicThreadProc()
         GetMessageRoute()->ForEach([&buf](auto pMessagePort) {
             if(pMessagePort && pMessagePort->GetWriteBufferSize())
             {
-                buf += fmt::format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),                                   
+                buf += fmt::format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),
                                    pMessagePort->GetServerPort().GetServiceID(),
                                    pMessagePort->GetWriteBufferSize());
             }

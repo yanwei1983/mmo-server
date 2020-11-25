@@ -241,9 +241,7 @@ void CNetSocket::_OnReceive(bufferevent* b)
         {
             if(pHeader->is_ciper == false)
             {
-                LOGNETERROR("CNetSocket _OnReceive Msg:{} size:{} need decryptor, but msg is not chiper",
-                        pHeader->msg_cmd,
-                        pHeader->msg_size);
+                LOGNETERROR("CNetSocket _OnReceive Msg:{} size:{} need decryptor, but msg is not chiper", pHeader->msg_cmd, pHeader->msg_size);
                 _OnClose(BEV_EVENT_READING);
                 return;
             }

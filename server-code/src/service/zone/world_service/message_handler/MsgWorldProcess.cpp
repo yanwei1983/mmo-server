@@ -50,4 +50,3 @@ ON_SERVERMSG(CWorldService, SocketClose)
 {
     AccountManager()->Logout(msg.vs());
 }
-

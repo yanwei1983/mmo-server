@@ -11,8 +11,6 @@
 #include "BaseCode.h"
 #include "NetworkDefine.h"
 
-
-
 class CMessagePort;
 class CNetworkService;
 class CServiceControl;
@@ -83,8 +81,8 @@ public:
     }
 
 public:
-    CEventManager*     GetEventManager() const { return m_pEventManager.get(); }
-    CMysqlConnection*  GetServerInfoDB() const { return m_pServerInfoDB.get(); }
+    CEventManager*    GetEventManager() const { return m_pEventManager.get(); }
+    CMysqlConnection* GetServerInfoDB() const { return m_pServerInfoDB.get(); }
 
 protected:
     bool          ConnectServerInfoDB(const std::string& mysql_url);
@@ -98,8 +96,7 @@ protected:
     void OnServerAddrInfoChange(const ServerPort& serverport, const ServerAddrInfo& new_info);
 
 protected:
-
-    WorldID_t   m_nWorldID;
+    WorldID_t m_nWorldID;
 
     std::mutex                                    m_mutex;
     std::unordered_map<ServerPort, CMessagePort*> m_setMessagePort;

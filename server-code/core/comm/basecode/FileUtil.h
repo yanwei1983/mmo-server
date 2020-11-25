@@ -47,8 +47,8 @@ export_lua inline bool scan_dir(const std::string&                              
     struct dirent* result = readdir(dp);
     while(result != nullptr)
     {
-        
-        if(DT_DIR & result->d_type)  // 判断下一级成员是否是目录
+
+        if(DT_DIR & result->d_type) // 判断下一级成员是否是目录
         {
             if(std::string(".") == result->d_name || std::string("..") == result->d_name)
             {

@@ -15,7 +15,6 @@
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "RPCService.h"
-
 #include "event2/http.h"
 #include "event2/keyvalq_struct.h"
 #include "gm_service.pb.h"
@@ -216,7 +215,6 @@ const CGMService::HttpRequestHandleFunc* CGMService::QueryHttpRequestHandler(con
 
     return nullptr;
 }
-
 
 void CGMService::OnLogicThreadProc()
 {

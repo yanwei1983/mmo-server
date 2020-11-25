@@ -24,7 +24,6 @@ public:
     virtual void OnLogicThreadProc() override;
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadExit() override;
-
 };
 
 CMarketService* MarketService();

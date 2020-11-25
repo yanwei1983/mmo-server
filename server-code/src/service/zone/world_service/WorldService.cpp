@@ -17,7 +17,6 @@
 #include "NetMSGProcess.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
-
 #include "SystemVars.h"
 #include "TeamManager.h"
 #include "Thread.h"
@@ -146,8 +145,8 @@ bool CWorldService::Init(const ServerPort& nServerPort)
 
     //设置等待哪些服ready
     GetMessageRoute()->ForeachServiceInfoByWorldID(GetWorldID(), false, [this](const ServerAddrInfo* info) {
-        ServiceType_t idServiceType =  info->idServiceType;
-        ServiceIdx_t idxService =  info->idServiceIdx;
+        ServiceType_t idServiceType = info->idServiceType;
+        ServiceIdx_t  idxService    = info->idServiceIdx;
         if(idServiceType == WORLD_SERVICE || idServiceType == AI_SERVICE || idServiceType == AOI_SERVICE || idServiceType == AUTH_SERVICE)
         {
             return true;
@@ -296,7 +295,7 @@ void CWorldService::OnAllWaitedServiceReady()
             SendProtoMsgToZonePort(serverport, send_msg);
         }
     }
-    
+
     __LEAVE_FUNCTION
 }
 
@@ -350,7 +349,7 @@ void CWorldService::OnLogicThreadProc()
             auto pMessagePort = GetMessageRoute()->QueryMessagePort(serverport, false);
             if(pMessagePort && pMessagePort->GetWriteBufferSize() > 0)
             {
-                buf += fmt::format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),                                   
+                buf += fmt::format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),
                                    pMessagePort->GetServerPort().GetServiceID(),
                                    pMessagePort->GetWriteBufferSize());
             }

@@ -81,7 +81,7 @@ namespace fuzzy
         double scale_and_defuzzify(const mu_map& _consequents_to_mus) const;
 
     public:
-        RuleSet();                                          // default constructor
+        RuleSet();                                                 // default constructor
         RuleSet(const std::string& name, Implication implication); // constructor
 
         /**

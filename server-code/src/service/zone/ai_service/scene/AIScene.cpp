@@ -6,8 +6,8 @@
 #include "GameMap.h"
 #include "MapManager.h"
 #include "NetMSGProcess.h"
-#include "config/Cfg_Scene.pb.h"
 #include "config/Cfg_Phase.pb.h"
+#include "config/Cfg_Scene.pb.h"
 CAIScene::CAIScene() {}
 
 CAIScene::~CAIScene()
