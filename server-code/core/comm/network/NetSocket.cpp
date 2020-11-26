@@ -315,14 +315,9 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
     {
         int32_t     err    = evutil_socket_geterror(bufferevent_getfd(b));
         const char* errstr = evutil_socket_error_to_string(err);
-        if(err == 10054 || err == 104 || err == 32)
-        {
-            LOGNETDEBUG("CNetSocket error{}: {}, {}:{}", err, errstr, pSocket->GetAddrString().c_str(), pSocket->GetPort());
-        }
-        else
-        {
-            LOGNETERROR("CNetSocket error{}: {}, {}:{}", err, errstr, pSocket->GetAddrString().c_str(), pSocket->GetPort());
-        }
+        
+        LOGNETDEBUG("CNetSocket error[{}]: {}, {}:{}", err, errstr, pSocket->GetAddrString().c_str(), pSocket->GetPort());
+        
         bClose = true;
     }
     if(what & BEV_EVENT_EOF)

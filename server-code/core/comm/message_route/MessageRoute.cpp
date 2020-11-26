@@ -56,6 +56,9 @@ void CMessageRoute::Destory()
     {
         return;
     }
+    m_pNetworkService->Stop();
+    m_pNetworkService->JoinIOThread();
+    
     m_setServerInfoByWorldID.clear();
     m_setServerInfo.clear();
     m_MergeList.clear();

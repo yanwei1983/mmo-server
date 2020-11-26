@@ -96,7 +96,7 @@ uint32_t CDataCount::GetNextResetTime() const
     return 0;
 }
 
-uint64_t CDataCount::AddData(uint32_t nVal, bool bUpdate)
+uint64_t CDataCount::AddData(uint64_t nVal, bool bUpdate)
 {
     __ENTER_FUNCTION
     m_pRecord->Field(TBLD_DATACOUNT::DATA_NUM) = GetDataNum() + nVal;
@@ -288,7 +288,7 @@ uint64_t CDataCountSet::AddCount(uint32_t nType, uint32_t nIdx, uint64_t nVal, b
     return 0;
 }
 
-uint64_t CDataCountSet::SetCount(uint32_t nType, uint32_t nIdx, uint32_t nVal, bool bUpdate /*= false*/)
+uint64_t CDataCountSet::SetCount(uint32_t nType, uint32_t nIdx, uint64_t nVal, bool bUpdate /*= false*/)
 {
     __ENTER_FUNCTION
     uint64_t key = MAKE64(nType, nIdx);
@@ -318,7 +318,7 @@ void CDataCountSet::DeleteCount(uint32_t nType, uint32_t nIdx)
     __LEAVE_FUNCTION
 }
 
-void CDataCountSet::CreateData(uint32_t nType, uint32_t nIdx, uint32_t nVal)
+void CDataCountSet::CreateData(uint32_t nType, uint32_t nIdx, uint64_t nVal)
 {
     __ENTER_FUNCTION
     auto* pDB = SceneService()->GetGameDB(m_pOwner->GetWorldID());

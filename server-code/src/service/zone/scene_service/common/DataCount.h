@@ -43,7 +43,7 @@ public:
     export_lua uint64_t GetDataNum();
     export_lua uint32_t GetNextResetTime() const;
 
-    export_lua uint64_t AddData(uint32_t nVal, bool bUpdate);
+    export_lua uint64_t AddData(uint64_t nVal, bool bUpdate);
     export_lua uint64_t SetData(uint64_t nVal, bool bUpdate);
 
     export_lua void Sync();
@@ -78,11 +78,11 @@ public:
     export_lua uint64_t GetMaxCount(uint32_t nType, uint32_t nIdx);
     export_lua uint64_t AddCount(uint32_t nType, uint32_t nIdx, uint64_t nVal, bool bUpdate = false);
     export_lua uint64_t _AddCount(uint32_t nType, uint32_t nIdx, uint64_t nVal, bool bUpdate = false);
-    export_lua uint64_t SetCount(uint32_t nType, uint32_t nIdx, uint32_t nVal, bool bUpdate = false);
+    export_lua uint64_t SetCount(uint32_t nType, uint32_t nIdx, uint64_t nVal, bool bUpdate = false);
     export_lua void     DeleteCount(uint32_t nType, uint32_t nIdx);
 
 private:
-    void CreateData(uint32_t nType, uint32_t nIdx, uint32_t nVal);
+    void CreateData(uint32_t nType, uint32_t nIdx, uint64_t nVal);
 
 private:
     CPlayer* m_pOwner = nullptr;
