@@ -140,8 +140,7 @@ bool CWorldService::Init(const ServerPort& nServerPort)
     m_pSystemVarSet.reset(CSystemVarSet::CreateNew());
     CHECKF(m_pSystemVarSet.get());
 
-    if(CreateService(100) == false)
-        return false;
+
 
     //设置等待哪些服ready
     GetMessageRoute()->ForeachServiceInfoByWorldID(GetWorldID(), false, [this](const ServerAddrInfo* info) {
@@ -155,6 +154,12 @@ bool CWorldService::Init(const ServerPort& nServerPort)
         AddWaitServiceReady(ServiceID{idServiceType, idxService});
         return true;
     });
+
+
+    if(CreateService(100) == false)
+        return false;
+
+    
 
     return true;
     __LEAVE_FUNCTION
@@ -176,7 +181,7 @@ CMysqlConnection* CWorldService::_ConnectGameDB(uint16_t nWorldID, CMysqlConnect
     {
         auto pDB = ConnectDB(db_info.get());
         CHECKF(pDB);
-        CHECKF(MysqlTableCheck::CheckAllTableAndFix<GAMEDB_TABLE_LIST>(pDB.get()));
+        CHECKF(MysqlTableCheck::CheckAllTable<GAMEDB_TABLE_LIST>(pDB.get()));
         m_pGameDB.reset(pDB.release());
         return m_pGameDB.get();
     }

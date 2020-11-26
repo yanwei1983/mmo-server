@@ -155,6 +155,7 @@ bool CNetSocket::_SendMsg(byte* pBuffer, size_t len)
         // hold msg
         int32_t result   = evbuffer_add(m_Sendbuf, pBuffer, len);
         m_nWaitWriteSize = evbuffer_get_length(m_Sendbuf);
+        LOGNETERROR("Hold Send Buffer {}:{} this_len:{} total_len:{}", GetAddrString().c_str(), GetPort(), len, m_nWaitWriteSize);
         return result == 0;
     }
     else if(GetStatus() == NSS_READY)
@@ -320,7 +321,7 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         }
         else
         {
-            LOGERROR("CNetSocket error{}: {}, {}:{}", err, errstr, pSocket->GetAddrString().c_str(), pSocket->GetPort());
+            LOGNETERROR("CNetSocket error{}: {}, {}:{}", err, errstr, pSocket->GetAddrString().c_str(), pSocket->GetPort());
         }
         bClose = true;
     }

@@ -130,13 +130,17 @@ bool CSocketService::Init(const ServerPort& nServerPort)
     //			return false;
     //		}
 
-    if(CreateService(100) == false)
-        return false;
 
     // SetIPCheck(true);
     RegisterAllMsgProcess<CSocketService>();
-
     AddWaitServiceReady(ServiceID{AUTH_SERVICE, GetServiceID().GetServiceIdx()});
+
+   
+    if(CreateService(100) == false)
+        return false;
+
+    
+
     return true;
 
     __LEAVE_FUNCTION

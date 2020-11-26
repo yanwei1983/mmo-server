@@ -75,11 +75,12 @@ bool CAuthService::Init(const ServerPort& nServerPort)
     m_pGMManager.reset(CGMManager::CreateNew(pGlobalDB.get()));
     CHECKF(m_pGMManager.get());
 
-    if(CreateService(100) == false)
-        return false;
     //注册消息
     RegisterAllMsgProcess<CAuthService>();
 
+    if(CreateService(100) == false)
+        return false;
+    
     ServerMSG::ServiceReady msg;
     msg.set_serverport(GetServerPort());
 

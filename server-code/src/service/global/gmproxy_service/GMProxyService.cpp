@@ -198,6 +198,7 @@ void CGMProxyService::Destory()
 
 bool CGMProxyService::Init(const ServerPort& nServerPort)
 {
+    __ENTER_FUNCTION
     //各种初始化
     tls_pService = this;
     scope_guards scope_exit;
@@ -210,9 +211,6 @@ bool CGMProxyService::Init(const ServerPort& nServerPort)
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
     };
-
-    if(CreateService(200) == false)
-        return false;
 
     //注册消息
     RegisterAllMsgProcess<CGMProxyService>();
@@ -230,7 +228,14 @@ bool CGMProxyService::Init(const ServerPort& nServerPort)
             m_pRPCService->StartRPCServer(pAddrInfo->publish_port, pAddrInfo->debug_port, true, new ProxyServiceImpl(this, pAddrInfo->debug_port)));
     }
 
+    if(CreateService(200) == false)
+        return false;
+
+    
+
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 ON_SERVERMSG(CGMProxyService, ServiceRegister)

@@ -59,11 +59,11 @@ bool CMarketService::Init(const ServerPort& nServerPort)
         BaseCode::SetNdc(oldNdc);
     };
 
+     //注册消息
+    RegisterAllMsgProcess<CMarketService>();
+
     if(CreateService(100) == false)
         return false;
-
-    //注册消息
-    RegisterAllMsgProcess<CMarketService>();
 
     ServerMSG::ServiceReady msg;
     msg.set_serverport(GetServerPort());

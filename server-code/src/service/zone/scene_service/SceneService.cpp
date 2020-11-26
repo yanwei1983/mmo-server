@@ -189,11 +189,6 @@ bool CSceneService::Init(const ServerPort& nServerPort)
     m_pLoadingThread.reset(CLoadingThread::CreateNew(this));
     CHECKF(m_pLoadingThread.get());
 
-    uint32_t FrameCount    = 20;
-    uint32_t FrameInterval = 1000 / FrameCount;
-    if(CreateService(FrameInterval) == false)
-        return false;
-
     if(IsSharedZone())
     {
         // share_zone store globaldb
@@ -202,6 +197,13 @@ bool CSceneService::Init(const ServerPort& nServerPort)
 
     AddWaitServiceReady(ServiceID{AI_SERVICE, GetServiceID().GetServiceIdx()});
     AddWaitServiceReady(ServiceID{AOI_SERVICE, GetServiceID().GetServiceIdx()});
+
+    uint32_t FrameCount    = 20;
+    uint32_t FrameInterval = 1000 / FrameCount;
+    if(CreateService(FrameInterval) == false)
+        return false;
+
+    
 
     return true;
     __LEAVE_FUNCTION

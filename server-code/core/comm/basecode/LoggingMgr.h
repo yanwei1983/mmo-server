@@ -88,6 +88,7 @@ namespace BaseCode
 #define LOGNETDEBUG(...) ZLOGFMT_DEBUG(BaseCode::s_network_logger, ##__VA_ARGS__)
 #define LOGNETINFO(...)  ZLOGFMT_INFO(BaseCode::s_network_logger, ##__VA_ARGS__)
 #define LOGNETERROR(...) ZLOGFMT_ERROR(BaseCode::s_network_logger, ##__VA_ARGS__)
+#define LOGNETTRACE(...) ZLOGFMT_TRACE(BaseCode::s_network_logger, ##__VA_ARGS__)
 
 #define LOGDBDEBUG(...) ZLOGFMT_DEBUG(BaseCode::s_db_logger, ##__VA_ARGS__)
 #define LOGDBINFO(...)  ZLOGFMT_INFO(BaseCode::s_db_logger, ##__VA_ARGS__)

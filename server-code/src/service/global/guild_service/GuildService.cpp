@@ -51,6 +51,7 @@ void CGuildService::Destory()
 
 bool CGuildService::Init(const ServerPort& nServerPort)
 {
+    __ENTER_FUNCTION
     //各种初始化
     tls_pService = this;
     scope_guards scope_exit;
@@ -74,13 +75,17 @@ bool CGuildService::Init(const ServerPort& nServerPort)
     m_pGuildManager.reset(CGuildManager::CreateNew());
     CHECKF(m_pGuildManager.get());
 
-    if(CreateService(100) == false)
-        return false;
-
     //注册消息
     RegisterAllMsgProcess<CGuildService>();
 
+    if(CreateService(100) == false)
+        return false;
+
+    
+
     return true;
+    __LEAVE_FUNCTION
+    return fales;
 }
 
 void CGuildService::OnLogicThreadProc()

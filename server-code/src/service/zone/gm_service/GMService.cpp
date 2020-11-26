@@ -158,11 +158,11 @@ bool CGMService::Init(const ServerPort& nServerPort)
         BaseCode::SetNdc(oldNdc);
     };
 
-    if(CreateService(200) == false)
-        return false;
-
     //注册消息
     RegisterAllMsgProcess<CGMService>();
+
+    if(CreateService(200) == false)
+        return false;
 
     {
         const ServerAddrInfo* pAddrInfo = GetMessageRoute()->QueryServiceInfo(GetServerPort());

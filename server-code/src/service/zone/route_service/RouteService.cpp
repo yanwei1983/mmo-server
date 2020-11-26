@@ -63,11 +63,13 @@ bool CRouteService::Init(const ServerPort& nServerPort)
         BaseCode::SetNdc(oldNdc);
     };
 
+    //注册消息
+    RegisterAllMsgProcess<CRouteService>();
+
     if(CreateService(100, this) == false)
         return false;
 
-    //注册消息
-    RegisterAllMsgProcess<CRouteService>();
+
 
     if(GetWorldID() != 0)
     {

@@ -144,9 +144,9 @@ void CServerSocket::_OnSocketConnectorEvent(bufferevent* b, short what, void* ct
         pSocket->OnConnected();
         bufferevent_enable(b, EV_READ | EV_WRITE | EV_PERSIST);
         pSocket->_SetTimeout();
-        bufferevent_write_buffer(b, pSocket->m_Sendbuf);
-
-        LOGNETDEBUG("CServerSocket::SocketConnectSucc:{}:{}", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+        LOGNETDEBUG("CServerSocket::SocketConnectSucc:{}:{}  SendWait:{}", pSocket->GetAddrString().c_str(), pSocket->GetPort(), pSocket->m_nWaitWriteSize);
+       
+        bufferevent_write_buffer(b, pSocket->m_Sendbuf);                
     }
     else
     {
