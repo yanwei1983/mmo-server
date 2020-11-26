@@ -475,8 +475,20 @@ bool CActor::MoveTo(const Vector2& posTarget, bool bCheckMove)
     if(bCheckMove && CheckCanMove(posTarget) == false)
         return false;
 
-    SetPos(posTarget);
+    _SetPos(posTarget);
+
+    SC_POS_CHANGE msg;
+    msg.set_scene_idx(GetSceneIdx());
+    msg.set_actor_id(GetID());
+    msg.set_posx(GetPosX());
+    msg.set_posy(GetPosY());
+    SendMsg(msg);
+    if(NeedSyncAI())
+        SceneService()->SendProtoMsgToAIService(msg);
+
     UpdateViewList(false);
+    
+
 
     m_pStatusSet->OnMove();
     __LEAVE_FUNCTION

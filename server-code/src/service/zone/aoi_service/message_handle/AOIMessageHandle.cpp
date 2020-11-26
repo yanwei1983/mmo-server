@@ -29,7 +29,7 @@ ON_SERVERMSG(CAOIService, AOIChange)
     __ENTER_FUNCTION
     CAOIActor* pActor = AOIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
-    pActor->SetPos(Vector2(msg.posx(), msg.posy()));
+    pActor->_SetPos(Vector2(msg.posx(), msg.posy()));
     pActor->UpdateViewList(false);
     __LEAVE_FUNCTION
 }

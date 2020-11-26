@@ -150,6 +150,26 @@ function OnRecv_SC_PROPERTY_CHANGE(client, buffer, size)
 	
 end
 
+function OnRecv_SC_POS_CHANGE(client, buffer, size)
+	local msg = ProtobufMessageWarp("SC_POS_CHANGE");
+	if(GetProtobufMessagePtr(msg):ParseFromArray(buffer,size) == false) then
+		error("SC_POS_CHANGE ParseFromArray fail");
+		return;
+	end
+	
+	local info = g_clientinfo[client:GetClientID()];
+	if info.scene_idx ~= msg.scene_idx then
+		return;
+	end
+
+	info.posx=msg.posx;
+	info.posy=msg.posy;
+	if g_print_debug then
+		print_clientmsg(client, "self posx:", info.posx, " posy:", info.posy);
+	end
+	client:AddEventCallBack(random_uint32_range(700,1500), "SendMove", false);
+end
+
 function OnRecv_SC_AOI_UPDATE(client, buffer, size)
 	local msg = ProtobufMessageWarp("SC_AOI_UPDATE");
 	if(GetProtobufMessagePtr(msg):ParseFromArray(buffer,size) == false) then
@@ -162,20 +182,11 @@ function OnRecv_SC_AOI_UPDATE(client, buffer, size)
 		return;
 	end
 
-	
-	if(info.playerid == msg.actor_id)then
-		info.posx=msg.posx;
-		info.posy=msg.posy;
-		if g_print_debug then
-			print_clientmsg(client, "self posx:", info.posx, " posy:", info.posy);
-		end
-		client:AddEventCallBack(random_uint32_range(700,1500), "SendMove", false);
-	else
-		--other actor
-		if g_print_debug then
-			print_clientmsg(client, string.format("%d posx:%f posy:%f", msg.actor_id, info.posx, info.posy));
-		end
+	--other actor
+	if g_print_debug then
+		print_clientmsg(client, string.format("%d posx:%f posy:%f", msg.actor_id, info.posx, info.posy));
 	end
+	
 	
 end
 

@@ -24,7 +24,7 @@ bool CAOIActor::Init(const ServerMSG::ActorCreate& msg)
     SetGuildID(msg.guild_id());
     _SetPhaseID(msg.phase_id());
 
-    SetPos(Vector2(msg.posx(), msg.posy()));
+    _SetPos(Vector2(msg.posx(), msg.posy()));
 
     m_bMustSee = msg.must_see();
     return true;

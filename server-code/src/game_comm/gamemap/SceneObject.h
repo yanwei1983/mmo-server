@@ -70,7 +70,7 @@ public:
     export_lua virtual float         GetPosX() const { return m_Pos.x; }
     export_lua virtual float         GetPosY() const { return m_Pos.y; }
     export_lua virtual float         GetFace() const { return m_Face; }
-    export_lua virtual void          SetPos(const CPos2D& pos);
+    export_lua virtual void          _SetPos(const CPos2D& pos);
     export_lua virtual void          SetFace(float face)
     {
         if(Math::isNaN(face) == false)

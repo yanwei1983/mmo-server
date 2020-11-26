@@ -20,16 +20,16 @@ link_libraries("-Wl,--no-allow-shlib-undefined")
 GET_DIRECTORY_PROPERTY(includes INCLUDE_DIRECTORIES)
 
 
-# make scene_service_gen_lua 生成 scene2lua.cpp
-add_custom_target(scene_service_gen_lua
+# make scene2lua 生成 scene2lua.cpp
+add_custom_target(scene2lua
 COMMAND echo ${HEADERS} > ${CMAKE_CURRENT_BINARY_DIR}/scene_cpps.txt && echo ${includes} > ${CMAKE_CURRENT_BINARY_DIR}/scene_includes.txt 
 COMMAND cxx2lua --cpps=${CMAKE_CURRENT_BINARY_DIR}/scene_cpps.txt --include=${CMAKE_CURRENT_BINARY_DIR}/scene_includes.txt 
 --output=${CMAKE_CURRENT_BINARY_DIR}/scene2lua.cpp --output_functionname=scene2lua --skip_cpp --format=clang-format-9
 COMMENT "gen scene2lua for export_lua"
 DEPENDS cxx2lua
  )
-# 将scene_service_gen_lua 挂接到 make gen_all_lua
-ADD_DEPENDENCIES(gen_all_lua scene_service_gen_lua)
+# 将scene2lua 挂接到 make gen_all_lua
+ADD_DEPENDENCIES(gen_all_lua scene2lua)
 
 # 如果scene2lua.cpp依赖的文件更新了，那么重新执行生成scene2lua.cpp
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/scene2lua.cpp

@@ -101,7 +101,7 @@ void CActor::SendRoomMessage(const proto_msg_t& msg, uint64_t idExclude)
     auto setSocketMap = SceneService()->IDList2VSMap(m_ViewActorsByType[ACT_PLAYER], idExclude);
     SceneService()->SendProtoMsgTo(setSocketMap, msg);
     auto cmd = msg_to_cmd(msg);
-    if(NeedSyncAI() && (cmd == CMD_SC_CASTSKILL || cmd == CMD_SC_SKILL_BREAK || cmd == CMD_SC_AOI_UPDATE))
+    if(NeedSyncAI() && (cmd == CMD_SC_CASTSKILL || cmd == CMD_SC_SKILL_BREAK))
     {
         SceneService()->SendProtoMsgToAIService(msg);
     }

@@ -34,7 +34,7 @@ bool CAIMonster::Init(const ServerMSG::ActorCreate& msg)
     SetHPMax(msg.hpmax());
     SetMP(msg.mp());
     SetMPMax(msg.mpmax());
-    SetPos(Vector2(msg.posx(), msg.posy()));
+    _SetPos(Vector2(msg.posx(), msg.posy()));
     SetOwnerID(msg.ownerid());
 
     m_pType = MonsterTypeSet()->QueryObj(msg.prof());

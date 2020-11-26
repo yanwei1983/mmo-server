@@ -82,7 +82,7 @@ bool CSceneBase::EnterMap(CSceneObject* pActor, float fPosX, float fPosY, float 
     if(pActor->IsPlayer())
         m_setPlayer[pActor->GetID()] = pActor;
     m_setActor[pActor->GetID()] = pActor;
-    pActor->SetPos(Vector2(fPosX, fPosY));
+    pActor->_SetPos(Vector2(fPosX, fPosY));
     pActor->SetFace(fFace);
 
     pActor->OnEnterMap(this);

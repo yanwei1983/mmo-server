@@ -8,7 +8,7 @@ CSceneObject::CSceneObject() {}
 
 CSceneObject::~CSceneObject() {}
 
-void CSceneObject::SetPos(const Vector2& pos)
+void CSceneObject::_SetPos(const Vector2& pos)
 {
     __ENTER_FUNCTION
     if(m_Pos.x == pos.x && m_Pos.y == pos.y)

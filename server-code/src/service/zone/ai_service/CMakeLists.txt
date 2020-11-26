@@ -15,8 +15,8 @@ source_group_by_dir(SRCS)
 GET_DIRECTORY_PROPERTY(includes INCLUDE_DIRECTORIES)
 
 
-# make ai_service_gen_lua 生成 ai2lua.cpp
-add_custom_target(ai_service_gen_lua
+# make ai2lua 生成 ai2lua.cpp
+add_custom_target(ai2lua
 COMMAND echo ${HEADERS} > ${CMAKE_CURRENT_BINARY_DIR}/ai_cpps.txt && echo ${includes} > ${CMAKE_CURRENT_BINARY_DIR}/ai_includes.txt 
 COMMAND ${BINARIES_CORE}/cxx2lua --cpps=${CMAKE_CURRENT_BINARY_DIR}/ai_cpps.txt --include=${CMAKE_CURRENT_BINARY_DIR}/ai_includes.txt 
 --output=${CMAKE_CURRENT_BINARY_DIR}/ai2lua.cpp --output_functionname=ai2lua --skip_cpp --format=clang-format-9
@@ -24,8 +24,8 @@ COMMENT "gen ai2lua for export_lua"
 DEPENDS cxx2lua
  )
 
-# # # 将ai_service_gen_lua 挂接到 make gen_all_lua
-ADD_DEPENDENCIES(gen_all_lua ai_service_gen_lua)
+# # # 将ai2lua 挂接到 make gen_all_lua
+ADD_DEPENDENCIES(gen_all_lua ai2lua)
 
 # ai2lua.cpp不存在，则生成 ai2lua.cpp
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ai2lua.cpp

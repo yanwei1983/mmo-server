@@ -13,11 +13,7 @@
 #include "msg/zone_service.pb.h"
 #include "server_msg/server_side.pb.h"
 
-ON_MSG(CAIService, SC_AOI_NEW) {}
-
-ON_MSG(CAIService, SC_AOI_REMOVE) {}
-
-ON_MSG(CAIService, SC_AOI_UPDATE)
+ON_MSG(CAIService, SC_POS_CHANGE)
 {
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
@@ -29,7 +25,7 @@ ON_MSG(CAIService, SC_AOI_UPDATE)
     CHECK(pActor->GetCurrentScene());
     CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx());
 
-    pActor->SetPos(Vector2(msg.posx(), msg.posy()));
+    pActor->_SetPos(Vector2(msg.posx(), msg.posy()));
     LOGACTORDEBUG(pActor->GetID(),
                   "Actor:{} MoveTo {} {:.2f}, {:.2f}",
                   pActor->GetID(),

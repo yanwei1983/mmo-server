@@ -173,6 +173,15 @@ message SC_AOI_UPDATE
 	float  posy		= 4;
 }
 
+//角色移动
+message SC_POS_CHANGE
+{
+	option (cmd).sc_cmd = CMD_SC_POS_CHANGE;
+	uint64 scene_idx	= 1;
+	uint64 actor_id = 2;
+	float  posx		= 3;
+	float  posy		= 4;
+}
 //sync mapval
 message SC_MAPVAL
 {

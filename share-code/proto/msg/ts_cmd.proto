@@ -118,6 +118,7 @@ enum SC_CMD
 	CMD_SC_AOI_NEW		 = 1020; //广播建立对象
 	CMD_SC_AOI_REMOVE	 = 1021; //广播删除对象
 	CMD_SC_AOI_UPDATE	 = 1022; //广播移动
+	CMD_SC_POS_CHANGE	 = 1023; //移动成功的回包
 
 	CMD_SC_CASTSKILL	 = 1031; //广播技能释放
 	CMD_SC_SKILL_BREAK	 = 1032; //广播技能打断
