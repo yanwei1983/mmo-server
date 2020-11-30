@@ -7,6 +7,7 @@
 #include "RobotClient.h"
 #include "msg/ts_cmd.pb.h"
 #include "pb_luahelper.h"
+#include "msg/zone_service.pb.h"
 
 void export_to_lua(lua_State* L, void* pManager)
 {
@@ -18,6 +19,14 @@ void export_to_lua(lua_State* L, void* pManager)
     lua_tinker::class_def<RobotClientManager>(L, "GetProcessCMD", &RobotClientManager::GetProcessCMD);
     lua_tinker::set(L, "robot_manager", (RobotClientManager*)pManager);
 
+    pb_luahelper::init_lua(L);
+    pb_luahelper::export_protobuf_enum_to_lua(L, ACTOR_ATTRIB_descriptor());
+    pb_luahelper::export_protobuf_enum_to_lua(L, ACTOR_PROPERTY_descriptor());
+    pb_luahelper::export_protobuf_enum_to_lua(L, MONEY_TYPE_descriptor());
+    pb_luahelper::export_protobuf_enum_to_lua(L, PK_MODE_descriptor());
+    pb_luahelper::export_protobuf_enum_to_lua(L, TalkChannel_descriptor());
+    pb_luahelper::export_protobuf_enum_to_lua(L, TaskState_descriptor());
+    
     pb_luahelper::export_protobuf_enum_to_lua(L, CS_CMD_descriptor());
     pb_luahelper::export_protobuf_enum_to_lua(L, SC_CMD_descriptor());
 }
@@ -44,7 +53,7 @@ RobotClientManager::RobotClientManager(uint32_t nRobStart, uint32_t nRobAmount)
 
 RobotClientManager::~RobotClientManager()
 {
-    Stop();
+    BreakLoop();
     JoinIOThread();
     for(RobotClient* pClient: m_setClient)
     {

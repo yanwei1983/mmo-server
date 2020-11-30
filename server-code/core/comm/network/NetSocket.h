@@ -49,13 +49,14 @@ public:
 
 public:
     virtual void OnDisconnected();
+    virtual void OnClosing();
     virtual void OnRecvData(byte* pBuffer, size_t len);
     virtual void OnRecvTimeout(bool& bReconnect);
 
 public:
     void         _SetTimeout();
     void         _OnReceive(bufferevent* b);
-    virtual void _OnClose(short what) = 0;
+    virtual void _OnClose(const std::string& what) = 0;
 
     static void _OnSocketRead(bufferevent*, void* ctx);
     static void _OnSendOK(bufferevent* b, void* ctx);

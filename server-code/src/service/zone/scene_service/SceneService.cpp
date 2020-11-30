@@ -28,6 +28,7 @@
 #include "MsgSceneProcess.h"
 #include "MysqlConnection.h"
 #include "NetMSGProcess.h"
+#include "MsgProcessRegister.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "NpcType.h"
@@ -176,7 +177,7 @@ bool CSceneService::Init(const ServerPort& nServerPort)
     m_pSceneManager.reset(CSceneManager::CreateNew(GetZoneID()));
     CHECKF(m_pSceneManager.get());
 
-    RegisterAllMsgProcess<CSceneService>();
+    RegisterAllMsgProcess<CSceneService>(GetNetMsgProcess());
 
     if(IsSharedZone() == false)
     {

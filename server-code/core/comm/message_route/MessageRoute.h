@@ -83,7 +83,8 @@ public:
 public:
     CEventManager*    GetEventManager() const { return m_pEventManager.get(); }
     CMysqlConnection* GetServerInfoDB() const { return m_pServerInfoDB.get(); }
-
+    CNetworkService*  GetNetworkService() const { return m_pNetworkService.get(); }
+    
 protected:
     bool          ConnectServerInfoDB(const std::string& mysql_url);
     CMessagePort* _ConnectRemoteServer(const ServerPort& nServerPort, const ServerAddrInfo& info);

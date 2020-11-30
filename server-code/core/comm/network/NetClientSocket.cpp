@@ -2,7 +2,7 @@
 
 #include <event2/bufferevent.h>
 #include <event2/event.h>
-
+#include "NetEventHandler.h"
 #include "EventManager.h"
 #include "NetworkMessage.h"
 #include "NetworkService.h"
@@ -41,8 +41,11 @@ bool CClientSocket::Init(bufferevent* pBufferEvent)
 void CClientSocket::Interrupt(bool bClearEventHandler)
 {
     __ENTER_FUNCTION
+    LOGNETDEBUG("CClientSocket Interrupt {}:{}", GetAddrString().c_str(), GetPort());
     if(bClearEventHandler)
     {
+        if(m_pEventHandler)
+            m_pEventHandler->OnUnbindSocket(this);
         m_pEventHandler = nullptr;
     }
     if(GetStatus() == NSS_READY || GetStatus() == NSS_CONNECTING)
@@ -59,7 +62,7 @@ void CClientSocket::Interrupt(bool bClearEventHandler)
     __LEAVE_FUNCTION
 }
 
-void CClientSocket::_OnClose(short what)
+void CClientSocket::_OnClose(const std::string& what)
 {
     __ENTER_FUNCTION
     if(GetStatus() == NSS_CLOSEING)
@@ -75,7 +78,7 @@ void CClientSocket::_OnClose(short what)
         bufferevent_disable(m_pBufferevent, EV_READ | EV_PERSIST);
     }
 
-    OnDisconnected();
+    OnClosing();
 
     __LEAVE_FUNCTION
 }

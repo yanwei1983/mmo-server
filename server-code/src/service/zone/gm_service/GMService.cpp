@@ -159,7 +159,7 @@ bool CGMService::Init(const ServerPort& nServerPort)
     };
 
     //注册消息
-    RegisterAllMsgProcess<CGMService>();
+    RegisterAllMsgProcess<CGMService>(GetNetMsgProcess());
 
     if(CreateService(200) == false)
         return false;

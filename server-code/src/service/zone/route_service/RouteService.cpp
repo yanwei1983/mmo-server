@@ -64,9 +64,9 @@ bool CRouteService::Init(const ServerPort& nServerPort)
     };
 
     //注册消息
-    RegisterAllMsgProcess<CRouteService>();
+    RegisterAllMsgProcess<CRouteService>(GetNetMsgProcess());
 
-    if(CreateService(100, this) == false)
+    if(CreateService(100) == false)
         return false;
 
 
@@ -80,17 +80,6 @@ bool CRouteService::Init(const ServerPort& nServerPort)
     return true;
 }
 
-void CRouteService::OnPortConnected(CNetSocket* pSocket) {}
-
-void CRouteService::OnPortConnectFailed(CNetSocket*) {}
-
-void CRouteService::OnPortDisconnected(CNetSocket* pSocket) {}
-
-void CRouteService::OnPortAccepted(CNetSocket* pSocket) {}
-
-void CRouteService::OnPortRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len) {}
-
-void CRouteService::OnPortRecvTimeout(CNetSocket* pSocket) {}
 
 ON_SERVERMSG(CRouteService, ServiceRegister)
 {

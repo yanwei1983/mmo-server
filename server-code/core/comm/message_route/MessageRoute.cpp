@@ -8,6 +8,7 @@
 #include "MysqlTableCheck.h"
 #include "NetClientSocket.h"
 #include "NetServerSocket.h"
+#include "NetworkService.h"
 #include "NetSocket.h"
 #include "NormalCrypto.h"
 #include "serverinfodb.h"
@@ -56,7 +57,8 @@ void CMessageRoute::Destory()
     {
         return;
     }
-    m_pNetworkService->Stop();
+    LOGDEBUG("MessageRoute BreakLoop.");
+    m_pNetworkService->BreakLoop();
     m_pNetworkService->JoinIOThread();
     
     m_setServerInfoByWorldID.clear();
@@ -65,10 +67,13 @@ void CMessageRoute::Destory()
     m_WorldReadyList.clear();
 
     m_pServerInfoDB.reset();
+
+    LOGDEBUG("MessageRoute ReleasePort.");
     for(auto& [k, v]: m_setMessagePort)
     {
         v->Destory();
         SAFE_DELETE(v);
+        LOGDEBUG("MessagePort {}Release.", k);
     }
     m_setMessagePort.clear();
 
@@ -483,7 +488,7 @@ bool CMessageRoute::IsConnected(const ServerPort& nServerPort)
         if(it->second->GetLocalPort() == true)
             return true;
         else
-            return it->second->GetRemoteSocket() != nullptr;
+            return it->second->GetRemoteSocketIdx() != INVALID_SOCKET_IDX;
     }
     else
     {
@@ -541,18 +546,18 @@ CMessagePort* CMessageRoute::_ConnectRemoteServer(const ServerPort& nServerPort,
     }
     else
     {
-        if(pMessagePort->GetRemoteSocket() != nullptr)
+        if(pMessagePort->GetRemoteSocketIdx() != INVALID_SOCKET_IDX)
             return pMessagePort;
         if(pMessagePort->GetLocalPort() == true)
             return pMessagePort;
     }
-    auto pRemoteSocket = m_pNetworkService->AsyncConnectTo(info.route_addr.c_str(), info.route_port, pMessagePort);
+    auto pRemoteSocket = m_pNetworkService->AsyncConnectTo(info.route_addr.c_str(), info.route_port, pMessagePort, true);
     if(pRemoteSocket == nullptr)
     {
         LOGFATAL("CMessageRoute::ConnectRemoteServer AsyncConnectTo {}:{} fail", info.route_addr.c_str(), info.route_port);
         return nullptr;
     }
-    pMessagePort->SetRemoteSocket(pRemoteSocket);
+    
 
     LOGMESSAGE("CMessageRoute::ConnectRemoteServer:{}, {}:{}", nServerPort, info.route_addr.c_str(), info.route_port);
 

@@ -76,7 +76,7 @@ bool CGuildService::Init(const ServerPort& nServerPort)
     CHECKF(m_pGuildManager.get());
 
     //注册消息
-    RegisterAllMsgProcess<CGuildService>();
+    RegisterAllMsgProcess<CGuildService>(GetNetMsgProcess());
 
     if(CreateService(100) == false)
         return false;

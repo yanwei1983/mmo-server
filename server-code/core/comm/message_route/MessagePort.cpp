@@ -3,11 +3,14 @@
 #include "CheckUtil.h"
 #include "MessageRoute.h"
 #include "NetServerSocket.h"
+#include "NetworkService.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "msg_internal.pb.h"
 
-CMessagePort::CMessagePort() {}
+CMessagePort::CMessagePort()
+:m_nRemoteSocketIdx(INVALID_SOCKET_IDX)
+ {}
 
 bool CMessagePort::Init(const ServerPort& nServerPort, CMessageRoute* pRoute)
 {
@@ -31,15 +34,20 @@ void CMessagePort::Destory()
     {
         SAFE_DELETE(pMsg);
     }
-    while(m_SendMsgQueue.get(pMsg))
+    if(m_SocketIdxList.empty() == false)
     {
-        SAFE_DELETE(pMsg);
+        auto socket_idx_list_copy = m_SocketIdxList;
+        m_SocketIdxList.clear();
+        for(auto socket_idx : socket_idx_list_copy)
+        {
+            if(socket_idx != INVALID_SOCKET_IDX)
+            {
+                m_pRoute->GetNetworkService()->_CloseSocket(socket_idx);
+            }
+        }
     }
-    if(m_pRemoteServerSocket)
-    {
-        m_pRemoteServerSocket->Interrupt(true);
-        DetachRemoteSocket();
-    }
+    
+    m_nRemoteSocketIdx = INVALID_SOCKET_IDX;
     m_pPortEventHandler = nullptr;
     m_Event.Cancel();
     m_Event.Clear();
@@ -54,6 +62,22 @@ bool CMessagePort::TakePortMsg(CNetworkMessage*& msg)
     return false;
 }
 
+void CMessagePort::OnBindSocket(CNetSocket* pSocket) 
+{
+    m_SocketIdxList.insert(pSocket->GetSocketIdx());
+}
+
+void CMessagePort::OnUnbindSocket(CNetSocket* pSocket) 
+{
+    m_SocketIdxList.erase(pSocket->GetSocketIdx());
+}
+
+
+void CMessagePort::OnStartConnect(CNetSocket* pSocket)
+{
+    SetRemoteSocket(pSocket->GetSocketIdx());
+}
+
 void CMessagePort::OnConnected(CNetSocket* pSocket)
 {
     __ENTER_FUNCTION
@@ -63,7 +87,6 @@ void CMessagePort::OnConnected(CNetSocket* pSocket)
     pSocket->_SendMsg((byte*)&msg, sizeof(msg));
     //服务器间通信扩充recv缓冲区大小
     pSocket->SetPacketSizeMax(_MAX_MSGSIZE * 10);
-    static_cast<CServerSocket*>(pSocket)->SetReconnect(true);
     pSocket->SetLogWriteHighWateMark(100 * 1024 * 1024);
 
     LOGNETDEBUG("MessagePort:{} OnConnected {}:{}", GetServerPort().GetServiceID(), pSocket->GetAddrString().c_str(), pSocket->GetPort());
@@ -71,6 +94,8 @@ void CMessagePort::OnConnected(CNetSocket* pSocket)
     {
         pHandler->OnPortConnected(pSocket);
     }
+
+    
     __LEAVE_FUNCTION
 }
 
@@ -82,6 +107,7 @@ void CMessagePort::OnConnectFailed(CNetSocket* pSocket)
     {
         pHandler->OnPortConnectFailed(pSocket);
     }
+    
     __LEAVE_FUNCTION
 }
 
@@ -93,9 +119,21 @@ void CMessagePort::OnDisconnected(CNetSocket* pSocket)
     {
         pHandler->OnPortDisconnected(pSocket);
     }
+    if(pSocket->GetSocketIdx() == m_nRemoteSocketIdx)
+        SetRemoteSocket(INVALID_SOCKET_IDX);
     __LEAVE_FUNCTION
 }
+void CMessagePort::OnWaitReconnect(CNetSocket* pSocket)
+{
+    LOGNETTRACE("MessagePort:{} OnWaitReconnect {}:{}", GetServerPort().GetServiceID(), pSocket->GetAddrString().c_str(), pSocket->GetPort());
+}
 
+void CMessagePort::OnClosing(CNetSocket* pSocket)
+{
+    LOGNETTRACE("MessagePort:{} OnClosing {}:{}", GetServerPort().GetServiceID(), pSocket->GetAddrString().c_str(), pSocket->GetPort());
+}
+
+ 
 void CMessagePort::OnAccepted(CNetSocket* pSocket)
 {
     __ENTER_FUNCTION
@@ -110,20 +148,33 @@ void CMessagePort::OnAccepted(CNetSocket* pSocket)
     __LEAVE_FUNCTION
 }
 
-void CMessagePort::SetRemoteSocket(CNetSocket* pSocket)
+void CMessagePort::SetRemoteSocket(uint16_t nRemoteSocketIdx)
 {
     __ENTER_FUNCTION
-    m_pRemoteServerSocket = pSocket;
+    m_nRemoteSocketIdx = nRemoteSocketIdx;
     __LEAVE_FUNCTION
+}
+
+CNetSocket* CMessagePort::GetRemoteSocket() const
+{
+    __ENTER_FUNCTION
+    if(m_nRemoteSocketIdx != INVALID_SOCKET_IDX)
+    {
+        auto pSocket = m_pRoute->GetNetworkService()->QuerySocketByIdx(m_nRemoteSocketIdx);
+        return pSocket;
+    }
+    __LEAVE_FUNCTION
+    return nullptr;
 }
 
 void CMessagePort::DetachRemoteSocket()
 {
-    if(m_pRemoteServerSocket)
-    {
-        m_pRemoteServerSocket->SetEventHandler(nullptr);
-        m_pRemoteServerSocket = nullptr;
-    }
+    __ENTER_FUNCTION
+    auto pSocket = GetRemoteSocket();
+    if(pSocket)
+        pSocket->SetEventHandler(nullptr);
+    m_nRemoteSocketIdx = INVALID_SOCKET_IDX;
+    __LEAVE_FUNCTION
 }
 
 void CMessagePort::OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len)
@@ -155,7 +206,7 @@ void CMessagePort::OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len)
     auto pHandler = m_pPortEventHandler.load();
     if(pHandler)
     {
-        pHandler->OnPortRecvData(pSocket, pBuffer, len);
+        pHandler->OnPortRecvData(*pMsg);
     }
 
     __LEAVE_FUNCTION
@@ -173,88 +224,79 @@ void CMessagePort::OnRecvTimeout(CNetSocket* pSocket)
 size_t CMessagePort::GetWriteBufferSize()
 {
     __ENTER_FUNCTION
-    if(m_pRemoteServerSocket)
+    if(m_nRemoteSocketIdx)
     {
-        size_t nNeedWrite = m_pRemoteServerSocket->GetWaitWriteSize();
-        return nNeedWrite;
+        auto pSocket = m_pRoute->GetNetworkService()->QuerySocketByIdx(m_nRemoteSocketIdx);
+        if(pSocket)
+        {
+            size_t nNeedWrite = pSocket->GetWaitWriteSize();
+            return nNeedWrite; 
+        }
+        
     }
     __LEAVE_FUNCTION
     return 0;
 }
 
-void CMessagePort::PostSend()
+void CMessagePort::_SendMsgToRemoteSocket(const CNetworkMessage& msg)
 {
+
     __ENTER_FUNCTION
-    if(m_Event.IsRunning() == false)
+    CHECK(m_nRemoteSocketIdx != INVALID_SOCKET_IDX);
+
+    InternalMsg internal_msg;
+    internal_msg.set_from(msg.GetFrom());
+    internal_msg.set_to(msg.GetTo());
+    internal_msg.set_proto_msg(msg.GetBuf(), msg.GetSize());
+
+    for(const auto& v: msg.GetForward())
     {
-        CEventEntryCreateParam param;
-        param.cb = std::bind(&CMessagePort::_SendAllMsg, this);
-        m_pRoute->GetEventManager()->ScheduleEvent(param, m_Event);
+        internal_msg.add_forward(v);
     }
-
-    __LEAVE_FUNCTION
-}
-
-void CMessagePort::_SendAllMsg()
-{
-    __ENTER_FUNCTION
-    CHECK(m_pRemoteServerSocket);
-    CNetworkMessage* pMsg;
-    while(m_SendMsgQueue.get(pMsg))
+    for(const auto& v: msg.GetMultiTo())
     {
-        __ENTER_FUNCTION
-        InternalMsg internal_msg;
-        internal_msg.set_from(pMsg->GetFrom());
-        internal_msg.set_to(pMsg->GetTo());
-        internal_msg.set_proto_msg(pMsg->GetBuf(), pMsg->GetSize());
-
-        for(const auto& v: pMsg->GetForward())
-        {
-            internal_msg.add_forward(v);
-        }
-        for(const auto& v: pMsg->GetMultiTo())
-        {
-            internal_msg.add_multi_vs(v);
-        }
-        for(const auto& v: pMsg->GetMultiIDTo())
-        {
-            internal_msg.add_multi_id(v);
-        }
-        for(const auto& v: pMsg->GetMultiIDTo())
-        {
-            internal_msg.add_multi_id(v);
-        }
-        for(const auto& v: pMsg->GetBroadcastTo())
-        {
-            internal_msg.add_broadcast_to(v);
-        }
-        internal_msg.set_brocast_type(pMsg->GetBroadcastType());
-
-        CNetworkMessage send_msg(0xFFFF, internal_msg);
-
-        m_pRemoteServerSocket->SendNetworkMessage(std::move(send_msg));
-
-        __LEAVE_FUNCTION
-        SAFE_DELETE(pMsg);
+        internal_msg.add_multi_vs(v);
     }
+    for(const auto& v: msg.GetMultiIDTo())
+    {
+        internal_msg.add_multi_id(v);
+    }
+    for(const auto& v: msg.GetMultiIDTo())
+    {
+        internal_msg.add_multi_id(v);
+    }
+    for(const auto& v: msg.GetBroadcastTo())
+    {
+        internal_msg.add_broadcast_to(v);
+    }
+    internal_msg.set_brocast_type(msg.GetBroadcastType());
+
+    CNetworkMessage send_msg(0xFFFF, internal_msg);
+    m_pRoute->GetNetworkService()->SendSocketMsgByIdx(m_nRemoteSocketIdx, send_msg, false);
+
+    
     __LEAVE_FUNCTION
 }
 
 bool CMessagePort::SendMsgToPort(const CNetworkMessage& msg)
 {
     __ENTER_FUNCTION
-    CNetworkMessage* pMsg = new CNetworkMessage(msg);
-    pMsg->CopyBuffer();
-
-    if(m_bLocalPort == false)
+    if(m_bLocalPort == true)
     {
-        m_SendMsgQueue.push(pMsg);
-        PostSend();
+        CNetworkMessage* pMsg = new CNetworkMessage(msg);
+        pMsg->CopyBuffer();
+        m_RecvMsgQueue.push(pMsg);
+        auto pHandler = m_pPortEventHandler.load();
+        if(pHandler)
+        {
+            pHandler->OnPortRecvData(*pMsg);
+        }
         return true;
+
     }
     else
     {
-        m_RecvMsgQueue.push(pMsg);
+        _SendMsgToRemoteSocket(msg);
         return true;
     }
     __LEAVE_FUNCTION

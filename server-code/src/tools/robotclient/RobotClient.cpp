@@ -2,6 +2,7 @@
 
 #include "NetMSGProcess.h"
 #include "NetServerSocket.h"
+#include "NetworkService.h"
 #include "ProtobuffUtil.h"
 #include "RobotClientManager.h"
 #include "msg/ts_cmd.pb.h"

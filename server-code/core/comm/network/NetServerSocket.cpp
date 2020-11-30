@@ -2,7 +2,7 @@
 
 #include <event2/bufferevent.h>
 #include <event2/event.h>
-
+#include "NetEventHandler.h"
 #include "EventManager.h"
 #include "NetworkMessage.h"
 #include "NetworkService.h"
@@ -46,8 +46,11 @@ bool CServerSocket::Init(bufferevent* pBufferEvent)
 void CServerSocket::Interrupt(bool bClearEventHandler)
 {
     __ENTER_FUNCTION
+    LOGNETDEBUG("CServerSocket Interrupt {}:{}", GetAddrString().c_str(), GetPort());
     if(bClearEventHandler)
     {
+        if(m_pEventHandler)
+            m_pEventHandler->OnUnbindSocket(this);
         m_pEventHandler = nullptr;
     }
     if(GetStatus() == NSS_READY || GetStatus() == NSS_CONNECTING)
@@ -65,7 +68,7 @@ void CServerSocket::Interrupt(bool bClearEventHandler)
     __LEAVE_FUNCTION
 }
 
-void CServerSocket::_OnClose(short what)
+void CServerSocket::_OnClose(const std::string& what)
 {
     __ENTER_FUNCTION
     if(GetStatus() == NSS_CLOSEING)
@@ -97,7 +100,8 @@ void CServerSocket::_OnClose(short what)
         event_add(m_pReconnectEvent, &reconnet_dealy);
         SetStatus(NSS_WAIT_RECONNECT);
         m_pService->_AddConnectingSocket(this);
-
+        if(m_pEventHandler)
+            m_pEventHandler->OnWaitReconnect(this);
         LOGNETDEBUG("CServerSocket _OnClose Reconnect Wait,5s, {}:{}", GetAddrString().c_str(), GetPort());
     }
     else
@@ -107,7 +111,7 @@ void CServerSocket::_OnClose(short what)
             bufferevent_disable(m_pBufferevent, EV_READ | EV_PERSIST);
         }
 
-        OnDisconnected();
+        OnClosing();
     }
     __LEAVE_FUNCTION
 }
@@ -121,7 +125,7 @@ void CServerSocket::_OnReconnect(int32_t fd, short what, void* ctx)
 
     if(pSocket->GetService()->_AsyncReconnect(pSocket) == false)
     {
-        pSocket->OnConnectFailed();
+        pSocket->OnDisconnected();
     }
     __LEAVE_FUNCTION
 }
@@ -169,6 +173,16 @@ void CServerSocket::OnRecvTimeout(bool& bReconnect)
     __LEAVE_FUNCTION
 }
 
+
+void CServerSocket::OnStartConnect()
+{
+    __ENTER_FUNCTION
+
+    if(m_pEventHandler)
+        m_pEventHandler->OnStartConnect(this);
+    __LEAVE_FUNCTION
+}
+
 void CServerSocket::OnConnected()
 {
     __ENTER_FUNCTION
@@ -183,7 +197,7 @@ void CServerSocket::OnConnectFailed()
     if(m_pEventHandler)
         m_pEventHandler->OnConnectFailed(this);
 
-    _OnClose(BEV_EVENT_TIMEOUT | BEV_EVENT_CONNECTED);
+    _OnClose("AsyncConnectFailed");
     __LEAVE_FUNCTION
 }
 

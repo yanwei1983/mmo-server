@@ -12,6 +12,7 @@
 #include "MessageRoute.h"
 #include "MonitorMgr.h"
 #include "NetMSGProcess.h"
+#include "MsgProcessRegister.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "server_msg/server_side.pb.h"
@@ -96,7 +97,7 @@ bool CAOIService::Init(const ServerPort& nServerPort)
     m_pAOIActorManager.reset(CAOIActorManager::CreateNew());
     CHECKF(m_pAOIActorManager.get());
 
-    RegisterAllMsgProcess<CAOIService>();
+    RegisterAllMsgProcess<CAOIService>(GetNetMsgProcess());
 
     constexpr uint32_t FrameCount    = 20;
     constexpr uint32_t FrameInterval = 1000 / FrameCount;

@@ -30,7 +30,7 @@
 #include "SystemVars.h"
 #include "gamedb.h"
 #include "msg/zone_service.pb.h"
-
+#include "protomsg_to_cmd.h"
 OBJECTHEAP_IMPLEMENTATION(CPlayer, s_heap);
 
 CPlayer::CPlayer()
@@ -268,6 +268,7 @@ void CPlayer::SetGuildID(OBJID val)
 bool CPlayer::SendMsg(const proto_msg_t& msg) const
 {
     __ENTER_FUNCTION
+    LOGNETTRACE("Player {} Send cmd:{}", GetID(), msg_to_cmd(msg));
     return SceneService()->SendProtoMsgToPlayer(GetSocket(), msg);
     __LEAVE_FUNCTION
     return false;

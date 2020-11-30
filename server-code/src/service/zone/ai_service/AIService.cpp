@@ -17,6 +17,7 @@
 #include "MonitorMgr.h"
 #include "MonsterType.h"
 #include "NetMSGProcess.h"
+#include "MsgProcessRegister.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "server_msg/server_side.pb.h"
@@ -113,7 +114,7 @@ bool CAIService::Init(const ServerPort& nServerPort)
     m_pAIActorManager.reset(CAIActorManager::CreateNew());
     CHECKF(m_pAIActorManager.get());
 
-    RegisterAllMsgProcess<CAIService>();
+    RegisterAllMsgProcess<CAIService>(GetNetMsgProcess());
 
     uint32_t FrameCount    = 20;
     uint32_t FrameInterval = 1000 / FrameCount;

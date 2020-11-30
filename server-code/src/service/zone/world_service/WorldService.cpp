@@ -15,6 +15,7 @@
 #include "MysqlConnection.h"
 #include "MysqlTableCheck.h"
 #include "NetMSGProcess.h"
+#include "MsgProcessRegister.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "SystemVars.h"
@@ -107,7 +108,7 @@ bool CWorldService::Init(const ServerPort& nServerPort)
     m_pTeamManager.reset(CTeamManager::CreateNew());
     CHECKF(m_pTeamManager.get());
 
-    RegisterAllMsgProcess<CWorldService>();
+    RegisterAllMsgProcess<CWorldService>(GetNetMsgProcess());
 
     auto pGlobalDB = ConnectGlobalDB(GetMessageRoute()->GetServerInfoDB());
     CHECKF(pGlobalDB.get());

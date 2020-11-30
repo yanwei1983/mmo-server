@@ -2,7 +2,7 @@
 
 #include <event2/bufferevent.h>
 #include <event2/event.h>
-
+#include "NetEventHandler.h"
 #include "EventManager.h"
 #include "NetworkMessage.h"
 #include "NetworkService.h"
@@ -24,13 +24,14 @@ CNetSocket::CNetSocket(CNetworkService* pService, CNetEventHandler* pEventHandle
     , m_Status(NSS_NOT_INIT)
     , m_nRecvTimeOutSec(30)
     , m_Sendbuf(evbuffer_new())
-    , m_nSocketIdx(0xFFFF)
+    , m_nSocketIdx(INVALID_SOCKET_IDX)
     , m_pDecryptor(nullptr)
     , m_pEncryptor(nullptr)
     , m_nPacketSizeMax(_MAX_MSGSIZE)
     , m_socket(INVALID_SOCKET)
     , m_ReadBuff{std::make_unique<byte[]>(m_nPacketSizeMax)}
 {
+    m_pService->_AllocSocketIdx(this);
 }
 
 CNetSocket::~CNetSocket()
@@ -56,7 +57,10 @@ CNetSocket::~CNetSocket()
     {
         SAFE_DELETE(pData);
     }
-
+    if(m_pEventHandler)
+        m_pEventHandler->OnUnbindSocket(this);
+    m_pEventHandler = nullptr;
+    m_pService->_ReleaseSocketIdx(this);
     __LEAVE_FUNCTION
 }
 
@@ -87,7 +91,7 @@ bool CNetSocket::SendNetworkMessage(CNetworkMessage&& msg)
 bool CNetSocket::SendNetworkMessage(const CNetworkMessage& msg, bool bNeedDuplicate)
 {
     __ENTER_FUNCTION
-    CHECKF(msg.GetSize() < GetPacketSizeMax());
+    CHECKF_FMT(msg.GetSize() < GetPacketSizeMax(), "msg_size:{} packsizemax:{}", msg.GetSize(), GetPacketSizeMax());
     CNetworkMessage send_msg;
     send_msg.CopyRawMessage(msg);
     if(m_pEncryptor && bNeedDuplicate)
@@ -229,7 +233,7 @@ void CNetSocket::_OnReceive(bufferevent* b)
                 data += fmt::format(FMT_STRING("{0:x} "), v);
             }
             LOGNETDEBUG("{}", data.c_str());
-            _OnClose(BEV_EVENT_READING);
+            _OnClose("_OnReceive Fail");
             return;
         }
         if(nSize < pHeader->msg_size)
@@ -243,7 +247,7 @@ void CNetSocket::_OnReceive(bufferevent* b)
             if(pHeader->is_ciper == false)
             {
                 LOGNETERROR("CNetSocket _OnReceive Msg:{} size:{} need decryptor, but msg is not chiper", pHeader->msg_cmd, pHeader->msg_size);
-                _OnClose(BEV_EVENT_READING);
+                _OnClose("_OnReceive Decryptor Fail");
                 return;
             }
             byte*  pBody    = pReadBuf + sizeof(MSG_HEAD);
@@ -295,6 +299,7 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         return;
     CNetSocket* pSocket = (CNetSocket*)ctx;
     bool        bClose  = false;
+    std::string err_msg;
     if(what & BEV_EVENT_TIMEOUT)
     {
         if(what & BEV_EVENT_READING)
@@ -307,6 +312,7 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         }
         else if(what & BEV_EVENT_WRITING)
         {
+            err_msg = "write timeout";
             bClose = true;
             LOGNETDEBUG("CNetSocket write timeout {}:{}", pSocket->GetAddrString().c_str(), pSocket->GetPort());
         }
@@ -317,7 +323,7 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         const char* errstr = evutil_socket_error_to_string(err);
         
         LOGNETDEBUG("CNetSocket error[{}]: {}, {}:{}", err, errstr, pSocket->GetAddrString().c_str(), pSocket->GetPort());
-        
+        err_msg = errstr;
         bClose = true;
     }
     if(what & BEV_EVENT_EOF)
@@ -327,9 +333,10 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         pSocket->_OnReceive(b);
         bufferevent_setcb(b, nullptr, nullptr, nullptr, nullptr);
         bClose = true;
+        err_msg = "eof";
     }
     if(bClose)
-        pSocket->_OnClose(what);
+        pSocket->_OnClose(err_msg);
 
     __LEAVE_FUNCTION
 }
@@ -368,6 +375,17 @@ void CNetSocket::SetPacketSizeMax(size_t val)
     }
 }
 
+void CNetSocket::OnClosing()
+{
+    __ENTER_FUNCTION
+    LOGNETDEBUG("CNetSocket OnClosing: {}:{}", GetAddrString().c_str(), GetPort());
+
+    if(m_pEventHandler)
+        m_pEventHandler->OnClosing(this);
+    __LEAVE_FUNCTION
+}
+
+
 void CNetSocket::OnDisconnected()
 {
     __ENTER_FUNCTION
@@ -377,7 +395,7 @@ void CNetSocket::OnDisconnected()
     if(m_pEventHandler)
         m_pEventHandler->OnDisconnected(this);
     m_pService->_RemoveSocket(this);
-    m_pService->_AddCloseingSocket(this);
+    m_pService->_AddClosingSocket(this);
     __LEAVE_FUNCTION
 }
 
@@ -393,7 +411,7 @@ void CNetSocket::OnRecvData(byte* pBuffer, size_t len)
         {
             LOGNETDEBUG("COMMON_CMD_INTERRUPT:{}:{}", GetAddrString().c_str(), GetPort());
 
-            _OnClose(COMMON_CMD_INTERRUPT);
+            _OnClose("RECIVE INTERRUPT");
             return;
         }
         break;

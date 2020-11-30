@@ -8,6 +8,7 @@
 
 #include "BaseCode.h"
 #include "NetworkMessage.h"
+#include "NetMSGProcess.h"
 
 template<class T, class FuncType>
 void ProcessMsg(CNetworkMessage* pMsg, FuncType func)
@@ -39,6 +40,15 @@ struct MsgProcRegCenter
     }
     std::map<uint32_t, std::tuple<const char*, MsgProcessFunc> > m_MsgProc;
 };
+
+template<class Service_T>
+inline void RegisterAllMsgProcess(CNetMSGProcess* pNetMsgProcess)
+{
+    for(const auto& [k, v]: MsgProcRegCenter<Service_T>::instance().m_MsgProc)
+    {
+        pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
+    }
+}
 
 template<class Service>
 struct MsgProcRegister

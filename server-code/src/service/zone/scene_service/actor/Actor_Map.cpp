@@ -83,22 +83,26 @@ uint64_t CActor::GetSceneIdx() const
 void CActor::SendRoomMessageExcludeSelf(const proto_msg_t& msg)
 {
     __ENTER_FUNCTION
-    SendRoomMessage(msg, GetID());
+    SendRoomMessage(msg, 0);
     __LEAVE_FUNCTION
 }
 
 void CActor::SendRoomMessage(const proto_msg_t& msg)
 {
     __ENTER_FUNCTION
-    SendRoomMessage(msg, 0);
+    SendRoomMessage(msg, GetID());
     __LEAVE_FUNCTION
 }
 
-void CActor::SendRoomMessage(const proto_msg_t& msg, uint64_t idExclude)
+void CActor::SendRoomMessage(const proto_msg_t& msg, uint64_t ext_include_id)
 {
     __ENTER_FUNCTION
     SendShowToDealyList();
-    auto setSocketMap = SceneService()->IDList2VSMap(m_ViewActorsByType[ACT_PLAYER], idExclude);
+    auto setSocketMap = SceneService()->IDList2VSMap(m_ViewActorsByType[ACT_PLAYER], 0);
+    if(ext_include_id != 0)
+    {
+        SceneService()->_ID2VS(ext_include_id, setSocketMap);
+    }
     SceneService()->SendProtoMsgTo(setSocketMap, msg);
     auto cmd = msg_to_cmd(msg);
     if(NeedSyncAI() && (cmd == CMD_SC_CASTSKILL || cmd == CMD_SC_SKILL_BREAK))

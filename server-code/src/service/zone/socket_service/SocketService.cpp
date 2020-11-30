@@ -1,7 +1,7 @@
 #include "SocketService.h"
 
 #include <functional>
-
+#include "NetworkService.h"
 #include "EventManager.h"
 #include "MemoryHelp.h"
 #include "MessagePort.h"
@@ -132,7 +132,7 @@ bool CSocketService::Init(const ServerPort& nServerPort)
 
 
     // SetIPCheck(true);
-    RegisterAllMsgProcess<CSocketService>();
+    RegisterAllMsgProcess<CSocketService>(GetNetMsgProcess());
     AddWaitServiceReady(ServiceID{AUTH_SERVICE, GetServiceID().GetServiceIdx()});
 
    
@@ -225,9 +225,6 @@ void CSocketService::RemoveClient(const VirtualSocket& vs)
     }
 }
 
-void CSocketService::OnConnected(CNetSocket* pSocket) {}
-
-void CSocketService::OnConnectFailed(CNetSocket*) {}
 
 void CSocketService::OnDisconnected(CNetSocket* pSocket)
 {
@@ -254,7 +251,7 @@ void CSocketService::OnAccepted(CNetSocket* pSocket)
     SC_KEY msg;
     msg.set_key(seed);
     CNetworkMessage _msg(msg_to_cmd(msg), msg);
-    pSocket->SendNetworkMessage(_msg);
+    pSocket->SendNetworkMessage(std::move(_msg));
     __LEAVE_FUNCTION
 }
 

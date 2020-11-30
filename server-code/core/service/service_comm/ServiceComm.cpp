@@ -4,6 +4,8 @@
 
 #include "CheckUtil.h"
 #include "DB2PB.h"
+#include "NetworkService.h"
+#include "NetMSGProcess.h"
 #include "EventManager.h"
 #include "GlobalSetting.h"
 #include "MessagePort.h"

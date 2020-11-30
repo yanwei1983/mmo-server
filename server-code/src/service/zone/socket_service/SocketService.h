@@ -7,6 +7,7 @@
 #include "ServiceComm.h"
 #include "UIDFactory.h"
 
+#include "NetEventHandler.h"
 class CSocketService;
 class CGameClient
 {
@@ -70,8 +71,6 @@ public:
     CreateNewRealeaseImpl(CSocketService);
 
 public:
-    virtual void OnConnected(CNetSocket* pSocket) override;
-    virtual void OnConnectFailed(CNetSocket*) override;
     virtual void OnDisconnected(CNetSocket* pSocket) override;
     virtual void OnAccepted(CNetSocket* pSocket) override;
     virtual void OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len) override;

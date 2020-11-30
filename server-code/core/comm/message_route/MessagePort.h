@@ -4,10 +4,12 @@
 #include "EventManager.h"
 #include "LockfreeQueue.h"
 #include "NetworkDefine.h"
-#include "NetworkService.h"
+#include "NetEventHandler.h"
 
 class CNetSocket;
 class CMessageRoute;
+class CNetworkMessage;
+
 class CMessagePortEventHandler
 {
 public:
@@ -24,10 +26,12 @@ public:
     // accept a new client
     virtual void OnPortAccepted(CNetSocket*) {}
     // receive data
-    virtual void OnPortRecvData(CNetSocket*, byte* pBuffer, size_t len) {}
+    virtual void OnPortRecvData(const CNetworkMessage&) {}
     // recv over time
     virtual void OnPortRecvTimeout(CNetSocket*) {}
 };
+
+
 class CMessagePort : public CNetEventHandler, public NoncopyableT<CMessagePort>, public CreateNewT<CMessagePort>
 {
     friend class CreateNewT<CMessagePort>;
@@ -41,17 +45,24 @@ public:
     bool Init(const ServerPort& nServerPort, CMessageRoute* pRoute);
 
 public:
-    virtual void OnConnected(CNetSocket* pSocket);
-    virtual void OnConnectFailed(CNetSocket*);
-    virtual void OnDisconnected(CNetSocket*);
-    virtual void OnAccepted(CNetSocket*);
-    virtual void OnRecvData(CNetSocket*, byte* pBuffer, size_t len);
-    virtual void OnRecvTimeout(CNetSocket*);
+    virtual void OnBindSocket(CNetSocket* pSocket) override;
+    virtual void OnUnbindSocket(CNetSocket* pSocket) override;
+    virtual void OnStartConnect(CNetSocket* pSocket) override;
+    virtual void OnConnected(CNetSocket* pSocket) override;
+    virtual void OnConnectFailed(CNetSocket*) override;
+    virtual void OnDisconnected(CNetSocket*) override;
+    virtual void OnWaitReconnect(CNetSocket*) override;
+    
+    virtual void OnAccepted(CNetSocket*) override;
+    virtual void OnRecvData(CNetSocket*, byte* pBuffer, size_t len) override;
+    virtual void OnRecvTimeout(CNetSocket*) override;
+    virtual void OnClosing(CNetSocket*)override;
 
     void              SetPortEventHandler(CMessagePortEventHandler* pHandler) { m_pPortEventHandler = pHandler; }
-    void              SetRemoteSocket(CNetSocket* pSocket);
+    void              SetRemoteSocket(uint16_t nRemoteSocketIdx);
     void              DetachRemoteSocket();
-    CNetSocket*       GetRemoteSocket() const { return m_pRemoteServerSocket; }
+    CNetSocket*       GetRemoteSocket() const;
+    uint16_t          GetRemoteSocketIdx() const {return m_nRemoteSocketIdx;}
     const ServerPort& GetServerPort() const { return m_nServerPort; }
     bool              GetLocalPort() const { return m_bLocalPort; }
     void              SetLocalPort(bool val) { m_bLocalPort = val; }
@@ -61,18 +72,18 @@ public:
     size_t GetWriteBufferSize();
 
 private:
-    void PostSend();
-    void _SendAllMsg();
-
+    void _SendMsgToRemoteSocket(const CNetworkMessage& msg);
 private:
     CMessageRoute*                         m_pRoute = nullptr;
     MPSCQueue<CNetworkMessage*>            m_RecvMsgQueue;
-    MPSCQueue<CNetworkMessage*>            m_SendMsgQueue;
-    CNetSocket*                            m_pRemoteServerSocket = nullptr;
+    
+    SocketIdx_t                            m_nRemoteSocketIdx;
     bool                                   m_bLocalPort          = false;
     ServerPort                             m_nServerPort;
     std::atomic<CMessagePortEventHandler*> m_pPortEventHandler = nullptr;
     CEventEntryPtr                         m_Event;
+
+    std::unordered_set<SocketIdx_t>        m_SocketIdxList;
 };
 
 #endif // MessagePort_h__

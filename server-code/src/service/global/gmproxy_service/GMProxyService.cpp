@@ -213,7 +213,7 @@ bool CGMProxyService::Init(const ServerPort& nServerPort)
     };
 
     //注册消息
-    RegisterAllMsgProcess<CGMProxyService>();
+    RegisterAllMsgProcess<CGMProxyService>(GetNetMsgProcess());
 
     {
         const ServerAddrInfo* pAddrInfo = GetMessageRoute()->QueryServiceInfo(GetServerPort());

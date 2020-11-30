@@ -1,10 +1,9 @@
 #ifndef SERVICECOMM_H
 #define SERVICECOMM_H
 #include "BaseCode.h"
-#include "EventManager.h"
-#include "MsgProcessRegister.h"
-#include "NetMSGProcess.h"
-#include "NetworkService.h"
+
+#include "NetworkDefine.h"
+
 #include "ServiceDefine.h"
 #include "UIDFactory.h"
 //#include <google/protobuf/descriptor.pb.h>
@@ -13,6 +12,12 @@ class CMessageRoute;
 class CMessagePort;
 class CMonitorMgr;
 class CMysqlConnection;
+class CNetworkService;
+class CNetMSGProcess;
+class CEventManager;
+class CNetworkMessage;
+class CNormalThread;
+
 namespace db
 {
     class tbld_dbinfo;
@@ -123,17 +128,6 @@ public:
     std::unique_ptr<CMysqlConnection>        ConnectServerInfoDB();
     static std::unique_ptr<db::tbld_dbinfo>  QueryDBInfo(uint16_t nWorldID, CMysqlConnection* pServerInfoDB);
     static std::unique_ptr<CMysqlConnection> ConnectDB(const db::tbld_dbinfo* pInfo);
-
-public:
-    template<class Service_T>
-    inline void RegisterAllMsgProcess()
-    {
-        auto pNetMsgProcess = GetNetMsgProcess();
-        for(const auto& [k, v]: MsgProcRegCenter<Service_T>::instance().m_MsgProc)
-        {
-            pNetMsgProcess->Register(k, std::get<0>(v), std::get<1>(v));
-        }
-    }
 
 public:
     void         AddWaitServiceReady(ServiceID&& service_id);

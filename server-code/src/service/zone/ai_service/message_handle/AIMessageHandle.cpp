@@ -27,8 +27,7 @@ ON_MSG(CAIService, SC_POS_CHANGE)
 
     pActor->_SetPos(Vector2(msg.posx(), msg.posy()));
     LOGACTORDEBUG(pActor->GetID(),
-                  "Actor:{} MoveTo {} {:.2f}, {:.2f}",
-                  pActor->GetID(),
+                  "MoveTo {} {:.2f}, {:.2f}",
                   pActor->GetCurrentScene()->GetMapID(),
                   pActor->GetPosX(),
                   pActor->GetPosY());
@@ -56,7 +55,7 @@ ON_SERVERMSG(CAIService, AOIChange)
             pTarget->RemoveFromViewList(pActor, pActor->GetID(), true);
         }
 
-        LOGACTORDEBUG(pActor->GetID(), "Actor:{} ViewListDel del:{}", pActor->GetID(), id);
+        LOGACTORDEBUG(pActor->GetID(), "ViewListDel del:{}", id);
     }
     for(const auto& id: msg.actor_add())
     {
@@ -65,13 +64,16 @@ ON_SERVERMSG(CAIService, AOIChange)
         {
             pActor->AddToViewList(pTarget);
             pTarget->AddToViewList(pActor);
-        }
 
-        LOGACTORDEBUG(pActor->GetID(), "Actor:{} ViewListAdd del:{}", pActor->GetID(), id);
+            LOGACTORDEBUG(pActor->GetID(), "ViewListAdd add:{}", id);
+        }
+        else
+        {
+            LOGACTORDEBUG(pActor->GetID(), "ViewListAdd add:{} not find", id);
+        }
     }
     LOGACTORDEBUG(pActor->GetID(),
-                  "Actor:{} ViewListChange cur:{} add:{} del:{}",
-                  pActor->GetID(),
+                  "ViewListChange cur:{} add:{} del:{}",                 
                   pActor->GetCurrentViewActorCount(),
                   msg.actor_add_size(),
                   msg.actor_del_size());

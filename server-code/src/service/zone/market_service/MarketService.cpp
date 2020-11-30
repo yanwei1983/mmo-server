@@ -60,7 +60,7 @@ bool CMarketService::Init(const ServerPort& nServerPort)
     };
 
      //注册消息
-    RegisterAllMsgProcess<CMarketService>();
+    RegisterAllMsgProcess<CMarketService>(GetNetMsgProcess());
 
     if(CreateService(100) == false)
         return false;

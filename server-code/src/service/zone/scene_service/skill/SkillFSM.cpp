@@ -99,7 +99,8 @@ bool CSkillFSM::CanIntone(const CSkillType* pSkillType, CActor* pTarget, const V
         break;
         case SCT_TARGET_OTHER:
         {
-            CHECKF(pTarget);
+            if(pTarget == nullptr)
+                return false;
             if(pTarget->GetStatus()->TestStatusByFlag(STATUSFLAG_DISABLE_BEATTACK) == true)
                 return false;
 

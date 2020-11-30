@@ -15,7 +15,7 @@ public:
 
 public:
     virtual void OnAccepted();
-    virtual void _OnClose(short what) override;
+    virtual void _OnClose(const std::string& what) override;
 };
 
 #endif /* NETCLIENTSOCKET_H */

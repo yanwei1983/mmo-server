@@ -10,6 +10,7 @@
 #include "MsgProcessRegister.h"
 #include "MysqlConnection.h"
 #include "NetMSGProcess.h"
+#include "MsgProcessRegister.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "server_msg/server_side.pb.h"
@@ -76,7 +77,7 @@ bool CAuthService::Init(const ServerPort& nServerPort)
     CHECKF(m_pGMManager.get());
 
     //注册消息
-    RegisterAllMsgProcess<CAuthService>();
+    RegisterAllMsgProcess<CAuthService>(GetNetMsgProcess());
 
     if(CreateService(100) == false)
         return false;

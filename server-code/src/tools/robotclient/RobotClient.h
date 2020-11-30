@@ -7,7 +7,8 @@
 
 #include "EventEntry.h"
 #include "NetSocket.h"
-#include "NetworkService.h"
+
+#include "NetEventHandler.h"
 class RobotClientManager;
 class CNetSocket;
 

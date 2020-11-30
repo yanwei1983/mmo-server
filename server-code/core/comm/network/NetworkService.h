@@ -18,6 +18,9 @@
 #include "PerSecondCount.h"
 #include "Thread.h"
 
+constexpr uint16_t INVALID_SOCKET_IDX = 0xFFFF;
+constexpr uint16_t MAX_SOCKET_IDX = 0x8000;
+
 struct event_base;
 struct event;
 struct evconnlistener;
@@ -26,28 +29,7 @@ struct lws_context;
 class CNetSocket;
 class CNetWebSocket;
 class CEventManager;
-
-class CNetEventHandler
-{
-public:
-    CNetEventHandler() {}
-    virtual ~CNetEventHandler() {}
-
-public:
-    // connect to other server succ
-    virtual void OnConnected(CNetSocket*) = 0;
-    // connect to other server failed, can set CNetSocket::setReconnectTimes = 0 to stop reconnect
-    virtual void OnConnectFailed(CNetSocket*) = 0;
-    // lost connect
-    virtual void OnDisconnected(CNetSocket*) = 0;
-    // accept a new client
-    virtual void OnAccepted(CNetSocket*) = 0;
-    // receive data
-    virtual void OnRecvData(CNetSocket*, byte* pBuffer, size_t len) = 0;
-    // recv over time
-    virtual void OnRecvTimeout(CNetSocket*) = 0;
-};
-
+class CNetEventHandler;
 class CServerSocket;
 class CClientSocket;
 
@@ -64,13 +46,13 @@ public:
     // http监听
     bool ListenHttpPort(const char* addr, int32_t port, std::function<void(struct evhttp_request* req)> func);
     //阻塞连接到一个目标地址
-    CServerSocket* ConnectTo(const char* addr, int32_t port, CNetEventHandler* pEventHandler);
+    CServerSocket* ConnectTo(const char* addr, int32_t port, CNetEventHandler* pEventHandler, bool bAutoReconnect = false);
     //异步连接到一个目标地址
-    CServerSocket* AsyncConnectTo(const char* addr, int32_t port, CNetEventHandler* pEventHandler);
+    CServerSocket* AsyncConnectTo(const char* addr, int32_t port, CNetEventHandler* pEventHandler, bool bAutoReconnect = false);
     bool           _Reconnect(CServerSocket* pSocket);
     bool           _AsyncReconnect(CServerSocket* pSocket);
 
-    void Stop();
+    void BreakLoop();
     //开启独立的IO线程
     void StartIOThread(const std::string&    thread_name,
                        std::function<void()> time_out_func = std::function<void()>(),
@@ -81,7 +63,7 @@ public:
     //读取IO一次，如果开启了独立IO线程则不需调用
     void RunOnce();
 
-    virtual CServerSocket*       CreateServerSocket(CNetEventHandler* pHandle);
+    virtual CServerSocket*       CreateServerSocket(CNetEventHandler* pHandle, bool bAutoReconnect);
     virtual CClientSocket*       CreateClientSocket(CNetEventHandler* pHandle);
     struct evhttp*               GetHttpHandle() const { return m_pHttpHandle; }
     bool                         GetIPCheck() const { return m_bIPCheck; }
@@ -119,11 +101,15 @@ public:
     void _CloseSocket(uint32_t nSocketIdx);
     void _AddConnectingSocket(CNetSocket* pSocket);
     void _RemoveSocket(CNetSocket* pSocket);
-    void _AddCloseingSocket(CNetSocket* pSocket);
+    void _AddClosingSocket(CNetSocket* pSocket);
+    void _ReleaseSocket(CNetSocket* pSocket);
+    void _AllocSocketIdx(CNetSocket* pSocket);
+    void _ReleaseSocketIdx(CNetSocket* pSocket);
+    CNetSocket* QuerySocketByIdx(uint16_t nSocketIdx);
     void JoinIOThread();
 
 private:
-    void _ProceseCloseingSocket();
+    void _ProceseClosingSocket();
 
 protected:
     event_base*                                     m_pBase;
@@ -136,10 +122,10 @@ protected:
 
     std::map<SOCKET, CNetSocket*>   m_setSocket;
     std::deque<SocketIdx_t>         m_SocketIdxPool;
-    std::array<CNetSocket*, 0xFFFF> m_setSocketByIdx;
+    std::array<CNetSocket*, MAX_SOCKET_IDX> m_setSocketByIdx;
 
     std::unordered_set<CNetSocket*> m_setConnectingSocket;
-    std::unordered_set<CNetSocket*> m_setCloseingSocket;
+    std::unordered_set<CNetSocket*> m_setClosingSocket;
 
     MPSCQueue<CNetworkMessage*> m_MessageQueue;
 
@@ -168,5 +154,6 @@ protected:
 
     std::function<void()> m_IOThreadTimeOutFunc;
 };
+
 
 #endif // NetworkService_h__

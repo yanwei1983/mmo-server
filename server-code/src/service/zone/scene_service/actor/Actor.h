@@ -78,7 +78,7 @@ public:
     // AOI相关
     export_lua void SendRoomMessage(const proto_msg_t& msg);
     export_lua void SendRoomMessageExcludeSelf(const proto_msg_t& msg);
-    export_lua void SendRoomMessage(const proto_msg_t& msg, uint64_t idExclude);
+    export_lua void SendRoomMessage(const proto_msg_t& msg, uint64_t ext_include_id);
 
     export_lua void SendWorldMessage(const proto_msg_t& msg);
 

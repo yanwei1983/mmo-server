@@ -43,6 +43,7 @@ ON_PLAYERMSG(CS_MOVE)
     if(pPlayer->MoveTo(Vector2(msg.x(), msg.y())) == false)
     {
         // send kick back to client
+        LOGACTORDEBUG(pPlayer->GetID(), "try CS_MOVE x:{}, y:{} fail, curx:{} cury:{}", msg.x(), msg.y(), pPlayer->GetPosX(), pPlayer->GetPosY());
         return;
     }
     pPlayer->SetFace(msg.face());

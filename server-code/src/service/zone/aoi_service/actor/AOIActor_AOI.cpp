@@ -157,6 +157,7 @@ bool CAOIActor::IsMustAddToViewList(CSceneObject* pSceneObj) const
 void CAOIActor::OnAOIProcess(const BROADCAST_SET& setBCAOIActorDel, const BROADCAST_SET& setBCAOIActor, const BROADCAST_SET& setBCAOIActorAdd)
 {
     __ENTER_FUNCTION
+    LOGACTORDEBUG(GetID(), "OnAOIProcess add:{} del:{} cur:{}", setBCAOIActorAdd.size(), setBCAOIActorDel.size(), setBCAOIActor.size());
     // step4: 需要离开视野的角色Remove
     OnAOIProcess_ActorRemoveFromAOI(setBCAOIActorDel);
 

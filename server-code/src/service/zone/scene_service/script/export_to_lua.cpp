@@ -2,6 +2,7 @@
 #include "ScriptManager.h"
 #include "msg/ts_cmd.pb.h"
 #include "msg/zone_service.pb.h"
+#include "Common.pb.h"
 #include "pb_luahelper.h"
 extern void scene2lua(lua_State* L);
 

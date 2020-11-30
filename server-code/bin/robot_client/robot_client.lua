@@ -8,6 +8,7 @@ robot_manager:RegisterCMD(CMD_SC_AOI_UPDATE, "OnRecv_SC_AOI_UPDATE");
 robot_manager:RegisterCMD(CMD_SC_PROPERTY_CHANGE, "OnRecv_SC_PROPERTY_CHANGE");
 robot_manager:RegisterCMD(CMD_SC_DEAD, "OnRecv_SC_DEAD");
 robot_manager:RegisterCMD(CMD_SC_DAMAGE, "OnRecv_SC_DAMAGE");
+robot_manager:RegisterCMD(CMD_SC_POS_CHANGE, "OnRecv_SC_POS_CHANGE");
 
 --robot_manager:RegisterCMD(CMD_SC_AOI_NEW, "OnRecv_SC_AOI_NEW");
 --robot_manager:RegisterCMD(CMD_SC_AOI_REMOVE, "OnRecv_SC_AOI_REMOVE");
@@ -135,18 +136,20 @@ function OnRecv_SC_PROPERTY_CHANGE(client, buffer, size)
 		return;
 	end
 	local info = g_clientinfo[client:GetClientID()];
-	if(info.playerid == msg.actor_id)then
-		local size_datalist = msg.datalist:size();
-		for i=0,size_datalist-1,1 do
-			if msg.datalist[i].actype == PROP_HP then
-				info.hp = msg.datalist[i].val;
-				if g_print_debug then
-					print_clientmsg(client, "hp=", info.hp);
-				end
+	if(info.playerid ~= msg.actor_id)then
+		return
+	end
+	
+	local size_datalist = msg.datalist:size();
+	for i=0,size_datalist-1,1 do
+		if msg.datalist[i].actype == PROP_HP then
+			info.hp = msg.datalist[i].val;
+			if g_print_debug then
+				print_clientmsg(client, "hp=", info.hp);
 			end
 		end
-	else
 	end
+	
 	
 end
 

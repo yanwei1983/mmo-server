@@ -18,7 +18,7 @@ bool CNetMSGProcess::Process(CNetworkMessage* pMsg) const
 
         return false;
     }
-    LOGNETTRACE("MSGPROC: cmd:{} from:{}", pMsg->GetCmd(), pMsg->GetFrom());
+    LOGNETTRACE("MSGPROC: cmd:{} from:{}", GetCmdName(pMsg->GetCmd()), pMsg->GetFrom());
     (itFind->second)(pMsg);
     return true;
     __LEAVE_FUNCTION
