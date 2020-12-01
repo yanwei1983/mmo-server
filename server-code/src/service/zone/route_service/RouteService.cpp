@@ -179,9 +179,18 @@ void CRouteService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
     //需要转发的，直接转发
     if(pNetworkMsg->GetForward().empty() == false)
     {
-        pNetworkMsg->SetTo(pNetworkMsg->GetForward().front());
+        auto forward = pNetworkMsg->GetForward().front();
         pNetworkMsg->PopForward();
-        _SendMsgToZonePort(*pNetworkMsg);
+        pNetworkMsg->SetTo(forward);
+        LOGNETTRACE("TransMsg From:{} Forward:{} Cmd:{}", pNetworkMsg->GetFrom(), forward, pNetworkMsg->GetCmd());
+        if(forward.GetServerPort() == GetServerPort())
+        {
+            OnProcessMessage(pNetworkMsg);
+        }
+        else
+        {
+            _SendMsgToZonePort(*pNetworkMsg);
+        }
         return;
     }
 
@@ -190,10 +199,12 @@ void CRouteService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
     {
         if(GetWorldID() == 0)
         {
+            LOGNETTRACE("TransmitMsgToAllRoute From:{} To:{} Cmd:{}", pNetworkMsg->GetFrom(), pNetworkMsg->GetTo(), pNetworkMsg->GetCmd());
             TransmitMsgToAllRoute(pNetworkMsg);
         }
         else if(pNetworkMsg->GetBroadcastType() == BROADCAST_INCLUDE)
         {
+            LOGNETTRACE("TransmitMsgToThisZoneWithServiceType From:{} To:{} Cmd:{}", pNetworkMsg->GetFrom(), pNetworkMsg->GetTo(), pNetworkMsg->GetCmd());
             for(const auto& server_type: pNetworkMsg->GetBroadcastTo())
             {
                 TransmitMsgToThisZoneWithServiceType(pNetworkMsg, server_type);
@@ -201,23 +212,29 @@ void CRouteService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
         }
         else if(pNetworkMsg->GetBroadcastType() == BROADCAST_EXCLUDE)
         {
+            LOGNETTRACE("TransmitMsgToThisZoneAllPortExcept From:{} To:{} Cmd:{}", pNetworkMsg->GetFrom(), pNetworkMsg->GetTo(), pNetworkMsg->GetCmd());
             std::set<ServiceType_t> exclude_list(pNetworkMsg->GetBroadcastTo().begin(), pNetworkMsg->GetBroadcastTo().end());
             TransmitMsgToThisZoneAllPortExcept(pNetworkMsg, exclude_list);
         }
         else
         {
+            LOGNETTRACE("TransmitMsgToThisZoneAllPort From:{} To:{} Cmd:{}", pNetworkMsg->GetFrom(), pNetworkMsg->GetTo(), pNetworkMsg->GetCmd());
             TransmitMsgToThisZoneAllPort(pNetworkMsg);
         }
     }
 
     //转发给对应的Service
-    for(const auto& vs: pNetworkMsg->GetMultiTo())
+    if(pNetworkMsg->GetMultiTo().empty() == false)
     {
-        CNetworkMessage send_msg;
-        send_msg.CopyRawMessage(*pNetworkMsg);
-        send_msg.SetFrom(pNetworkMsg->GetFrom());
-        send_msg.SetTo(vs);
-        _SendMsgToZonePort(send_msg);
+        LOGNETTRACE("SendToMultiTo From:{} To:{} Cmd:{}", pNetworkMsg->GetFrom(), pNetworkMsg->GetTo(), pNetworkMsg->GetCmd());
+        for(const auto& vs: pNetworkMsg->GetMultiTo())
+        {
+            CNetworkMessage send_msg;
+            send_msg.CopyRawMessage(*pNetworkMsg);
+            send_msg.SetFrom(pNetworkMsg->GetFrom());
+            send_msg.SetTo(vs);
+            _SendMsgToZonePort(send_msg);
+        }
     }
 }
 

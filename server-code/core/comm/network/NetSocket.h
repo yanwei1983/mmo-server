@@ -56,7 +56,7 @@ public:
 public:
     void         _SetTimeout();
     void         _OnReceive(bufferevent* b);
-    virtual void _OnClose(const std::string& what) = 0;
+    virtual void _OnError(const std::string& what) = 0;
 
     static void _OnSocketRead(bufferevent*, void* ctx);
     static void _OnSendOK(bufferevent* b, void* ctx);
@@ -89,8 +89,8 @@ public:
     size_t  GetWaitWriteSize();
     size_t  GetPacketSizeMax() const { return m_nPacketSizeMax; }
     void    SetPacketSizeMax(size_t val);
-    void    SetEventHandler(CNetEventHandler* v) { m_pEventHandler = v; }
-
+    void    _SetEventHandler(CNetEventHandler* v) { m_pEventHandler = v; }
+    void    DetachEventHandler();
     void set_sock_nodely();
     void set_sock_quickack();
 

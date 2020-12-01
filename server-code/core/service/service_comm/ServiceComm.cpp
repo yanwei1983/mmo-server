@@ -332,13 +332,20 @@ bool CServiceCommon::TransmitMsgToAllRouteExcept(const CNetworkMessage* pMsg, co
 bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
 {
     __ENTER_FUNCTION
-    VirtualSocket vs(msg.GetTo());
+    LOGNETTRACE("SendMsgToZonePort from:{} To:{} Cmd:{} ForwardCount:{}", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
+    const auto& vs = msg.GetTo();
+    if(vs.IsVaild() == false)
+    {
+        LOGWARNING("SendMsgToZonePort fail To Is Not Valild.");
+        LOGWARNING("CallStack：{}", GetStackTraceString(CallFrameMap(2, 7)));
+        return false;
+    }
     if(GetMessageRoute() && vs.GetServerPort() != m_nServerPort)
     {
         m_pMonitorMgr->AddSendInfo(msg.GetCmd(), msg.GetSize());
-        if(vs.GetServerPort().GetWorldID() == GetWorldID() ||
-           ((GetServiceID().GetServiceType() == ROUTE_SERVICE) && (vs.GetServerPort().GetServiceType() == ROUTE_SERVICE)))
+        if(vs.GetServerPort().GetWorldID() == GetWorldID())
         {
+            // trans msg in same world
             CMessagePort* pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
             if(pMessagePort)
             {
@@ -346,8 +353,20 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
             }
             else
             {
-                LOGWARNING("SendMsgToZonePort To ServerPort:{}, not find", vs);
-                LOGWARNING("CallStack：{}", GetStackTraceString(CallFrameMap(2, 7)));
+                LOGWARNING("SendMsgToZonePort world from:{} To:{} Cmd:{} ForwardCount:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
+            }
+        }
+        else if (GetServiceID().GetServiceType() == ROUTE_SERVICE && vs.GetServerPort().GetServiceType() == ROUTE_SERVICE)
+        {
+            // route_service send msg to other route
+            CMessagePort* pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
+            if(pMessagePort)
+            {
+                return pMessagePort->SendMsgToPort(msg);
+            }
+            else
+            {
+                LOGWARNING("SendMsgToZonePort trans from:{} To:{} Cmd:{} ForwardCount:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
             }
         }
         else
@@ -359,7 +378,21 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
         }
         return false;
     }
-    else if((vs.GetServerPort() == m_nServerPort || vs.GetServerPort().IsVaild() == false) && vs.GetSocketIdx() != 0)
+    else if(GetMessageRoute() && vs.GetServerPort() == m_nServerPort)
+    {
+        //send to this service
+        CMessagePort* pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
+        if(pMessagePort)
+        {
+            return pMessagePort->SendMsgToPort(msg);
+        }
+        else
+        {
+            LOGWARNING("SendMsgToZonePort local from:{} To:{} Cmd:{} ForwardCount:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
+        }
+        return false;
+    }
+    else if(vs.GetServerPort().IsVaild() == false && vs.GetSocketIdx() != 0)
     {
         // direct send message
         if(m_pNetworkService)
@@ -380,10 +413,10 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
     }
     else
     {
-        LOGWARNING("Message Want Send To Worng: {}", msg.GetTo());
-        LOGWARNING("CallStack：{}", GetStackTraceString(CallFrameMap(2, 7)));
+        LOGWARNING("Message Want Send from:{} To:{} Cmd:{} ForwardCount:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
         return false;
     }
+
     __LEAVE_FUNCTION
     return false;
 }
@@ -405,6 +438,7 @@ bool CServiceCommon::SendProtoMsgTo(const VirtualSocketMap_t& setSocketMap, cons
         {
             m_pMonitorMgr->AddSendInfo_some(nCmd, _msg.GetSize(), socket_list.size());
             _msg.SetMultiTo(socket_list);
+            _msg.SetTo(nServerPort);
             _SendMsgToZonePort(_msg);
         }
     }

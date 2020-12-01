@@ -20,7 +20,7 @@ public:
     size_t GetReconnectTimes() const { return m_nReconnectTimes; }
     void   SetReconnectTimes(size_t val) { m_nReconnectTimes = val; }
 
-    virtual void _OnClose(const std::string& what) override;
+    virtual void _OnError(const std::string& what) override;
     static void  _OnReconnect(int32_t fd, short what, void* ctx);
     static void  _OnSocketConnectorEvent(bufferevent*, short what, void* ctx);
 

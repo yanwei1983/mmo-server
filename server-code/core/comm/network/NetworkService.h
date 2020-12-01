@@ -101,11 +101,17 @@ public:
     void _CloseSocket(uint32_t nSocketIdx);
     void _AddConnectingSocket(CNetSocket* pSocket);
     void _RemoveSocket(CNetSocket* pSocket);
+
+public:
     void _AddClosingSocket(CNetSocket* pSocket);
     void _ReleaseSocket(CNetSocket* pSocket);
-    void _AllocSocketIdx(CNetSocket* pSocket);
+
+public:
+    bool _AllocSocketIdx(CNetSocket* pSocket);
     void _ReleaseSocketIdx(CNetSocket* pSocket);
     CNetSocket* QuerySocketByIdx(uint16_t nSocketIdx);
+
+public:
     void JoinIOThread();
 
 private:
@@ -125,7 +131,7 @@ protected:
     std::array<CNetSocket*, MAX_SOCKET_IDX> m_setSocketByIdx;
 
     std::unordered_set<CNetSocket*> m_setConnectingSocket;
-    std::unordered_set<CNetSocket*> m_setClosingSocket;
+    
 
     MPSCQueue<CNetworkMessage*> m_MessageQueue;
 
@@ -134,6 +140,8 @@ protected:
     struct event*     m_pIOTimeOutEvent                 = nullptr;
     struct event*     m_pCloseSocketEvent               = nullptr;
     std::atomic<bool> m_bWaitingProcessCloseSocketEvent = false;
+
+    MPSCQueue<CNetSocket*> m_setClosingSocket;
 
     PerSecondCount m_RecvBPS;
     PerSecondCount m_SendBPS;

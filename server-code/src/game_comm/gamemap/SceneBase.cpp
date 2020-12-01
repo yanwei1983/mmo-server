@@ -14,16 +14,20 @@ CSceneBase::~CSceneBase() {}
 
 bool CSceneBase::Init(const SceneIdx& idxScene, CMapManager* pMapManager)
 {
+    __ENTER_FUNCTION
     m_idxScene = idxScene;
     m_pMap     = pMapManager->QueryMap(idxScene.GetMapID());
     CHECKF_FMT(m_pMap, "FIND Map Fail:{}", idxScene.GetMapID());
     CHECKF_FMT(m_pMap->GetMapData(), "FIND MapData Fail:{}", idxScene.GetMapID());
 
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 bool CSceneBase::InitSceneTree(const CPos2D& vBasePos, float fWidth, float fHeight, uint32_t nTileGridRange, bool bDynamicSetLev)
 {
+    __ENTER_FUNCTION
     if(m_pSceneTree)
     {
         return false;
@@ -32,10 +36,13 @@ bool CSceneBase::InitSceneTree(const CPos2D& vBasePos, float fWidth, float fHeig
     CHECKF(pSceneTree);
     m_pSceneTree.reset(pSceneTree);
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 bool CSceneBase::LinkSceneTree(CSceneBase* pLinkScene)
 {
+    __ENTER_FUNCTION
     if(m_pSceneTree)
     {
         return false;
@@ -43,6 +50,8 @@ bool CSceneBase::LinkSceneTree(CSceneBase* pLinkScene)
 
     m_pSceneTree = pLinkScene->m_pSceneTree;
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 uint64_t CSceneBase::GetScriptID() const
@@ -57,26 +66,33 @@ uint16_t CSceneBase::GetMapID() const
 
 CSceneObject* CSceneBase::QueryPlayer(OBJID idObj) const
 {
+    __ENTER_FUNCTION
     auto it = m_setPlayer.find(idObj);
     if(it != m_setPlayer.end())
     {
         return it->second;
     }
+    __LEAVE_FUNCTION
+    
     return nullptr;
 }
 
 CSceneObject* CSceneBase::QuerySceneObj(OBJID idObj) const
 {
+    __ENTER_FUNCTION
     auto it = m_setActor.find(idObj);
     if(it != m_setActor.end())
     {
         return it->second;
     }
+    __LEAVE_FUNCTION
+    
     return nullptr;
 }
 
 bool CSceneBase::EnterMap(CSceneObject* pActor, float fPosX, float fPosY, float fFace)
 {
+    __ENTER_FUNCTION
     CHECKF(m_pSceneTree->IsInsideScene(fPosX, fPosY));
 
     if(pActor->IsPlayer())
@@ -89,6 +105,8 @@ bool CSceneBase::EnterMap(CSceneObject* pActor, float fPosX, float fPosY, float 
     pActor->UpdateViewList(true);
     m_pSceneTree->CheckNeedResizeSceneTile(m_setPlayer.size());
     return true;
+    __LEAVE_FUNCTION
+    return false;
 }
 
 void CSceneBase::LeaveMap(CSceneObject* pActor, uint16_t idTargetMap /*= 0*/)
@@ -98,6 +116,7 @@ void CSceneBase::LeaveMap(CSceneObject* pActor, uint16_t idTargetMap /*= 0*/)
 
 void CSceneBase::_LeaveMap(CSceneObject* pActor, uint16_t idTargetMap /*= 0*/)
 {
+    __ENTER_FUNCTION
     if(pActor->IsPlayer())
         m_setPlayer.erase(pActor->GetID());
 
@@ -108,6 +127,8 @@ void CSceneBase::_LeaveMap(CSceneObject* pActor, uint16_t idTargetMap /*= 0*/)
     pActor->OnLeaveMap(idTargetMap);
 
     m_pSceneTree->CheckNeedResizeSceneTile(m_setPlayer.size());
+    __LEAVE_FUNCTION
+    
 }
 
 Vector2 CSceneBase::FindPosNearby(const Vector2& pos, float range) const
@@ -120,16 +141,23 @@ Vector2 CSceneBase::FindPosNearby(const Vector2& pos, float range) const
 
 void CSceneBase::AddDynaRegion(uint32_t nRegionType, const FloatRect& rect)
 {
+    __ENTER_FUNCTION
     m_DynaRegionDataSet[nRegionType].AddDynaRegion(rect);
+    __LEAVE_FUNCTION
+    
 }
 
 void CSceneBase::ClearDynaRegion(uint32_t nRegionType)
 {
+    __ENTER_FUNCTION
     m_DynaRegionDataSet[nRegionType].Clear();
+    __LEAVE_FUNCTION
+    
 }
 
 bool CSceneBase::IsPassDisable(float x, float y, uint32_t actor_type) const
 {
+    __ENTER_FUNCTION
     if(m_pMap->IsPassDisable(x, y) == true)
         return true;
 
@@ -141,14 +169,17 @@ bool CSceneBase::IsPassDisable(float x, float y, uint32_t actor_type) const
     if(m_pMap->HasMapFlag(MAPFLAG_COLLISION_ENABLE) == true)
     {
         if(m_pSceneTree && m_pSceneTree->CollisionTest(x, y, actor_type) == true)
-            return false;
+            return true;
     }
 
+    return false;
+    __LEAVE_FUNCTION
     return true;
 }
 
 bool CSceneBase::IsPvPDisable(float x, float y) const
 {
+    __ENTER_FUNCTION
     if(m_pMap->HasMapFlag(MAPFLAG_DISABLE_PK) == true)
         return true;
 
@@ -160,10 +191,13 @@ bool CSceneBase::IsPvPDisable(float x, float y) const
         return true;
 
     return false;
+    __LEAVE_FUNCTION
+    return true;
 }
 
 bool CSceneBase::IsPvPFree(float x, float y) const
 {
+    __ENTER_FUNCTION
     if(m_pMap->IsPvPFree(x, y) == true)
         return true;
 
@@ -172,10 +206,13 @@ bool CSceneBase::IsPvPFree(float x, float y) const
         return true;
 
     return false;
+    __LEAVE_FUNCTION
+    return true;
 }
 
 bool CSceneBase::IsRecordDisable(float x, float y) const
 {
+    __ENTER_FUNCTION
     if(m_pMap->IsRecordDisable(x, y) == true)
         return true;
 
@@ -184,10 +221,13 @@ bool CSceneBase::IsRecordDisable(float x, float y) const
         return true;
 
     return false;
+    __LEAVE_FUNCTION
+    return true;
 }
 
 bool CSceneBase::IsDropDisable(float x, float y) const
 {
+    __ENTER_FUNCTION
     if(m_pMap->IsDropDisable(x, y) == true)
         return true;
 
@@ -197,13 +237,16 @@ bool CSceneBase::IsDropDisable(float x, float y) const
 
     // Drop layer
     if(m_pSceneTree && m_pSceneTree->CollisionTest(x, y, ActorType::ACT_MAPITEM) == true)
-        return false;
+        return true;
 
     return false;
+    __LEAVE_FUNCTION
+    return true;
 }
 
 bool CSceneBase::IsDeadNoDrop(float x, float y) const
 {
+    __ENTER_FUNCTION
     if(m_pMap->IsDeadNoDrop(x, y) == true)
         return true;
 
@@ -212,10 +255,13 @@ bool CSceneBase::IsDeadNoDrop(float x, float y) const
         return true;
 
     return false;
+    __LEAVE_FUNCTION
+    return true;
 }
 
 bool CSceneBase::IsStallDisable(float x, float y) const
 {
+    __ENTER_FUNCTION
     if(m_pMap->IsStallDisable(x, y) == true)
         return true;
 
@@ -224,13 +270,16 @@ bool CSceneBase::IsStallDisable(float x, float y) const
         return true;
 
     if(m_pSceneTree && m_pSceneTree->CollisionTest(x, y, ActorType::ACT_NPC) == true)
-        return false;
+        return true;
 
     return false;
+    __LEAVE_FUNCTION
+    return true;
 }
 
 bool CSceneBase::IsPlaceDisable(float x, float y) const
 {
+    __ENTER_FUNCTION
     if(m_pMap->IsPlaceDisable(x, y) == true)
         return true;
 
@@ -239,9 +288,11 @@ bool CSceneBase::IsPlaceDisable(float x, float y) const
         return true;
 
     if(m_pSceneTree && m_pSceneTree->CollisionTest(x, y, ActorType::ACT_NPC) == true)
-        return false;
+        return true;
 
     return false;
+    __LEAVE_FUNCTION
+    return true;
 }
 
 uint32_t CSceneBase::GetSPRegionIdx(float x, float y) const

@@ -31,8 +31,8 @@ SET(BASECODE2LUA_SRC
 )
 
 GET_DIRECTORY_PROPERTY(includes INCLUDE_DIRECTORIES)
-# make script_gen_lua 生成 basecode2lua.cpp
-add_custom_target(script_gen_lua
+# make basecode2lua 生成 basecode2lua.cpp
+add_custom_target(basecode2lua
 COMMAND echo ${BASECODE2LUA_SRC} > ${CMAKE_CURRENT_BINARY_DIR}/basecode_cpps.txt && echo ${includes} > ${CMAKE_CURRENT_BINARY_DIR}/basecode_includes.txt 
 COMMAND cxx2lua --cpps=${CMAKE_CURRENT_BINARY_DIR}/basecode_cpps.txt --include=${CMAKE_CURRENT_BINARY_DIR}/basecode_includes.txt 
 --output=${CMAKE_CURRENT_BINARY_DIR}/basecode2lua.cpp --output_functionname=basecode2lua --skip_cpp --format=clang-format-9
@@ -40,8 +40,8 @@ COMMENT "gen basecode for export_lua"
 DEPENDS cxx2lua
  )
 
-# # # 将script_gen_lua 挂接到 make gen_all_lua
-ADD_DEPENDENCIES(gen_all_lua script_gen_lua)
+# # # basecode2lua 挂接到 make gen_all_lua
+ADD_DEPENDENCIES(gen_all_lua basecode2lua)
 
 # basecode2lua.cpp不存在，则生成 basecode2lua.cpp
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/basecode2lua.cpp

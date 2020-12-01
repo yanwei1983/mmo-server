@@ -430,31 +430,40 @@ bool CActor::CheckCanMove(const Vector2& posTarget, bool bSet)
         return false;
     //判断时间
     constexpr uint32_t ONCE_MOVE_PER_TIME(200); // 350ms最小移动间隔, 服务器稍微增加一点误差
-    uint32_t           now         = TimeGetMonotonic();
-    uint32_t           passed_time = now - GetLastMoveTime();
+
+    uint32_t now         = TimeGetMonotonic();
+    uint32_t passed_time = now - GetLastMoveTime();
     if(passed_time < ONCE_MOVE_PER_TIME)
     {
         // move too fast, may be need kick back
-        LOGDEBUG("move too fast: %ld {},{} {},{}", GetID(), GetPos().x, GetPos().y, posTarget.x, posTarget.y);
+        LOGACTORDEBUG(GetID(), "move too fast:{},{} {},{}", GetPos().x, GetPos().y, posTarget.x, posTarget.y);
         return false;
     }
     constexpr uint32_t MOVE_TIME_TOLERANCE(200);
-    float              move_spd = 0.0f;
-    move_spd                    = GetMoveSpeed() * 1.5f; //允许1.5倍的速度差异
+    float              move_spd = GetMoveSpeed() * 1.5f; //允许1.5倍的速度差异
 
     float can_move_dis = float(passed_time + MOVE_TIME_TOLERANCE) / 1000.0f * move_spd;
     can_move_dis       = std::min(can_move_dis, move_spd);
 
     float move_dis = GameMath::distance(GetPos(), posTarget);
+    constexpr float move_step_min = 0.01f; //最小移动距离
+    if(move_dis < move_step_min)
+    {
+        LOGACTORTRACE(GetID(), "move too near:{},{} {},{} dis:{}", GetPos().x, GetPos().y, posTarget.x, posTarget.y, move_dis);
+        return false;
+    }
     if(can_move_dis < move_dis)
     {
         // move too fast, may be need kick back
-        LOGDEBUG("move too long: %ld {},{} {},{}", GetID(), GetPos().x, GetPos().y, posTarget.x, posTarget.y);
+        LOGACTORDEBUG(GetID(), "move too long:{},{} {},{}", GetPos().x, GetPos().y, posTarget.x, posTarget.y);
         return false;
     }
 
     if(GetCurrentScene()->IsPassDisable(posTarget.x, posTarget.y, GetActorType()) == true)
+    {
+        LOGACTORTRACE(GetID(), "move to from x:{} y:{} to x:{} y:{} pass_disable", GetPos().x, GetPos().y, posTarget.x, posTarget.y);
         return false;
+    }
 
     if(bSet)
         SetLastMoveTime(now);
@@ -491,6 +500,7 @@ bool CActor::MoveTo(const Vector2& posTarget, bool bCheckMove)
 
 
     m_pStatusSet->OnMove();
+    return true;
     __LEAVE_FUNCTION
     return false;
 }
@@ -506,7 +516,7 @@ bool CActor::_CastSkill(uint32_t idSkill, OBJID idTarget, const Vector2& targetP
 void CActor::OnBeAttack(CActor* pAttacker, int32_t nRealDamage)
 {
     __ENTER_FUNCTION
-    LOGDEBUG("OnBeAttack: Actor:{} Attacker:{} Damage:{}", GetID(), (pAttacker) ? pAttacker->GetID() : 0, nRealDamage);
+    LOGACTORDEBUG(GetID(), "OnBeAttack: Actor:{} Attacker:{} Damage:{}", (pAttacker) ? pAttacker->GetID() : 0, nRealDamage);
 
     AddProperty(PROP_HP, -nRealDamage, SYNC_ALL_DELAY);
 
@@ -658,7 +668,7 @@ void CActor::BeKillBy(CActor* pAttacker)
     msg.set_attacker_id(pAttacker ? pAttacker->GetID() : 0);
     SendRoomMessage(msg);
 
-    LOGDEBUG("BeKillBy:{} Attacker:{}", GetID(), pAttacker ? pAttacker->GetID() : 0);
+    LOGACTORDEBUG(GetID(), "BeKillBy:{} Attacker:{}", GetID(), pAttacker ? pAttacker->GetID() : 0);
     if(m_pScene && m_pScene->GetScriptID())
     {
         ScriptManager()->TryExecScript<void>(m_pScene->GetScriptID(), SCB_MAP_ONACTORBEKILL, this, pAttacker);

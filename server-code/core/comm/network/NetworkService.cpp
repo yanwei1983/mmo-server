@@ -80,12 +80,7 @@ void CNetworkService::Destroy()
         it = m_setConnectingSocket.erase(it);
     }
 
-    for(auto it = m_setClosingSocket.begin(); it != m_setClosingSocket.end();)
-    {
-        auto v = *it;
-        SAFE_DELETE(v);
-        it = m_setClosingSocket.erase(it);
-    }
+    _ProceseClosingSocket();
 
     if(m_pHttpHandle != nullptr)
     {
@@ -244,6 +239,7 @@ CServerSocket* CNetworkService::ConnectTo(const char* addr, int32_t port, CNetEv
     }
 
     CServerSocket* pSocket = CreateServerSocket(pEventHandler, bAutoReconnect);
+    CHECKF(pSocket);
     pSocket->SetAddrAndPort(addr, port);
     pSocket->SetSocket(fd);
     pSocket->Init(pBufferEvent);
@@ -270,7 +266,7 @@ bool CNetworkService::_Reconnect(CServerSocket* pSocket)
 
     if(evutil_getaddrinfo(pSocket->GetAddrString().c_str(), std::to_string(pSocket->GetPort()).c_str(), &hits, &answer) != 0)
     {
-        LOGNETERROR("CNetworkService::_Reconnect:{}:{} evutil_getaddrinfo fail", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+        LOGNETERROR("CNetworkService::_Reconnect:{}:{} evutil_getaddrinfo fail", pSocket->GetAddrString(), pSocket->GetPort());
         return false;
     }
     std::unique_ptr<addrinfo, decltype(evutil_freeaddrinfo)*> answer_ptr(answer, evutil_freeaddrinfo);
@@ -278,13 +274,13 @@ bool CNetworkService::_Reconnect(CServerSocket* pSocket)
     int32_t fd = socket(answer_ptr->ai_family, answer_ptr->ai_socktype, answer_ptr->ai_protocol);
     if(fd < 0)
     {
-        LOGNETERROR("CNetworkService::_Reconnect:{}:{} socket fail", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+        LOGNETERROR("CNetworkService::_Reconnect:{}:{} socket fail", pSocket->GetAddrString(), pSocket->GetPort());
 
         return false;
     }
     if(connect(fd, answer_ptr->ai_addr, answer_ptr->ai_addrlen))
     {
-        LOGNETERROR("CNetworkService::_Reconnect:{}:{} connect fail", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+        LOGNETERROR("CNetworkService::_Reconnect:{}:{} connect fail", pSocket->GetAddrString(), pSocket->GetPort());
 
         evutil_closesocket(fd);
         return false;
@@ -294,7 +290,7 @@ bool CNetworkService::_Reconnect(CServerSocket* pSocket)
     bufferevent_setfd(pSocket->GetBufferevent(), fd);
     pSocket->Init(pSocket->GetBufferevent());
     pSocket->OnConnected();
-    LOGNETDEBUG("CNetworkService::_Reconnect:{}:{}", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+    LOGNETDEBUG("CNetworkService::_Reconnect:{}:{}", pSocket->GetAddrString(), pSocket->GetPort());
 
     return true;
     __LEAVE_FUNCTION
@@ -329,6 +325,7 @@ CServerSocket* CNetworkService::AsyncConnectTo(const char* addr, int32_t port, C
     }
 
     CServerSocket* pSocket = CreateServerSocket(pEventHandler,bAutoReconnect);
+    CHECKF(pSocket);
     pSocket->SetAddrAndPort(addr, port);
     pSocket->Init(pBufferEvent);
     pSocket->OnStartConnect();
@@ -364,7 +361,7 @@ bool CNetworkService::_AsyncReconnect(CServerSocket* pSocket)
 
     if(evutil_getaddrinfo(pSocket->GetAddrString().c_str(), std::to_string(pSocket->GetPort()).c_str(), &hits, &answer) != 0)
     {
-        LOGNETERROR("CNetworkService::_AsyncReconnect:{}:{} evutil_getaddrinfo fail", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+        LOGNETERROR("CNetworkService::_AsyncReconnect:{}:{} evutil_getaddrinfo fail", pSocket->GetAddrString(), pSocket->GetPort());
 
         return false;
     }
@@ -376,12 +373,12 @@ bool CNetworkService::_AsyncReconnect(CServerSocket* pSocket)
         const char* errstr = evutil_socket_error_to_string(err);
 
         LOGNETERROR("CNetworkService::_AsyncReconnect:{}:{} bufferevent_socket_connect fail:{}",
-                    pSocket->GetAddrString().c_str(),
+                    pSocket->GetAddrString(),
                     pSocket->GetPort(),
                     errstr);
         return false;
     }
-    LOGNETDEBUG("CNetworkService::_AsyncReconnect:{}:{}", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+    LOGNETDEBUG("CNetworkService::_AsyncReconnect:{}:{}", pSocket->GetAddrString(), pSocket->GetPort());
 
     return true;
     __LEAVE_FUNCTION
@@ -482,6 +479,8 @@ void CNetworkService::RunOnce()
 CServerSocket* CNetworkService::CreateServerSocket(CNetEventHandler* pHandle, bool bAutoReconnect)
 {
     auto pSocket = new CServerSocket(this, pHandle, bAutoReconnect);
+    CHECKF(pSocket);
+    CHECKF(_AllocSocketIdx(pSocket));
     if(pHandle)
         pHandle->OnBindSocket(pSocket);
     return pSocket;
@@ -489,6 +488,8 @@ CServerSocket* CNetworkService::CreateServerSocket(CNetEventHandler* pHandle, bo
 CClientSocket* CNetworkService::CreateClientSocket(CNetEventHandler* pHandle)
 {
     auto pSocket = new CClientSocket(this, pHandle);
+    CHECKF(pSocket);
+    CHECKF(_AllocSocketIdx(pSocket));
     if(pHandle)
         pHandle->OnBindSocket(pSocket);
     return pSocket;
@@ -557,6 +558,7 @@ void CNetworkService::OnAccept(int32_t fd, sockaddr* addr, int32_t, evconnlisten
     }
     CNetEventHandler* pEventHandler = m_setListener[listener];
     CClientSocket*    pSocket       = CreateClientSocket(pEventHandler);
+    CHECK(pSocket);
     pSocket->SetAddrAndPort(szHost, uPort);
     pSocket->SetSocket(fd);
 
@@ -579,16 +581,18 @@ CNetSocket* CNetworkService::QuerySocketByIdx(uint16_t nSocketIdx)
 }
 
 
-void CNetworkService::_AllocSocketIdx(CNetSocket* pSocket)
+bool CNetworkService::_AllocSocketIdx(CNetSocket* pSocket)
 {
     __ENTER_FUNCTION
     std::lock_guard<std::mutex> lock(m_mutex);
-    CHECK(m_SocketIdxPool.empty() == false);
+    CHECKF(m_SocketIdxPool.empty() == false);
     auto nSocketIdx = m_SocketIdxPool.front();
     m_SocketIdxPool.pop_front();
     m_setSocketByIdx[nSocketIdx] = pSocket;
     pSocket->SetSocketIdx(nSocketIdx);
+    return true;
     __LEAVE_FUNCTION
+    return false;
 }
 
 void CNetworkService::_ReleaseSocketIdx(CNetSocket* pSocket)
@@ -601,6 +605,7 @@ void CNetworkService::_ReleaseSocketIdx(CNetSocket* pSocket)
     m_SocketIdxPool.push_back(pSocket->GetSocketIdx());
     m_setSocketByIdx[pSocket->GetSocketIdx()] = nullptr;
     pSocket->SetSocketIdx(INVALID_SOCKET_IDX);
+    
     
     __LEAVE_FUNCTION
 }
@@ -632,7 +637,8 @@ void CNetworkService::_AddConnectingSocket(CNetSocket* pSocket)
 void CNetworkService::_ReleaseSocket(CNetSocket* pSocket)
 {
     __ENTER_FUNCTION
-    
+    pSocket->DetachEventHandler();
+    _ReleaseSocketIdx(pSocket);
     SAFE_DELETE(pSocket);
     __LEAVE_FUNCTION
 }
@@ -655,10 +661,8 @@ void CNetworkService::_AddClosingSocket(CNetSocket* pSocket)
 {
     __ENTER_FUNCTION
     CHECK(pSocket);
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_setClosingSocket.insert(pSocket);
-    }
+    m_setClosingSocket.push(pSocket);
+    
     if(m_bWaitingProcessCloseSocketEvent == false)
     {
         // add a remove event
@@ -676,14 +680,12 @@ void CNetworkService::_ProceseClosingSocket()
 {
     __ENTER_FUNCTION
     m_bWaitingProcessCloseSocketEvent = false;
-    std::lock_guard<std::mutex> lock(m_mutex);
-
-    for(auto it = m_setClosingSocket.begin(); it != m_setClosingSocket.end();)
+    CNetSocket* pSocket = nullptr;
+    while(m_setClosingSocket.pop(pSocket))
     {
-        auto v = *it;
-        _ReleaseSocket(v);
-        it = m_setClosingSocket.erase(it);
+        _ReleaseSocket(pSocket);
     }
+
     __LEAVE_FUNCTION
 }
 

@@ -41,7 +41,7 @@ bool CClientSocket::Init(bufferevent* pBufferEvent)
 void CClientSocket::Interrupt(bool bClearEventHandler)
 {
     __ENTER_FUNCTION
-    LOGNETDEBUG("CClientSocket Interrupt {}:{}", GetAddrString().c_str(), GetPort());
+    LOGNETDEBUG("CClientSocket Interrupt {}:{}", GetAddrString(), GetPort());
     if(bClearEventHandler)
     {
         if(m_pEventHandler)
@@ -62,23 +62,11 @@ void CClientSocket::Interrupt(bool bClearEventHandler)
     __LEAVE_FUNCTION
 }
 
-void CClientSocket::_OnClose(const std::string& what)
+void CClientSocket::_OnError(const std::string& what)
 {
     __ENTER_FUNCTION
-    if(GetStatus() == NSS_CLOSEING)
-    {
-        OnDisconnected();
-        return;
-    }
-    SetStatus(NSS_CLOSEING);
-
-    LOGNETDEBUG("CClientSocket _OnClose {}:{} err:{}", GetAddrString().c_str(), GetPort(), what);
-    if(m_pBufferevent)
-    {
-        bufferevent_disable(m_pBufferevent, EV_READ | EV_PERSIST);
-    }
-
-    OnClosing();
+    LOGNETDEBUG("CServerSocket _OnError {}:{} err:{}", GetAddrString(), GetPort(), what);
+    OnDisconnected();
 
     __LEAVE_FUNCTION
 }

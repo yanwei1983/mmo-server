@@ -31,7 +31,6 @@ CNetSocket::CNetSocket(CNetworkService* pService, CNetEventHandler* pEventHandle
     , m_socket(INVALID_SOCKET)
     , m_ReadBuff{std::make_unique<byte[]>(m_nPacketSizeMax)}
 {
-    m_pService->_AllocSocketIdx(this);
 }
 
 CNetSocket::~CNetSocket()
@@ -57,11 +56,18 @@ CNetSocket::~CNetSocket()
     {
         SAFE_DELETE(pData);
     }
-    if(m_pEventHandler)
-        m_pEventHandler->OnUnbindSocket(this);
-    m_pEventHandler = nullptr;
-    m_pService->_ReleaseSocketIdx(this);
+    m_Event.Cancel();
+    m_Event.Clear();
     __LEAVE_FUNCTION
+}
+
+void CNetSocket::DetachEventHandler()
+{
+    if(m_pEventHandler)
+    {
+        m_pEventHandler->OnUnbindSocket(this);
+        m_pEventHandler = nullptr;
+    }
 }
 
 CNetSocket::SendMsgData::SendMsgData(CNetworkMessage&& msg)
@@ -159,7 +165,7 @@ bool CNetSocket::_SendMsg(byte* pBuffer, size_t len)
         // hold msg
         int32_t result   = evbuffer_add(m_Sendbuf, pBuffer, len);
         m_nWaitWriteSize = evbuffer_get_length(m_Sendbuf);
-        LOGNETERROR("Hold Send Buffer {}:{} this_len:{} total_len:{}", GetAddrString().c_str(), GetPort(), len, m_nWaitWriteSize);
+        LOGNETERROR("Hold Send Buffer {}:{} this_len:{} total_len:{}", GetAddrString(), GetPort(), len, m_nWaitWriteSize);
         return result == 0;
     }
     else if(GetStatus() == NSS_READY)
@@ -173,7 +179,7 @@ bool CNetSocket::_SendMsg(byte* pBuffer, size_t len)
         m_nWaitWriteSize  = nNeedWrite;
         if(nNeedWrite > m_nLogWriteHighWateMark)
         {
-            LOGNETERROR("Write Buffer {}:{} oversize:{}", GetAddrString().c_str(), GetPort(), nNeedWrite);
+            LOGNETERROR("Write Buffer {}:{} oversize:{}", GetAddrString(), GetPort(), nNeedWrite);
         }
 
         return true;
@@ -233,7 +239,7 @@ void CNetSocket::_OnReceive(bufferevent* b)
                 data += fmt::format(FMT_STRING("{0:x} "), v);
             }
             LOGNETDEBUG("{}", data.c_str());
-            _OnClose("_OnReceive Fail");
+            _OnError("_OnReceive Fail");
             return;
         }
         if(nSize < pHeader->msg_size)
@@ -242,12 +248,12 @@ void CNetSocket::_OnReceive(bufferevent* b)
         evbuffer_remove(input, pReadBuf, pHeader->msg_size);
         pHeader = (MSG_HEAD*)pReadBuf;
 
-        if(m_pDecryptor)
+        if(m_pDecryptor && pHeader->msg_size != sizeof(MSG_HEAD))
         {
             if(pHeader->is_ciper == false)
             {
                 LOGNETERROR("CNetSocket _OnReceive Msg:{} size:{} need decryptor, but msg is not chiper", pHeader->msg_cmd, pHeader->msg_size);
-                _OnClose("_OnReceive Decryptor Fail");
+                _OnError("_OnReceive Decryptor Fail");
                 return;
             }
             byte*  pBody    = pReadBuf + sizeof(MSG_HEAD);
@@ -314,7 +320,7 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         {
             err_msg = "write timeout";
             bClose = true;
-            LOGNETDEBUG("CNetSocket write timeout {}:{}", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+            LOGNETDEBUG("CNetSocket write timeout {}:{}", pSocket->GetAddrString(), pSocket->GetPort());
         }
     }
     if(what & BEV_EVENT_ERROR)
@@ -322,13 +328,13 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         int32_t     err    = evutil_socket_geterror(bufferevent_getfd(b));
         const char* errstr = evutil_socket_error_to_string(err);
         
-        LOGNETDEBUG("CNetSocket error[{}]: {}, {}:{}", err, errstr, pSocket->GetAddrString().c_str(), pSocket->GetPort());
+        LOGNETDEBUG("CNetSocket error[{}]: {}, {}:{}", err, errstr, pSocket->GetAddrString(), pSocket->GetPort());
         err_msg = errstr;
         bClose = true;
     }
     if(what & BEV_EVENT_EOF)
     {
-        LOGNETDEBUG("CNetSocket eof {}:{}", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+        LOGNETDEBUG("CNetSocket eof {}:{}", pSocket->GetAddrString(), pSocket->GetPort());
         //尝试将剩余的接收缓冲区内的消息处理完(判断是否是主动关闭)
         pSocket->_OnReceive(b);
         bufferevent_setcb(b, nullptr, nullptr, nullptr, nullptr);
@@ -336,7 +342,7 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         err_msg = "eof";
     }
     if(bClose)
-        pSocket->_OnClose(err_msg);
+        pSocket->_OnError(err_msg);
 
     __LEAVE_FUNCTION
 }
@@ -378,7 +384,7 @@ void CNetSocket::SetPacketSizeMax(size_t val)
 void CNetSocket::OnClosing()
 {
     __ENTER_FUNCTION
-    LOGNETDEBUG("CNetSocket OnClosing: {}:{}", GetAddrString().c_str(), GetPort());
+    LOGNETDEBUG("CNetSocket OnClosing: {}:{}", GetAddrString(), GetPort());
 
     if(m_pEventHandler)
         m_pEventHandler->OnClosing(this);
@@ -389,7 +395,7 @@ void CNetSocket::OnClosing()
 void CNetSocket::OnDisconnected()
 {
     __ENTER_FUNCTION
-    LOGNETDEBUG("CNetSocket OnDisconnected: {}:{}", GetAddrString().c_str(), GetPort());
+    LOGNETDEBUG("CNetSocket OnDisconnected: {}:{}", GetAddrString(), GetPort());
 
     SetStatus(NSS_CLOSED);
     if(m_pEventHandler)
@@ -409,9 +415,9 @@ void CNetSocket::OnRecvData(byte* pBuffer, size_t len)
     {
         case COMMON_CMD_INTERRUPT:
         {
-            LOGNETDEBUG("COMMON_CMD_INTERRUPT:{}:{}", GetAddrString().c_str(), GetPort());
+            LOGNETDEBUG("COMMON_CMD_INTERRUPT:{}:{}", GetAddrString(), GetPort());
 
-            _OnClose("RECIVE INTERRUPT");
+            Interrupt(false);
             return;
         }
         break;
@@ -421,13 +427,13 @@ void CNetSocket::OnRecvData(byte* pBuffer, size_t len)
             msg.msg_cmd  = COMMON_CMD_PONG;
             msg.msg_size = sizeof(MSG_HEAD);
             _SendMsg((byte*)&msg, sizeof(msg));
-            // LOGNETDEBUG("MSG_PING_RECV:{}:{}", GetAddrString().c_str(), GetPort());
+            // LOGNETDEBUG("MSG_PING_RECV:{}:{}", GetAddrString(), GetPort());
             return;
         }
         break;
         case COMMON_CMD_PONG:
         {
-            // LOGNETDEBUG("MSG_PONG_RECV:{}:{}", GetAddrString().c_str(), GetPort());
+            // LOGNETDEBUG("MSG_PONG_RECV:{}:{}", GetAddrString(), GetPort());
             return;
         }
         break;

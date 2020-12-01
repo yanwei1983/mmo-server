@@ -52,6 +52,7 @@ public:
     export_lua void AddForward(const VirtualSocket& forward) { m_setForward.push_back(forward); }
     export_lua void ClearForward() { m_setForward.clear(); }
     export_lua void PopForward() { m_setForward.pop_front(); }
+    export_lua size_t GetForwardCount() const { return m_setForward.size(); }
 
     export_lua const std::vector<VirtualSocket>& GetMultiTo() const { return m_MultiTo; }
 

@@ -160,17 +160,17 @@ bool CEventEntry::CreateEvTimer(event_base* base)
 void CEventEntry::Trigger()
 {
     __ENTER_FUNCTION
+    if(m_pCallBack)
+    {
+        auto call_back = m_pCallBack;
+        call_back();
+    }
+
     if(m_bPersist == false)
     {
         m_bRunning = false;
         m_pManager->SubRunningEventCount();
     }
-
-    if(m_pCallBack)
-    {
-        m_pCallBack();
-    }
-
     __LEAVE_FUNCTION
 }
 

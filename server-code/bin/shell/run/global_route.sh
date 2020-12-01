@@ -3,6 +3,9 @@ cd `dirname $0`
 cd ../..
 DIR_file=`pwd`
 
+echo "$1 $2"
+ext_param=$2
+
 mkdir -p binary
 mkdir -p .pid
 mkdir -p /data/log
@@ -23,32 +26,32 @@ export TSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_tsan
 
 start_route()
 {
-   ${DIR_file}/binary/route --worldid=0 --start=ROUTE_SERVICE-0 --logpath=/data/log/global/route -d 
+   ${DIR_file}/binary/route --worldid=0 --start=ROUTE_SERVICE-0 --logpath=/data/log/global/route -d $ext_param
 }
 
 start_gmproxy_1()
 {
-    ${DIR_file}/binary/gmproxy_1 --worldid=0 --start=GM_PROXY_SERVICE-1 --logpath=/data/log/global/gmproxy1 -d 
+    ${DIR_file}/binary/gmproxy_1 --worldid=0 --start=GM_PROXY_SERVICE-1 --logpath=/data/log/global/gmproxy1 -d $ext_param
 }
 
 start_gmproxy_2()
 {
-    ${DIR_file}/binary/gmproxy_2 --worldid=0 --start=GM_PROXY_SERVICE-2 --logpath=/data/log/global/gmproxy2 -d 
+    ${DIR_file}/binary/gmproxy_2 --worldid=0 --start=GM_PROXY_SERVICE-2 --logpath=/data/log/global/gmproxy2 -d $ext_param
 }
 
 start_gmproxy_3()
 {
-${DIR_file}/binary/gmproxy_3 --worldid=0 --start=GM_PROXY_SERVICE-3 --logpath=/data/log/global/gmproxy3 -d 
+${DIR_file}/binary/gmproxy_3 --worldid=0 --start=GM_PROXY_SERVICE-3 --logpath=/data/log/global/gmproxy3 -d $ext_param
 }
 
 start_gmproxy_4()
 {
-${DIR_file}/binary/gmproxy_4 --worldid=0 --start=GM_PROXY_SERVICE-4 --logpath=/data/log/global/gmproxy4 -d 
+${DIR_file}/binary/gmproxy_4 --worldid=0 --start=GM_PROXY_SERVICE-4 --logpath=/data/log/global/gmproxy4 -d $ext_param
 }
 
 start_gmproxy_5()
 {
-${DIR_file}/binary/gmproxy_5 --worldid=0 --start=GM_PROXY_SERVICE-5 --logpath=/data/log/global/gmproxy5 -d 
+${DIR_file}/binary/gmproxy_5 --worldid=0 --start=GM_PROXY_SERVICE-5 --logpath=/data/log/global/gmproxy5 -d $ext_param
 }
 
 

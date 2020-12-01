@@ -59,7 +59,7 @@ bool CPlayer::Init(OBJID idPlayer, const VirtualSocket& socket)
     //这个函数实在Loading线程中调用的, 不要发送消息,不要处理各种问题,只负责读取数据库
     SetID(idPlayer);
     m_Socket = socket;
-
+    CHECKF(m_Socket.IsVaild());
     auto pDB = SceneService()->GetGameDB(GetWorldIDFromPlayerID(idPlayer));
     CHECKF(pDB);
     auto result_ptr = pDB->QueryKeyLimit<TBLD_PLAYER, TBLD_PLAYER::ID>(idPlayer, 1);

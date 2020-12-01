@@ -27,9 +27,9 @@ namespace BaseCode
 
     thread_local int32_t s_monitor_logger = LOG4Z_MAIN_LOGGER_ID;
 
-    bool g_log_aidebug    = false;
-    bool g_log_actordebug = false;
-    bool g_log_skilldebug = false;
+    int32_t g_log_aidebug    = LOG_LEVEL_DEBUG;
+    int32_t g_log_actordebug = LOG_LEVEL_DEBUG;
+    int32_t g_log_skilldebug = LOG_LEVEL_DEBUG;
 } // namespace BaseCode
 
 static std::string g_logPath;
@@ -48,7 +48,7 @@ void BaseCode::InitMonitorLog(const std::string& logname)
     LOGDEBUG("InitMonitor:{}", logname);
 }
 
-void BaseCode::MyLogMsgX(const char* pszName, const char* pszBuffer)
+void BaseCode::MyLogMsgX(const char* pszName, const char* pSrcFile, int32_t line, const char* pszBuffer)
 {
     if(!pszName || !pszBuffer)
         return;
@@ -62,7 +62,7 @@ void BaseCode::MyLogMsgX(const char* pszName, const char* pszBuffer)
     if(nullptr == fp)
         return;
 
-    fmt::print(fp, "{:%H:%M:%S} [{:d}] {:s}\n", localtime_c, get_cur_thread_id(), pszBuffer);
+    fmt::print(fp, "{:%H:%M:%S}[{:d}]{:s}[{}:{}]\n", localtime_c, get_cur_thread_id(), pszBuffer, pSrcFile, line);
 
     fclose(fp);
 }
@@ -144,11 +144,11 @@ void BaseCode::InitLog(const std::string& path, int32_t log_lev)
 
 void BaseCode::CreateExtLogDir()
 {
-    if(g_log_aidebug)
+    if(g_log_aidebug >= 0)
         createRecursionDir(g_logPath + "/aidebug");
-    if(g_log_skilldebug)
+    if(g_log_skilldebug >= 0)
         createRecursionDir(g_logPath + "/skilldebug");
-    if(g_log_actordebug)
+    if(g_log_actordebug >= 0)
         createRecursionDir(g_logPath + "/actordebug");
 }
 

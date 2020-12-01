@@ -28,7 +28,7 @@ function OnConnect(client)
 	--msg.prog_ver = "0.1.0"
 	
 	
-	msg.openid="12345"
+	msg.openid= string.format("test_%d", client:GetClientID());
 	msg.auth = ""
 	msg.last_succ_key = "gmtest"
 	msg.prog_ver = "0.0.1"

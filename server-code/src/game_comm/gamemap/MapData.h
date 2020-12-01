@@ -105,7 +105,7 @@ private:
 
     //地图信息
     std::unique_ptr<MapGridData[]> m_pGridData;
-    uint32_t                       m_CollisionMask[32];
+    std::array<uint32_t,32>        m_CollisionMask;
 
     //
 };

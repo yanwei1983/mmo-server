@@ -232,6 +232,7 @@ void CWorldService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
             else
             {
                 send_msg.SetMultiTo(socket_list);
+                send_msg.SetTo(nServerPort);
                 _SendMsgToZonePort(send_msg);
             }
         }

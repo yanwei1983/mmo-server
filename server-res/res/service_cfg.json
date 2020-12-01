@@ -5,8 +5,8 @@
   },
   "debug":
   {
-    "log_aidebug":true,
-    "log_actordebug":true,
-    "log_skilldebug":true
+    "log_aidebug":1,
+    "log_actordebug":1,
+    "log_skilldebug":1
   }
 }

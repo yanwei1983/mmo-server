@@ -42,9 +42,9 @@ bool CMapData::Init(uint32_t idMapTemplate)
     {
         m_pGridData[i] = cfg.griddata().Get(i);
     }
-    for(size_t i = 0; i < cfg.collision().size(); i++)
+    for(size_t i = 0; i < m_CollisionMask.size() && i < cfg.collision().size(); i++)
     {
-        m_pGridData[i] = cfg.collision().Get(i);
+        m_CollisionMask[i] = cfg.collision().Get(i);
     }
     LOGDEBUG("MapData {} LoadSucc.", file_path.c_str());
 

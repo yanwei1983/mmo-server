@@ -46,7 +46,7 @@ bool CServerSocket::Init(bufferevent* pBufferEvent)
 void CServerSocket::Interrupt(bool bClearEventHandler)
 {
     __ENTER_FUNCTION
-    LOGNETDEBUG("CServerSocket Interrupt {}:{}", GetAddrString().c_str(), GetPort());
+    LOGNETDEBUG("CServerSocket Interrupt {}:{}", GetAddrString(), GetPort());
     if(bClearEventHandler)
     {
         if(m_pEventHandler)
@@ -68,7 +68,7 @@ void CServerSocket::Interrupt(bool bClearEventHandler)
     __LEAVE_FUNCTION
 }
 
-void CServerSocket::_OnClose(const std::string& what)
+void CServerSocket::_OnError(const std::string& what)
 {
     __ENTER_FUNCTION
     if(GetStatus() == NSS_CLOSEING)
@@ -78,7 +78,7 @@ void CServerSocket::_OnClose(const std::string& what)
     }
     SetStatus(NSS_CLOSEING);
 
-    LOGNETDEBUG("CServerSocket _OnClose {}:{} err:{}", GetAddrString().c_str(), GetPort(), what);
+    LOGNETDEBUG("CServerSocket _OnError {}:{} err:{}", GetAddrString(), GetPort(), what);
 
     if(m_nReconnectTimes > 0 && m_bReconnect)
     {
@@ -102,7 +102,7 @@ void CServerSocket::_OnClose(const std::string& what)
         m_pService->_AddConnectingSocket(this);
         if(m_pEventHandler)
             m_pEventHandler->OnWaitReconnect(this);
-        LOGNETDEBUG("CServerSocket _OnClose Reconnect Wait,5s, {}:{}", GetAddrString().c_str(), GetPort());
+        LOGNETDEBUG("CServerSocket _OnError Reconnect Wait,5s, {}:{}", GetAddrString(), GetPort());
     }
     else
     {
@@ -121,7 +121,7 @@ void CServerSocket::_OnReconnect(int32_t fd, short what, void* ctx)
     __ENTER_FUNCTION
 
     CServerSocket* pSocket = (CServerSocket*)ctx;
-    LOGNETDEBUG("CServerSocket Reconnect:{}::{}", pSocket->GetAddrString().c_str(), pSocket->GetPort());
+    LOGNETDEBUG("CServerSocket Reconnect:{}::{}", pSocket->GetAddrString(), pSocket->GetPort());
 
     if(pSocket->GetService()->_AsyncReconnect(pSocket) == false)
     {
@@ -148,7 +148,7 @@ void CServerSocket::_OnSocketConnectorEvent(bufferevent* b, short what, void* ct
         pSocket->OnConnected();
         bufferevent_enable(b, EV_READ | EV_WRITE | EV_PERSIST);
         pSocket->_SetTimeout();
-        LOGNETDEBUG("CServerSocket::SocketConnectSucc:{}:{}  SendWait:{}", pSocket->GetAddrString().c_str(), pSocket->GetPort(), pSocket->m_nWaitWriteSize);
+        LOGNETDEBUG("CServerSocket::SocketConnectSucc:{}:{}  SendWait:{}", pSocket->GetAddrString(), pSocket->GetPort(), pSocket->m_nWaitWriteSize);
        
         bufferevent_write_buffer(b, pSocket->m_Sendbuf);                
     }
@@ -156,7 +156,7 @@ void CServerSocket::_OnSocketConnectorEvent(bufferevent* b, short what, void* ct
     {
         int32_t     err    = evutil_socket_geterror(bufferevent_getfd(b));
         const char* errstr = evutil_socket_error_to_string(err);
-        LOGNETDEBUG("CServerSocket::SocketConnectFail:{}:{} {}", pSocket->GetAddrString().c_str(), pSocket->GetPort(), errstr);
+        LOGNETDEBUG("CServerSocket::SocketConnectFail:{}:{} {}", pSocket->GetAddrString(), pSocket->GetPort(), errstr);
 
         pSocket->OnConnectFailed();
     }
@@ -197,7 +197,7 @@ void CServerSocket::OnConnectFailed()
     if(m_pEventHandler)
         m_pEventHandler->OnConnectFailed(this);
 
-    _OnClose("AsyncConnectFailed");
+    _OnError("AsyncConnectFailed");
     __LEAVE_FUNCTION
 }
 
