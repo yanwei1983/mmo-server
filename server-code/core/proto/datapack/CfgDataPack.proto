@@ -6,4 +6,5 @@ message CfgDataPack
     string version = 1;
     uint32 size = 2;
     repeated bytes data_set = 3;
+    string data_name = 4;
 };

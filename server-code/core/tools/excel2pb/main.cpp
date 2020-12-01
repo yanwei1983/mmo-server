@@ -225,6 +225,7 @@ int main(int argc, char** argv)
     {
         CfgDataPack output;
         output.set_size(vecMessage.size());
+        output.set_data_name(desc->name());
         for(const auto& [title, y, x, pRow]: vecMessage)
         {
             auto data = output.add_data_set();
