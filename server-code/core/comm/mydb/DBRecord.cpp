@@ -165,7 +165,6 @@ bool CDBRecord::Update(bool bSync)
         if(bSync)
         {
             m_pMysqlConnection->Update(sql);
-            return true;
         }
         else
         {
