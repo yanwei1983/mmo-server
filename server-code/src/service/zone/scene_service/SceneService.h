@@ -7,6 +7,7 @@
 #include "ScriptManager.h"
 #include "ServiceComm.h"
 #include "game_common_def.h"
+#include "BaseCode.h"
 
 class CMapManager;
 class CSystemVarSet;
@@ -17,6 +18,7 @@ class CGMManager;
 class CMonitorMgr;
 class CTeamInfoManager;
 class CMysqlConnection;
+class CNetworkMessage;
 
 export_lua class CSceneService : public IService, public CServiceCommon
 {
@@ -47,11 +49,12 @@ public:
     virtual void OnServiceReadyFromCrash(const ServiceID& service_id) override;
 
 public:
-    void                          CreateSocketMessagePool(const VirtualSocket& vs);
-    void                          DelSocketMessagePool(const VirtualSocket& vs);
-    void                          PushMsgToMessagePool(const VirtualSocket& vs, CNetworkMessage* pMsg);
-    std::deque<CNetworkMessage*>& GetMessagePoolRef(const VirtualSocket& vs);
-    bool                          PopMsgFromMessagePool(const VirtualSocket& vs, CNetworkMessage*& pMsg);
+    void   CreateSocketMessagePool(const VirtualSocket& vs);
+    void   DelSocketMessagePool(const VirtualSocket& vs);
+    void   PushMsgToMessagePool(const VirtualSocket& vs, CNetworkMessage* pMsg);
+    size_t GetMessagePoolMsgCount(const VirtualSocket& vs) const;
+
+    std::unique_ptr<CNetworkMessage> PopMsgFromMessagePool(const VirtualSocket& vs);
     //发送消息给World
     export_lua bool SendProtoMsgToWorld(uint16_t idWorld, const proto_msg_t& msg) const;
     //转发消息给其他的zone
@@ -94,7 +97,7 @@ private:
 private:
     CUIDFactory                       m_UIDFactory;
     std::unique_ptr<CMysqlConnection> m_pGlobalDB;
-
+    
     std::unordered_map<uint16_t, std::unique_ptr<CMysqlConnection>> m_GameDBMap;
 
     CMyTimer m_tLastDisplayTime;
@@ -104,7 +107,8 @@ private:
     std::unique_ptr<CSceneManager>  m_pSceneManager;
     std::unique_ptr<CLoadingThread> m_pLoadingThread;
 
-    std::unordered_map<uint64_t, std::deque<CNetworkMessage*>> m_MessagePoolBySocket;
+    using MessagePool = std::deque<std::unique_ptr<CNetworkMessage>>;
+    std::unordered_map<uint64_t, MessagePool> m_MessagePoolBySocket;
 
     std::unique_ptr<CGMManager>        m_pGMManager;
     std::unique_ptr<CLUAScriptManager> m_pScriptManager;

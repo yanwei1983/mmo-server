@@ -586,27 +586,26 @@ void CPlayer::SaveInfo()
 void CPlayer::ProcessMsg()
 {
     __ENTER_FUNCTION
-    auto& refPool = SceneService()->GetMessagePoolRef(GetSocket());
-    if(refPool.empty() == true)
+    auto msg_count = SceneService()->GetMessagePoolMsgCount(GetSocket());
+    if(msg_count == 0)
         return;
 
     auto pProcesser = SceneService()->GetNetMsgProcess();
     //每个人每次最多处理10条消息
     constexpr int32_t MAX_PROCESS_PER_TIME = 10;
     int32_t           nProcessCount        = 0;
-    while(refPool.empty() == false && nProcessCount < MAX_PROCESS_PER_TIME)
+    while(msg_count > 0 && nProcessCount < MAX_PROCESS_PER_TIME)
     {
-        CNetworkMessage* pMsg = refPool.front();
-        refPool.pop_front();
+        std::unique_ptr<CNetworkMessage> pMsg = SceneService()->PopMsgFromMessagePool(GetSocket());
         if(pMsg)
         {
             MonitorMgr()->CmdProcessStart(pMsg->GetCmd());
-            pProcesser->Process(pMsg);
+            pProcesser->Process(pMsg.get());
             MonitorMgr()->CmdProcessEnd(pMsg->GetCmd());
-            SAFE_DELETE(pMsg);
         }
+        msg_count--;
     }
-    if(refPool.size() > 100)
+    if(msg_count > 100)
     {
         LOGWARNING("Player{} Have Too Mony Msg Need Process.", GetID());
     }

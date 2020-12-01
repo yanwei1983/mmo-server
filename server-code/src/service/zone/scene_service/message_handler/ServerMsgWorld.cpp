@@ -131,7 +131,10 @@ ON_SERVERMSG(CSceneService, AOIChange)
 {
     // recive from aoi
     CActor* pActor = ActorManager()->QueryActor(msg.actor_id());
-    CHECK_FMT(pActor, "actorid:{} not find", msg.actor_id());
+    if(pActor == nullptr)
+    {
+        return;
+    }
     CHECK(pActor->GetCurrentScene());
     CHECK(msg.scene_idx() == pActor->GetSceneIdx());
     BROADCAST_SET setBCActorDel{msg.actor_del().begin(), msg.actor_del().end()};

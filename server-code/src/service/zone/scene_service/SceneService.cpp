@@ -100,13 +100,6 @@ void CSceneService::Destory()
         GetActorManager()->Destory();
     m_pActorManager.reset();
 
-    for(auto& [k, refQueue]: m_MessagePoolBySocket)
-    {
-        for(auto& msg: refQueue)
-        {
-            SAFE_DELETE(msg);
-        }
-    }
     m_MessagePoolBySocket.clear();
     DestoryServiceCommon();
     LOGMESSAGE("{} Close", GetServiceName());
@@ -263,9 +256,9 @@ void CSceneService::PushMsgToMessagePool(const VirtualSocket& vs, CNetworkMessag
 
     auto& refList = itFind->second;
 
-    CNetworkMessage* pStoreMsg = new CNetworkMessage(*pMsg);
+    std::unique_ptr<CNetworkMessage> pStoreMsg = std::make_unique<CNetworkMessage>(*pMsg);
     pStoreMsg->CopyBuffer();
-    refList.push_back(pStoreMsg);
+    refList.push_back(std::move(pStoreMsg));
 
     constexpr int32_t MAX_USER_HOLD_MESSAGE = 500;
     if(refList.size() > MAX_USER_HOLD_MESSAGE)
@@ -282,27 +275,35 @@ void CSceneService::PushMsgToMessagePool(const VirtualSocket& vs, CNetworkMessag
     __LEAVE_FUNCTION
 }
 
-std::deque<CNetworkMessage*>& CSceneService::GetMessagePoolRef(const VirtualSocket& vs)
-{
-    return m_MessagePoolBySocket[vs];
-}
-
-bool CSceneService::PopMsgFromMessagePool(const VirtualSocket& vs, CNetworkMessage*& pMsg)
+size_t CSceneService::GetMessagePoolMsgCount(const VirtualSocket& vs)const
 {
     __ENTER_FUNCTION
     auto itFind = m_MessagePoolBySocket.find(vs);
     if(itFind == m_MessagePoolBySocket.end())
-        return false;
+        return 0;
+
+    auto& refList = itFind->second;
+    return refList.size();
+    __LEAVE_FUNCTION
+    return 0;
+}
+
+std::unique_ptr<CNetworkMessage> CSceneService::PopMsgFromMessagePool(const VirtualSocket& vs)
+{
+    __ENTER_FUNCTION
+    auto itFind = m_MessagePoolBySocket.find(vs);
+    if(itFind == m_MessagePoolBySocket.end())
+        return nullptr;
 
     auto& refList = itFind->second;
     if(refList.empty())
-        return false;
+        return nullptr;
 
-    pMsg = refList.front();
+    std::unique_ptr<CNetworkMessage> pMsg( refList.front().release() );
     refList.pop_front();
-    return true;
+    return pMsg;
     __LEAVE_FUNCTION
-    return false;
+    return nullptr;
 }
 
 bool CSceneService::SendProtoMsgToWorld(uint16_t idWorld, const proto_msg_t& msg) const
