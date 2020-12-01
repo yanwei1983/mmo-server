@@ -88,8 +88,7 @@ bool CPhase::Init(CScene* pScene, const SceneIdx& idxScene, uint64_t idPhase, co
     SceneService()->SendProtoMsgToAIService(msg);
     SceneService()->SendProtoMsgToAOIService(msg);
 
-    if(GetScriptID() != 0)
-        ScriptManager()->TryExecScript<void>(GetScriptID(), SCB_MAP_ONCREATE, this);
+    ScriptManager()->TryExecScript<void>(SCRIPT_MAP, GetScriptID(), "OnCreate", this);
 
     //刷新所有的NPC
     auto pVec = NpcTypeSet()->QueryObjByMapID(idxScene.GetMapID(), idPhase);
@@ -147,8 +146,9 @@ void CPhase::AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name
 
     CEventEntryCreateParam param;
     param.evType = 0;
-    param.cb     = [pThis = this, _func_name = func_name]() {
-        ScriptManager()->ExecScript<void>(pThis->m_pMap->GetScriptID(), _func_name.c_str(), pThis);
+    param.cb     = [pThis = this, _func_name = func_name]() 
+    {
+        ScriptManager()->TryExecScript<void>(SCRIPT_MAP, pThis->m_pMap->GetScriptID(), _func_name.c_str(), pThis);
     };
     param.tWaitTime = tIntervalMS;
     param.bPersist  = false;

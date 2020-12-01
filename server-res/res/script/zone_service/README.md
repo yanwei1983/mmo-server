@@ -1,9 +1,0 @@
-
-* 1000xxxxx Map
-* 2000xxxxx Monster
-* 3000xxxxx Npc
-* 4000xxxxx Item
-* 5000xxxxx Task
-* 6000xxxxx Status
-* 7000xxxxx Skill
-* 9000xxxxx System

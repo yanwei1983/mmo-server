@@ -32,7 +32,7 @@ void CActor::OnEnterMap(CSceneBase* pScene)
     __ENTER_FUNCTION
     CSceneObject::OnEnterMap(pScene);
     if(pScene && pScene->GetScriptID())
-        ScriptManager()->TryExecScript<void>(pScene->GetScriptID(), SCB_MAP_ONENTERMAP, this);
+        ScriptManager()->TryExecScript<void>(SCRIPT_MAP, pScene->GetScriptID(), "OnEnterMap", this);
     __LEAVE_FUNCTION
 }
 
@@ -50,7 +50,7 @@ void CActor::OnLeaveMap(uint16_t idTargetMap)
     }
 
     if(m_pScene && m_pScene->GetScriptID())
-        ScriptManager()->TryExecScript<void>(m_pScene->GetScriptID(), SCB_MAP_ONLEAVEMAP, this, idTargetMap);
+        ScriptManager()->TryExecScript<void>(SCRIPT_MAP, m_pScene->GetScriptID(), "OnLeaveMap", this, idTargetMap);
 
     CSceneObject::OnLeaveMap(idTargetMap);
 

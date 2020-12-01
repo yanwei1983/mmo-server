@@ -50,7 +50,7 @@ int32_t CStatusType::GetMaxSecs() const
 {
     return m_Data.max_secs();
 }
-OBJID CStatusType::GetScirptID() const
+OBJID CStatusType::GetScriptID() const
 {
     return m_Data.scriptid();
 }

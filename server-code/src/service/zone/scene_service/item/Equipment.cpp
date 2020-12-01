@@ -414,7 +414,7 @@ void CEquipment::CheckItemExpire(uint32_t dwTimeNow)
             if(m_pOwner->GetBag()->IsFull() == false)
             {
                 UnequipItem(nGrid, SYNC_TRUE, false, false);
-                ScriptManager()->TryExecScript<void>(pItem->ItemTypePtr()->GetScriptID(), SCB_ITEM_ONTIMEOUT, pItem, m_pOwner);
+                ScriptManager()->TryExecScript<void>(SCRIPT_ITEM, pItem->ItemTypePtr()->GetScriptID(), "OnTimeOut", pItem, m_pOwner);
             }
             else
             {

@@ -199,8 +199,7 @@ bool CPlayerTask::AcceptTask(uint32_t idTask, bool bChkCondition /*= true*/, boo
     }
     AddTaskPhase(pData);
 
-    if(pType->GetScriptID() != 0)
-        ScriptManager()->TryExecScript<void>(pType->GetScriptID(), SCB_TASK_ON_ACCEPT, m_pOwner, pData);
+    ScriptManager()->TryExecScript<void>(SCRIPT_TASK, pType->GetScriptID(), "OnAccept", m_pOwner, pData);
 
     for(int32_t i = 0; i < pType->GetDataRef().finish_data_list_size(); i++)
     {
@@ -320,8 +319,7 @@ bool CPlayerTask::SubmitTask(uint32_t idTask, uint32_t nSubmitMultiple)
         }
     }
 
-    if(pType->GetScriptID() != 0)
-        ScriptManager()->TryExecScript<void>(pType->GetScriptID(), SCB_TASK_ON_COMMIT, m_pOwner, pData, nSubmitMultiple);
+    ScriptManager()->TryExecScript<void>(SCRIPT_TASK, pType->GetScriptID(), "OnCommit", m_pOwner, pData, nSubmitMultiple);
 
     //给予奖励
     if(pType->GetAwardExp() > 0)
@@ -385,8 +383,8 @@ bool CPlayerTask::GiveupTask(uint32_t idTask)
     pData->SetFinishTime(TimeGetSecond(), UPDATE_FALSE);
     pData->SetState(TASKSTATE_FINISHED, UPDATE_TRUE);
     RemoveTaskPhase(pData);
-    if(pTaskType->GetScriptID() != 0)
-        ScriptManager()->TryExecScript<void>(pTaskType->GetScriptID(), SCB_TASK_ON_GIVEUP, m_pOwner, pData);
+
+    ScriptManager()->TryExecScript<void>(SCRIPT_TASK, pTaskType->GetScriptID(), "OnGiveup", m_pOwner, pData);
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -420,10 +418,10 @@ bool CPlayerTask::CanAccept(const CTaskType* pType)
 
     if(pType->GetScriptID() != 0)
     {
-        const std::string& funcName = ScriptManager()->QueryFunc(pType->GetScriptID(), SCB_TASK_CAN_ACCEPT);
-        if(funcName.empty() == false)
+        bool find = ScriptManager()->QueryScriptFunc(SCRIPT_TASK, pType->GetScriptID(), "CanAccept");
+        if(find)
         {
-            return ScriptManager()->_ExecScript<bool>(funcName.c_str(), m_pOwner);
+            return ScriptManager()->ExecStackScriptFunc<bool>(m_pOwner);
         }
     }
 
@@ -505,10 +503,10 @@ bool CPlayerTask::CanSubmit(const CTaskType* pTaskType)
 
     if(pTaskType->GetScriptID() != 0)
     {
-        const std::string& funcName = ScriptManager()->QueryFunc(pTaskType->GetScriptID(), SCB_TASK_CAN_COMMIT);
-        if(funcName.empty() == false)
+        auto find = ScriptManager()->QueryScriptFunc(SCRIPT_TASK, pTaskType->GetScriptID(), "CanCommit");
+        if(find)
         {
-            return ScriptManager()->_ExecScript<bool>(funcName.c_str(), m_pOwner, pData);
+            return ScriptManager()->ExecStackScriptFunc<bool>(m_pOwner, pData);
         }
     }
 
@@ -712,10 +710,10 @@ bool CPlayerTask::ShowTaskDialog(uint32_t idTask, OBJID idNpc)
     auto pTaskType = TaskTypeSet()->QueryObj(idTask);
     if(pTaskType->GetScriptID() != 0)
     {
-        const std::string& funcName = ScriptManager()->QueryFunc(pTaskType->GetScriptID(), SCB_TASK_SHOW_TASKDIALOG);
-        if(funcName.empty() == false)
+        auto find = ScriptManager()->QueryScriptFunc(SCRIPT_TASK, pTaskType->GetScriptID(), "ShowTaskDialog");
+        if(find)
         {
-            ScriptManager()->_ExecScript<void>(funcName.c_str(), m_pOwner);
+            ScriptManager()->ExecStackScriptFunc<void>(m_pOwner);
             return true;
         }
     }

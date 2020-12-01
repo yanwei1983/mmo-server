@@ -123,7 +123,7 @@ bool CPlayerDialog::OnDialogClick(uint64_t idDialog, uint32_t nIdx)
         break;
         case DIALOG_FUNC_SCRIPT:
         {
-            ScriptManager()->ExecScript<void>(v.idData, v.callback_func.c_str(), m_pOwner);
+            ScriptManager()->_ExecScript<void>(v.callback_func.c_str(), m_pOwner);
             return true;
         }
         break;

@@ -3,6 +3,7 @@
 /server-code/.cmake_zonedb
 .vscode/
 .vs
+.clangd
 desktop.ini
 GM_TAG
 *.pb.h

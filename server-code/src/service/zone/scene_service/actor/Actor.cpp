@@ -671,7 +671,7 @@ void CActor::BeKillBy(CActor* pAttacker)
     LOGACTORDEBUG(GetID(), "BeKillBy:{} Attacker:{}", GetID(), pAttacker ? pAttacker->GetID() : 0);
     if(m_pScene && m_pScene->GetScriptID())
     {
-        ScriptManager()->TryExecScript<void>(m_pScene->GetScriptID(), SCB_MAP_ONACTORBEKILL, this, pAttacker);
+        ScriptManager()->TryExecScript<void>(SCRIPT_MAP, m_pScene->GetScriptID(), "OnActorBeKill", this, pAttacker);
     }
 
     GetStatus()->OnDead(pAttacker);

@@ -123,7 +123,8 @@ namespace lua_tinker
     // call lua func
     template<typename RVal, typename... Args>
     RVal call(lua_State* L, const char* name, Args&&... arg);
-
+    template<typename RVal, typename... Args>
+    RVal call_stackfunc(lua_State* L, Args&&... arg);
     // getmetatable(scope_global_name)[name] = getmetatable(global_name)
     void scope_inner(lua_State* L, const char* scope_global_name, const char* name, const char* global_name);
     // namespace
@@ -1733,43 +1734,14 @@ namespace lua_tinker
     template<typename RVal>
     RVal dofile(lua_State* L, const char* filename)
     {
-        lua_getglobal(L, ERROR_CALLBACK_NAME);
-        int32_t errfunc = lua_gettop(L);
 
-        if(luaL_loadfile(L, filename) == 0)
-        {
-            if(lua_pcall(L, 0, detail::pop<RVal>::nresult, errfunc) != LUA_OK)
-            {
-                // stack have a nil string from on_error
-                if constexpr(detail::pop<RVal>::nresult == 0)
-                {
-                    // not need it, pop
-                    lua_pop(L, 1);
-                }
-                else if constexpr(detail::pop<RVal>::nresult > 1)
-                {
-                    // push nil to pop result
-                    for(int32_t i = 0; i < detail::pop<RVal>::nresult - 1; i++)
-                    {
-                        lua_pushnil(L);
-                    };
-                }
-                else
-                {
-                    //==1, leave it for pop resuslt
-                }
-            }
-            else
-            {
-            }
-        }
-        else
+
+        if(luaL_loadfile(L, filename) != 0)
         {
             print_error(L, "%s", lua_tostring(L, -1));
+            return RVal();
         }
-
-        lua_remove(L, errfunc);
-        return detail::pop<RVal>::apply(L);
+        return call_stackfunc<RVal>(L);
     }
 
     template<typename RVal>
@@ -1781,85 +1753,62 @@ namespace lua_tinker
     template<typename RVal>
     RVal dobuffer(lua_State* L, const char* buff, size_t sz)
     {
-        lua_getglobal(L, ERROR_CALLBACK_NAME);
-        int32_t errfunc = lua_gettop(L);
-
-        if(luaL_loadbuffer(L, buff, sz, "lua_tinker::dobuffer()") == 0)
-        {
-            if(lua_pcall(L, 0, detail::pop<RVal>::nresult, errfunc) != LUA_OK)
-            {
-                // stack have a nil string from on_error
-                if constexpr(detail::pop<RVal>::nresult == 0)
-                {
-                    // not need it, pop
-                    lua_pop(L, 1);
-                }
-                else if constexpr(detail::pop<RVal>::nresult > 1)
-                {
-                    // push nil to pop result
-                    for(int32_t i = 0; i < detail::pop<RVal>::nresult - 1; i++)
-                    {
-                        lua_pushnil(L);
-                    };
-                }
-                else
-                {
-                    //==1, leave it for pop resuslt
-                }
-            }
-            else
-            {
-            }
-        }
-        else
-        {
+        if(luaL_loadbuffer(L, buff, sz, "lua_tinker::dobuffer()") != 0)
+         {
             print_error(L, "%s", lua_tostring(L, -1));
+            return RVal();
         }
-
-        lua_remove(L, errfunc);
-        return detail::pop<RVal>::apply(L);
+        return call_stackfunc<RVal>(L);
     }
 
     // call lua func
     template<typename RVal, typename... Args>
     RVal call(lua_State* L, const char* name, Args&&... arg)
     {
-        lua_getglobal(L, ERROR_CALLBACK_NAME);
-        int32_t errfunc = lua_gettop(L);
         lua_getglobal(L, name);
-        if(lua_isfunction(L, -1))
+        if(lua_isfunction(L, -1) == false)
         {
-            detail::push_args(L, std::forward<Args>(arg)...);
-
-            if(lua_pcall(L, sizeof...(Args), detail::pop<RVal>::nresult, errfunc) != LUA_OK)
-            {
-                // stack have a nil string from on_error
-                if constexpr(detail::pop<RVal>::nresult == 0)
-                {
-                    // not need it, pop
-                    lua_pop(L, 1);
-                }
-                else if constexpr(detail::pop<RVal>::nresult > 1)
-                {
-                    // push nil to pop result
-                    for(int32_t i = 0; i < detail::pop<RVal>::nresult - 1; i++)
-                    {
-                        lua_pushnil(L);
-                    };
-                }
-                else
-                {
-                    //==1, leave it for pop resuslt
-                }
-            }
-            else
-            {
-            }
+            lua_pop(L, 1); // pop func
+            print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
+            return RVal();
         }
         else
         {
-            lua_pop(L, 1); // pop getglobal
-            print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
+            return call_stackfunc<RVal>(L, std::forward<Args>(arg)...);
+        }
+    }
+
+    template<typename RVal, typename... Args>
+    RVal call_stackfunc(lua_State* L, Args&&... arg)
+    {
+        //top = func
+        lua_getglobal(L, ERROR_CALLBACK_NAME);
+        //top = errfunc, move errfunc to top+1
+        int32_t errfunc = lua_gettop(L) + 1 ;
+        lua_insert(L, errfunc); 
+        
+        detail::push_args(L, std::forward<Args>(arg)...);
+
+        if(lua_pcall(L, sizeof...(Args), detail::pop<RVal>::nresult, errfunc) != LUA_OK)
+        {
+            // stack have a nil string from on_error
+            if constexpr(detail::pop<RVal>::nresult == 0)
+            {
+                // not need it, pop
+                lua_pop(L, 1);
+            }
+            else if constexpr(detail::pop<RVal>::nresult > 1)
+            {
+                // push nil to pop result
+                for(int32_t i = 0; i < detail::pop<RVal>::nresult - 1; i++)
+                {
+                    lua_pushnil(L);
+                };
+            }
+            else
+            {
+                //==1, leave it for pop resuslt
+            }
         }
 
         lua_remove(L, errfunc);
@@ -2420,60 +2369,88 @@ namespace lua_tinker
             void dec_ref();
 
             bool validate();
+            
+            template<typename Key>
+            void _push_key(Key&& key)
+            {
+                if constexpr(std::is_convertible_v<Key,lua_Integer>)
+                {
+                    lua_pushinteger(m_L, key);
+                }
+                else
+                {
+                    lua_pushstring(m_L, key);
+                }
+            }
 
-            template<typename T>
-            void set(const char* key, T&& object)
+            template<typename T, typename Key>
+            void set(Key&& key, T&& object)
             {
                 if(validate())
                 {
-                    lua_pushstring(m_L, key);
+                    _push_key(std::forward<Key>(key));
                     detail::push(m_L, std::forward<T>(object));
                     lua_settable(m_L, m_index);
                 }
             }
-            template<typename T>
-            void set(int32_t key, T&& object)
-            {
-                if(validate())
-                {
-                    lua_pushinteger(m_L, key);
-                    detail::push(m_L, std::forward<T>(object));
-                    lua_settable(m_L, m_index);
-                }
-            }
 
-            template<typename T>
-            T get(const char* key)
+            template<typename T, typename Key>
+            T get(Key&& key)
             {
                 if(validate())
                 {
-                    lua_pushstring(m_L, key);
+                    _push_key(std::forward<Key>(key));
                     lua_gettable(m_L, m_index);
+                    return detail::pop<T>::apply(m_L);
                 }
                 else
                 {
-                    lua_pushnil(m_L);
+                    return T();
                 }
-
-                return detail::pop<T>::apply(m_L);
             }
 
-            template<typename T>
-            T get(int32_t key)
+            template<typename Key>
+            bool get_to_stack(Key&& key)
             {
                 if(validate())
                 {
-                    lua_pushinteger(m_L, key);
+                    _push_key(std::forward<Key>(key));
                     lua_gettable(m_L, m_index);
+                    return true;
                 }
                 else
                 {
-                    lua_pushnil(m_L);
+                    return false;
                 }
-
-                return detail::pop<T>::apply(m_L);
             }
 
+            template<typename RVal, typename Key, typename... Args>
+            RVal call(Key&& key, Args&&... arg)
+            {
+                if(validate())
+                {
+                    _push_key(std::forward<Key>(key));
+                    lua_gettable(m_L, m_index);
+                    if(lua_isfunction(m_L, -1) == false)
+                    {
+                        lua_pop(m_L, 1); // pop func
+                        print_error(m_L, "lua_tinker::call() attempt to call table[`%d'] (not a function)", key);
+                        
+                        return RVal();
+                    }
+                    else
+                    {
+
+                        return call_stackfunc<RVal>(m_L, std::forward<Args>(arg)...);
+                    }
+                }
+                else
+                {
+                    return RVal();
+                }
+                
+            }
+            
             size_t len() const
             {
                 lua_len(m_L, m_index);
@@ -2505,28 +2482,28 @@ namespace lua_tinker
         table_onstack(const table_onstack& input);
         ~table_onstack();
 
-        template<typename T>
-        void set(const char* key, T&& object)
+        template<typename T, typename Key>
+        void set(Key&& key, T&& object)
         {
-            m_obj->set(key, std::forward<T>(object));
+            m_obj->set(std::forward<Key>(key), std::forward<T>(object));
         }
 
-        template<typename T>
-        void set(int32_t key, T&& object)
+        template<typename T, typename Key>
+        T get(Key&& key)
         {
-            m_obj->set(key, std::forward<T>(object));
+            return m_obj->get<T>(std::forward<Key>(key));
         }
 
-        template<typename T>
-        T get(const char* key)
+        template<typename Key>
+        bool get_to_stack(Key&& key)
         {
-            return m_obj->get<T>(key);
+            return m_obj->get_to_stack(std::forward<Key>(key));
         }
 
-        template<typename T>
-        T get(int32_t key)
+        template<typename RVal, typename Key, typename... Args>
+        RVal call(Key&& key, Args&&... args)
         {
-            return m_obj->get<T>(key);
+            return m_obj->call<RVal>(std::forward<Key>(key), std::forward<Args>(args)...);
         }
 
         size_t len() const { return m_obj->len(); }
@@ -2610,7 +2587,7 @@ namespace lua_tinker
             return table_ref();
         }
 
-        table_onstack push_table_to_stack()
+        table_onstack push_table_to_stack() const
         {
             if(lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_regidx) == LUA_TTABLE)
             {
@@ -2632,41 +2609,16 @@ namespace lua_tinker
         template<typename... Args>
         RVal operator()(Args&&... args) const
         {
-            lua_getglobal(m_L, ERROR_CALLBACK_NAME);
-            int32_t errfunc = lua_gettop(m_L);
-
-            if(lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_regidx) == LUA_TFUNCTION)
+            
+            lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_regidx);
+            if(lua_isfunction(m_L, -1) == false)
             {
-                detail::push_args(m_L, std::forward<Args>(args)...);
-                if(lua_pcall(m_L, sizeof...(Args), detail::pop<RVal>::nresult, errfunc) != 0)
-                {
-                    // stack have a nil string from on_error
-                    if constexpr(detail::pop<RVal>::nresult == 0)
-                    {
-                        // not need it, pop
-                        lua_pop(m_L, 1);
-                    }
-                    else if constexpr(detail::pop<RVal>::nresult > 1)
-                    {
-                        // push nil to pop result
-                        for(int32_t i = 0; i < detail::pop<RVal>::nresult - 1; i++)
-                        {
-                            lua_pushnil(m_L);
-                        };
-                    }
-                    else
-                    {
-                        //==1, leave it for pop resuslt
-                    }
-                }
+                lua_pop(m_L, 1); // pop func
+                print_error(m_L, "lua_tinker::call() attempt to call register_func[`%d'] (not a function)", m_regidx);
+                
+                return RVal();
             }
-            else
-            {
-                print_error(m_L, "lua_tinker::lua_function_ref attempt to call (not a function)");
-            }
-
-            lua_remove(m_L, errfunc);
-            return detail::pop<RVal>::apply(m_L);
+            return call_stackfunc<RVal>(m_L, std::forward<Args>(args)...);
         }
     };
 

@@ -19,10 +19,19 @@ function stripextension(filename)
     end  
 end
 
+function register_script(script_type, id)
+	local table_name = script_manager:ScriptTypeToName(script_type);
+	local script_table = _G[table_name];
+	local script = script_table[id];
+	script = script or {};
+	script_manager:RegistFucName(script_type, id);
+	return script;
+end
 
 
 function main()
-	--遍历所有文件
+    --遍历所有文件
+    script_manager:RegistScriptType(SCRIPT_AI, "g_SCRIPT_AI");
 	script_manager:LoadFilesInDir("ai", false);
 end
 

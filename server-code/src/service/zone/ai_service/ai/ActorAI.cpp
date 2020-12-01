@@ -57,14 +57,15 @@ bool CActorAI::Init(CAIActor* pActor, const CAIType* pAIType)
 void CActorAI::OnUnderAttack(OBJID idTarget, int32_t nDamage)
 {
     __ENTER_FUNCTION
-    if(GetAIData().script_id())
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: OnUnderAttack target:{} damage:{}", idTarget, nDamage);
+
+    bool find = ScriptManager()->QueryScriptFunc(SCRIPT_AI, GetAIData().script_id(), "OnUnderAttack");
+    if(find)
     {
-        if(ScriptManager()->TryExecScript<bool>(GetAIData().script_id(), SCB_AI_ONUNDERATTACK, this, idTarget, nDamage) == true)
-        {
-            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: SCB_AI_ONUNDERATTACK Succ");
-            return;
-        }
+        ScriptManager()->ExecStackScriptFunc<void>(this, idTarget, nDamage);
+        return;
     }
+
     AddHate(idTarget, nDamage);
 
     __LEAVE_FUNCTION
@@ -182,18 +183,9 @@ bool CActorAI::ToPratol()
     return false;
 }
 
-bool CActorAI::ToIdle()
+bool CActorAI::_ToIdle()
 {
     __ENTER_FUNCTION
-    if(GetAIData().script_id())
-    {
-        if(ScriptManager()->TryExecScript<bool>(GetAIData().script_id(), SCB_AI_TO_IDLE, this) == true)
-        {
-            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: SCB_AI_TO_IDLE Succ");
-            return true;
-        }
-    }
-
     if(GetAIData().follow_path() && m_pPathData)
     {
         // 如果是巡逻怪物，则开始巡逻
@@ -214,7 +206,28 @@ bool CActorAI::ToIdle()
     {
         AddNextCall(random_uint32_range(GetAIData().idle_randomwalk_ms_min(), GetAIData().idle_randomwalk_ms_max()));
     }
+
     return true;
+    __LEAVE_FUNCTION
+    return false;
+}
+
+bool CActorAI::ToIdle()
+{
+    __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToIdle");
+
+    auto find = ScriptManager()->QueryScriptFunc(SCRIPT_AI, GetAIData().script_id(), "ToIdle");
+    if(find)
+    {
+        if(ScriptManager()->ExecStackScriptFunc<bool>(this) == true)
+        {
+            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: TryExecScript ToIdle Succ");
+            return true;
+        }
+    }
+    
+    return _ToIdle();
     __LEAVE_FUNCTION
     return false;
 }
@@ -308,22 +321,33 @@ bool CActorAI::ToEscape(OBJID idTarget)
     return false;
 }
 
-bool CActorAI::ToGoBack()
+bool CActorAI::_ToGoBack()
 {
     __ENTER_FUNCTION
-    if(GetAIData().script_id())
-    {
-        if(ScriptManager()->TryExecScript<bool>(GetAIData().script_id(), SCB_AI_TO_GOBACK, this) == true)
-        {
-            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: SCB_AI_TO_GOBACK Succ");
-            return true;
-        }
-    }
-
     m_posTarget = m_posRecord;
     ChangeState(ATT_GOBACK); // 转换到ESCAPE状态
     AddNextCall(MOVE_PER_WAIT_MS);
     return true;
+    __LEAVE_FUNCTION
+    return false;
+}
+
+bool CActorAI::ToGoBack()
+{
+    __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToGoBack");
+
+    auto find = ScriptManager()->QueryScriptFunc(SCRIPT_AI, GetAIData().script_id(), "ToGoBack");
+    if(find)
+    {
+        if(ScriptManager()->ExecStackScriptFunc<bool>(this) == true)
+        {
+            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: TryExecScript ToGoBack Succ");
+            return true;
+        }
+    }
+
+    return _ToGoBack();
     __LEAVE_FUNCTION
     return false;
 }
@@ -348,6 +372,37 @@ bool CActorAI::ToSkillFinish(uint32_t stun_ms)
     return false;
 }
 
+void CActorAI::_ProcessAttack(CAIActor* pTarget)
+{
+    __ENTER_FUNCTION
+    float dis = GameMath::distance(GetActor()->GetPos(), pTarget->GetPos());
+    if(dis > GetAIData().attack_target_range())
+    {
+        LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ProessAttack target out of range");
+
+        SetMainTarget(0);
+        ToAttack();
+        return;
+    }
+
+    double self_hp    = double(GetActor()->GetHP()) / double(GetActor()->GetHPMax());
+    double self_mp    = double(GetActor()->GetMP()) / double(GetActor()->GetMPMax());
+    double target_hp  = double(pTarget->GetHP()) / double(pTarget->GetHPMax());
+    auto   pSkillData = GetActor()->GetSkillSet().ChooseSkill(m_pAIType->GetSkillFAM(), dis, self_hp, self_mp, target_hp);
+    if(pSkillData == nullptr)
+    {
+        LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: Skill can't choose");
+
+        SetMainTarget(0);
+        ToAttack();
+        return;
+    }
+
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: {} SelectSkill: {}", GetActor()->GetID(), pSkillData->GetSkillType()->GetID());
+    SetCurSkillTypeID(pSkillData->GetSkillType()->GetID());
+    ToSkill();
+    __LEAVE_FUNCTION
+}
 void CActorAI::ProcessAttack()
 {
     __ENTER_FUNCTION
@@ -382,41 +437,18 @@ void CActorAI::ProcessAttack()
         }
     }
 
-    if(GetAIData().script_id())
+    auto find = ScriptManager()->QueryScriptFunc(SCRIPT_AI, GetAIData().script_id(), "ProcessAttack");
+    if(find)
     {
-        if(ScriptManager()->TryExecScript<bool>(GetAIData().script_id(), SCB_AI_PROCESS_ATTACK, this, pTarget) == true)
+        if(ScriptManager()->ExecStackScriptFunc<bool>(this, pTarget) == true)
         {
-            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: TryExecScript SCB_AI_PROCESS_ATTACK Succ");
+            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: TryExecScript ProcessAttack Succ");
             return;
         }
     }
+        
 
-    float dis = GameMath::distance(GetActor()->GetPos(), pTarget->GetPos());
-    if(dis > GetAIData().attack_target_range())
-    {
-        LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ProessAttack target out of range");
-
-        SetMainTarget(0);
-        ToAttack();
-        return;
-    }
-
-    double self_hp    = double(GetActor()->GetHP()) / double(GetActor()->GetHPMax());
-    double self_mp    = double(GetActor()->GetMP()) / double(GetActor()->GetMPMax());
-    double target_hp  = double(pTarget->GetHP()) / double(pTarget->GetHPMax());
-    auto   pSkillData = GetActor()->GetSkillSet().ChooseSkill(m_pAIType->GetSkillFAM(), dis, self_hp, self_mp, target_hp);
-    if(pSkillData == nullptr)
-    {
-        LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: Skill can't choose");
-
-        SetMainTarget(0);
-        ToAttack();
-        return;
-    }
-
-    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: {} SelectSkill: {}", GetActor()->GetID(), pSkillData->GetSkillType()->GetID());
-    SetCurSkillTypeID(pSkillData->GetSkillType()->GetID());
-    ToSkill();
+    _ProcessAttack(pTarget);
     __LEAVE_FUNCTION
 }
 
@@ -719,20 +751,9 @@ bool CActorAI::ForEachInHateList(const std::function<bool(ST_HATE_DATA*)>& func)
     return false;
 }
 
-bool CActorAI::FindNextEnemy()
+bool CActorAI::_FindNextEnemy()
 {
     __ENTER_FUNCTION
-    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: FindNextEnemy Start");
-    SetMainTarget(0);
-    if(GetAIData().script_id())
-    {
-        if(ScriptManager()->TryExecScript<bool>(GetAIData().script_id(), SCB_AI_FINDNEXTENEMY, this) == true)
-        {
-            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: TryExecScript SCB_AI_FINDNEXTENEMY Succ");
-            return true;
-        }
-    }
-
     if(FindEnemyInHateList() == true)
     {
         return true;
@@ -792,6 +813,26 @@ bool CActorAI::FindNextEnemy()
             return GetMainTarget() != ID_NONE;
         }
     }
+    __LEAVE_FUNCTION
+    return false;
+}
+
+bool CActorAI::FindNextEnemy()
+{
+    __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: FindNextEnemy Start");
+    SetMainTarget(0);
+
+    auto find = ScriptManager()->QueryScriptFunc(SCRIPT_AI, GetAIData().script_id(), "FindNextEnemy");
+    if(find)
+    {
+        if(ScriptManager()->ExecStackScriptFunc<bool>(this) == true)
+        {
+            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: TryExecScript FindNextEnemy Succ");
+            return true;
+        }
+    }
+    return _FindNextEnemy();
     __LEAVE_FUNCTION
     return false;
 }
@@ -874,19 +915,9 @@ void CActorAI::_SearchEnemy_CallBack()
     __LEAVE_FUNCTION
 }
 
-OBJID CActorAI::SearchEnemy()
+OBJID CActorAI::_SearchEnemy()
 {
     __ENTER_FUNCTION
-    if(GetAIData().script_id() != 0)
-    {
-        OBJID idTarget = ScriptManager()->TryExecScript<OBJID>(GetAIData().script_id(), SCB_AI_SEARCHENEMY, this);
-        if(idTarget != 0)
-        {
-            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: TryExecScript SCB_AI_SEARCHENEMY Succ");
-            return idTarget;
-        }
-    }
-
     for(OBJID idActor: m_pActor->_GetViewList())
     {
         //找到第一个在范围内的敌人
@@ -904,6 +935,25 @@ OBJID CActorAI::SearchEnemy()
 
         return idActor;
     }
+    __LEAVE_FUNCTION
+    return ID_NONE;
+}
+
+OBJID CActorAI::SearchEnemy()
+{
+    __ENTER_FUNCTION
+
+    auto find = ScriptManager()->QueryScriptFunc(SCRIPT_AI, GetAIData().script_id(), "SearchEnemy");
+    if(find)
+    {
+        OBJID idTarget = ScriptManager()->ExecStackScriptFunc<OBJID>(this);
+       
+        LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: TryExecScript SearchEnemy Succ");
+        return idTarget;
+    }
+
+
+    return _SearchEnemy();
 
     __LEAVE_FUNCTION
     return ID_NONE;

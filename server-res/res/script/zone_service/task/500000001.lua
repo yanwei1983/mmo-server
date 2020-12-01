@@ -1,18 +1,17 @@
 --任务脚本 1
 
 --注册回调,需要的才注册，不注册不会回调
-script_manager:RegistFucName(500000001, SCB_TASK_CAN_ACCEPT, "x500000001_CanAccept");
-local this_task_id = 1;
+local this_task = register_script(SCRIPT_TASK, 1010001);
 
-function x500000001_CanAccept(pPlayer)
+function this_task.CanAccept(pPlayer)
 end
 
-function x500000001_OnAccept(pPlayer)
+function this_task.OnAccept(pPlayer)
 end
 
-function x500000001_CanCommit(pPlayer)
+function this_task.CanCommit(pPlayer)
 end
 
-function x500000001_OnCommit(pPlayer)
+function this_task.OnCommit(pPlayer)
 end
 

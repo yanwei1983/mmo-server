@@ -73,10 +73,8 @@ void CNpc::MakeShowData(SC_AOI_NEW& msg)
 void CNpc::OnEnterMap(CSceneBase* pScene)
 {
     CActor::OnEnterMap(pScene);
-    if(m_pType->GetScriptID() != 0)
-    {
-        ScriptManager()->TryExecScript<void>(m_pType->GetScriptID(), SCB_NPC_ONBORN, this);
-    }
+
+    ScriptManager()->TryExecScript<void>(SCRIPT_NPC, m_pType->GetScriptID(), "OnBorn", this);
 
     ServerMSG::ActorCreate aoi_msg;
     aoi_msg.set_actor_id(GetID());
@@ -173,15 +171,15 @@ void CNpc::_ActiveNpc(CPlayer* pPlayer)
 void CNpc::ActiveNpc(CPlayer* pPlayer)
 {
     __ENTER_FUNCTION
-    if(m_pType->GetScriptID() != 0)
+
+    auto find = ScriptManager()->QueryScriptFunc(SCRIPT_AI, m_pType->GetScriptID(), "OnActive");
+    if(find)
     {
-        const std::string& funcName = ScriptManager()->QueryFunc(m_pType->GetScriptID(), SCB_NPC_ONACTIVE);
-        if(funcName.empty() == false)
-        {
-            ScriptManager()->_ExecScript<void>(funcName.c_str(), this, pPlayer);
-            return;
-        }
-    }
+        ScriptManager()->ExecStackScriptFunc<void>(this);
+        
+        return;
+        
+    }  
 
     _ActiveNpc(pPlayer);
     __LEAVE_FUNCTION

@@ -153,10 +153,9 @@ void CSkillFSM::DoIntone(const CSkillType* pSkillType)
 
     m_pCurSkillType = pSkillType;
     m_curState      = SKILLSTATE_INTONE;
-    if(m_pCurSkillType->GetScirptID() != 0)
-    {
-        ScriptManager()->TryExecScript<void>(m_pCurSkillType->GetScirptID(), SCB_SKILL_DOINTONE, m_pOwner, m_idTarget, m_posTarget, m_pCurSkillType);
-    }
+
+    ScriptManager()
+        ->TryExecScript<void>(SCRIPT_SKILL, m_pCurSkillType->GetScirptID(), "OnDoIntone", m_pOwner, m_idTarget, m_posTarget, m_pCurSkillType);
 
     if(pSkillType->GetIntoneMS() == 0)
     {
@@ -213,8 +212,8 @@ void CSkillFSM::DoLaunch()
     m_curState    = SKILLSTATE_INTONE;
     m_nApplyTimes = 0;
 
-    if(m_pCurSkillType->GetScirptID() != 0)
-        ScriptManager()->TryExecScript<void>(m_pCurSkillType->GetScirptID(), SCB_SKILL_DOLAUNCH, m_pOwner, m_idTarget, m_posTarget, m_pCurSkillType);
+    ScriptManager()
+        ->TryExecScript<void>(SCRIPT_SKILL, m_pCurSkillType->GetScirptID(), "OnDoLaunch", m_pOwner, m_idTarget, m_posTarget, m_pCurSkillType);
 
     StartSkillCoolDown(m_pCurSkillType->GetCDType(), m_pCurSkillType->GetCDSec());
 
@@ -423,8 +422,10 @@ void CSkillFSM::FindTarget(CActor* pOwner, const CSkillType* pSkillType, OBJID i
                 {
                     if(CanSkillAttackActor(pSkillType, pOwner, pActor) == true)
                     {
-                        if(ScriptManager()
-                               ->TryExecScript<bool>(pSkillType->GetScirptID(), SCB_SKILL_ISTARGET, pOwner, posTarget, pSkillType, pActor) == true)
+                        bool is_target =
+                            ScriptManager()
+                                ->TryExecScript<bool>(SCRIPT_SKILL, pSkillType->GetScirptID(), "IsTarget", pOwner, posTarget, pSkillType, pActor);
+                        if(is_target == true)
                         {
                             vecTarget.push_back(pActor);
                         }
@@ -453,8 +454,8 @@ void _SkillEffectInRange(CActor* pOwner, const CSkillType* pSkillType, OBJID idT
     CSkillFSM::DoMultiDamage(pOwner, pSkillType, idTarget, posTarget, vecTarget);
     CSkillFSM::AddBullet(pOwner, pSkillType->GetBulletTypeID(), idTarget, posTarget, vecTarget);
     CSkillFSM::AttachStatus(pOwner, pSkillType, vecTarget);
-    if(pSkillType->GetScirptID() != 0)
-        ScriptManager()->TryExecScript<void>(pSkillType->GetScirptID(), SCB_SKILL_DOAPPLY, pOwner, idTarget, posTarget, pSkillType, nApplyTimes);
+
+    ScriptManager()->TryExecScript<void>(SCRIPT_SKILL, pSkillType->GetScirptID(), "OnSkillEffect", pOwner, idTarget, posTarget, pSkillType, nApplyTimes);
     __LEAVE_FUNCTION
 }
 
@@ -633,8 +634,7 @@ int32_t CSkillFSM::DoDamage(CActor* pOwner, const CSkillType* pSkillType, CActor
         return DR_MISS;
     }
 
-    if(pSkillType->GetScirptID() != 0)
-        ScriptManager()->TryExecScript<void>(pSkillType->GetScirptID(), SCB_SKILL_DODAMAGE, pOwner, idTarget, posTarget, pSkillType, pTarget);
+    ScriptManager()->TryExecScript<void>(SCRIPT_SKILL, pSkillType->GetScirptID(), "OnDoDamage", pOwner, idTarget, posTarget, pSkillType, pTarget);
 
     int32_t nDamage = DR_NODAMAGE;
 

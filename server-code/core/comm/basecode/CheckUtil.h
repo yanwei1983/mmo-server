@@ -7,198 +7,198 @@
 #include "LoggingMgr.h"
 
 #ifndef CHECK
-#define CHECK(expr)                                                              \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr);                                          \
+#define CHECK(expr)                                                             \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr);                                         \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return;                                                              \
-        }                                                                        \
+            return;                                                             \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECKF
-#define CHECKF(expr)                                                             \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr);                                          \
+#define CHECKF(expr)                                                            \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr);                                         \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return 0;                                                            \
-        }                                                                        \
+            return 0;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_RET
-#define CHECK_RET(expr, r)                                                       \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr);                                          \
+#define CHECK_RET(expr, r)                                                      \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr);                                         \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return r;                                                            \
-        }                                                                        \
+            return r;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_RETTYPE
-#define CHECK_RETTYPE(expr, R)                                                   \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr);                                          \
+#define CHECK_RETTYPE(expr, R)                                                  \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr);                                         \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            static R r;                                                          \
-            return r;                                                            \
-        }                                                                        \
+            static R r;                                                         \
+            return r;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_M
-#define CHECK_M(expr, msg)                                                       \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " msg:{}", msg);                           \
+#define CHECK_M(expr, msg)                                                      \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " msg:{}", msg);                          \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return;                                                              \
-        }                                                                        \
+            return;                                                             \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECKF_M
-#define CHECKF_M(expr, msg)                                                      \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " msg:{}", msg);                           \
+#define CHECKF_M(expr, msg)                                                     \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " msg:{}", msg);                          \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return 0;                                                            \
-        }                                                                        \
+            return 0;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_RET_M
-#define CHECK_RET_M(expr, r, msg)                                                \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " msg:{}", msg);                           \
+#define CHECK_RET_M(expr, r, msg)                                               \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " msg:{}", msg);                          \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return r;                                                            \
-        }                                                                        \
+            return r;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_RETTYPE_M
-#define CHECK_RETTYPE_M(expr, R, msg)                                            \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " msg:{}", msg);                           \
+#define CHECK_RETTYPE_M(expr, R, msg)                                           \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " msg:{}", msg);                          \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            static R r;                                                          \
-            return r;                                                            \
-        }                                                                        \
+            static R r;                                                         \
+            return r;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_V
-#define CHECK_V(expr, v)                                                         \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " " #v ":{}", v);                          \
+#define CHECK_V(expr, v)                                                        \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " " #v ":{}", v);                         \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return;                                                              \
-        }                                                                        \
+            return;                                                             \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECKF_V
-#define CHECKF_V(expr, v)                                                        \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " " #v ":{}", v);                          \
+#define CHECKF_V(expr, v)                                                       \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " " #v ":{}", v);                         \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return 0;                                                            \
-        }                                                                        \
+            return 0;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_RET_V
-#define CHECK_RET_V(expr, r, v)                                                  \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " " #v ":{}", v);                          \
+#define CHECK_RET_V(expr, r, v)                                                 \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " " #v ":{}", v);                         \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return r;                                                            \
-        }                                                                        \
+            return r;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_RETTYPE_V
-#define CHECK_RETTYPE_V(expr, R, v)                                              \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " " #v ":{}", v);                          \
+#define CHECK_RETTYPE_V(expr, R, v)                                             \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " " #v ":{}", v);                         \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            static R r;                                                          \
-            return r;                                                            \
-        }                                                                        \
+            static R r;                                                         \
+            return r;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_FMT
-#define CHECK_FMT(expr, fmt_msg, ...)                                            \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);           \
+#define CHECK_FMT(expr, fmt_msg, ...)                                           \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);          \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return;                                                              \
-        }                                                                        \
+            return;                                                             \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECKF_FMT
-#define CHECKF_FMT(expr, fmt_msg, ...)                                           \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);           \
+#define CHECKF_FMT(expr, fmt_msg, ...)                                          \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);          \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return 0;                                                            \
-        }                                                                        \
+            return 0;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_RET_FMT
-#define CHECK_RET_FMT(expr, r, fmt_msg, ...)                                     \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);           \
+#define CHECK_RET_FMT(expr, r, fmt_msg, ...)                                    \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);          \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return r;                                                            \
-        }                                                                        \
+            return r;                                                           \
+        }                                                                       \
     }
 #endif
 
 #ifndef CHECK_RETTYPE_FMT
-#define CHECK_RETTYPE_FMT(expr, R, fmt_msg, ...)                                 \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);           \
+#define CHECK_RETTYPE_FMT(expr, R, fmt_msg, ...)                                \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);          \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            static R r;                                                          \
-            return r;                                                            \
-        }                                                                        \
+            static R r;                                                         \
+            return r;                                                           \
+        }                                                                       \
     }
 #endif
 
@@ -229,14 +229,14 @@
 #ifdef _DEBUG
 
 #ifndef CHECK_DEBUG
-#define CHECK_DEBUG(expr)                                                        \
-    {                                                                            \
-        if(!(expr))                                                              \
-        {                                                                        \
-            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);           \
+#define CHECK_DEBUG(expr)                                                       \
+    {                                                                           \
+        if(!(expr))                                                             \
+        {                                                                       \
+            LOGASSERT("ASSERT:" #expr " msg:" fmt_msg, ##__VA_ARGS__);          \
             LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7))); \
-            return 0;                                                            \
-        }                                                                        \
+            return 0;                                                           \
+        }                                                                       \
     }
 #endif
 

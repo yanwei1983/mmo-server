@@ -954,10 +954,8 @@ void CPackage::CheckItemExpire(uint32_t dwTimeNow)
         if(pItem)
         {
             uint64_t idScript = pItem->ItemTypePtr()->GetScriptID();
-            if(idScript != ID_NONE)
-            {
-                ScriptManager()->TryExecScript<void>(idScript, SCB_ITEM_ONTIMEOUT, pItem, m_pOwner);
-            }
+
+            ScriptManager()->TryExecScript<void>(SCRIPT_ITEM, idScript, "OnTimeOut", pItem, m_pOwner);
 
             //带掩码的物品，自动删除
             if(pItem->HasFlag(ITEMFLAG_DELITEM_EXPIRE))

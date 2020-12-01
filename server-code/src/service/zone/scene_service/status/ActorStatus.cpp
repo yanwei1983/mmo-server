@@ -338,8 +338,8 @@ void CActorStatus::OnAttach()
     if(m_pType)
         m_pOwner->GetAttrib().Store(m_pType->GetAttribChangeList());
     //执行脚本
-    if(m_pType && m_pType->GetScirptID() != 0)
-        ScriptManager()->TryExecScript<void>(m_pType->GetScirptID(), SCB_STATUS_ONATTACH, this);
+
+    ScriptManager()->TryExecScript<void>(SCRIPT_STATUS, GetScriptID(), "OnAttach", this);
 
     SC_STATUS_ACTION msg;
     msg.set_actor_id(m_pOwner->GetID());
@@ -367,8 +367,8 @@ void CActorStatus::OnDeatch()
     if(m_pType)
         m_pOwner->GetAttrib().Remove(m_pType->GetAttribChangeList());
     //执行脚本
-    if(m_pType && m_pType->GetScirptID() != 0)
-        ScriptManager()->TryExecScript<void>(m_pType->GetScirptID(), SCB_STATUS_ONDETACH, this);
+
+    ScriptManager()->TryExecScript<void>(SCRIPT_STATUS, GetScriptID(), "OnDetach", this);
 
     SC_STATUS_ACTION msg;
     msg.set_actor_id(m_pOwner->GetID());
@@ -380,15 +380,17 @@ void CActorStatus::OnDeatch()
     __LEAVE_FUNCTION
 }
 
+uint64_t CActorStatus::GetScriptID() const
+{
+    if(m_pType)
+        return m_pType->GetScriptID();
+    return 0;
+}
 bool CActorStatus::OnMove()
 {
     __ENTER_FUNCTION
     //执行脚本
-    bool bNeedDestory = false;
-    if(m_pType && m_pType->GetScirptID() != 0)
-    {
-        bNeedDestory = ScriptManager()->TryExecScript<bool>(m_pType->GetScirptID(), SCB_STATUS_ONMOVE, this);
-    }
+    bool bNeedDestory = ScriptManager()->TryExecScript<bool>(SCRIPT_STATUS, GetScriptID(), "OnMove", this);
 
     return bNeedDestory;
     __LEAVE_FUNCTION
@@ -399,11 +401,7 @@ bool CActorStatus::OnSkill(uint32_t idSkill)
 {
     __ENTER_FUNCTION
     //执行脚本
-    bool bNeedDestory = false;
-    if(m_pType && m_pType->GetScirptID() != 0)
-    {
-        bNeedDestory = ScriptManager()->TryExecScript<bool>(m_pType->GetScirptID(), SCB_STATUS_ONSKILL, this, idSkill);
-    }
+    bool bNeedDestory = ScriptManager()->TryExecScript<bool>(SCRIPT_STATUS, GetScriptID(), "OnSkill", this, idSkill);
 
     return bNeedDestory;
     __LEAVE_FUNCTION
@@ -414,11 +412,7 @@ bool CActorStatus::OnAttack(CActor* pTarget, uint32_t idSkill, int32_t nDamage)
 {
     __ENTER_FUNCTION
     //执行脚本
-    bool bNeedDestory = false;
-    if(m_pType && m_pType->GetScirptID() != 0)
-    {
-        bNeedDestory = ScriptManager()->TryExecScript<bool>(m_pType->GetScirptID(), SCB_STATUS_ONATTACK, this, pTarget, idSkill, nDamage);
-    }
+    bool bNeedDestory = ScriptManager()->TryExecScript<bool>(SCRIPT_STATUS, GetScriptID(), "OnAttack", this, pTarget, idSkill, nDamage);
 
     return bNeedDestory;
 
@@ -430,11 +424,7 @@ bool CActorStatus::OnBeAttack(CActor* pAttacker, int32_t nDamage)
 {
     __ENTER_FUNCTION
     //执行脚本
-    bool bNeedDestory = false;
-    if(m_pType && m_pType->GetScirptID() != 0)
-    {
-        bNeedDestory = ScriptManager()->TryExecScript<bool>(m_pType->GetScirptID(), SCB_STATUS_ONBEATTACK, this, pAttacker, nDamage);
-    }
+    bool bNeedDestory = ScriptManager()->TryExecScript<bool>(SCRIPT_STATUS, GetScriptID(), "OnBeAttack", this, pAttacker, nDamage);
 
     return bNeedDestory;
     __LEAVE_FUNCTION
@@ -444,11 +434,7 @@ bool CActorStatus::OnBeAttack(CActor* pAttacker, int32_t nDamage)
 bool CActorStatus::OnDead(CActor* pKiller)
 {
     __ENTER_FUNCTION
-    bool bNeedDestory = true;
-    if(m_pType && m_pType->GetScirptID() != 0)
-    {
-        bNeedDestory = ScriptManager()->TryExecScript<bool>(m_pType->GetScirptID(), SCB_STATUS_ONDEAD, this, pKiller);
-    }
+    bool bNeedDestory = ScriptManager()->TryExecScript<bool>(SCRIPT_STATUS, GetScriptID(), "OnDead", this, pKiller);
 
     return bNeedDestory;
     __LEAVE_FUNCTION
@@ -459,11 +445,7 @@ bool CActorStatus::OnLeaveMap()
 {
     __ENTER_FUNCTION
     //执行脚本
-    bool bNeedDestory = false;
-    if(m_pType && m_pType->GetScirptID() != 0)
-    {
-        bNeedDestory = ScriptManager()->TryExecScript<bool>(m_pType->GetScirptID(), SCB_STATUS_ONLEAVEMAP, this);
-    }
+    bool bNeedDestory = ScriptManager()->TryExecScript<bool>(SCRIPT_STATUS, GetScriptID(), "OnLeaveMap", this);
 
     return bNeedDestory;
     __LEAVE_FUNCTION
@@ -474,10 +456,7 @@ void CActorStatus::OnLogin()
 {
     __ENTER_FUNCTION
     //执行脚本
-    if(m_pType && m_pType->GetScirptID() != 0)
-    {
-        ScriptManager()->TryExecScript<void>(m_pType->GetScirptID(), SCB_STATUS_ONLOGIN, this);
-    }
+    ScriptManager()->TryExecScript<void>(SCRIPT_STATUS, GetScriptID(), "OnLogin", this);
 
     if(IsPaused() == true)
     {
@@ -495,10 +474,8 @@ void CActorStatus::OnLogout()
 {
     __ENTER_FUNCTION
     //执行脚本
-    if(m_pType && m_pType->GetScirptID() != 0)
-    {
-        ScriptManager()->TryExecScript<void>(m_pType->GetScirptID(), SCB_STATUS_ONLOGOUT, this);
-    }
+
+    ScriptManager()->TryExecScript<void>(SCRIPT_STATUS, GetScriptID(), "OnLogout", this);
 
     CancelEvent();
     __LEAVE_FUNCTION
@@ -529,10 +506,9 @@ void CActorStatus::OnEffect()
 {
     __ENTER_FUNCTION
     //执行脚本
-    if(m_pType && m_pType->GetScirptID() != 0)
-    {
-        ScriptManager()->TryExecScript<void>(m_pType->GetScirptID(), SCB_STATUS_ONEFFECT, this);
-    }
+
+    ScriptManager()->TryExecScript<void>(SCRIPT_STATUS, GetScriptID(), "OnEffect", this);
+
     SC_STATUS_ACTION msg;
     msg.set_actor_id(m_pOwner->GetID());
     msg.set_action(SC_STATUS_ACTION::STATUS_EFFECT);

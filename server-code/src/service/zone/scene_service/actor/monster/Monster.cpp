@@ -58,10 +58,7 @@ bool CMonster::Init(uint32_t idMonsterType, OBJID idOwner, uint32_t idGen, uint6
     _SetHP(GetHPMax());
     _SetMP(GetMPMax());
 
-    if(m_pType->GetScriptID())
-    {
-        ScriptManager()->TryExecScript<void>(m_pType->GetScriptID(), SCB_MONSTER_ONBORN, this);
-    }
+    ScriptManager()->TryExecScript<void>(SCRIPT_MONSTER, m_pType->GetScriptID(), "OnBorn", this);
 
     m_pCDSet.reset(CCoolDownSet::CreateNew());
     CHECKF(m_pCDSet.get());
@@ -120,10 +117,8 @@ void CMonster::BeKillBy(CActor* pAttacker)
 {
     __ENTER_FUNCTION
     CActor::BeKillBy(pAttacker);
-    if(m_pType->GetScriptID())
-    {
-        ScriptManager()->TryExecScript<void>(m_pType->GetScriptID(), SCB_MONSTER_ONBEKILL, this);
-    }
+
+    ScriptManager()->TryExecScript<void>(SCRIPT_MONSTER, m_pType->GetScriptID(), "OnBeKill", this);
 
     CPlayer* pKillerPlayer = nullptr;
     if(pAttacker == nullptr)
@@ -230,10 +225,8 @@ void CMonster::OnBeAttack(CActor* pAttacker, int32_t nRealDamage)
         m_HateList.AddHate(pAttacker->GetID(), nRealDamage);
 
     CActor::OnBeAttack(pAttacker, nRealDamage);
-    if(m_pType->GetScriptID())
-    {
-        ScriptManager()->TryExecScript<void>(m_pType->GetScriptID(), SCB_MONSTER_ONBEATTACK, this, pAttacker, nRealDamage);
-    }
+
+    ScriptManager()->TryExecScript<void>(SCRIPT_MONSTER, m_pType->GetScriptID(), "OnBeAttack", this, pAttacker, nRealDamage);
 
     __LEAVE_FUNCTION
 }

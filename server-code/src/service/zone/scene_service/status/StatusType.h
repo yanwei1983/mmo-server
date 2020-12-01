@@ -28,7 +28,7 @@ public:
     export_lua int32_t  GetTimes() const;
     export_lua int32_t  GetMaxTimes() const;
     export_lua int32_t  GetMaxSecs() const;
-    export_lua OBJID    GetScirptID() const;
+    export_lua OBJID    GetScriptID() const;
 
     export_lua const std::vector<CActorAttribChange>& GetAttribChangeList() const;
 

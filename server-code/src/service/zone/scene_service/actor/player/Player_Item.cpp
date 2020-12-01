@@ -132,19 +132,16 @@ bool CPlayer::UseItem(uint32_t nGridInBag, uint32_t nCount /* = 1*/)
         if(nCanUseCount < nCount)
             nCount = nCanUseCount;
 
-        auto check_func_name = ScriptManager()->QueryFunc(pItemType->GetScriptID(), SCB_ITEM_ONBATCHUSECHECK);
-        if(check_func_name.empty() == false)
+        bool find = ScriptManager()->QueryScriptFunc(SCRIPT_ITEM,pItemType->GetScriptID(), "OnBatchUseCheck");
+        if(find)
         {
-            nCount = ScriptManager()->_ExecScript<uint32_t>(check_func_name.c_str(), check_func_name.c_str(), pItem, nCount, this);
+            nCount = ScriptManager()->ExecStackScriptFunc<uint32_t>(pItem, nCount, this);
             if(nCount == 0)
                 return false;
         }
     }
 
-    auto check_func_name = ScriptManager()->QueryFunc(pItemType->GetScriptID(), SCB_ITEM_ONUSE);
-    if(check_func_name.empty())
-        return false;
-    bool bSucc = ScriptManager()->_ExecScript<bool>(check_func_name.c_str(), check_func_name.c_str(), pItem, nCount, this);
+    bool bSucc = ScriptManager()->TryExecScript<bool>(SCRIPT_ITEM, pItemType->GetScriptID(), "OnUse", pItem, nCount, this);
     if(bSucc == false)
         return false;
 

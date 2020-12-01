@@ -97,8 +97,6 @@ bool CLUAScriptManager::Init(const std::string& name, InitRegisterFunc func, voi
 
         lua_tinker::class_add<CLUAScriptManager>(m_pLua, "CLUAScriptManager");
         lua_tinker::class_def<CLUAScriptManager>(m_pLua, "RegistFucName", &CLUAScriptManager::RegistFucName);
-        lua_tinker::class_def<CLUAScriptManager>(m_pLua, "RegistFile", &CLUAScriptManager::RegistFile);
-        lua_tinker::class_def<CLUAScriptManager>(m_pLua, "LoadFile", &CLUAScriptManager::LoadFile);
         lua_tinker::class_def<CLUAScriptManager>(m_pLua, "LoadFilesInDir", &CLUAScriptManager::LoadFilesInDir);
 
         lua_tinker::def(m_pLua, "InitBaseCodeInLua", &InitBaseCodeInLua);
@@ -138,6 +136,7 @@ void CLUAScriptManager::Destory()
 {
     if(m_pLua)
     {
+        m_script_table.clear();
         lua_close(m_pLua);
         m_pLua = nullptr;
         LOGDEBUG("ScriptManager Destory Succ");
@@ -150,34 +149,21 @@ void CLUAScriptManager::Reload(const std::string& name, bool bExecMain)
     Init(name, m_pInitRegisterFunc, m_pInitParam, m_search_path.c_str(), bExecMain);
 }
 
-void CLUAScriptManager::LoadFile(uint64_t idScript, const std::string& filename)
-{
-    m_Data[idScript].FileName = filename;
-    lua_tinker::dofile(m_pLua, filename.c_str());
-}
-
 void CLUAScriptManager::LoadFilesInDir(const std::string& dir, bool bRecursive)
 {
     //遍历文件夹
-    scan_dir(m_search_path, dir, bRecursive, [pThis = this](const std::string& dirname, const std::string& filename) {
+    scan_dir(m_search_path, dir, bRecursive, [this](const std::string& dirname, const std::string& filename) {
         if(get_file_ext(filename) != "lua")
             return;
+
         try
         {
-            uint64_t id = std::stoull(get_filename_without_ext(filename));
-            pThis->LoadFile(id, dirname + "/" + filename);
+            lua_tinker::dofile(m_pLua, (dirname + "/" + filename).c_str());
         }
         catch(...)
         {
         }
     });
-}
-
-void CLUAScriptManager::RegistFile(uint64_t idScript, const std::string& filename)
-{
-    //获得当前lua路径
-    LOGLUA("register script:%ld {}", idScript, filename.c_str());
-    m_Data[idScript].FileName = filename;
 }
 
 void CLUAScriptManager::OnTimer(time_t tTick)
@@ -195,4 +181,74 @@ void CLUAScriptManager::OnTimer(time_t tTick)
 void CLUAScriptManager::FullGC()
 {
     lua_gc(m_pLua, LUA_GCCOLLECT, 0);
+}
+
+
+void CLUAScriptManager::RegistScriptType(uint32_t idScriptType, const std::string& table_name)
+{
+    m_ScriptTableName[idScriptType] = table_name;
+}
+
+std::string_view CLUAScriptManager::ScriptTypeToName(uint32_t idScriptType) const
+{
+    auto it = m_ScriptTableName.find(idScriptType);
+    if(it != m_ScriptTableName.end())
+        return it->second;
+    return {};
+}
+
+//注册一个函数回调名
+void CLUAScriptManager::RegistFucName(uint32_t idScriptType, uint64_t idScript)
+{
+    m_Data[idScriptType].insert(idScript);
+}
+
+bool CLUAScriptManager::IsRegisted(uint32_t idScriptType, uint64_t idScript) const
+{
+    auto it_find = m_Data.find(idScriptType);
+    if(it_find == m_Data.end())
+        return false;
+    const auto& refSet = it_find->second;
+    if(refSet.count(idScript) > 0)
+    {
+        return true; 
+    }
+    else
+    {
+        return false;
+    }
+    
+}
+
+
+const lua_tinker::table_ref& CLUAScriptManager::QueryScriptTable(const std::string_view& table_name)
+{
+    auto it = m_script_table.find(table_name);
+    if(it == m_script_table.end())
+        return it->second;
+    
+    auto table_ref = lua_tinker::get<lua_tinker::table_ref>(m_pLua, table_name.data());
+    m_script_table.emplace(table_name, std::move(table_ref));
+
+    it = m_script_table.find(table_name);
+    return it->second;
+}
+
+bool CLUAScriptManager::QueryScriptFunc(uint32_t idScriptType, uint64_t idScript, const std::string_view& FuncName)
+{
+    if(idScript == 0)
+        return false;
+    if(IsRegisted(idScriptType, idScript) == false)
+        return false;
+    const auto& table_ref = QueryScriptTable(ScriptTypeToName(idScriptType));
+    auto table_onstack = table_ref.push_table_to_stack();
+    bool succ = table_onstack.get_to_stack(FuncName.data());
+    if(succ == true)
+    {
+        if(lua_isfunction(m_pLua, -1) == true)
+            return true;
+        
+        lua_pop(m_pLua, 1);
+    }
+    return false;
 }

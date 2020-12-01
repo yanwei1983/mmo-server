@@ -70,7 +70,9 @@ public:
     export_lua void OrderAttack(OBJID idTarget);
 
     export_lua OBJID SearchEnemy();
+    export_lua OBJID _SearchEnemy();
     export_lua bool  FindNextEnemy();
+    export_lua bool  _FindNextEnemy();
     export_lua void  ClearHateList();
     export_lua void  AddHate(OBJID idTarget, int32_t nHate);
 
@@ -94,6 +96,7 @@ public:
     export_lua bool ToPratol();
     // 转到idle状态
     export_lua bool ToIdle();
+    export_lua bool _ToIdle();
     // 攻击决策
     export_lua bool ToAttack();
     // 转到前进状态
@@ -107,11 +110,13 @@ public:
 
     // 回出生点
     export_lua bool ToGoBack();
+    export_lua bool _ToGoBack();
     // 巡逻等待
     export_lua bool ToPatrolWait(uint32_t wait_min, uint32_t wait_max);
 
 protected:
     void ProcessAttack();
+    export_lua void _ProcessAttack(CAIActor* pTarget);
     void ProcessRandMove();
     //! 空闲状态处理
     void ProcessIdle();
