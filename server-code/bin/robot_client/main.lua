@@ -4,9 +4,14 @@ require "robot_client"
 
 InitBaseCodeInLua(this_lua);
 g_clientinfo = {} or g_clientinfo;
-g_print_debug = true
+g_print_debug = false
 function print_clientmsg(client,...)
 	print(string.format("[%s]", client:GetClientID()), ...)
+end
+function print_debugmsg(client,...)
+	if g_print_debug then
+		print(string.format("[%s]", client:GetClientID()), ...)
+	end
 end
 
 function main(start_idx, max_players)

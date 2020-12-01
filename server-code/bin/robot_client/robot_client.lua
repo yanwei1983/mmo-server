@@ -36,9 +36,7 @@ function OnConnect(client)
 end
 
 function OnDisconnected(client)
-	if g_print_debug then
-			print_clientmsg(client, "OnDisconnected.");
-	end
+	print_debugmsg(client, "OnDisconnected.");
 end
 
 function OnRecv_SC_LOGIN(client, buffer, size)
@@ -49,13 +47,9 @@ function OnRecv_SC_LOGIN(client, buffer, size)
 	end
 	
 	if(msg.result_code == 0) then
-		if g_print_debug then
-			print_clientmsg(client, "SC_LOGIN succ.");
-		end
+		print_debugmsg(client, "SC_LOGIN succ.");
 	else
-		if g_print_debug then
-			print_clientmsg(client,"SC_LOGIN error: ",msg.result_code, " detail: ", msg.detail);
-		end
+		print_debugmsg(client,"SC_LOGIN error: ",msg.result_code, " detail: ", msg.detail);
 	end
 		
 end
@@ -68,15 +62,11 @@ function OnRecv_SC_CREATEACTOR(client, buffer, size)
 	end
 	if msg.result_code == 0 then
 		--select actor
-		if g_print_debug then
-			print_clientmsg(client,"send CS_SELECTACTOR");
-		end
+		print_debugmsg(client,"send CS_SELECTACTOR");
 		local send_msg = ProtobufMessageWarp("CS_SELECTACTOR");
 		client:SendProtobufToServer(GetProtobufMessagePtr(send_msg) );
 	else
-		if g_print_debug then
-			print_clientmsg(client,"SC_CREATEACTOR error:",msg.result_code);
-		end
+		print_debugmsg(client,"SC_CREATEACTOR error:",msg.result_code);
 	end
 end
 
@@ -90,9 +80,7 @@ function OnRecv_SC_ACTORINFOLIST(client, buffer, size)
 	local actor_size = GetProtobufFieldSize(msg, "list");
 	if(actor_size == 0)then
 		--create actor
-		if g_print_debug then
-			print_clientmsg(client,"send CS_CREATEACTOR");
-		end
+		print_debugmsg(client,"send CS_CREATEACTOR");
 		
 		local send_msg = ProtobufMessageWarp("CS_CREATEACTOR");
 		send_msg.name = "test_"..client:GetClientID();
@@ -101,9 +89,8 @@ function OnRecv_SC_ACTORINFOLIST(client, buffer, size)
 		client:SendProtobufToServer(GetProtobufMessagePtr(send_msg) );
 	else
 		--select actor
-		if g_print_debug then
-			print_clientmsg(client,"send CS_SELECTACTOR");
-		end
+		print_debugmsg(client,"send CS_SELECTACTOR");
+
 		local send_msg = ProtobufMessageWarp("CS_SELECTACTOR");
 		client:SendProtobufToServer(GetProtobufMessagePtr(send_msg) );
 		
@@ -123,9 +110,7 @@ function OnRecv_SC_PLAYERINFO(client, buffer, size)
 	info.playerid = msg.playerid;
 	info.hp = msg.hp;
 	
-	if g_print_debug then
-		print_clientmsg(client, "SC_PLAYERINFO recv. hp:", info.hp);
-	end
+	print_debugmsg(client, "SC_PLAYERINFO recv. hp:", info.hp);
 		
 end
 
@@ -144,9 +129,7 @@ function OnRecv_SC_PROPERTY_CHANGE(client, buffer, size)
 	for i=0,size_datalist-1,1 do
 		if msg.datalist[i].actype == PROP_HP then
 			info.hp = msg.datalist[i].val;
-			if g_print_debug then
-				print_clientmsg(client, "hp=", info.hp);
-			end
+			print_debugmsg(client, "hp=", info.hp);
 		end
 	end
 	
@@ -167,9 +150,8 @@ function OnRecv_SC_POS_CHANGE(client, buffer, size)
 
 	info.posx=msg.posx;
 	info.posy=msg.posy;
-	if g_print_debug then
-		print_clientmsg(client, "self posx:", info.posx, " posy:", info.posy);
-	end
+	print_debugmsg(client, "self posx:", info.posx, " posy:", info.posy);
+
 	client:AddEventCallBack(random_uint32_range(700,1500), "SendMove", false);
 end
 
@@ -186,9 +168,7 @@ function OnRecv_SC_AOI_UPDATE(client, buffer, size)
 	end
 
 	--other actor
-	if g_print_debug then
-		print_clientmsg(client, string.format("%d posx:%f posy:%f", msg.actor_id, info.posx, info.posy));
-	end
+	print_debugmsg(client, string.format("%d posx:%f posy:%f", msg.actor_id, info.posx, info.posy));
 	
 	
 end
@@ -200,9 +180,7 @@ function OnRecv_SC_LOADMAP(client, buffer, size)
 		error("SC_LOADMAP ParseFromArray fail");
 		return;
 	end
-	if g_print_debug then
-		print_clientmsg(client, "loading map:", msg.mapid, ",x:", msg.posx, ",y:", msg.posy);
-	end
+	print_debugmsg(client, "loading map:", msg.mapid, ",x:", msg.posx, ",y:", msg.posy);
 	
 	local info = g_clientinfo[client:GetClientID()];
 	info.scene_idx= msg.scene_idx;
@@ -219,17 +197,15 @@ function OnRecv_SC_ENTERMAP(client, buffer, size)
 		error("SC_ENTERMAP ParseFromArray fail");
 		return;
 	end
-	if g_print_debug then
-		print_clientmsg(client, "enter map succ.");
-	end
+	print_debugmsg(client, "enter map succ.");
+
 	local info = g_clientinfo[client:GetClientID()];
 	if info.hp == 0 then
 		local send_msg = ProtobufMessageWarp("CS_REBORN");
 		send_msg.reborn_type = 2;
 		client:SendProtobufToServer(GetProtobufMessagePtr(send_msg) );
-		if g_print_debug then
-			print_clientmsg(client, "send reborn");
-		end
+		print_debugmsg(client, "send reborn");
+
 	else
 		client:AddEventCallBack(random_uint32_range(700,1500), "SendMove", false);
 	end
@@ -245,15 +221,13 @@ function OnRecv_SC_DEAD(client, buffer, size)
 	
 	local info = g_clientinfo[client:GetClientID()];
 	if(info.playerid == msg.actor_id)then
-		if g_print_debug then
-			print_clientmsg(client, "player dead.");
-		end
+		print_debugmsg(client, "player dead.");
+
 		local send_msg = ProtobufMessageWarp("CS_REBORN");
 		send_msg.reborn_type = 2;
 		client:SendProtobufToServer(GetProtobufMessagePtr(send_msg) );
-		if g_print_debug then
-			print_clientmsg(client, "send reborn");
-		end
+		print_debugmsg(client, "send reborn");
+
 	end
 end
 
@@ -265,9 +239,8 @@ function OnRecv_SC_DAMAGE(client, buffer, size)
 		return;
 	end
 	
-	if g_print_debug then
-		print_clientmsg(client, string.format("attacker %d damage %d", msg.attacker_id, msg.damage) );
-	end
+	print_debugmsg(client, string.format("attacker %d damage %d", msg.attacker_id, msg.damage) );
+
 end
 
 function SendMove(client)
@@ -278,8 +251,6 @@ function SendMove(client)
 	send_msg.x = info.posx + random_float(-1.0, 1.0);
 	send_msg.y = info.posy + random_float(-1.0, 1.0);
 	client:SendProtobufToServer(GetProtobufMessagePtr(send_msg) );
-	if g_print_debug then
-		print_clientmsg(client, "sendmove x:", send_msg.x, ",y:", send_msg.y);
-	end
+	print_debugmsg(client, "sendmove x:", send_msg.x, ",y:", send_msg.y);
 	
 end
