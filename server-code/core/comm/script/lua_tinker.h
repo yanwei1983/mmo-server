@@ -9,6 +9,7 @@
 #if !defined(_LUA_TINKER_H_)
 #define _LUA_TINKER_H_
 
+#include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <functional>
@@ -19,6 +20,7 @@
 #include <type_traits>
 #include <typeindex>
 #include <typeinfo>
+
 
 //#include<set>
 #include <map>
@@ -77,7 +79,7 @@ namespace lua_tinker
 
     // close callback func
     typedef std::function<void(lua_State*)> Lua_Close_CallBack_Func;
-    void                                    register_lua_close_callback(lua_State* L, Lua_Close_CallBack_Func&& callback_func);
+    void register_lua_close_callback(lua_State* L, Lua_Close_CallBack_Func&& callback_func);
 
     // error callback
     typedef int32_t (*error_call_back_fn)(lua_State* L);
@@ -530,6 +532,17 @@ namespace lua_tinker
 
             static table_onstack apply(lua_State* L);
         };
+
+        template<typename RVal>
+        RVal pop_nil(lua_State* L)
+        {
+            for(int32_t i = 0; i < detail::pop<RVal>::nresult; i++)
+            {
+                lua_pushnil(L);
+            };
+            return detail::pop<RVal>::apply(L);
+        }
+           
 
         // push value_list to lua stack //here need a T/T*/T& not a T&&
         void push_args(lua_State* L);
@@ -1739,7 +1752,7 @@ namespace lua_tinker
         if(luaL_loadfile(L, filename) != 0)
         {
             print_error(L, "%s", lua_tostring(L, -1));
-            return RVal();
+            return detail::pop_nil<RVal>(L);
         }
         return call_stackfunc<RVal>(L);
     }
@@ -1756,7 +1769,7 @@ namespace lua_tinker
         if(luaL_loadbuffer(L, buff, sz, "lua_tinker::dobuffer()") != 0)
          {
             print_error(L, "%s", lua_tostring(L, -1));
-            return RVal();
+            return detail::pop_nil<RVal>(L);
         }
         return call_stackfunc<RVal>(L);
     }
@@ -1770,7 +1783,7 @@ namespace lua_tinker
         {
             lua_pop(L, 1); // pop func
             print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
-            return RVal();
+            return detail::pop_nil<RVal>(L);
         }
         else
         {
@@ -1783,9 +1796,10 @@ namespace lua_tinker
     {
         //top = func
         lua_getglobal(L, ERROR_CALLBACK_NAME);
-        //top = errfunc, move errfunc to top+1
-        int32_t errfunc = lua_gettop(L) + 1 ;
-        lua_insert(L, errfunc); 
+        //top = errfunc | func
+        int32_t errfunc = lua_gettop(L)-1;
+        lua_insert(L, errfunc);
+        //top = func | errfunc 
         
         detail::push_args(L, std::forward<Args>(arg)...);
 
@@ -2394,18 +2408,18 @@ namespace lua_tinker
                 }
             }
 
-            template<typename T, typename Key>
-            T get(Key&& key)
+            template<typename RVal, typename Key>
+            RVal get(Key&& key)
             {
                 if(validate())
                 {
                     _push_key(std::forward<Key>(key));
                     lua_gettable(m_L, m_index);
-                    return detail::pop<T>::apply(m_L);
+                    return detail::pop<RVal>::apply(m_L);
                 }
                 else
                 {
-                    return T();
+                    return detail::pop_nil<RVal>(m_L);
                 }
             }
 
@@ -2431,23 +2445,21 @@ namespace lua_tinker
                 {
                     _push_key(std::forward<Key>(key));
                     lua_gettable(m_L, m_index);
-                    if(lua_isfunction(m_L, -1) == false)
+                    if(lua_isfunction(m_L, -1) == true)
                     {
-                        lua_pop(m_L, 1); // pop func
-                        print_error(m_L, "lua_tinker::call() attempt to call table[`%d'] (not a function)", key);
-                        
-                        return RVal();
+                        return call_stackfunc<RVal>(m_L, std::forward<Args>(arg)...);
                     }
                     else
                     {
-
-                        return call_stackfunc<RVal>(m_L, std::forward<Args>(arg)...);
+                        lua_pop(m_L, 1); // pop func
+                        print_error(m_L, "lua_tinker::call() attempt to call table[`%d'] (not a function)", key);
                     }
+                    
                 }
-                else
-                {
-                    return RVal();
-                }
+
+                //return nil
+                return detail::pop_nil<RVal>(m_L);
+                
                 
             }
             
@@ -2616,7 +2628,7 @@ namespace lua_tinker
                 lua_pop(m_L, 1); // pop func
                 print_error(m_L, "lua_tinker::call() attempt to call register_func[`%d'] (not a function)", m_regidx);
                 
-                return RVal();
+                return detail::pop_nil<RVal>(m_L);
             }
             return call_stackfunc<RVal>(m_L, std::forward<Args>(args)...);
         }
