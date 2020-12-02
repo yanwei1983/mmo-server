@@ -47,6 +47,8 @@ namespace lua_tinker
                 return stack_obj(L, lua_gettop(L));
             }
 
+            void    reset(int32_t nIdx = 0){_stack_pos = nIdx;}
+
             bool    is_vaild() const { return _stack_pos != 0; }
             int32_t get_type() const { return is_vaild() && lua_type(L, _stack_pos); }
             bool    is_number() const { return get_type() == LUA_TNUMBER; }
@@ -64,23 +66,21 @@ namespace lua_tinker
             {
                 if(is_vaild())
                     lua_remove(L, _stack_pos);
-                _stack_pos = 0;
+                reset(0);
             }
 
             void insert_to(int32_t nIdx)
             {
-                int32_t nTop = lua_gettop(L);
-                if(nTop == _stack_pos)
+                if(is_top())
                 {
-                    lua_rotate(L, nIdx, 1);
+                    lua_rotate(L, lua_absindex(L, nIdx), 1);
                     _stack_pos = lua_absindex(L, nIdx);
                 }
             }
 
             void pop_up(int32_t nIdx)
             {
-                int32_t nTop = lua_gettop(L);
-                if(nTop == _stack_pos)
+                if(is_top())
                 {
                     lua_rotate(L, nIdx, 1);
                     lua_pop(L, lua_gettop(L) - nIdx);
@@ -98,6 +98,11 @@ namespace lua_tinker
             {
                 if(is_vaild())
                     lua_pushvalue(L, _stack_pos);
+            }
+
+            bool is_top() const
+            {
+                return lua_gettop(L) == _stack_pos;
             }
 
             stack_obj get_lenobj() const
@@ -187,6 +192,12 @@ namespace lua_tinker
                         return get_top(L);
                 }
                 return stack_obj(L, 0);
+            }
+
+            void set_to_global(const char* name)
+            {
+                lua_setglobal(L, name);
+                reset(0);
             }
         };
 

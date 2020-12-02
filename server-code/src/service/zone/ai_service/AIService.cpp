@@ -18,9 +18,10 @@
 #include "MonsterType.h"
 #include "NetMSGProcess.h"
 #include "MsgProcessRegister.h"
-#include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "server_msg/server_side.pb.h"
+#include "ScriptManager.h"
+#include "ScriptCallBackType.h"
 
 static thread_local CAIService* tls_pService;
 CAIService*                     AIService()

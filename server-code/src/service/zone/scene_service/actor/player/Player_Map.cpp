@@ -174,7 +174,7 @@ void CPlayer::_FlyPhase(CSceneBase* pTargetPhase, float fPosX, float fPosY, floa
     CHECK(pOldPhase);
     CHECK(pTargetPhase);
     auto idTargetMap = pTargetPhase->GetSceneIdx().GetMapID();
-    LOGLOGIN("Player FlyMap:{} {} pos:{:.2f} {:.2f} {:.2f}", GetID(), idTargetMap, fPosX, fPosY, fRange);
+    LOGACTORDEBUG( GetID(), "Player FlyMap:{} pos:{:.2f} {:.2f} {:.2f}",idTargetMap, fPosX, fPosY, fRange);
 
     pOldPhase->LeaveMap(this, idTargetMap);
     m_pScene = nullptr;
@@ -269,7 +269,7 @@ void CPlayer::OnLoadMapSucc()
     CHECK(GetCurrentScene() == nullptr);
     auto pPhase = SceneManager()->QueryPhase(m_idLoadingScene);
     CHECK(pPhase);
-    LOGLOGIN("CPlayer::OnLoadMapSucc: {}", GetID());
+    LOGACTORDEBUG(GetID(), "CPlayer::OnLoadMapSucc");
 
     pPhase->EnterMap(this, m_fLoadingPosX, m_fLoadingPosY, m_fLoadingFace);
     __LEAVE_FUNCTION
@@ -296,7 +296,7 @@ void CPlayer::OnEnterMap(CSceneBase* pScene)
     __ENTER_FUNCTION
 
     CHECK(GetCurrentScene() == nullptr);
-    LOGLOGIN("Player OnEnterMapStart:{} {} pos:{:.2f} {:.2f}", GetID(), pScene->GetMapID(), GetPosX(), GetPosY());
+    LOGACTORDEBUG(GetID(), "Player OnEnterMapStart:{} pos:{:.2f} {:.2f}", pScene->GetMapID(), GetPosX(), GetPosY());
     CActor::OnEnterMap(pScene);
 
     m_idLoadingScene = 0;
@@ -352,7 +352,7 @@ void CPlayer::OnEnterMap(CSceneBase* pScene)
         SceneService()->SendProtoMsgToAOIService(send);
     }
 
-    LOGLOGIN("CPlayer::OnEnterMapEnd: {} mapid: {}", GetID(), GetSceneIdx());
+    LOGACTORDEBUG(GetID(), "CPlayer::OnEnterMapEnd: mapid: {}", GetSceneIdx());
 
     {
         SC_ENTERMAP msg;
@@ -369,7 +369,7 @@ void CPlayer::OnLeaveMap(uint16_t idTargetMap)
 {
     __ENTER_FUNCTION
     CHECK(GetCurrentScene());
-    LOGLOGIN("Player OnLeaveMap:{} {}", GetID(), GetCurrentScene()->GetMapID());
+    LOGACTORDEBUG(GetID(), "Player OnLeaveMap:{}", GetCurrentScene()->GetMapID());
 
     if(GetCurrentScene()->GetMap()->HasMapFlag(MAPFLAG_RECORD_DISABLE) == false)
     {
@@ -404,7 +404,7 @@ bool CPlayer::Reborn(uint32_t nRebornType)
     {
         case REBORN_HOME: //回城复活
         {
-            LOGLOGIN("Player Reborn HOME:{} {}", GetID(), GetCurrentScene()->GetMapID());
+            LOGACTORDEBUG(GetID(), "Player Reborn HOME: {}", GetCurrentScene()->GetMapID());
             GetStatus()->DetachStatusByType(STATUSTYPE_DEAD);
             SetProperty(PROP_HP, GetHPMax() / 2, SYNC_ALL_DELAY);
             FlyMap(GetHomeSceneIdx().GetMapID(), 0, 0, GetHomePosX(), GetHomePosY(), 0.0f, GetHomeFace());
@@ -418,7 +418,7 @@ bool CPlayer::Reborn(uint32_t nRebornType)
             const auto& pRebornData = GetCurrentScene()->GetMap()->GetRebornDataByIdx(GetCampID());
             CHECKF_FMT(pRebornData, "can't find RebornData In Map {} WithCamp:{}", GetMapID(), GetCampID());
 
-            LOGLOGIN("Player Reborn MAPPOS:{} {}", GetID(), GetCurrentScene()->GetMapID());
+            LOGACTORDEBUG(GetID(), "Player Reborn MAPPOS:{}", GetCurrentScene()->GetMapID());
             GetStatus()->DetachStatusByType(STATUSTYPE_DEAD);
             SetProperty(PROP_HP, MulDiv(GetHPMax(), 2, 3), SYNC_ALL_DELAY);
             if(pRebornData->reborn_this_phase() == true)
@@ -446,7 +446,7 @@ bool CPlayer::Reborn(uint32_t nRebornType)
             if(GetCurrentScene()->GetMap()->HasMapFlag(MAPFLAG_DISABLE_REBORN_STANDPOS) == true)
                 return false;
             //元宝检查
-            LOGLOGIN("Player Reborn STANDPOS:{} {}", GetID(), GetCurrentScene()->GetMapID());
+            LOGACTORDEBUG(GetID(),"Player Reborn STANDPOS:{}",  GetCurrentScene()->GetMapID());
             GetStatus()->DetachStatusByType(STATUSTYPE_DEAD);
             SetProperty(PROP_HP, GetHPMax(), SYNC_ALL_DELAY);
             FlyToPhase(GetCurrentScene(), GetPosX(), GetPosY(), 0.0f, GetFace());

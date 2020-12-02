@@ -23,7 +23,7 @@ ON_SERVERMSG(CSceneService, PlayerEnterZone)
 
     SceneService()->GetLoadingThread()->CancleWaiting(msg.idplayer());
 
-    LOGLOGIN("AddLoginPlayer: {}", msg.idplayer());
+    LOGACTORDEBUG(msg.idplayer(), "AddLoginPlayer");
     ST_LOADINGTHREAD_PROCESS_DATA data;
     data.nPorcessType  = LPT_LOADING;
     data.idPlayer      = msg.idplayer();

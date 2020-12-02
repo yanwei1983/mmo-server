@@ -4,14 +4,13 @@
 #include "BaseCode.h"
 #include "IService.h"
 #include "MyTimer.h"
-#include "NetSocket.h"
-#include "ScriptManager.h"
 #include "ServiceComm.h"
 #include "UIDFactory.h"
 
 class CAIActorManager;
 class CAISceneManager;
 class CMapManager;
+class CLUAScriptManager;
 
 class CAIService : public IService, public CServiceCommon
 {

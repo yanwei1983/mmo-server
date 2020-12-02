@@ -14,6 +14,7 @@
 #include "HateList.h"
 #include "MapManager.h"
 #include "ScriptCallBackType.h"
+#include "ScriptManager.h"
 #include "SkillType.h"
 #include "config/Cfg_Scene_Patrol.pb.h"
 

@@ -7,6 +7,7 @@
 #include "PlayerTask.h"
 #include "SceneService.h"
 #include "ScriptCallBackType.h"
+#include "ScriptManager.h"
 #include "gamedb.h"
 #include "msg/zone_service.pb.h"
 

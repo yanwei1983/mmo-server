@@ -121,12 +121,12 @@ void CLoadingThread::CancleOnReadyList(OBJID idPlayer)
         if(pData->nPorcessType == LPT_LOADING)
         {
             // loading ready
-            LOGLOGIN("remove from loading_ready:{}", idPlayer);
+            LOGACTORDEBUG(idPlayer, "remove from loading_ready");
         }
         else
         {
             // save ready
-            LOGLOGIN("remove from saver_eady:{}", idPlayer);
+            LOGACTORDEBUG(idPlayer, "remove from save_ready");
         }
         SAFE_DELETE(pData->pPlayer);
         SAFE_DELETE(pData);
@@ -158,7 +158,7 @@ void CLoadingThread::CancleOnWaitList(OBJID idPlayer)
         {
             // remove this
             m_nLoadingCount--;
-            LOGLOGIN("remove from loading:{}", idPlayer);
+            LOGACTORDEBUG(idPlayer, "remove from loading" );
         }
         else
         {
@@ -167,7 +167,7 @@ void CLoadingThread::CancleOnWaitList(OBJID idPlayer)
                 pLoadData->pPlayer->SaveInfo();
             //必然是后一个顶前一个,应该已经在World被Kick了
             m_nSaveingCount--;
-            LOGLOGIN("remove from saving:{}", idPlayer);
+            LOGACTORDEBUG(idPlayer, "remove from saving");
         }
         SAFE_DELETE(pLoadData->pPlayer);
         SAFE_DELETE(pLoadData);
@@ -240,20 +240,20 @@ void CLoadingThread::OnThreadProcess()
             if(pPlayer == nullptr)
             {
                 // log error
-                LOGLOGIN("LoadingFail:{}", pCurData->idPlayer);
+                LOGACTORDEBUG(pCurData->idPlayer, "LoadingFail");
                 SAFE_DELETE(pCurData);
             }
             else if(m_idNeedCancle == m_idCurProcess)
             {
                 // log cancle
-                LOGLOGIN("CacleLoading:{}", pPlayer->GetID());
+                LOGACTORDEBUG(pPlayer->GetID(), "CacleLoading");
                 SAFE_DELETE(pCurData);
                 SAFE_DELETE(pPlayer);
             }
             else
             {
                 //放入ready列表
-                LOGLOGIN("LoadingReady:{}", pCurData->idPlayer);
+                LOGACTORDEBUG(pCurData->idPlayer, "LoadingReady");
 
                 pCurData->pPlayer = pPlayer;
                 m_nReadyCount++;
@@ -274,7 +274,7 @@ void CLoadingThread::OnThreadProcess()
             {
                 //保存成功， 放入ready列表，准备发送ChangeZone消息给TargetZone
                 pCurData->pPlayer->SaveInfo();
-                LOGLOGIN("SaveingReady:{}", pCurData->idPlayer);
+                LOGACTORDEBUG(pCurData->idPlayer, "SaveingReady" );
                 if(pCurData->bChangeZone)
                 {
                     m_nReadyCount++;

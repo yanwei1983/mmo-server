@@ -5,6 +5,7 @@
 #include "ActorStatusSet.h"
 #include "SceneService.h"
 #include "ScriptCallBackType.h"
+#include "ScriptManager.h"
 #include "SkillFSM.h"
 #include "StatusType.h"
 #include "gamedb.h"

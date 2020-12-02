@@ -4,6 +4,7 @@
 #include "ActorManager.h"
 #include "ActorStatusSet.h"
 #include "CoolDown.h"
+
 #include "GameEventDef.h"
 #include "GameLog.h"
 #include "Monster.h"
@@ -13,6 +14,7 @@
 #include "SceneService.h"
 #include "SceneTree.h"
 #include "ScriptCallBackType.h"
+#include "ScriptManager.h"
 #include "SkillFSM.h"
 #include "msg/ts_cmd.pb.h"
 #include "msg/zone_service.pb.h"

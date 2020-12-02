@@ -42,7 +42,8 @@ CDBRecord::CDBRecord(CMysqlConnection*          pMysqlConnection,
             }
             if(row == nullptr)
             {
-                auto pMysqlField                                   = std::make_unique<CDBField>(this, ref_field_info_ptr, nullptr, 0);
+                auto pMysqlField = std::make_unique<CDBField>(this, ref_field_info_ptr, nullptr, 0);
+                
                 m_FieldsByName[ref_field_info_ptr->GetFieldName()] = pMysqlField.get();
                 m_FieldsByIdx.push_back(std::move(pMysqlField));
 
@@ -55,7 +56,8 @@ CDBRecord::CDBRecord(CMysqlConnection*          pMysqlConnection,
             else
             {
                 //有数据
-                auto pMysqlField                                   = std::make_unique<CDBField>(this, ref_field_info_ptr, row[i], lengths[i]);
+                auto pMysqlField = std::make_unique<CDBField>(this, ref_field_info_ptr, row[i], lengths[i]);
+
                 m_FieldsByName[ref_field_info_ptr->GetFieldName()] = pMysqlField.get();
 
                 if(CanModify())

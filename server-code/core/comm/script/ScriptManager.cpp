@@ -98,6 +98,9 @@ bool CLUAScriptManager::Init(const std::string& name, InitRegisterFunc func, voi
         lua_tinker::class_add<CLUAScriptManager>(m_pLua, "CLUAScriptManager");
         lua_tinker::class_def<CLUAScriptManager>(m_pLua, "RegistFucName", &CLUAScriptManager::RegistFucName);
         lua_tinker::class_def<CLUAScriptManager>(m_pLua, "LoadFilesInDir", &CLUAScriptManager::LoadFilesInDir);
+        lua_tinker::class_def<CLUAScriptManager>(m_pLua, "RegistScriptType", &CLUAScriptManager::RegistScriptType);
+        lua_tinker::class_def<CLUAScriptManager>(m_pLua, "ScriptTypeToName", &CLUAScriptManager::ScriptTypeToName);
+        lua_tinker::class_def<CLUAScriptManager>(m_pLua, "IsRegisted", &CLUAScriptManager::IsRegisted);
 
         lua_tinker::def(m_pLua, "InitBaseCodeInLua", &InitBaseCodeInLua);
         lua_tinker::def(m_pLua, "_ALERT", &LogLuaError);
@@ -186,21 +189,32 @@ void CLUAScriptManager::FullGC()
 
 void CLUAScriptManager::RegistScriptType(uint32_t idScriptType, const std::string& table_name)
 {
-    m_ScriptTableName[idScriptType] = table_name;
+    m_ScriptTableName.emplace(idScriptType,table_name);
+    auto stack_obj = lua_tinker::detail::stack_obj::new_table(m_pLua);
+    stack_obj.set_to_global(table_name.c_str());
+
+
+    CHECK(m_script_table.count(table_name) == 0);
+
+    auto table_ref = lua_tinker::get<lua_tinker::table_ref>(m_pLua, table_name.c_str());
+    CHECK(table_ref.empty() == false);
+    m_script_table.emplace(table_name, std::move(table_ref));
 }
 
-std::string_view CLUAScriptManager::ScriptTypeToName(uint32_t idScriptType) const
+const std::string& CLUAScriptManager::ScriptTypeToName(uint32_t idScriptType) const
 {
     auto it = m_ScriptTableName.find(idScriptType);
     if(it != m_ScriptTableName.end())
         return it->second;
-    return {};
+    static std::string empty;
+    return empty;
 }
 
 //注册一个函数回调名
 void CLUAScriptManager::RegistFucName(uint32_t idScriptType, uint64_t idScript)
 {
     m_Data[idScriptType].insert(idScript);
+    LOGLUADEBUG("Register: {}-{}", ScriptTypeToName(idScriptType), idScript);
 }
 
 bool CLUAScriptManager::IsRegisted(uint32_t idScriptType, uint64_t idScript) const
@@ -221,27 +235,28 @@ bool CLUAScriptManager::IsRegisted(uint32_t idScriptType, uint64_t idScript) con
 }
 
 
-const lua_tinker::table_ref& CLUAScriptManager::QueryScriptTable(const std::string_view& table_name)
+const lua_tinker::table_ref* CLUAScriptManager::QueryScriptTable(const std::string& table_name) const
 {
+    __ENTER_FUNCTION
     auto it = m_script_table.find(table_name);
-    if(it == m_script_table.end())
-        return it->second;
+    if(it != m_script_table.end())
+        return &it->second;
     
-    auto table_ref = lua_tinker::get<lua_tinker::table_ref>(m_pLua, table_name.data());
-    m_script_table.emplace(table_name, std::move(table_ref));
-
-    it = m_script_table.find(table_name);
-    return it->second;
+    __LEAVE_FUNCTION
+    return nullptr;
 }
 
-bool CLUAScriptManager::QueryScriptFunc(uint32_t idScriptType, uint64_t idScript, const std::string_view& FuncName)
+bool CLUAScriptManager::QueryScriptFunc(uint32_t idScriptType, uint64_t idScript, const std::string& FuncName)
 {
+    __ENTER_FUNCTION
     if(idScript == 0)
         return false;
     if(IsRegisted(idScriptType, idScript) == false)
         return false;
-    const auto& table_ref = QueryScriptTable(ScriptTypeToName(idScriptType));
-    auto table_onstack = table_ref.push_table_to_stack();
+    auto table_ref_ptr = QueryScriptTable(ScriptTypeToName(idScriptType));
+    CHECKF(table_ref_ptr);
+        
+    auto table_onstack = table_ref_ptr->push_table_to_stack();
     bool succ = table_onstack.get_to_stack(FuncName.data());
     if(succ == true)
     {
@@ -250,5 +265,7 @@ bool CLUAScriptManager::QueryScriptFunc(uint32_t idScriptType, uint64_t idScript
         
         lua_pop(m_pLua, 1);
     }
+
+    __LEAVE_FUNCTION
     return false;
 }

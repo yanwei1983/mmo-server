@@ -3,8 +3,6 @@
 
 #include "IService.h"
 #include "MyTimer.h"
-#include "NetSocket.h"
-#include "ScriptManager.h"
 #include "ServiceComm.h"
 #include "game_common_def.h"
 #include "BaseCode.h"
@@ -19,6 +17,7 @@ class CMonitorMgr;
 class CTeamInfoManager;
 class CMysqlConnection;
 class CNetworkMessage;
+class CLUAScriptManager;
 
 export_lua class CSceneService : public IService, public CServiceCommon
 {

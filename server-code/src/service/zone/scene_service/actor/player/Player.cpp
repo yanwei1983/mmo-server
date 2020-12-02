@@ -25,6 +25,8 @@
 #include "Scene.h"
 #include "SceneManager.h"
 #include "SceneService.h"
+#include "ScriptCallBackType.h"
+#include "ScriptManager.h"
 #include "SkillManager.h"
 #include "StoragePackage.h"
 #include "SystemVars.h"
@@ -49,7 +51,7 @@ CPlayer::~CPlayer()
     m_MessageList.clear();
     if(GetCurrentScene() != nullptr)
         GetCurrentScene()->LeaveMap(this);
-
+    LOGACTORDEBUG(GetID(), "CPlayer::Release");
     __LEAVE_FUNCTION
 }
 
@@ -102,7 +104,7 @@ bool CPlayer::Init(OBJID idPlayer, const VirtualSocket& socket)
 
     m_pPlayerDialog.reset(CPlayerDialog::CreateNew(this));
     CHECKF(m_pPlayerDialog.get());
-
+    LOGACTORDEBUG(GetID(), "CPlayer::InitSucc");
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -312,7 +314,7 @@ void CPlayer::OnLogout()
 
     SceneService()->DelSocketMessagePool(GetSocket());
     //处理好数据
-    LOGLOGIN("Player:{} Logout", GetName().c_str());
+    LOGACTORDEBUG(GetID(), "Player:{} Logout", GetName().c_str());
     ActorManager()->DelActor(this, false);
     m_pEventOnTimer.Clear();
 
@@ -337,9 +339,13 @@ void CPlayer::OnLogin(bool bLogin, const SceneIdx& idxScene, float fPosX, float 
     __ENTER_FUNCTION
 
     if(bLogin)
-        LOGLOGIN("CPlayer::OnLogin: {}", GetID());
+    {
+        LOGACTORDEBUG(GetID(), "CPlayer::OnLogin");
+    }
     else
-        LOGLOGIN("CPlayer::OnLoginChangeZone: {}", GetID());
+    {
+        LOGACTORDEBUG(GetID(), "CPlayer::OnLoginChangeZone");
+    }   
 
     if(bLogin)
     {
@@ -579,7 +585,7 @@ void CPlayer::SaveInfo()
     //本身回写
     m_pRecord->Update(true);
 
-    LOGLOGIN("CPlayer::SaveInfo: {}", GetID());
+    LOGACTORDEBUG(GetID(), "CPlayer::SaveInfo");
     __LEAVE_FUNCTION
 }
 

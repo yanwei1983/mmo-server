@@ -7,6 +7,7 @@
 #include "SceneManager.h"
 #include "SceneService.h"
 #include "SceneTree.h"
+#include "ScriptManager.h"
 #include "ScriptCallBackType.h"
 #include "msg/zone_service.pb.h"
 #include "protomsg_to_cmd.h"

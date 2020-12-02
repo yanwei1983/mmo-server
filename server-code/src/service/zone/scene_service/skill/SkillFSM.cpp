@@ -14,6 +14,7 @@
 #include "SceneBase.h"
 #include "SceneService.h"
 #include "ScriptCallBackType.h"
+#include "ScriptManager.h"
 #include "SkillType.h"
 #include "msg/zone_service.pb.h"
 CSkillFSM::CSkillFSM() {}

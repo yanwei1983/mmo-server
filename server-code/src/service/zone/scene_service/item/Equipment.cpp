@@ -10,6 +10,7 @@
 #include "PlayerTask.h"
 #include "SceneService.h"
 #include "ScriptCallBackType.h"
+#include "ScriptManager.h"
 #include "SuitEquip.h"
 #include "config/Cfg_Achievement.pb.h"
 #include "gamedb.h"
