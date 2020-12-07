@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
     BaseCode::InitLog("/data/log/robot_client");
     for(uint32_t i = 0; i < max_thread; i++)
     {
-        RobotClientManager* pManager = new RobotClientManager(nStart + nAmount * i, nAmount);
+        RobotClientManager* pManager = new RobotClientManager(nStart + nAmount * i, nAmount, opt["--script"]);
         pManager->StartIOThread("client_IO");
         vecManager.push_back(pManager);
     }

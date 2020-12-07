@@ -80,11 +80,11 @@ void LogLuaDebug(const char* txt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-bool CLUAScriptManager::Init(const std::string& name, InitRegisterFunc func, void* pInitParam, const char* search_path /*= "script"*/, bool bExecMain)
+bool CLUAScriptManager::Init(const std::string& name, InitRegisterFunc func, void* pInitParam, const char* search_path /*= "script"*/, const char* main_file_name /*= "main.lua"*/, bool bExecMain)
 {
     m_pInitRegisterFunc = func;
     m_pInitParam        = pInitParam;
-
+    m_main_file_name    = main_file_name;
     if(m_pLua == nullptr)
     {
         m_pLua = my_luaL_newstate();
@@ -114,19 +114,19 @@ bool CLUAScriptManager::Init(const std::string& name, InitRegisterFunc func, voi
     {
         m_pInitRegisterFunc(m_pLua, m_pInitParam);
     }
-
+    
     if(search_path)
     {
         lua_tinker::table_onstack table(m_pLua, "package");
         std::string               load_path = table.get<std::string>("path");
         table.set("path", load_path + ";./" + search_path + "/?.lua");
 
-        lua_tinker::dofile(m_pLua, (std::string(search_path) + "/main.lua").c_str());
+        lua_tinker::dofile(m_pLua, fmt::format("{}/{}", search_path, m_main_file_name).c_str());
         m_search_path = std::string("./") + search_path;
     }
     else
     {
-        lua_tinker::dofile(m_pLua, "main.lua");
+        lua_tinker::dofile(m_pLua, m_main_file_name.c_str());
     }
     // 调用初始化函数
     if(bExecMain)
@@ -149,7 +149,7 @@ void CLUAScriptManager::Destory()
 ///////////////////////////////////////////////////////////////////////////////////////
 void CLUAScriptManager::Reload(const std::string& name, bool bExecMain)
 {
-    Init(name, m_pInitRegisterFunc, m_pInitParam, m_search_path.c_str(), bExecMain);
+    Init(name, m_pInitRegisterFunc, m_pInitParam, m_search_path.c_str(), m_main_file_name.c_str(), bExecMain);
 }
 
 void CLUAScriptManager::LoadFilesInDir(const std::string& dir, bool bRecursive)

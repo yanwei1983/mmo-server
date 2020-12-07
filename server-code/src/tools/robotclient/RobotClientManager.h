@@ -14,7 +14,7 @@ class RobotClient;
 class RobotClientManager : public CNetworkService
 {
 public:
-    RobotClientManager(uint32_t nRobStart, uint32_t nRobAmount);
+    RobotClientManager(uint32_t nRobStart, uint32_t nRobAmount, const std::string& lua_file_name);
     ~RobotClientManager();
 
 public:

@@ -19,7 +19,7 @@ public:
 
 private:
     CLUAScriptManager();
-    bool Init(const std::string& name, InitRegisterFunc func, void* pInitParam, const char* search_path = "script", bool bExecMain = true);
+    bool Init(const std::string& name, InitRegisterFunc func, void* pInitParam, const char* search_path = "script", const char* main_file_name = "main.lua", bool bExecMain = true);
 
 public:
     CreateNewImpl(CLUAScriptManager);
@@ -135,6 +135,7 @@ private:
     time_t     m_tNextGCStepTime; //下1次执行GC的Time
 
     std::string      m_search_path;
+    std::string      m_main_file_name;
     InitRegisterFunc m_pInitRegisterFunc;
     void*            m_pInitParam;
 

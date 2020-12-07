@@ -15,9 +15,8 @@ robot_manager:RegisterCMD(CMD_SC_POS_CHANGE, "OnRecv_SC_POS_CHANGE");
 
 
 function OnConnect(client)
-	if g_print_debug then
-		print_clientmsg(client, "OnConnect.");
-	end
+	print_debugmsg(client, "OnConnect.");
+	
 	local info = g_clientinfo[client:GetClientID()];
 	local msg = ProtobufMessageWarp("CS_LOGIN");
 	--msg.openid = info.openid;
@@ -152,7 +151,6 @@ function OnRecv_SC_POS_CHANGE(client, buffer, size)
 	info.posy=msg.posy;
 	print_debugmsg(client, "self posx:", info.posx, " posy:", info.posy);
 
-	client:AddEventCallBack(random_uint32_range(700,1500), "SendMove", false);
 end
 
 function OnRecv_SC_AOI_UPDATE(client, buffer, size)
@@ -207,7 +205,7 @@ function OnRecv_SC_ENTERMAP(client, buffer, size)
 		print_debugmsg(client, "send reborn");
 
 	else
-		client:AddEventCallBack(random_uint32_range(700,1500), "SendMove", false);
+		
 	end
 end
 
@@ -243,14 +241,32 @@ function OnRecv_SC_DAMAGE(client, buffer, size)
 
 end
 
-function SendMove(client)
+
+InitBaseCodeInLua(this_lua);
+g_clientinfo = {} or g_clientinfo;
+g_print_debug = true
+function print_clientmsg(client,...)
+	print(string.format("[%s]", client:GetClientID()), ...)
+end
+function print_debugmsg(client,...)
+	if g_print_debug then
+		print(string.format("[%s]", client:GetClientID()), ...)
+	end
+end
+
+function main(start_idx, max_players)
 	
-	local send_msg = ProtobufMessageWarp("CS_MOVE");
-	local info = g_clientinfo[client:GetClientID()];
-	send_msg.scene_idx=info.scene_idx;
-	send_msg.x = info.posx + random_float(-1.0, 1.0);
-	send_msg.y = info.posy + random_float(-1.0, 1.0);
-	client:SendProtobufToServer(GetProtobufMessagePtr(send_msg) );
-	print_debugmsg(client, "sendmove x:", send_msg.x, ",y:", send_msg.y);
+	print("enter main start:",start_idx, " to ", start_idx+max_players-1)
+	for i=start_idx,max_players+start_idx-1 do
+		local ip = "172.28.1.254";
+		local port_list = {18031,18032};
+		local port = port_list[random_uint32_range(1,#port_list)];
+		print("connect to ", ip, port);
+		local pClient = robot_manager:ConnectServer(ip,port);
+		if(pClient) then
+			pClient:SetClientID(i);
+			g_clientinfo[i] ={openid="player_"..i};
+		end
+	end
 	
 end
