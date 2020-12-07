@@ -50,27 +50,27 @@ ${DIR_file}/binary/shared_scene_5 --worldid=0 --start=SCENE_SERVICE-55,AI_SERVIC
 
 stop_scene1()
 {
-${DIR_file}/binary/shared_scene_1 --worldid=0 --stop=SCENE_SERVICE-51,AI_SERVICE-51,AOI_SERVICE-51
+${DIR_file}/service_loader --worldid=0 --stop=SCENE_SERVICE-51,AI_SERVICE-51,AOI_SERVICE-51
 }
 
 stop_scene2()
 {
-${DIR_file}/binary/shared_scene_2 --worldid=0 --stop=SCENE_SERVICE-52,AI_SERVICE-52,AOI_SERVICE-52
+${DIR_file}/service_loader --worldid=0 --stop=SCENE_SERVICE-52,AI_SERVICE-52,AOI_SERVICE-52
 }
 
 stop_scene3()
 {
-${DIR_file}/binary/shared_scene_3 --worldid=0 --stop=SCENE_SERVICE-53,AI_SERVICE-53,AOI_SERVICE-53
+${DIR_file}/service_loader --worldid=0 --stop=SCENE_SERVICE-53,AI_SERVICE-53,AOI_SERVICE-53
 }
 
 stop_scene4()
 {
-${DIR_file}/binary/shared_scene_4 --worldid=0 --stop=SCENE_SERVICE-54,AI_SERVICE-54,AOI_SERVICE-54
+${DIR_file}/service_loader --worldid=0 --stop=SCENE_SERVICE-54,AI_SERVICE-54,AOI_SERVICE-54
 }
 
 stop_scene5()
 {
-${DIR_file}/binary/shared_scene_5 --worldid=0 --stop=SCENE_SERVICE-55,AI_SERVICE-55,AOI_SERVICE-55
+${DIR_file}/service_loader --worldid=0 --stop=SCENE_SERVICE-55,AI_SERVICE-55,AOI_SERVICE-55
 }
 
 start()

@@ -129,73 +129,73 @@ start_socket_all()
 
 stop_world()
 {
-${DIR_file}/binary/z${serverid}_world --worldid=${serverid} --stop=WORLD_SERVICE-0
+${DIR_file}/service_loader --worldid=${serverid} --stop=WORLD_SERVICE-0
 }
 
 stop_market()
 {
-${DIR_file}/binary/z${serverid}_market --worldid=${serverid} --stop=MARKET_SERVICE-0
+${DIR_file}/service_loader --worldid=${serverid} --stop=MARKET_SERVICE-0
 }
 
 stop_gm()
 {
-${DIR_file}/binary/z${serverid}_gm --worldid=${serverid} --stop=GM_SERVICE-0
+${DIR_file}/service_loader --worldid=${serverid} --stop=GM_SERVICE-0
 }
 
 
 stop_route()
 {
-${DIR_file}/binary/z${serverid}_route --worldid=${serverid} --stop=ROUTE_SERVICE-0
+${DIR_file}/service_loader --worldid=${serverid} --stop=ROUTE_SERVICE-0
 }
 
 stop_scene1()
 {
-    ${DIR_file}/binary/z${serverid}_scene1 --worldid=${serverid} --stop=SCENE_SERVICE-1,AI_SERVICE-1,AOI_SERVICE-1
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SCENE_SERVICE-1,AI_SERVICE-1,AOI_SERVICE-1
 }
 
 stop_scene2()
 {
-    ${DIR_file}/binary/z${serverid}_scene2 --worldid=${serverid} --stop=SCENE_SERVICE-2,AI_SERVICE-2,AOI_SERVICE-2
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SCENE_SERVICE-2,AI_SERVICE-2,AOI_SERVICE-2
 }
 
 stop_scene3()
 {
-    ${DIR_file}/binary/z${serverid}_scene3 --worldid=${serverid} --stop=SCENE_SERVICE-3,AI_SERVICE-3,AOI_SERVICE-3
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SCENE_SERVICE-3,AI_SERVICE-3,AOI_SERVICE-3
 }
 
 stop_scene4()
 {
-    ${DIR_file}/binary/z${serverid}_scene4 --worldid=${serverid} --stop=SCENE_SERVICE-4,AI_SERVICE-4,AOI_SERVICE-4
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SCENE_SERVICE-4,AI_SERVICE-4,AOI_SERVICE-4
 }
 
 stop_scene5()
 {
-    ${DIR_file}/binary/z${serverid}_scene5 --worldid=${serverid} --stop=SCENE_SERVICE-5,AI_SERVICE-5,AOI_SERVICE-5
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SCENE_SERVICE-5,AI_SERVICE-5,AOI_SERVICE-5
 }
 
 stop_socket1()
 {
-    ${DIR_file}/binary/z${serverid}_socket1 --worldid=${serverid} --stop=SOCKET_SERVICE-1,AUTH_SERVICE-1
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SOCKET_SERVICE-1,AUTH_SERVICE-1
 }
 
 stop_socket2()
 {
-    ${DIR_file}/binary/z${serverid}_socket2 --worldid=${serverid} --stop=SOCKET_SERVICE-2,AUTH_SERVICE-2
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SOCKET_SERVICE-2,AUTH_SERVICE-2
 }
 
 stop_socket3()
 {
-    ${DIR_file}/binary/z${serverid}_socket3 --worldid=${serverid} --stop=SOCKET_SERVICE-3,AUTH_SERVICE-3
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SOCKET_SERVICE-3,AUTH_SERVICE-3
 }
 
 stop_socket4()
 {
-    ${DIR_file}/binary/z${serverid}_socket4 --worldid=${serverid} --stop=SOCKET_SERVICE-4,AUTH_SERVICE-4
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SOCKET_SERVICE-4,AUTH_SERVICE-4
 }
 
 stop_socket5()
 {
-    ${DIR_file}/binary/z${serverid}_socket5 --worldid=${serverid} --stop=SOCKET_SERVICE-5,AUTH_SERVICE-5
+    ${DIR_file}/service_loader --worldid=${serverid} --stop=SOCKET_SERVICE-5,AUTH_SERVICE-5
 }
 
 

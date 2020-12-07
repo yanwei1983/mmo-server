@@ -1,12 +1,13 @@
 {
-  "ServerInfoMYSQL":
+  "ServerInfoMYSQL": 
   {
-    "url":"D218FC3A49560830F772758FF4A570654700E1F51C61FE2381AD3FE3BE6037BD188B09040539896F2DD6736B7BB609C75E"
+    "url": "D218FC3A49560830F772758FF4A570654700E1F51C61FE2381AD3FE3BE6037BD188B09040539896F2DD6736B7BB609C75E"
   },
-  "debug":
+  "debug": 
   {
-    "log_aidebug":1,
-    "log_actordebug":1,
-    "log_skilldebug":1
+    "log_lev": "LOG_LEVEL_TRACE",
+    "log_aidebug": "LOG_LEVEL_DEBUG",
+    "log_actordebug": "LOG_LEVEL_TRACE",
+    "log_skilldebug": "LOG_LEVEL_DEBUG"
   }
 }

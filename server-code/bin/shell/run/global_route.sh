@@ -57,32 +57,32 @@ ${DIR_file}/binary/gmproxy_5 --worldid=0 --start=GM_PROXY_SERVICE-5 --logpath=/d
 
 stop_route()
 {
-    ${DIR_file}/binary/route --worldid=0 --stop=ROUTE_SERVICE-0
+    ${DIR_file}/service_loader --worldid=0 --stop=ROUTE_SERVICE-0
 }
 
 stop_gmproxy_1()
 {
-    ${DIR_file}/binary/gmproxy_1 --worldid=0 --stop=GM_PROXY_SERVICE-1
+    ${DIR_file}/service_loader --worldid=0 --stop=GM_PROXY_SERVICE-1
 }
 
 stop_gmproxy_2()
 {
-    ${DIR_file}/binary/gmproxy_2 --worldid=0 --stop=GM_PROXY_SERVICE-2
+    ${DIR_file}/service_loader --worldid=0 --stop=GM_PROXY_SERVICE-2
 }
 
 stop_gmproxy_3()
 {
-${DIR_file}/binary/gmproxy_3 --worldid=0 --stop=GM_PROXY_SERVICE-3
+${DIR_file}/service_loader --worldid=0 --stop=GM_PROXY_SERVICE-3
 }
 
 stop_gmproxy_4()
 {
-${DIR_file}/binary/gmproxy_4 --worldid=0 --stop=GM_PROXY_SERVICE-4
+${DIR_file}/service_loader --worldid=0 --stop=GM_PROXY_SERVICE-4
 }
 
 stop_gmproxy_5()
 {
-${DIR_file}/binary/gmproxy_5 --worldid=0 --stop=GM_PROXY_SERVICE-5
+${DIR_file}/service_loader --worldid=0 --stop=GM_PROXY_SERVICE-5
 }
 
 

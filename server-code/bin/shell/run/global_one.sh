@@ -22,7 +22,7 @@ ${DIR_file}/binary/global_all --worldid=0 --start --logpath=/data/log/global_all
 
 stop()
 {
-    ${DIR_file}/binary/global_all --worldid=0 --stop --logpath=/data/log/global_all
+    ${DIR_file}/service_loader --worldid=0 --stop --logpath=/data/log/global_all
 }
 
 if [ $1 ];
