@@ -10,7 +10,7 @@
 #include <string>
 
 #include "CallStackDumper.h"
-
+#include "LoggingMgr.h"
 using namespace std;
 
 namespace
@@ -69,7 +69,7 @@ namespace
     SIGNAL_HANDLER(catch_segv)
     {
         unblock_signal(SIGSEGV);
-        DumpStackFile(CallFrameMap(2));
+        LOGERROR(GetStackTraceString(CallFrameMap(2)));
         MAKE_THROW_FRAME(nullp);
         handle_segv();
     }
@@ -83,7 +83,7 @@ namespace
 #ifdef HANDLE_DIVIDE_OVERFLOW
         HANDLE_DIVIDE_OVERFLOW;
 #else
-        DumpStackFile(CallFrameMap(2));
+        LOGERROR(GetStackTraceString(CallFrameMap(2)));
         MAKE_THROW_FRAME(arithexception);
 #endif
         handle_fpe();
