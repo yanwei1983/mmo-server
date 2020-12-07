@@ -39,7 +39,7 @@ bool CNpc::Init(uint32_t idType)
     _SetPhaseID(m_pType->GetPhaseID());
     m_ActorAttrib->SetBase(m_pType->GetAbility());
 
-    RecalcAttrib(true);
+    RecalcAttrib(true, false);
     _SetHP(GetHPMax());
     _SetMP(GetMPMax());
 

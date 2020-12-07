@@ -28,10 +28,12 @@ bool CActorManager::Init()
 void CActorManager::Destory()
 {
     __ENTER_FUNCTION
+    LOGDEBUG("CActorManager::Destory");
     for(auto it = m_PlayerRefMap.begin(); it != m_PlayerRefMap.end(); it++)
     {
         CPlayer* pPlayer = it->second;
         pPlayer->SaveInfo();
+        SAFE_DELETE(pPlayer);
     }
     for(auto it = m_ActorMap.begin(); it != m_ActorMap.end(); it++)
     {

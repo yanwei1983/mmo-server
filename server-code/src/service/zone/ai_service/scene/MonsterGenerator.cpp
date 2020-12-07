@@ -8,6 +8,7 @@
 #include "GameMapDef.h"
 #include "MapManager.h"
 #include "MonsterType.h"
+#include "GameEventDef.h"
 #include "config/Cfg_Scene_MonsterGenerator.pb.h"
 #include "server_msg/server_side.pb.h"
 
@@ -118,9 +119,10 @@ void CMonsterGenerator::StartGen(MonsterGenData* pData, bool bCheckRunning)
     CHECK(pData);
     if(pData->nCurGen < pData->gen_data.gen_max())
     {
-        if(bCheckRunning == false || pData->m_pEvent.IsRunning() == false)
+        if(bCheckRunning == false || pData->m_pEvent.IsWaitTrigger() == false)
         {
             CEventEntryCreateParam param;
+            param.evType    = EVENTID_MONSTER_GENERATOR;
             param.cb        = std::bind(&CMonsterGenerator::OnGenTimer, this, pData);
             param.tWaitTime = pData->gen_data.wait_time();
             EventManager()->ScheduleEvent(param, pData->m_pEvent);

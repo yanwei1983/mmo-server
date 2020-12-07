@@ -54,7 +54,7 @@ bool CMonster::Init(uint32_t idMonsterType, OBJID idOwner, uint32_t idGen, uint6
             m_idOwner = idOwner;
         }
     }
-    RecalcAttrib(true);
+    RecalcAttrib(true, false);
     _SetHP(GetHPMax());
     _SetMP(GetMPMax());
 

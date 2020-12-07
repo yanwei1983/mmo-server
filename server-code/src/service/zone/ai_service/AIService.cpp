@@ -22,6 +22,7 @@
 #include "server_msg/server_side.pb.h"
 #include "ScriptManager.h"
 #include "ScriptCallBackType.h"
+#include "GameEventDef.h"
 
 static thread_local CAIService* tls_pService;
 CAIService*                     AIService()
@@ -99,6 +100,7 @@ bool CAIService::Init(const ServerPort& nServerPort)
                                                         &export_to_lua,
                                                         (void*)this,
                                                         "res/script/ai_service",
+                                                        "main.lua",
                                                         true));
 
     m_pMapManager.reset(CMapManager::CreateNew(GetZoneID()));
@@ -148,10 +150,29 @@ void CAIService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\nEvent:{}\tActive:{}\tMem:{}"),
-                                      EventManager()->GetEventCount(),
-                                      EventManager()->GetRunningEventCount(),
-                                      get_thread_memory_allocted());
+                          fmt::format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(),
+                           get_thread_memory_allocted());
+        buf += fmt::format(FMT_STRING("\nEvent:{}\tActive:{}"),
+                           EventManager()->GetEventCount(),
+                           EventManager()->GetRunningEventCount());
+
+        for(const auto& [k, v]: EventManager()->GetCountEntryByManagerType())
+        {
+            auto result = magic_enum::enum_cast<EventManagerType>(k);
+            if(result)
+            {
+                buf += fmt::format(FMT_STRING("\nManagerType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
+            }
+        }
+        for(const auto& [k, v]: EventManager()->GetCountEntryByType())
+        {
+            auto result = magic_enum::enum_cast<GameEventType>(k);
+            if(result)
+            {
+                buf += fmt::format(FMT_STRING("\nEvType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
+            }
+        }
+
         auto pMessagePort = GetMessageRoute()->QueryMessagePort(GetSceneServerPort(), false);
         if(pMessagePort)
         {

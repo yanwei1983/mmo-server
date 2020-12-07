@@ -35,6 +35,7 @@ bool CSceneManager::Init(uint32_t idZone)
 void CSceneManager::Destory()
 {
     __ENTER_FUNCTION
+    LOGDEBUG("CSceneManager::Destory");
     for(auto& [k, v]: m_mapScene)
     {
         v->Destory();

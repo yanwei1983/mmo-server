@@ -8,9 +8,10 @@
 CAIPathFinder_Normal::CAIPathFinder_Normal(CAIActor* pActor)
     : m_pActor(pActor)
 {
+    
 }
 
-Vector2 CAIPathFinder_Normal::SearchStep(const Vector2& dest, float move_spd)
+std::optional<Vector2> CAIPathFinder_Normal::SearchStep(const Vector2& dest, float move_spd)
 {
     __ENTER_FUNCTION
     // src->dest ddlline
@@ -32,7 +33,7 @@ Vector2 CAIPathFinder_Normal::SearchStep(const Vector2& dest, float move_spd)
     }
 
     auto dir     = dis.normalisedCopy();
-    auto new_pos = dir * move_spd;
+    auto new_pos = m_pActor->GetPos() + dir * move_spd;
     if(m_pActor->GetCurrentScene()->IsPassDisable(new_pos.x, new_pos.y, m_pActor->GetActorType()) == false)
     {
         return new_pos;
@@ -51,11 +52,12 @@ Vector2 CAIPathFinder_Normal::SearchStep(const Vector2& dest, float move_spd)
             {
                 return new_pos;
             }
+
         }
-        return m_pActor->GetPos();
+        return {};
     }
 
     // record pos
     __LEAVE_FUNCTION
-    return m_pActor->GetPos();
+    return {};
 }

@@ -82,7 +82,7 @@ void CActor::AddDelaySendShowTo(OBJID id)
     if(m_setDealySendShow.empty() == true)
     {
         auto pEntry = GetEventMapRef().Query(EVENTID_BROCAST_SHOW);
-        if(pEntry == nullptr || pEntry->IsCanceled() || pEntry->IsRunning() == false)
+        if(pEntry == nullptr || pEntry->IsCanceled() || pEntry->IsWaitTrigger() == false)
         {
             CEventEntryCreateParam param;
             param.evType    = EVENTID_BROCAST_SHOW;
@@ -102,7 +102,7 @@ void CActor::AddDelaySendShowToAllViewPlayer()
     if(m_setDealySendShow.empty() == true)
     {
         auto pEntry = GetEventMapRef().Query(EVENTID_BROCAST_SHOW);
-        if(pEntry == nullptr || pEntry->IsCanceled() || pEntry->IsRunning() == false)
+        if(pEntry == nullptr || pEntry->IsCanceled() || pEntry->IsWaitTrigger() == false)
         {
             CEventEntryCreateParam param;
             param.evType    = EVENTID_BROCAST_SHOW;

@@ -119,6 +119,8 @@ void CSceneObject::SetSceneTile(CSceneTile* val)
     if(m_nHideCount != 0)
         return;
 
+    LOGACTORTRACE(GetID(), "SetSceneTile old{:p} new:{:p}", (void*)m_pSceneTile, (void*)val);
+
     if(m_pSceneTile)
         m_pSceneTile->RemoveActor(this);
     m_pSceneTile = val;
@@ -295,75 +297,83 @@ bool CSceneObject::_UpdateViewList()
     uint32_t use_manhattan         = scene_tree->IsViewManhattanDistance();
     uint32_t view_range_in_square  = scene_tree->GetViewRangeInSquare();
     uint32_t view_range_out_square = scene_tree->GetViewRangeOutSquare();
+    LOGACTORTRACE(GetID(), "ViewStep0: m_ViewActors:{} max:{} view_in:{} view_out:{} use_manha:{} ",
+        m_ViewActors.size(), viewcount_max, view_range_in_square, view_range_out_square, use_manhattan);
     // 广播集算法修改测试
     //////////////////////////////////////////////////////////////////////////
     // step1: 获取当前广播集范围内的对象
     {
-        scene_tree->foreach_SceneTileInSight(GetPosX(),
-                                             GetPosY(),
-                                             [thisActor = this,
-                                              &setBCActor,
-                                              &actor_viewin_withdis,
-                                              &actor_viewout_withdis,
-                                              view_range_in_square,
-                                              view_range_out_square,
-                                              viewcount_max,
-                                              use_manhattan](CSceneTile* pSceneTile) {
-                                                 const auto& actor_list = *pSceneTile;
-                                                 for(CSceneObject* pActor: actor_list)
-                                                 {
-                                                     if(pActor == thisActor)
-                                                         continue;
-                                                     if(pActor == nullptr)
-                                                         continue;
 
-                                                     // 判断目标是否需要加入广播集
-                                                     if(thisActor->ViewTest(pActor) == false)
-                                                         continue;
-                                                     //不需要视野剪裁，那么就都加入
-                                                     if(viewcount_max <= 0)
-                                                     {
-                                                         setBCActor.insert(pActor->GetID());
-                                                         continue;
-                                                     }
-                                                     //! 目标进入视野，需要加入广播集
-                                                     if(thisActor->IsMustAddToViewList(pActor) == true)
-                                                     {
-                                                         //强制加入视野的，优先合入
-                                                         setBCActor.insert(pActor->GetID());
-                                                     }
-                                                     else
-                                                     {
-                                                         float distance_square = 0;
-                                                         if(use_manhattan)
-                                                         {
-                                                             distance_square = GameMath::manhattanDistance(thisActor->GetPos(), pActor->GetPos());
-                                                         }
-                                                         else
-                                                         {
-                                                             distance_square = GameMath::simpleDistance(thisActor->GetPos(), pActor->GetPos());
-                                                         }
+        auto foreach_func = [thisActor = this,
+                             &setBCActor,
+                             &actor_viewin_withdis,
+                             &actor_viewout_withdis,
+                             view_range_in_square,
+                             view_range_out_square,
+                             viewcount_max,
+                             use_manhattan](CSceneTile* pSceneTile)
+        {
+            CHECK(pSceneTile);
+            const auto& actor_list = *pSceneTile;
+            for(CSceneObject* pActor: actor_list)
+            {
+                if(pActor == thisActor)
+                    continue;
+                if(pActor == nullptr)
+                    continue;
 
-                                                         if(view_range_in_square <= 0)
-                                                         {
-                                                             //如果view_in == 0,那么所有人全部根据麦哈顿距离进入视野
-                                                             actor_viewin_withdis.emplace_back(ACTOR_MAP_BY_DIS_DATA{distance_square, pActor});
-                                                         }
-                                                         else
-                                                         {
-                                                             if(distance_square <= view_range_in_square)
-                                                             {
-                                                                 actor_viewin_withdis.emplace_back(ACTOR_MAP_BY_DIS_DATA{distance_square, pActor});
-                                                             }
-                                                             else if(distance_square <= view_range_out_square)
-                                                             {
-                                                                 actor_viewout_withdis.emplace_back(ACTOR_MAP_BY_DIS_DATA{distance_square, pActor});
-                                                             }
-                                                         }
-                                                     }
-                                                 }
-                                             });
+                // 判断目标是否需要加入广播集
+                if(thisActor->ViewTest(pActor) == false)
+                    continue;
+                //不需要视野剪裁，那么就都加入
+                if(viewcount_max <= 0)
+                {
+                    setBCActor.insert(pActor->GetID());
+                    continue;
+                }
+                //! 目标进入视野，需要加入广播集
+                if(thisActor->IsMustAddToViewList(pActor) == true)
+                {
+                    //强制加入视野的，优先合入
+                    setBCActor.insert(pActor->GetID());
+                }
+                else
+                {
+                    float distance_square = 0;
+                    if(use_manhattan)
+                    {
+                        distance_square = GameMath::manhattanDistance(thisActor->GetPos(), pActor->GetPos());
+                    }
+                    else
+                    {
+                        distance_square = GameMath::simpleDistance(thisActor->GetPos(), pActor->GetPos());
+                    }
+
+                    if(view_range_in_square <= 0)
+                    {
+                        //如果view_in == 0,那么所有人全部根据麦哈顿距离进入视野
+                        actor_viewin_withdis.emplace_back(ACTOR_MAP_BY_DIS_DATA{distance_square, pActor});
+                    }
+                    else
+                    {
+                        if(distance_square <= view_range_in_square)
+                        {
+                            actor_viewin_withdis.emplace_back(ACTOR_MAP_BY_DIS_DATA{distance_square, pActor});
+                        }
+                        else if(distance_square <= view_range_out_square)
+                        {
+                            actor_viewout_withdis.emplace_back(ACTOR_MAP_BY_DIS_DATA{distance_square, pActor});
+                        }
+                    }
+                }
+            }
+        };
+
+        scene_tree->foreach_SceneTileInSight(GetPosX(), GetPosY(), foreach_func);
     }
+    
+    LOGACTORTRACE(GetID(), "ViewStep0: setBCActor:{} viewout:{} viewin:{} ",
+        setBCActor.size(), actor_viewin_withdis.size(), actor_viewout_withdis.size());
 
     if(viewcount_max > 0 && setBCActor.size() < viewcount_max)
     {
@@ -384,8 +394,11 @@ bool CSceneObject::_UpdateViewList()
             setBCActor.insert(id);
             it++;
         }
-    }
 
+        LOGACTORTRACE(GetID(), "ViewStep1-1: setBCActor:{}",setBCActor.size() );
+    }
+    
+    
     //////////////////////////////////////////////////////////////////////////
     // setp2: 计算当前广播集与旧广播集的差集——这部分是新进入视野的
     BROADCAST_SET setBCActorAdd;
@@ -394,7 +407,7 @@ bool CSceneObject::_UpdateViewList()
                    m_ViewActors.begin(),
                    m_ViewActors.end(),
                    std::insert_iterator(setBCActorAdd, setBCActorAdd.begin()));
-
+    LOGACTORTRACE(GetID(), "ViewStep2: setBCActorAdd:{}",setBCActorAdd.size());
     //////////////////////////////////////////////////////////////////////////
     // step3: 计算旧广播集与当前广播集的差集——这部分是可能需要离开视野的
     BROADCAST_SET setBCActorDel;
@@ -403,7 +416,7 @@ bool CSceneObject::_UpdateViewList()
                    setBCActor.begin(),
                    setBCActor.end(),
                    std::insert_iterator(setBCActorDel, setBCActorDel.begin()));
-
+    LOGACTORTRACE(GetID(), "ViewStep3: setBCActorDel:{}",setBCActorDel.size());
     if(viewcount_max > 0 && setBCActor.size() < viewcount_max)
     {
         //计算待删除列表还可以保留多少个
@@ -424,7 +437,7 @@ bool CSceneObject::_UpdateViewList()
             it++;
         }
     }
-
+    
     OnAOIProcess(setBCActorDel, setBCActor, setBCActorAdd);
     return true;
 }

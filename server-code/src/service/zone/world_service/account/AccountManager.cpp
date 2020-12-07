@@ -18,6 +18,7 @@ CAccountManager::~CAccountManager()
 
 void CAccountManager::Destory()
 {
+    LOGDEBUG("CAccountManager::Destory");
     for(auto& pair_v: m_setAccount)
     {
         SAFE_DELETE(pair_v.second);

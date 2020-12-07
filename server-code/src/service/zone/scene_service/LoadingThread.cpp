@@ -25,6 +25,7 @@ bool CLoadingThread::Init(CSceneService* pZoneRef)
 void CLoadingThread::Destory()
 {
     __ENTER_FUNCTION
+    LOGDEBUG("CLoadingThread::Destory");
     m_bStop = true;
     m_cv.notify_one();
     if(m_Thread)
@@ -43,7 +44,9 @@ void CLoadingThread::Destory()
                 if(pData->pPlayer)
                 {
                     pData->pPlayer->SaveInfo();
+                    SAFE_DELETE(pData->pPlayer);
                 }
+                
             }
             SAFE_DELETE(pData);
         }
@@ -145,7 +148,7 @@ void CLoadingThread::CancleOnWaitList(OBJID idPlayer)
         auto& pLoadData = *it;
         if(pLoadData == nullptr)
         {
-            it = m_ReadyList.erase(it);
+            it = m_WaitingList.erase(it);
             continue;
         }
         if(pLoadData->idPlayer != idPlayer)
@@ -172,7 +175,7 @@ void CLoadingThread::CancleOnWaitList(OBJID idPlayer)
         SAFE_DELETE(pLoadData->pPlayer);
         SAFE_DELETE(pLoadData);
 
-        it = m_ReadyList.erase(it);
+        it = m_WaitingList.erase(it);
         continue;
     }
     __LEAVE_FUNCTION

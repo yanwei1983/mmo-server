@@ -44,7 +44,7 @@ public:
     export_lua bool IsElit() const;
 
     export_lua virtual bool IsEnemy(CSceneObject* pActor) const override;
-    void                    SetIsAISleep(bool bVal) {}
+    void                    SetAISleep(bool bVal) {}
     virtual void            MakeShowData(SC_AOI_NEW& msg) override;
 
 public:

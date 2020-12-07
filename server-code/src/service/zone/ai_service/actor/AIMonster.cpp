@@ -57,7 +57,7 @@ bool CAIMonster::Init(const ServerMSG::ActorCreate& msg)
     return false;
 }
 
-void CAIMonster::SetIsAISleep(bool bSleep)
+void CAIMonster::SetAISleep(bool bSleep)
 {
     if(m_pAI)
         m_pAI->SetAISleep(bSleep);

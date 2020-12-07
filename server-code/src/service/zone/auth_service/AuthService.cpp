@@ -37,7 +37,6 @@ CAuthService::~CAuthService() {}
 
 void CAuthService::Release()
 {
-
     Destory();
     delete this;
 }

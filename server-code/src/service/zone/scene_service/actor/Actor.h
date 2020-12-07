@@ -125,7 +125,7 @@ public:
 
 public:
     //重新计算属性
-    export_lua virtual void RecalcAttrib(bool bClearCache = false);
+    export_lua virtual void RecalcAttrib(bool bClearCache = false, bool bNotify = true);
 
 public:
     virtual void OnEnterMap(CSceneBase* pScene) override;
@@ -150,10 +150,11 @@ public:
     export_lua virtual void BeKillBy(CActor* pAttacker);
 
 public:
-    export_lua bool MoveTo(const Vector2& posTarget, bool bCheckMove = true);
-    export_lua bool CheckCanMove(const Vector2& posTarget, bool bSet = true);
-    export_lua bool CanMove();
-    export_lua void FlyTo(const Vector2& pos);
+    export_lua virtual bool ForceMoveTo(const Vector2& posTarget);
+    export_lua virtual bool MoveTo(const Vector2& posTarget, bool bCheckMove = true);
+    export_lua virtual bool CheckCanMove(const Vector2& posTarget, bool bSet = true);
+    export_lua virtual bool CanMove();
+    export_lua virtual void FlyTo(const Vector2& pos);
 
     export_lua bool _CastSkill(uint32_t idSkill, OBJID idTarget, const Vector2& targetPos);
 

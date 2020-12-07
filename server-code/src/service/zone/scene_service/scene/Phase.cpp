@@ -39,6 +39,10 @@ void CPhase::Destory()
     {
         CActor* pActor = static_cast<CActor*>(m_setActor.begin()->second);
         _LeaveMap(pActor);
+        if(pActor->IsPlayer())
+        {
+            pActor->CastTo<CPlayer>()->SaveInfo();
+        }
         ActorManager()->DelActor(pActor);
     }
 
@@ -145,7 +149,7 @@ void CPhase::AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name
         return;
 
     CEventEntryCreateParam param;
-    param.evType = 0;
+    param.evType = EVENTID_PHASE_TIMECALL;
     param.cb     = [pThis = this, _func_name = func_name]() 
     {
         ScriptManager()->TryExecScript<void>(SCRIPT_MAP, pThis->m_pMap->GetScriptID(), _func_name.c_str(), pThis);
@@ -337,7 +341,7 @@ void CPhase::ScheduleDelPhase(uint32_t wait_ms)
     };
 
     CEventEntryCreateParam param;
-    param.evType    = 0;
+    param.evType    = EVENTID_PHASE_DEL;
     param.cb        = std::move(del_func);
     param.tWaitTime = wait_ms;
     param.bPersist  = false;

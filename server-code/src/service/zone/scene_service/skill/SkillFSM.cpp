@@ -16,6 +16,7 @@
 #include "ScriptCallBackType.h"
 #include "ScriptManager.h"
 #include "SkillType.h"
+#include "GameEventDef.h"
 #include "msg/zone_service.pb.h"
 CSkillFSM::CSkillFSM() {}
 
@@ -165,7 +166,7 @@ void CSkillFSM::DoIntone(const CSkillType* pSkillType)
     else
     {
         CEventEntryCreateParam param;
-        param.evType    = 0;
+        param.evType    = EVENTID_SKILL_DO_LAUNCH;
         param.cb        = std::bind(&CSkillFSM::DoLaunch, this);
         param.tWaitTime = pSkillType->GetIntoneMS();
         param.bPersist  = false;
@@ -498,7 +499,7 @@ void CSkillFSM::ScheduleApply()
         uint32_t next_apply_time = m_pCurSkillType->GetApplyMS() + m_pCurSkillType->GetApplyAdjMS() * m_nApplyTimes;
 
         CEventEntryCreateParam param;
-        param.evType    = 0;
+        param.evType    = EVENTID_SKILL_DO_APPLY;
         param.cb        = std::bind(&CSkillFSM::DoApply, this);
         param.tWaitTime = next_apply_time;
         param.bPersist  = false;
@@ -537,7 +538,7 @@ void CSkillFSM::DoStun()
     else
     {
         CEventEntryCreateParam param;
-        param.evType    = 0;
+        param.evType    = EVENTID_SKILL_DO_IDLE;
         param.cb        = std::bind(&CSkillFSM::DoIdle, this);
         param.tWaitTime = m_pCurSkillType->GetIntoneMS();
         param.bPersist  = false;

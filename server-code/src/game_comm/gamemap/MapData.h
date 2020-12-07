@@ -69,8 +69,8 @@ public:
     export_lua float    GirdHeight() const { return m_fGirdHeight; }
     export_lua uint32_t GetGirdCount() const { return m_nWidth * m_nHeight; }
 
-    export_lua Vector2 LineFindCanStand(const Vector2& src, const Vector2& dest) const;
-    export_lua Vector2 LineFindCanJump(const Vector2& src, const Vector2& dest) const;
+    export_lua std::optional<Vector2> LineFindCanStand(const Vector2& src, const Vector2& dest) const;
+    export_lua std::optional<Vector2> LineFindCanJump(const Vector2& src, const Vector2& dest) const;
     export_lua bool    IsPassDisable(float x, float y) const { return _getGridData(x, y).bPassDisable == TRUE; }
     export_lua bool    IsJumpDisable(float x, float y) const { return _getGridData(x, y).bJumpDisable == TRUE; }
     export_lua bool    IsPVPDisable(float x, float y) const { return _getGridData(x, y).bPvPDisable == TRUE; }

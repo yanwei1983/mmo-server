@@ -14,8 +14,17 @@ void CAIActor::AddToViewList(CSceneObject* pActor)
     //如果自己是怪物
     if(IsMonster())
     {
-        CastTo<CAIMonster>()->SetIsAISleep(false);
+        CastTo<CAIMonster>()->SetAISleep(false);
     }
+    LOGACTORDEBUG(GetID(), "ViewList add:{}", pActor->GetID());
+    __LEAVE_FUNCTION
+}
 
+void CAIActor::RemoveFromViewList(CSceneObject* pActor, OBJID idActor, bool bErase)
+{
+    __ENTER_FUNCTION
+    CSceneObject::RemoveFromViewList(pActor,idActor,bErase);
+
+    LOGACTORDEBUG(GetID(), "ViewList del:{}", idActor);
     __LEAVE_FUNCTION
 }

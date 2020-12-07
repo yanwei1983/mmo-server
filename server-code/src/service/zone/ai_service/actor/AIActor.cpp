@@ -88,7 +88,7 @@ void CAIActor::FlyTo(const Vector2& posTarget)
     msg.set_x(posTarget.x);
     msg.set_y(posTarget.y);
     AIService()->SendProtoMsgToScene(msg);
-    LOGACTORDEBUG(GetID(), "From {} {} FlyTo {} {}", m_Pos.x, m_Pos.y, msg.x(), msg.y());
+ 
 
     __LEAVE_FUNCTION
 }
@@ -98,27 +98,25 @@ void CAIActor::MoveToTarget(const Vector2& posTarget)
     __ENTER_FUNCTION
     Vector2 dir = (posTarget - m_Pos);
     float   dis = dir.normalise();
+    Vector2 move_pos = m_Pos;
     if(dis < GetMoveSpeed())
     {
-        ServerMSG::ActorMove msg;
-        msg.set_actor_id(GetID());
-        msg.set_x(posTarget.x);
-        msg.set_y(posTarget.y);
-        AIService()->SendProtoMsgToScene(msg);
-        LOGACTORDEBUG(GetID(), "From {} {} MoveToTargetE {} {}", m_Pos.x, m_Pos.y, posTarget.x, posTarget.y);
-        SetLastMoveTime(TimeGetMonotonic());
+       move_pos = posTarget;
     }
     else
     {
         dir = dir * GetMoveSpeed() * GetMovePassedTime();
-        ServerMSG::ActorMove msg;
-        msg.set_actor_id(GetID());
-        msg.set_x(GetPos().x + dir.x);
-        msg.set_y(GetPos().y + dir.y);
-        AIService()->SendProtoMsgToScene(msg);
-        LOGACTORDEBUG(GetID(), "From {} {} MoveToTarget {} {}", m_Pos.x, m_Pos.y, msg.x(), msg.y());
-        SetLastMoveTime(TimeGetMonotonic());
+        move_pos += dir;
     }
+
+    ServerMSG::ActorMove msg;
+    msg.set_actor_id(GetID());
+    msg.set_x(move_pos.x);
+    msg.set_y(move_pos.y);
+    AIService()->SendProtoMsgToScene(msg);
+
+    LOGACTORDEBUG(GetID(), "From {} MoveToTargetE {} {}", m_Pos, msg.x(), msg.y());
+    SetLastMoveTime(TimeGetMonotonic());
     __LEAVE_FUNCTION
 }
 

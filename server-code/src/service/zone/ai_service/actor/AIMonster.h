@@ -21,7 +21,7 @@ public:
     virtual ActorType GetActorType() const override { return ActorType::ACT_MONSTER; }
     static ActorType  GetActorTypeStatic() { return ActorType::ACT_MONSTER; }
 
-    void         SetIsAISleep(bool bSleep);
+    void         SetAISleep(bool bSleep);
     virtual void OnDead() override;
     virtual void OnBorn() override;
     virtual void OnUnderAttack(OBJID idTarget, int32_t nDamage) override;

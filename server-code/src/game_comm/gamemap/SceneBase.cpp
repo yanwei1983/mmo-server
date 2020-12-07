@@ -35,6 +35,8 @@ bool CSceneBase::InitSceneTree(const CPos2D& vBasePos, float fWidth, float fHeig
     CSceneTree* pSceneTree = CSceneTree::CreateNew(m_pMap, vBasePos, fWidth, fHeight, nTileGridRange, bDynamicSetLev);
     CHECKF(pSceneTree);
     m_pSceneTree.reset(pSceneTree);
+
+    LOGDEBUG("CSceneBase::InitSceneTree {} {:p} Tree:{:p}", GetID(),(void*)this,(void*)pSceneTree);
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -49,6 +51,7 @@ bool CSceneBase::LinkSceneTree(CSceneBase* pLinkScene)
     }
 
     m_pSceneTree = pLinkScene->m_pSceneTree;
+    LOGDEBUG("CSceneBase::InitSceneTree {} {:p} Tree:{:p}", GetID(),(void*)this,(void*)m_pSceneTree.get());
     return true;
     __LEAVE_FUNCTION
     return false;

@@ -97,6 +97,7 @@ ON_SERVERMSG(CRouteService, ServiceRegister)
 
         //注册30秒发送一次ready
         CEventEntryCreateParam param;
+        //param.evType = EVENTID_SEND_READY;
         param.cb = []() {
             RouteService()->SendServiceReady();
         };

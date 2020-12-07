@@ -381,7 +381,7 @@ void CActor::AddDelayAttribChange(uint32_t nType, uint32_t nVal)
     m_DelayAttribChangeMap[nType] = nVal;
 
     auto pEvent = GetEventMapRef().Query(GameEventType::EVENTID_SEND_ATTRIB_CHANGE);
-    if(pEvent == nullptr || pEvent->IsCanceled() || pEvent->IsRunning() == false)
+    if(pEvent == nullptr || pEvent->IsCanceled() || pEvent->IsWaitTrigger() == false)
     {
         // 200毫秒后一次性发送
         CEventEntryCreateParam param;
@@ -396,7 +396,7 @@ void CActor::AddDelayAttribChange(uint32_t nType, uint32_t nVal)
     __LEAVE_FUNCTION
 }
 
-void CActor::RecalcAttrib(bool bClearCache /*= false*/)
+void CActor::RecalcAttrib(bool bClearCache /*= false*/, bool bNotify /* = true */)
 {
     __ENTER_FUNCTION
     uint32_t nOldHPMax = GetHPMax();
@@ -406,15 +406,16 @@ void CActor::RecalcAttrib(bool bClearCache /*= false*/)
     //广播通知hp变化
     if(GetHPMax() != nOldHPMax)
     {
-        AddDelayAttribChange(PROP_HP_MAX, GetHPMax());
+        if(bNotify)
+            AddDelayAttribChange(PROP_HP_MAX, GetHPMax());
     }
     if(GetHP() > GetHPMax())
     {
-        SetProperty(PROP_HP, GetHPMax(), SYNC_ALL_DELAY);
+        SetProperty(PROP_HP, GetHPMax(), (bNotify)?SYNC_ALL_DELAY:SYNC_FALSE);
     }
     if(GetMP() > GetMPMax())
     {
-        SetProperty(PROP_MP, GetMPMax(), SYNC_TRUE);
+        SetProperty(PROP_MP, GetMPMax(), (bNotify)?SYNC_TRUE:SYNC_FALSE);
     }
     __LEAVE_FUNCTION
 }
@@ -427,49 +428,14 @@ float CActor::GetMoveSpeed() const
 bool CActor::CheckCanMove(const Vector2& posTarget, bool bSet)
 {
     __ENTER_FUNCTION
-
-    if(CanMove() == false)
-        return false;
-    //判断时间
-    constexpr uint32_t ONCE_MOVE_PER_TIME(200); // 350ms最小移动间隔, 服务器稍微增加一点误差
-
-    uint32_t now         = TimeGetMonotonic();
-    uint32_t passed_time = now - GetLastMoveTime();
-    if(passed_time < ONCE_MOVE_PER_TIME)
-    {
-        // move too fast, may be need kick back
-        LOGACTORDEBUG(GetID(), "move too fast:{},{} {},{}", GetPos().x, GetPos().y, posTarget.x, posTarget.y);
-        return false;
-    }
-    constexpr uint32_t MOVE_TIME_TOLERANCE(200);
-    float              move_spd = GetMoveSpeed() * 1.5f; //允许1.5倍的速度差异
-
-    float can_move_dis = float(passed_time + MOVE_TIME_TOLERANCE) / 1000.0f * move_spd;
-    can_move_dis       = std::min(can_move_dis, move_spd);
-
-    float move_dis = GameMath::distance(GetPos(), posTarget);
-    constexpr float move_step_min = 0.01f; //最小移动距离
-    if(move_dis < move_step_min)
-    {
-        LOGACTORTRACE(GetID(), "move too near:{},{} {},{} dis:{}", GetPos().x, GetPos().y, posTarget.x, posTarget.y, move_dis);
-        return false;
-    }
-    if(can_move_dis < move_dis)
-    {
-        // move too fast, may be need kick back
-        LOGACTORDEBUG(GetID(), "move too long:{},{} {},{}", GetPos().x, GetPos().y, posTarget.x, posTarget.y);
-        return false;
-    }
-
     if(GetCurrentScene()->IsPassDisable(posTarget.x, posTarget.y, GetActorType()) == true)
     {
         LOGACTORTRACE(GetID(), "move to from x:{} y:{} to x:{} y:{} pass_disable", GetPos().x, GetPos().y, posTarget.x, posTarget.y);
         return false;
     }
-
+    uint32_t now         = TimeGetMonotonic();
     if(bSet)
         SetLastMoveTime(now);
-
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -480,9 +446,35 @@ bool CActor::CanMove()
     return GetStatus()->TestStatusByFlag(STATUSFLAG_DISABLE_MOVE) == false;
 }
 
+bool CActor::ForceMoveTo(const Vector2& posTarget)
+{
+    __ENTER_FUNCTION
+    _SetPos(posTarget);
+
+    SC_POS_CHANGE msg;
+    msg.set_scene_idx(GetSceneIdx());
+    msg.set_actor_id(GetID());
+    msg.set_posx(GetPosX());
+    msg.set_posy(GetPosY());
+    SendMsg(msg);
+    if(NeedSyncAI())
+        SceneService()->SendProtoMsgToAIService(msg);
+
+    UpdateViewList(false);
+    
+
+
+    m_pStatusSet->OnMove();
+    return true;
+    __LEAVE_FUNCTION
+    return false;
+}
+
 bool CActor::MoveTo(const Vector2& posTarget, bool bCheckMove)
 {
     __ENTER_FUNCTION
+    if(CanMove() == false)
+        return false;
     if(bCheckMove && CheckCanMove(posTarget) == false)
         return false;
 
@@ -518,7 +510,7 @@ bool CActor::_CastSkill(uint32_t idSkill, OBJID idTarget, const Vector2& targetP
 void CActor::OnBeAttack(CActor* pAttacker, int32_t nRealDamage)
 {
     __ENTER_FUNCTION
-    LOGACTORDEBUG(GetID(), "OnBeAttack: Actor:{} Attacker:{} Damage:{}", (pAttacker) ? pAttacker->GetID() : 0, nRealDamage);
+    LOGACTORDEBUG(GetID(), "OnBeAttack: Attacker:{} Damage:{}", (pAttacker) ? pAttacker->GetID() : 0, nRealDamage);
 
     AddProperty(PROP_HP, -nRealDamage, SYNC_ALL_DELAY);
 

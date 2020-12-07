@@ -96,7 +96,8 @@ public:
 
     export_lua void BroadcastShow();
     export_lua bool IsTalkEnable(uint32_t nTalkChannel);
-
+    
+    export_lua virtual bool CheckCanMove(const Vector2& posTarget, bool bSet = true) override;
 public:
     //属性
     export_lua virtual void     _SetProperty(uint32_t nType, uint32_t nVal, uint32_t nSync = SYNC_TRUE) override;
@@ -154,7 +155,7 @@ public:
     //处理网络消息
     void             ProcessMsg();
     export_lua const VirtualSocket& GetSocket() const { return m_Socket; }
-    export_lua virtual void         RecalcAttrib(bool bClearCache = false) override;
+    export_lua virtual void         RecalcAttrib(bool bClearCache = false, bool bNotify = true) override;
 
 public:
     void OnRecvGameData(CNetworkMessage* pMsg);

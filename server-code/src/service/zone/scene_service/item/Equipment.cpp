@@ -428,7 +428,6 @@ void CEquipment::CheckItemExpire(uint32_t dwTimeNow)
     if(bRecalcAbility)
     {
         m_pOwner->RecalcAttrib();
-        m_pOwner->BroadcastShow();
     }
     __LEAVE_FUNCTION
 }

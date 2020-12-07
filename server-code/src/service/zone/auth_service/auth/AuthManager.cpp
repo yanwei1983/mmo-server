@@ -20,22 +20,23 @@ CAuthManager::~CAuthManager()
 
 void CAuthManager::Destory()
 {
+    for(auto [k,v] : m_AuthList)
+    {
+        brpc::StartCancel(brpc::CallId{v});
+    }
+    for(auto [k,v] : m_AuthList)
+    {
+        brpc::Join(brpc::CallId{v});
+    }
     m_pAuthChannel.reset();
-    m_threadAuth->Stop();
-    m_threadAuth->Join();
 }
 
 bool CAuthManager::Init(CAuthService* pService)
 {
-    m_threadAuth = std::make_unique<CWorkerThread>(
-        "AuthThread",
-        [pService]() { SetAuthServicePtr(pService); },
-        []() { SetAuthServicePtr(nullptr); });
-
     m_pAuthChannel = std::make_unique<brpc::Channel>();
     brpc::ChannelOptions options;
     options.protocol = brpc::PROTOCOL_HTTP;
-    // options.connection_type = brpc::CONNECTION_TYPE_POOLED;
+    options.connection_type = brpc::CONNECTION_TYPE_POOLED;
     options.timeout_ms = 50000 /*milliseconds*/; // 5s
     options.max_retry  = 3;
 

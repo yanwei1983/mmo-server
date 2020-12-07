@@ -260,24 +260,24 @@ float CGameMap::GetHigh(float x, float y) const
     return -1.0f;
 }
 
-Vector2 CGameMap::LineFindCanStand(const Vector2& src, const Vector2& dest) const
+std::optional<Vector2> CGameMap::LineFindCanStand(const Vector2& src, const Vector2& dest) const
 {
     __ENTER_FUNCTION
     if(m_pMapData == nullptr)
-        return dest;
+        return {};
     return m_pMapData->LineFindCanStand(src, dest);
     __LEAVE_FUNCTION
-    return dest;
+    return {};
 }
 
-Vector2 CGameMap::LineFindCanJump(const Vector2& src, const Vector2& dest) const
+std::optional<Vector2> CGameMap::LineFindCanJump(const Vector2& src, const Vector2& dest) const
 {
     __ENTER_FUNCTION
     if(m_pMapData == nullptr)
-        return dest;
+        return {};
     return m_pMapData->LineFindCanJump(src, dest);
     __LEAVE_FUNCTION
-    return dest;
+    return {};
 }
 
 Vector2 CGameMap::FindPosNearby(const Vector2& pos, float range) const

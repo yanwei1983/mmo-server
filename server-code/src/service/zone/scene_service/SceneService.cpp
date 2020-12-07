@@ -447,17 +447,37 @@ void CSceneService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\nMessageProcess:{}"), GetMessageProcess()) +
-                          fmt::format(FMT_STRING("\nEvent:{}\tActive:{}\tMem:{}"),
-                                      EventManager()->GetEventCount(),
-                                      EventManager()->GetRunningEventCount(),
-                                      get_thread_memory_allocted()) +
-                          fmt::format(FMT_STRING("\nUser:{}\tMonster:{}"), ActorManager()->GetUserCount(), ActorManager()->GetMonsterCount()) +
-                          fmt::format(FMT_STRING("\nLoading:{}\tSaveing:{}\tReady:{}"),
-                                      GetLoadingThread()->GetLoadingCount(),
-                                      GetLoadingThread()->GetSaveingCount(),
-                                      GetLoadingThread()->GetReadyCount()) +
-                          fmt::format(FMT_STRING("\nScene:{}\tDynaScene:{}"), SceneManager()->GetSceneCount(), SceneManager()->GetDynaSceneCount());
+                          fmt::format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(),
+                           get_thread_memory_allocted());
+        buf += fmt::format(FMT_STRING("\nEvent:{}\tActive:{}"),
+                           EventManager()->GetEventCount(),
+                           EventManager()->GetRunningEventCount());
+
+        for(const auto& [k, v]: EventManager()->GetCountEntryByManagerType())
+        {
+            auto result = magic_enum::enum_cast<EventManagerType>(k);
+            if(result)
+            {
+                buf += fmt::format(FMT_STRING("\nManagerType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
+            }
+        }
+        for(const auto& [k, v]: EventManager()->GetCountEntryByType())
+        {
+            auto result = magic_enum::enum_cast<GameEventType>(k);
+            if(result)
+            {
+                buf += fmt::format(FMT_STRING("\nEvType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
+            }
+        }
+
+
+        buf += fmt::format(FMT_STRING("\nUser:{}\tMonster:{}"), ActorManager()->GetUserCount(), ActorManager()->GetMonsterCount()) +
+               fmt::format(FMT_STRING("\nLoading:{}\tSaveing:{}\tReady:{}"),
+                           GetLoadingThread()->GetLoadingCount(),
+                           GetLoadingThread()->GetSaveingCount(),
+                           GetLoadingThread()->GetReadyCount()) +
+               fmt::format(FMT_STRING("\nScene:{}\tDynaScene:{}"), SceneManager()->GetSceneCount(), SceneManager()->GetDynaSceneCount());
+
         SceneManager()->ForEach([&buf](CScene* pScene) {
             size_t player_count = 0;
             size_t actor_count  = 0;
@@ -475,7 +495,7 @@ void CSceneService::OnLogicThreadProc()
                                player_count,
                                actor_count);
         });
-
+        
         //检查ai,world,socket1-5如果是源端socket的话,有多少缓冲区堆积
         auto check_func = [&buf](const ServerPort& serverport) {
             auto pMessagePort = GetMessageRoute()->QueryMessagePort(serverport, false);

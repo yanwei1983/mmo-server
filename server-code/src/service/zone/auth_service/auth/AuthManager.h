@@ -58,8 +58,6 @@ private:
     MPSCQueue<std::function<void()>>           m_ResultList;
     uint64_t                                   m_CallIdx = 0;
 
-    std::unique_ptr<CWorkerThread> m_threadAuth;
-
     std::unique_ptr<brpc::Channel> m_pAuthChannel;
 };
 

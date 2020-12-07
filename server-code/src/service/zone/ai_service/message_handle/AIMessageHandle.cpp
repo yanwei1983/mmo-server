@@ -54,8 +54,6 @@ ON_SERVERMSG(CAIService, AOIChange)
         {
             pTarget->RemoveFromViewList(pActor, pActor->GetID(), true);
         }
-
-        LOGACTORDEBUG(pActor->GetID(), "ViewListDel del:{}", id);
     }
     for(const auto& id: msg.actor_add())
     {
@@ -64,13 +62,7 @@ ON_SERVERMSG(CAIService, AOIChange)
         {
             pActor->AddToViewList(pTarget);
             pTarget->AddToViewList(pActor);
-
-            LOGACTORDEBUG(pActor->GetID(), "ViewListAdd add:{}", id);
-        }
-        else
-        {
-            LOGACTORDEBUG(pActor->GetID(), "ViewListAdd add:{} not find", id);
-        }
+        }        
     }
     LOGACTORDEBUG(pActor->GetID(),
                   "ViewListChange cur:{} add:{} del:{}",                 

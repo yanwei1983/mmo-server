@@ -40,7 +40,7 @@ bool CPet::Init(CPetSet* pPetSet, CDBRecordPtr&& pRecord)
     m_pCDSet.reset(CCoolDownSet::CreateNew());
     CHECKF(m_pCDSet.get());
 
-    RecalcAttrib(true);
+    RecalcAttrib(true, false);
 
     return true;
     __LEAVE_FUNCTION

@@ -18,6 +18,7 @@ bool CUserManager::Init()
 
 void CUserManager::Destory()
 {
+    LOGDEBUG("CUserManager::Destory");
     for(auto& v: m_setUser)
     {
         SAFE_DELETE(v.second);

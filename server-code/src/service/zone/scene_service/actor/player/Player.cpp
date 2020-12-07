@@ -442,9 +442,9 @@ void CPlayer::OnLogin(bool bLogin, const SceneIdx& idxScene, float fPosX, float 
     m_fLoadingPosY   = findpos.y;
     m_fLoadingFace   = fFace;
 
+    
+    RecalcAttrib(true, false);
     SendPlayerInfoToClient();
-    RecalcAttrib(true);
-
     //通知前端读取场景
     //等待前端loading完成
     SC_LOADMAP msg;
@@ -457,7 +457,7 @@ void CPlayer::OnLogin(bool bLogin, const SceneIdx& idxScene, float fPosX, float 
     SendMsg(msg);
 
     CEventEntryCreateParam param;
-    param.evType    = 0;
+    param.evType    = EVENTID_PLAYER_ON_TIMER;
     param.cb        = std::bind(&CPlayer::OnTimer, this);
     param.tWaitTime = 100;
     param.bPersist  = true;
@@ -616,4 +616,45 @@ void CPlayer::ProcessMsg()
         LOGWARNING("Player{} Have Too Mony Msg Need Process.", GetID());
     }
     __LEAVE_FUNCTION
+}
+
+
+
+bool CPlayer::CheckCanMove(const Vector2& posTarget, bool bSet)
+{
+    __ENTER_FUNCTION
+    //判断时间
+    constexpr uint32_t ONCE_MOVE_PER_TIME(200); // 350ms最小移动间隔, 服务器稍微增加一点误差
+
+    uint32_t now         = TimeGetMonotonic();
+    uint32_t passed_time = now - GetLastMoveTime();
+    if(passed_time < ONCE_MOVE_PER_TIME)
+    {
+        // move too fast, may be need kick back
+        LOGACTORDEBUG(GetID(), "move too fast:{},{} {},{}", GetPos().x, GetPos().y, posTarget.x, posTarget.y);
+        return false;
+    }
+    constexpr uint32_t MOVE_TIME_TOLERANCE(200);
+    float              move_spd = GetMoveSpeed() * 1.5f; //允许1.5倍的速度差异
+
+    float can_move_dis = float(passed_time + MOVE_TIME_TOLERANCE) / 1000.0f * move_spd;
+    can_move_dis       = std::min(can_move_dis, move_spd);
+
+    float move_dis = GameMath::distance(GetPos(), posTarget);
+    constexpr float move_step_min = 0.01f; //最小移动距离
+    if(move_dis < move_step_min)
+    {
+        LOGACTORTRACE(GetID(), "move too near:{},{} {},{} dis:{}", GetPos().x, GetPos().y, posTarget.x, posTarget.y, move_dis);
+        return false;
+    }
+    if(can_move_dis < move_dis)
+    {
+        // move too fast, may be need kick back
+        LOGACTORDEBUG(GetID(), "move too long:{},{} {},{}", GetPos().x, GetPos().y, posTarget.x, posTarget.y);
+        return false;
+    }
+
+    return CActor::CheckCanMove( posTarget, bSet);
+    __LEAVE_FUNCTION
+    return false;
 }

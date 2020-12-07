@@ -16,9 +16,11 @@
 #include "ScriptCallBackType.h"
 #include "ScriptManager.h"
 #include "SkillType.h"
+#include "GameEventDef.h"
 #include "config/Cfg_Scene_Patrol.pb.h"
 
 constexpr int32_t MOVE_PER_WAIT_MS = 500; //每500ms向zone发送一次移动消息
+constexpr float DIS_VERY_CLOSE = 0.01f;
 
 CActorAI::CActorAI() {}
 
@@ -109,7 +111,7 @@ uint32_t CActorAI::GetState() const
 void CActorAI::ChangeState(uint32_t val)
 {
     m_nState = val;
-    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: {} ChangeState: {}", GetActor()->GetID(), GetStateData(val).name);
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ChangeState: {}", GetStateData(val).name);
 }
 
 void CActorAI::SetAISleep(bool v)
@@ -122,7 +124,7 @@ void CActorAI::SetAISleep(bool v)
         return;
 
     m_bSleep = v;
-    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: {} SetAISleep: {}", GetActor()->GetID(), v ? "true" : "false");
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: SetAISleep: {}", v ? "true" : "false");
 
     if(m_bSleep == true)
     {
@@ -141,6 +143,7 @@ void CActorAI::SetAISleep(bool v)
 bool CActorAI::ToRandMove()
 {
     __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToRandMove");
     ChangeState(ATT_RANDMOVE);
 
     float dis = GameMath::distance(m_posBorn, GetActor()->GetPos());
@@ -162,6 +165,7 @@ bool CActorAI::ToRandMove()
 bool CActorAI::ToPratol()
 {
     __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToPratol");
     if(m_pPathData == nullptr)
         return false;
 
@@ -236,6 +240,7 @@ bool CActorAI::ToIdle()
 bool CActorAI::ToAttack()
 {
     __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToAttack");
     ChangeState(ATT_ATTACK);
     AddNextCall(GetAIData().attack_wait_ms());
     return true;
@@ -246,6 +251,7 @@ bool CActorAI::ToAttack()
 bool CActorAI::ToApproach()
 {
     __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToApproach");
     if(GetActor()->GetMoveSpeed() == 0 || GetAIData().can_approach() == false)
     {
         return ToAttack();
@@ -261,6 +267,7 @@ bool CActorAI::ToApproach()
 bool CActorAI::ToSkill()
 {
     __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToSkill");
     CAIActor* pTarget = AIActorManager()->QueryActor(GetMainTarget());
     if(pTarget == nullptr || pTarget->IsDead() == true)
     { // 目标不存在或已死亡
@@ -306,6 +313,7 @@ bool CActorAI::ToSkill()
 bool CActorAI::ToEscape(OBJID idTarget)
 {
     __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToEscape");
     CAIActor* pTarget = AIActorManager()->QueryActor(idTarget);
     if(pTarget == nullptr || pTarget->IsDead() == true)
     { // 目标不存在或已死亡
@@ -326,6 +334,7 @@ bool CActorAI::_ToGoBack()
 {
     __ENTER_FUNCTION
     m_posTarget = m_posRecord;
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToGoBack {}", m_posTarget);
     ChangeState(ATT_GOBACK); // 转换到ESCAPE状态
     AddNextCall(MOVE_PER_WAIT_MS);
     return true;
@@ -356,6 +365,7 @@ bool CActorAI::ToGoBack()
 bool CActorAI::ToPatrolWait(uint32_t wait_min, uint32_t wait_max)
 {
     __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToPatrolWait");
     ChangeState(ATT_PRATOLWAIT); // 转换到ESCAPE状态
     AddNextCall(random_uint32_range(wait_min, wait_max));
     return true;
@@ -366,6 +376,7 @@ bool CActorAI::ToPatrolWait(uint32_t wait_min, uint32_t wait_max)
 bool CActorAI::ToSkillFinish(uint32_t stun_ms)
 {
     __ENTER_FUNCTION
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: ToSkillFinish");
     ChangeState(ATT_SKILLWAIT); // 转换到ESCAPE状态
     AddNextCall(stun_ms);
     return true;
@@ -456,19 +467,20 @@ void CActorAI::ProcessAttack()
 void CActorAI::ProcessRandMove()
 {
     __ENTER_FUNCTION
-    if(GetActor()->GetPos() == m_posTarget)
+    if(GameMath::distance(GetActor()->GetPos(),m_posTarget) <= 0.01f)
     {
         ToIdle();
         return;
     }
-    auto posStep = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
-    if(posStep == GetActor()->GetPos())
+    auto result = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
+    if(!result)
     {
         //没有找到路径
         ToIdle();
         return;
     }
-    GetActor()->MoveToTarget(posStep);
+    GetActor()->MoveToTarget(result.value());
+    LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "From {} MoveToTarget {}", GetActor()->GetPos(), result.value());
     AddNextCall(MOVE_PER_WAIT_MS);
     __LEAVE_FUNCTION
 }
@@ -509,35 +521,46 @@ void CActorAI::ProcessApproach()
     float fDis  = vDir.normalise();
     m_posTarget = pTarget->GetPos() + vDir * m_fTargetDis;
 
-    if(GetActor()->GetPos() != m_posTarget)
+    if(GameMath::distance(GetActor()->GetPos(),m_posTarget) > DIS_VERY_CLOSE)
     {
-        auto posStep = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
-        if(posStep == GetActor()->GetPos())
+        auto result = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
+        if(result)
+        {
+            GetActor()->MoveToTarget(result.value());
+            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "From {} MoveToTarget {}", GetActor()->GetPos(), result.value());
+            AddNextCall(MOVE_PER_WAIT_MS);
+        }
+        else
         {
             //没有找到路径
+            ToAttack();
         }
-        GetActor()->MoveToTarget(posStep);
-        AddNextCall(MOVE_PER_WAIT_MS);
     }
     else
     {
         ToSkill();
     }
+    
     __LEAVE_FUNCTION
 }
 
 void CActorAI::ProcessEscape()
 {
     __ENTER_FUNCTION
-    if(GetActor()->GetPos() != m_posTarget)
+    if(GameMath::distance(GetActor()->GetPos(),m_posTarget) > DIS_VERY_CLOSE)
     {
-        auto posStep = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
-        if(posStep == GetActor()->GetPos())
+        auto result = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
+        if(result)
+        {
+            GetActor()->MoveToTarget(result.value());
+            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "From {} MoveToTarget {}", GetActor()->GetPos(), result.value());
+            AddNextCall(MOVE_PER_WAIT_MS);
+        }
+        else
         {
             //没有找到路径
+            ToAttack();
         }
-        GetActor()->MoveToTarget(posStep);
-        AddNextCall(MOVE_PER_WAIT_MS);
     }
     else
     {
@@ -549,19 +572,22 @@ void CActorAI::ProcessEscape()
 void CActorAI::ProcessGoback()
 {
     __ENTER_FUNCTION
-    if(GetActor()->GetPos() != m_posTarget)
+    if(GameMath::distance(GetActor()->GetPos(),m_posTarget) > DIS_VERY_CLOSE)
     {
-        auto posStep = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
-        if(posStep == GetActor()->GetPos())
+        auto result = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
+        if(result)
         {
-            //没有找到路径
-            // flyto
-            GetActor()->FlyTo(m_posTarget);
+            GetActor()->MoveToTarget(result.value());
+            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "From {} MoveToTarget {}", GetActor()->GetPos(), result.value());
             AddNextCall(MOVE_PER_WAIT_MS);
+            
         }
         else
         {
-            GetActor()->MoveToTarget(posStep);
+           //没有找到路径
+            // flyto
+            GetActor()->FlyTo(m_posTarget);
+            LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "From {} FlyTo {}", GetActor()->GetPos(), m_posTarget);
             AddNextCall(MOVE_PER_WAIT_MS);
         }
     }
@@ -580,16 +606,17 @@ void CActorAI::ProcessSkill()
 void CActorAI::ProcessPatrol()
 {
     __ENTER_FUNCTION
-    if(GetActor()->GetPos() != m_posTarget)
+    if(GameMath::distance(GetActor()->GetPos(), m_posTarget) > DIS_VERY_CLOSE)
     {
-        auto posStep = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
-        if(posStep == GetActor()->GetPos())
+        auto result = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
+        if(!result)
         {
             //没有找到路径
             ToIdle();
             return;
         }
-        GetActor()->MoveToTarget(posStep);
+        GetActor()->MoveToTarget(result.value());
+        LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "From {} MoveToTarget {}", GetActor()->GetPos(), result.value());
         AddNextCall(MOVE_PER_WAIT_MS);
     }
     else
@@ -660,7 +687,10 @@ void CActorAI::OrderAttack(OBJID idTarget)
     if(m_nState == ATT_GOBACK || m_nState == ATT_ESCAPE)
         return;
     if(m_nState == ATT_PRATOL || m_nState == ATT_PRATOLWAIT || m_nState == ATT_RANDMOVE || m_nState == ATT_IDLE)
+    {
         m_posRecord = GetActor()->GetPos();
+        LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: m_posRecord {}", m_posRecord);
+    }
 
     LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: OrderAttack: {}", idTarget);
 
@@ -874,6 +904,7 @@ void CActorAI::AddNextCall(uint32_t ms)
     __ENTER_FUNCTION
     m_Event.Cancel();
     CEventEntryCreateParam param;
+    param.evType    = EVENTID_MONSTER_AI;
     param.cb        = std::bind(&CActorAI::Process, this);
     param.tWaitTime = ms;
     EventManager()->ScheduleEvent(param, m_Event);
@@ -892,6 +923,7 @@ void CActorAI::SetAutoSearchEnemy()
     uint32_t ms = random_uint32_range(GetAIType()->GetDataRef().search_enemy_ms_min(), GetAIType()->GetDataRef().search_enemy_ms_max());
 
     CEventEntryCreateParam param;
+    param.evType    = EVENTID_MONSTER_AI_SEARCHENEMY;
     param.cb        = std::bind(&CActorAI::_SearchEnemy_CallBack, this);
     param.tWaitTime = ms;
     EventManager()->ScheduleEvent(param, m_SearchEnemyEvent);

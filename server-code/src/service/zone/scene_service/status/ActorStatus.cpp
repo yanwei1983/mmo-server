@@ -9,6 +9,7 @@
 #include "SkillFSM.h"
 #include "StatusType.h"
 #include "gamedb.h"
+#include "GameEventDef.h"
 #include "msg/zone_service.pb.h"
 AttachStatusInfo CStatusType::CloneInfo() const
 {
@@ -270,7 +271,7 @@ bool CActorStatus::ScheduleEvent(time_t tIntervalMS /*= 0*/)
     __ENTER_FUNCTION
     m_info.last_timestamp = TimeGetSecond();
     CEventEntryCreateParam param;
-    param.evType    = 0;
+    param.evType    = EVENTID_STATUS_CALLBACL;
     param.cb        = std::bind(&CActorStatus::ProcessEvent, this);
     param.tWaitTime = tIntervalMS;
     param.bPersist  = false;
