@@ -3,7 +3,6 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 #include "NetEventHandler.h"
-#include "EventManager.h"
 #include "NetworkMessage.h"
 #include "NetworkService.h"
 #include "event2/buffer.h"
@@ -21,6 +20,7 @@ CServerSocket::~CServerSocket()
 {
     if(m_pReconnectEvent)
     {
+        event_del(m_pReconnectEvent);
         event_free(m_pReconnectEvent);
         m_pReconnectEvent = nullptr;
     }

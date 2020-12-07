@@ -28,7 +28,6 @@ struct lws_context;
 
 class CNetSocket;
 class CNetWebSocket;
-class CEventManager;
 class CNetEventHandler;
 class CServerSocket;
 class CClientSocket;
@@ -81,7 +80,6 @@ public:
 
 public:
     event_base*    GetEVBase() const { return m_pBase; }
-    CEventManager* GetEventManager() const { return m_pEventManager.get(); }
     size_t         GetSocketAmount();
     // socket广播消息
     void BrocastMsg(const CNetworkMessage& msg, SOCKET execpt_this);
@@ -124,7 +122,6 @@ protected:
     std::function<void(struct evhttp_request* req)> m_funcOnReciveHttp;
     std::mutex                                      m_mutex;
 
-    std::unique_ptr<CEventManager> m_pEventManager;
 
     std::map<SOCKET, CNetSocket*>   m_setSocket;
     std::deque<SocketIdx_t>         m_SocketIdxPool;

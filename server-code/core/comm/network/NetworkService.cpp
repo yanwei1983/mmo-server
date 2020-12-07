@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "EventManager.h"
 #include "NetEventHandler.h"
 #include "NetClientSocket.h"
 #include "NetServerSocket.h"
@@ -23,8 +22,6 @@ CNetworkService::CNetworkService()
         m_SocketIdxPool[i] = i + 1;
         m_setSocketByIdx[i] = nullptr;
     }
-
-    m_pEventManager.reset(CEventManager::CreateNew(m_pBase));
 }
 
 CNetworkService::~CNetworkService()
@@ -87,8 +84,6 @@ void CNetworkService::Destroy()
         evhttp_free(m_pHttpHandle);
         m_pHttpHandle = nullptr;
     }
-
-    m_pEventManager.reset();
 
     if(m_pBase)
     {

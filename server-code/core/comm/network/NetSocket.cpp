@@ -3,7 +3,6 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 #include "NetEventHandler.h"
-#include "EventManager.h"
 #include "NetworkMessage.h"
 #include "NetworkService.h"
 #include "event2/buffer.h"
@@ -16,6 +15,7 @@
 #endif
 
 OBJECTHEAP_IMPLEMENTATION(CNetSocket, s_Heap);
+
 
 CNetSocket::CNetSocket(CNetworkService* pService, CNetEventHandler* pEventHandler)
     : m_pService(pService)
@@ -31,6 +31,11 @@ CNetSocket::CNetSocket(CNetworkService* pService, CNetEventHandler* pEventHandle
     , m_socket(INVALID_SOCKET)
     , m_ReadBuff{std::make_unique<byte[]>(m_nPacketSizeMax)}
 {
+    m_pEventSendMsg = evuser_new(pService->GetEVBase(), [](int,short,void* ctx)
+    {
+        CNetSocket* pThis = (CNetSocket*)ctx;
+        pThis->_SendAllMsg();
+    }, this);
 }
 
 CNetSocket::~CNetSocket()
@@ -56,8 +61,12 @@ CNetSocket::~CNetSocket()
     {
         SAFE_DELETE(pData);
     }
-    m_Event.Cancel();
-    m_Event.Clear();
+    if(m_pEventSendMsg)
+    {
+        evuser_del(m_pEventSendMsg);
+        event_free(m_pEventSendMsg);
+        m_pEventSendMsg = nullptr;
+    }
     __LEAVE_FUNCTION
 }
 
@@ -126,11 +135,9 @@ void CNetSocket::InitEncryptor(uint32_t seed)
 void CNetSocket::PostSend()
 {
     __ENTER_FUNCTION
-    if(m_Event.IsRunning() == false)
+    if(evuser_pending(m_pEventSendMsg, nullptr) == false)
     {
-        CEventEntryCreateParam param;
-        param.cb = std::bind(&CNetSocket::_SendAllMsg, this);
-        m_pService->GetEventManager()->ScheduleEvent(param, m_Event);
+        evuser_trigger(m_pEventSendMsg);
     }
 
     __LEAVE_FUNCTION

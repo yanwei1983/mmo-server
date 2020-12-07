@@ -56,67 +56,74 @@ void CEventEntry::SetEventType(uint32_t val)
 void CEventEntry::Cancel()
 {
     __ENTER_FUNCTION
-    if(m_bRunning == false)
+    if(IsWaitTrigger() == false)
         return;
     if(m_pCallBack)
     {
-        m_pCallBack = nullptr;
         if(m_pevTimer)
         {
             event_del(m_pevTimer);
             m_pManager->SubRunningEventCount();
         }
-        m_bRunning = false;
+        m_pCallBack = nullptr; 
     }
     __LEAVE_FUNCTION
 }
 
 bool CEventEntry::IsCanceled() const
 {
-    return m_bRunning == false;
+    return !IsWaitTrigger();
 }
 
-bool CEventEntry::IsRunning() const
+bool CEventEntry::IsWaitTrigger() const
 {
-    return m_bRunning;
+    if(m_pevTimer)
+    {
+        return evtimer_pending(m_pevTimer, NULL) != 0;
+    }
+    return false;
 }
+
 
 bool CEventEntry::IsVaild() const
 {
-    return m_bRunning == true && m_pCallBack != nullptr;
+    return m_pevTimer && m_pCallBack;
 }
 
 void CEventEntry::Clear()
 {
     __ENTER_FUNCTION
-    m_pCallBack = nullptr;
-    if(m_pevTimer && m_bRunning)
+
+    if(IsWaitTrigger())
     {
         event_del(m_pevTimer);
         m_pManager->SubRunningEventCount();
     }
-    m_bRunning = false;
+    m_pCallBack = nullptr; 
     __LEAVE_FUNCTION
 }
 
-void CEventEntry::Set(const CEventEntryCreateParam& param, uint32_t nManagerType)
+void CEventEntry::Set(const CEventEntryCreateParam& param)
 {
     m_evType        = param.evType;
     m_pCallBack     = param.cb;
     m_tWaitTime     = param.tWaitTime;
     m_bPersist      = param.bPersist;
-    m_bRunning      = true;
-    m_evManagerType = nManagerType;
 }
 
-void CEventEntry::ReleaseFromManager()
+void CEventEntry::Release()
 {
     __ENTER_FUNCTION
-    if(m_pManager)
+    CHECK(m_pManager)
+    auto this_ptr = shared_from_this();
+    m_pManager->RemoveWait(this_ptr);
+    if(m_evManagerType == EMT_EVMANAGER)
     {
-        m_pManager->RemoveWait(this);
+        m_pManager->_DeleteManagedEvent(this_ptr);
     }
-    delete this;
+     
+    m_pManager->ReleaseEvent(this_ptr);
+
     __LEAVE_FUNCTION
 }
 
@@ -144,7 +151,7 @@ bool CEventEntry::CreateEvTimer(event_base* base)
                 {
                     if(nManagerType == EMT_EVMANAGER)
                     {
-                        pEntry->ReleaseFromManager();
+                        pEntry->Release();
                         // pEntry is deleted
                     }
                 }
@@ -160,15 +167,15 @@ bool CEventEntry::CreateEvTimer(event_base* base)
 void CEventEntry::Trigger()
 {
     __ENTER_FUNCTION
+   
     if(m_pCallBack)
-    {
+    {       
         auto call_back = m_pCallBack;
         call_back();
     }
 
     if(m_bPersist == false)
     {
-        m_bRunning = false;
         m_pManager->SubRunningEventCount();
     }
     __LEAVE_FUNCTION
@@ -187,10 +194,10 @@ void CEventEntryMap::Clear()
     __ENTER_FUNCTION
     for(auto it = m_setEntry.begin(); it != m_setEntry.end();)
     {
-        CEventEntry* pEntry = it->second;
+        CEventEntrySharedPtr pEntry = it->second.lock();
         if(pEntry)
         {
-            pEntry->ReleaseFromManager();
+            pEntry->Release();
         }
         it = m_setEntry.erase(it);
     }
@@ -204,8 +211,10 @@ bool CEventEntryMap::Cancel(uint32_t evType)
     auto it = m_setEntry.find(evType);
     if(it != m_setEntry.end())
     {
-        CEventEntry* pEnery = it->second;
-        pEnery->Cancel();
+        CEventEntrySharedPtr pEntry = it->second.lock();
+        if(pEntry)
+            pEntry->Cancel();
+
         return true;
     }
     __LEAVE_FUNCTION
@@ -218,39 +227,42 @@ void CEventEntryMap::ClearByType(uint32_t evType)
     auto it = m_setEntry.find(evType);
     if(it != m_setEntry.end())
     {
-        CEventEntry* pEnery = it->second;
-        pEnery->ReleaseFromManager();
+        CEventEntrySharedPtr pEntry = it->second.lock();
+        if(pEntry)
+        {
+            pEntry->Release();
+        }
         m_setEntry.erase(it);
     }
     __LEAVE_FUNCTION
 }
 
-const CEventEntry* CEventEntryMap::Query(uint32_t evType) const
+CEventEntrySharedPtr CEventEntryMap::Query(uint32_t evType) const
 {
     __ENTER_FUNCTION
     auto it = m_setEntry.find(evType);
     if(it != m_setEntry.end())
     {
-        return it->second;
+        return it->second.lock();
     }
     __LEAVE_FUNCTION
     return nullptr;
 }
 
-CEventEntry*& CEventEntryMap::GetRef(uint32_t evType)
+CEventEntryWeakPtr& CEventEntryMap::GetRef(uint32_t evType)
 {
     return m_setEntry[evType];
 }
 
-CEventEntry*& CEventEntryMap::operator[](uint32_t evType)
+CEventEntryWeakPtr& CEventEntryMap::operator[](uint32_t evType)
 {
     return m_setEntry[evType];
 }
 
-bool CEventEntryMap::Set(CEventEntry* pEntry)
+bool CEventEntryMap::Set(const CEventEntrySharedPtr& pEntry)
 {
     __ENTER_FUNCTION
-    m_setEntry[pEntry->GetEventType()] = pEntry;
+    m_setEntry[pEntry->GetEventType()] = CEventEntryWeakPtr{pEntry};
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -269,10 +281,10 @@ void CEventEntryQueue::Clear()
     __ENTER_FUNCTION
     for(auto it = m_setEntry.begin(); it != m_setEntry.end();)
     {
-        CEventEntry* pEntry = *it;
+        CEventEntrySharedPtr pEntry = it->lock();
         if(pEntry)
         {
-            pEntry->ReleaseFromManager();
+            pEntry->Release();
         }
         it = m_setEntry.erase(it);
     }
@@ -283,41 +295,49 @@ void CEventEntryQueue::Clear()
 void CEventEntryQueue::ClearByType(uint32_t evType)
 {
     __ENTER_FUNCTION
-    for(auto it = m_setEntry.begin(); it != m_setEntry.end(); it++)
+    for(auto it = m_setEntry.begin(); it != m_setEntry.end();)
     {
-        CEventEntry* pEntry = *it;
+        CEventEntrySharedPtr pEntry = it->lock();
         if(pEntry && pEntry->GetEventType() == evType)
         {
-            pEntry->ReleaseFromManager();
-            m_setEntry.erase(it);
-            return;
+            pEntry->Release();
+            it = m_setEntry.erase(it);
         }
+        else
+        {
+            it++;
+        }
+        
     }
     __LEAVE_FUNCTION
 }
 
-void CEventEntryQueue::Clear_IF(const std::function<bool(CEventEntry*)>& func)
+void CEventEntryQueue::Clear_IF(const std::function<bool(const CEventEntrySharedPtr&)>& func)
 {
     __ENTER_FUNCTION
-    for(auto it = m_setEntry.begin(); it != m_setEntry.end(); it++)
+    for(auto it = m_setEntry.begin(); it != m_setEntry.end(); )
     {
-        CEventEntry* pEntry = *it;
+        CEventEntrySharedPtr pEntry = it->lock();
         if(pEntry && func(pEntry) == true)
         {
-            pEntry->ReleaseFromManager();
-            m_setEntry.erase(it);
-            return;
+            pEntry->Release();
+            it = m_setEntry.erase(it);
         }
+        else
+        {
+            it++;
+        }
+        
     }
     __LEAVE_FUNCTION
 }
 
-bool CEventEntryQueue::Add(CEventEntry* pEntry)
+bool CEventEntryQueue::Add(const CEventEntrySharedPtr& pEntry)
 {
     __ENTER_FUNCTION
     if(pEntry)
     {
-        m_setEntry.insert(pEntry);
+        m_setEntry.emplace(CEventEntryWeakPtr{pEntry});
         return true;
     }
     __LEAVE_FUNCTION
@@ -335,9 +355,9 @@ CEventEntryPtr::~CEventEntryPtr()
 bool CEventEntryPtr::Cancel()
 {
     __ENTER_FUNCTION
-    if(m_pEntry)
+    if(auto shared_ptr = m_pEntry.lock())
     {
-        m_pEntry->Cancel();
+        shared_ptr->Cancel();
         return true;
     }
     __LEAVE_FUNCTION
@@ -347,37 +367,37 @@ bool CEventEntryPtr::Cancel()
 void CEventEntryPtr::Clear()
 {
     __ENTER_FUNCTION
-    if(m_pEntry)
+    if(auto shared_ptr = m_pEntry.lock())
     {
-        m_pEntry->ReleaseFromManager();
-        m_pEntry = nullptr;
+        shared_ptr->Release();
+        m_pEntry.reset();
     }
     __LEAVE_FUNCTION
 }
 
-bool CEventEntryPtr::IsRunning()
+bool CEventEntryPtr::IsWaitTrigger()
 {
     __ENTER_FUNCTION
-    if(m_pEntry)
+    if(auto shared_ptr = m_pEntry.lock())
     {
-        return m_pEntry->IsRunning();
+        return shared_ptr->IsWaitTrigger();
     }
     __LEAVE_FUNCTION
     return false;
 }
 
-CEventEntry* CEventEntryPtr::Query() const
+CEventEntrySharedPtr CEventEntryPtr::Query() const
+{
+    return m_pEntry.lock();
+}
+
+CEventEntryWeakPtr& CEventEntryPtr::GetRef()
 {
     return m_pEntry;
 }
 
-CEventEntry*& CEventEntryPtr::GetRef()
-{
-    return m_pEntry;
-}
-
-bool CEventEntryPtr::Set(CEventEntry* pEntry)
+bool CEventEntryPtr::Set(const CEventEntrySharedPtr& pEntry)
 {
     m_pEntry = pEntry;
-    return m_pEntry != nullptr;
+    return pEntry != nullptr;
 }

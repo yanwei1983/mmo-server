@@ -1,10 +1,10 @@
 #ifndef MessagePort_h__
 #define MessagePort_h__
 
-#include "EventManager.h"
 #include "LockfreeQueue.h"
 #include "NetworkDefine.h"
 #include "NetEventHandler.h"
+#include "Noncopyable.h"
 
 class CNetSocket;
 class CMessageRoute;
@@ -81,7 +81,6 @@ private:
     bool                                   m_bLocalPort          = false;
     ServerPort                             m_nServerPort;
     std::atomic<CMessagePortEventHandler*> m_pPortEventHandler = nullptr;
-    CEventEntryPtr                         m_Event;
 
     std::unordered_set<SocketIdx_t>        m_SocketIdxList;
 };

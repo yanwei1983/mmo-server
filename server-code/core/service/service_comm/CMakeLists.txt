@@ -15,7 +15,7 @@ ADD_LIBRARY(service_comm SHARED ${SRCS})
 
 #指定库输出路径
 SET(LIBRARY_OUTPUT_PATH ${LIBRARIES_CORE})
-ADD_DEPENDENCIES(service_comm network basecode myproto mydb message_route)
+ADD_DEPENDENCIES(service_comm network basecode myproto mydb message_route game_event)
 # 指定额外的链接库
 TARGET_LINK_LIBRARIES(service_comm
  PRIVATE libnetwork.so
@@ -23,6 +23,7 @@ TARGET_LINK_LIBRARIES(service_comm
  PRIVATE libmyproto.so
  PRIVATE libmydb.so
  PRIVATE libmessage_route.so
+ PUBLIC libgame_event.so
  PUBLIC libfmt.so
  PRIVATE crypto_comm
  pthread

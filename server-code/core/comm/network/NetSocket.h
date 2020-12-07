@@ -119,7 +119,7 @@ protected:
     struct evbuffer* m_Sendbuf;
 
     MPSCQueue<SendMsgData*> m_SendMsgQueue;
-    CEventEntryPtr          m_Event;
+    struct event*    m_pEventSendMsg; 
 
     std::string m_strAddr;
     int32_t     m_nPort;

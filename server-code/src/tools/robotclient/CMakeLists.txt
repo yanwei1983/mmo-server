@@ -11,7 +11,7 @@ add_executable(robotclient ${SRCS})
 
 #指定库输出路径
 SET(EXECUTABLE_OUTPUT_PATH ${BINARIES})
-ADD_DEPENDENCIES(robotclient basecode pb_util crypto_comm network script myproto)
+ADD_DEPENDENCIES(robotclient basecode pb_util crypto_comm network script myproto game_event)
 
 # 指定额外的链接库
 TARGET_LINK_LIBRARIES(robotclient
@@ -21,6 +21,7 @@ TARGET_LINK_LIBRARIES(robotclient
  libevent_extra.so
  libbasecode.so
  libnetwork.so
+ libgame_event.so
  libscript.so
  libmyproto.so
  crypto_comm

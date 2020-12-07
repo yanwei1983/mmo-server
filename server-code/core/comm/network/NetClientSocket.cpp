@@ -3,7 +3,6 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 #include "NetEventHandler.h"
-#include "EventManager.h"
 #include "NetworkMessage.h"
 #include "NetworkService.h"
 #include "event2/buffer.h"

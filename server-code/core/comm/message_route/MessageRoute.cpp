@@ -2,7 +2,6 @@
 
 #include <fstream>
 
-#include "EventManager.h"
 #include "GlobalSetting.h"
 #include "MessagePort.h"
 #include "MysqlTableCheck.h"
@@ -40,7 +39,6 @@ void ReleaseMessageRoute()
 CMessageRoute::CMessageRoute()
     : m_pNetworkService(std::make_unique<CNetworkService>())
 {
-    m_pEventManager.reset(CEventManager::CreateNew(m_pNetworkService->GetEVBase()));
     m_pNetworkService->StartIOThread("MessageRoute");
     LOGDEBUG("MessageRoute Create.");
 }
@@ -77,7 +75,6 @@ void CMessageRoute::Destory()
     }
     m_setMessagePort.clear();
 
-    m_pEventManager.reset();
     m_pNetworkService.reset();
 
     LOGDEBUG("MessageRoute Delete.");

@@ -49,8 +49,6 @@ void CMessagePort::Destory()
     
     m_nRemoteSocketIdx = INVALID_SOCKET_IDX;
     m_pPortEventHandler = nullptr;
-    m_Event.Cancel();
-    m_Event.Clear();
     __LEAVE_FUNCTION
 }
 

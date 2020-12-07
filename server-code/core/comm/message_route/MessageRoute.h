@@ -14,7 +14,6 @@
 class CMessagePort;
 class CNetworkService;
 class CServiceControl;
-class CEventManager;
 class CMysqlConnection;
 //每个Service会有一个自己的MessagePort, 当Service开启时会开始监听socket
 // Service与Service之间的通讯, 如果在一个Exe内, 那么可以直接找到MessagePort并放入队列,
@@ -81,7 +80,6 @@ public:
     }
 
 public:
-    CEventManager*    GetEventManager() const { return m_pEventManager.get(); }
     CMysqlConnection* GetServerInfoDB() const { return m_pServerInfoDB.get(); }
     CNetworkService*  GetNetworkService() const { return m_pNetworkService.get(); }
     
@@ -103,7 +101,6 @@ protected:
     std::unordered_map<ServerPort, CMessagePort*> m_setMessagePort;
 
     std::unique_ptr<CNetworkService>  m_pNetworkService;
-    std::unique_ptr<CEventManager>    m_pEventManager;
     std::unique_ptr<CMysqlConnection> m_pServerInfoDB;
 
     uint32_t m_lastUpdateTime = 0;
