@@ -69,7 +69,11 @@ namespace
     SIGNAL_HANDLER(catch_segv)
     {
         unblock_signal(SIGSEGV);
-        LOGERROR(GetStackTraceString(CallFrameMap(2)));
+        if(BaseCode::IsLogRunning())
+            LOGERROR(GetStackTraceString(CallFrameMap(2)));
+        else
+            BaseCode::MyLogMsgX("segv", true, GetStackTraceString(CallFrameMap(2)).c_str());
+        
         MAKE_THROW_FRAME(nullp);
         handle_segv();
     }
@@ -83,7 +87,11 @@ namespace
 #ifdef HANDLE_DIVIDE_OVERFLOW
         HANDLE_DIVIDE_OVERFLOW;
 #else
-        LOGERROR(GetStackTraceString(CallFrameMap(2)));
+        if(BaseCode::IsLogRunning())
+            LOGERROR(GetStackTraceString(CallFrameMap(2)));
+        else
+            BaseCode::MyLogMsgX("fpe", true, GetStackTraceString(CallFrameMap(2)).c_str());
+
         MAKE_THROW_FRAME(arithexception);
 #endif
         handle_fpe();

@@ -524,4 +524,53 @@ export_lua namespace GameMath
     }
 };
 
-#endif //__GAMEMATH_H_2007_2_7
+
+template<>
+struct fmt::formatter<Vector2> : public fmt::formatter<float>
+{
+    template<typename FormatContext>
+    auto format(const Vector2& v, FormatContext& ctx)
+    {
+        // ctx.out() is an output iterator to write to.
+        return fmt::format_to(ctx.out(), "({}:{})", v.x, v.y);
+    }
+};
+
+
+template<>
+struct fmt::formatter<Vector3> : public fmt::formatter<float>
+{
+    template<typename FormatContext>
+    auto format(const Vector3& v, FormatContext& ctx)
+    {
+        // ctx.out() is an output iterator to write to.
+        return fmt::format_to(ctx.out(), "({}:{}:{})", v.x, v.y, v.z);
+    }
+};
+
+
+template<>
+struct fmt::formatter<Rect> : public fmt::formatter<long>
+{
+    template<typename FormatContext>
+    auto format(const Rect& v, FormatContext& ctx)
+    {
+        // ctx.out() is an output iterator to write to.
+        return fmt::format_to(ctx.out(), "({}:{}:{}:{})", v.left, v.top, v.right, v.bottom);
+    }
+};
+
+
+template<>
+struct fmt::formatter<FloatRect> : public fmt::formatter<float>
+{
+    template<typename FormatContext>
+    auto format(const FloatRect& v, FormatContext& ctx)
+    {
+        // ctx.out() is an output iterator to write to.
+        return fmt::format_to(ctx.out(), "({}:{}:{}:{})", v.left, v.top, v.right, v.bottom);
+    }
+};
+
+
+#endif //__GAMEMATH_H_

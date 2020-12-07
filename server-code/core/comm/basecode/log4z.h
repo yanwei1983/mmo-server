@@ -329,6 +329,8 @@ public:
     //! Default no need to call and no recommended.
     virtual bool stop() = 0;
 
+    virtual bool isRunning() = 0;
+
     //! Find logger. thread safe.
     virtual LoggerId findLogger(const char* key) = 0;
 

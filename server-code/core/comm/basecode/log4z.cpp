@@ -340,6 +340,7 @@ public:
     virtual LoggerId createLogger(const char* key);
     virtual bool     start();
     virtual bool     stop();
+    virtual bool     isRunning();
     virtual bool     prePushLog(LoggerId id, int32_t level);
     virtual bool     pushLog(LogData* pLog, const char* file, int32_t line);
     //! 查找ID
@@ -1254,6 +1255,11 @@ LoggerId LogerManager::createLogger(const char* key)
     }
 
     return newID;
+}
+
+bool LogerManager::isRunning()
+{
+    return _runing;
 }
 
 bool LogerManager::start()

@@ -414,4 +414,6 @@ public:
 
 export_lua using CPos2D = Vector2;
 
+
+
 #endif // VECTOR2_H__

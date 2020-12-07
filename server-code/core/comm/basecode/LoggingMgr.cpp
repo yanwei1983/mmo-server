@@ -33,7 +33,7 @@ namespace BaseCode
 } // namespace BaseCode
 
 static std::string g_logPath;
-
+static bool g_log_start = false;
 void BaseCode::InitMonitorLog(const std::string& logname)
 {
     using namespace zsummer::log4z;
@@ -48,21 +48,48 @@ void BaseCode::InitMonitorLog(const std::string& logname)
     LOGDEBUG("InitMonitor:{}", logname);
 }
 
-void BaseCode::MyLogMsgX(const char* pszName, const char* pSrcFile, int32_t line, const char* pszBuffer)
+namespace 
 {
-    if(!pszName || !pszBuffer)
+    std::tuple<FILE*,struct tm> logFileOpen(const char* pszName, bool logData)
+    {
+        if(!pszName)
+            return {};
+        auto        curTime     = std::chrono::system_clock::now();
+        std::time_t now_c       = std::chrono::system_clock::to_time_t(curTime);
+        auto        localtime_c = timeToLocalTime(now_c);
+
+        std::string szLogName;
+        if(logData)
+            szLogName = fmt::format("{}/{}_{:%Y-%m-%d}.log", g_logPath, pszName, localtime_c);
+        else
+            szLogName = fmt::format("{}/{}.log", g_logPath, pszName);
+
+        FILE* fp = fopen(szLogName.c_str(), "a+");
+        return {fp,localtime_c};
+    }
+}
+
+
+void BaseCode::MyLogMsgX(const char* pszName, bool logData, const char* pszBuffer)
+{
+    if(!pszBuffer)
         return;
-    auto        curTime     = std::chrono::system_clock::now();
-    std::time_t now_c       = std::chrono::system_clock::to_time_t(curTime);
-    auto        localtime_c = timeToLocalTime(now_c);
-
-    std::string szLogName = fmt::format("{}/{}_{:%Y-%m-%d}.log", g_logPath, pszName, localtime_c);
-
-    FILE* fp = fopen(szLogName.c_str(), "a+");
-    if(nullptr == fp)
+    auto [fp,localtime_c] = logFileOpen(pszName, logData);
+    if(fp == nullptr)
         return;
 
-    fmt::print(fp, "{:%H:%M:%S}[{:d}]{:s}[{}:{}]\n", localtime_c, get_cur_thread_id(), pszBuffer, pSrcFile, line);
+    fmt::print(fp, "{:%H:%M:%S}[{}]{:s}\n", localtime_c, getNdcStr(), pszBuffer);
+
+    fclose(fp);
+}
+
+void BaseCode::MyLogMsgX(const char* pszName, bool logData, const char* pSrcFile, int32_t line, const char* pszBuffer)
+{
+    auto [fp,localtime_c] = logFileOpen(pszName, logData);
+    if(fp == nullptr)
+        return;
+
+    fmt::print(fp, "{:%H:%M:%S}[{}]{:s}[{}:{}]\n", localtime_c, getNdcStr(), pszBuffer, pSrcFile, line);
 
     fclose(fp);
 }
@@ -120,26 +147,31 @@ void BaseCode::InitLog(const std::string& path, int32_t log_lev)
         ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_login_logger, false);
         ILog4zManager::getRef().setLoggerDisplay(BaseCode::s_gm_logger, false);
     }
-    {
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_debug_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_error_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_message_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_warning_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_fatal_logger, log_lev);
-
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_network_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_db_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_stack_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_lua_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_ai_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_login_logger, log_lev);
-        ILog4zManager::getRef().setLoggerLevel(BaseCode::s_gm_logger, log_lev);
-    }
-
+    SetLogLev(log_lev);
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_lua_logger, false);
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_gm_logger, false);
 
     ILog4zManager::getRef().start();
+    g_log_start = true;
+}
+
+void BaseCode::SetLogLev(int log_lev)
+{
+    using namespace zsummer::log4z;
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_debug_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_error_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_message_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_warning_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_fatal_logger, log_lev);
+
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_network_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_db_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_stack_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_lua_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_ai_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_login_logger, log_lev);
+    ILog4zManager::getRef().setLoggerLevel(BaseCode::s_gm_logger, log_lev);
+    
 }
 
 void BaseCode::CreateExtLogDir()
@@ -167,6 +199,12 @@ void BaseCode::StopLog()
     }
 
     ILog4zManager::getRef().stop();
+    g_log_start = false;
+}
+
+bool BaseCode::IsLogRunning()
+{
+    return g_log_start;
 }
 
 static thread_local NDC* this_thread_NDC = nullptr;
@@ -205,5 +243,5 @@ NDC* BaseCode::getNdc()
 
 std::string BaseCode::getNdcStr()
 {
-    return (this_thread_NDC) ? this_thread_NDC->ndc : std::string();
+    return (this_thread_NDC) ? this_thread_NDC->ndc : std::to_string(get_cur_thread_id());
 }

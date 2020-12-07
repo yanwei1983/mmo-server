@@ -15,13 +15,13 @@ struct NDC
 
 namespace BaseCode
 {
-
-    void MyLogMsgX(const char* pszName, const char* pSrcFile, int32_t line, const char* pszBuffer);
+    void MyLogMsgX(const char* pszName, bool logData, const char* pszBuffer);
+    void MyLogMsgX(const char* pszName, bool logData, const char* pSrcFile, int32_t line, const char* pszBuffer);
 
     template<typename... Args>
-    void MyLogMsg(const char* pszName, const char* pSrcFile, int32_t line, const char* fmt, Args&&... args)
+    void MyLogMsg(const char* pszName, bool logData, const char* pSrcFile, int32_t line, const char* fmt, Args&&... args)
     {
-        MyLogMsgX(pszName, pSrcFile, line, fmt::format(fmt, std::forward<Args>(args)...).c_str());
+        MyLogMsgX(pszName, logData, pSrcFile, line, fmt::format(fmt, std::forward<Args>(args)...).c_str());
     }
 
     template<typename... Args>
@@ -41,7 +41,9 @@ namespace BaseCode
     std::string getNdcStr();
     void        StopLog();
     void        CreateExtLogDir();
-
+    void        SetLogLev(int log_lev);
+    bool        IsLogRunning();
+    
     extern int32_t s_default_logger;
     extern int32_t s_debug_logger;
     extern int32_t s_error_logger;
@@ -70,7 +72,7 @@ namespace BaseCode
 #define LOG_DETAIL_M(expr, g_log_lev, log_lev, log_dir, actor_id, fmtr, ...)                                            \
     if(expr && log_lev >= g_log_lev)                                                                                    \
     {                                                                                                                   \
-        BaseCode::MyLogMsg(fmt::format(log_dir "/role_{}", actor_id).c_str(), __FILE__, __LINE__, fmtr, ##__VA_ARGS__); \
+        BaseCode::MyLogMsg(fmt::format(log_dir "/role_{}", actor_id).c_str(), false, __FILE__, __LINE__, fmtr, ##__VA_ARGS__); \
     }
 
 #define LOGACTORDEBUG(actor_id, fmtr, ...)   LOG_DETAIL_M(true, BaseCode::g_log_actordebug, LOG_LEVEL_DEBUG, "actordebug", actor_id, fmtr, ##__VA_ARGS__)
