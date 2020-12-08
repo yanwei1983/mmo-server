@@ -15,6 +15,7 @@
 #include "NormalCrypto.h"
 #include "serverinfodb.h"
 #include "serverinfodb.pb.h"
+#include "protomsg_to_cmd.h"
 
 CServiceCommon::CServiceCommon()
 {
@@ -165,7 +166,6 @@ void CServiceCommon::OnLogicThreadCreate()
 
 void CServiceCommon::OnLogicThreadExit() {}
 
-uint32_t msg_to_cmd(const proto_msg_t& msg);
 
 bool CServiceCommon::ForwardProtoMsgToPlayer(const ServerPort& nServerPort, uint64_t id_player, const proto_msg_t& msg) const
 {

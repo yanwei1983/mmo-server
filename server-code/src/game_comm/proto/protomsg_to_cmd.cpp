@@ -48,3 +48,30 @@ uint32_t msg_to_cmd(const proto_msg_t& msg)
     __LEAVE_FUNCTION
     return 0;
 }
+
+
+
+
+std::string cs_cmd_to_name(uint32_t cmd)
+{
+    if(cmd < CS_CMD_MAX)
+    {
+        return CS_CMD_Name(cmd);
+    }
+    else
+    {
+        return ServerMSG::OMsgID_Name(cmd);
+    }
+}
+
+std::string sc_cmd_to_name(uint32_t cmd)
+{
+    if(cmd < SC_CMD_MAX)
+    {
+        return SC_CMD_Name(cmd);
+    }
+    else
+    {
+        return ServerMSG::OMsgID_Name(cmd);
+    }
+}

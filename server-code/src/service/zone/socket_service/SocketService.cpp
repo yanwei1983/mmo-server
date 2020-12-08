@@ -316,7 +316,8 @@ void CSocketService::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffe
         pSocket->Interrupt(true);
         return;
     }
-
+    m_pMonitorMgr->CmdProcessAdd(pHead->msg_cmd);
+    
     switch(pHead->msg_cmd)
     {
         default:
