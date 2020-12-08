@@ -3,8 +3,8 @@ cd `dirname $0`
 cd ../..
 DIR_file=`pwd`
 
-serverid=$1
-if [ ! -n "$1" ] ;then  
+serverid=$2
+if [ ! -n "$2" ] ;then  
     serverid=1
 fi 
 
@@ -31,9 +31,9 @@ stop()
 }
 
 
-if [ $2 ];
+if [ $1 ];
 then
-    $2;
+    $1;
 else
-    echo "$0 [zone_id] [start|stop]";    
+    echo "$0 [start|stop] [zone_id]";    
 fi
