@@ -3,7 +3,6 @@
 #define RESUME_SIG  SIGUSR2
 #define SUSPEND_SIG SIGUSR1
 
-static thread_local sigset_t wait_mask;
 static thread_local int32_t  suspended = 0; // per-thread flag
 
 void resume_handler(int32_t sig, siginfo_t* pInfo, void* pVoid)
@@ -18,6 +17,10 @@ void suspend_handler(int32_t sig, siginfo_t* pInfo, void* pVoid)
     suspended = 1;
     do
     {
+        sigset_t wait_mask;
+        sigfillset(&wait_mask);
+        sigdelset(&wait_mask, SUSPEND_SIG);
+        sigdelset(&wait_mask, RESUME_SIG);
         sigsuspend(&wait_mask);
     } while(suspended);
 }
@@ -75,12 +78,16 @@ void CNormalThread::ThreadFunc()
 {
     __ENTER_FUNCTION
     SetTid(pthread_self());
+    
+    //允许线程处理SUSPEND_SIG和RESUME_SIG
+    sigset_t unblock_mask;
+    sigemptyset(&unblock_mask);
+    sigaddset(&unblock_mask, SUSPEND_SIG);
+    sigaddset(&unblock_mask, RESUME_SIG);
+    pthread_sigmask(SIG_UNBLOCK, &unblock_mask, NULL);
+
+
     struct sigaction sa;
-
-    sigfillset(&wait_mask);
-    sigdelset(&wait_mask, SUSPEND_SIG);
-    sigdelset(&wait_mask, RESUME_SIG);
-
     sigfillset(&sa.sa_mask);
     sa.sa_flags     = SA_SIGINFO;
     sa.sa_sigaction = &resume_handler;

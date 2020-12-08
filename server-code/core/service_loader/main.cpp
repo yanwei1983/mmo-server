@@ -19,6 +19,7 @@
 #include "ServiceLoader.h"
 #include "StringAlgo.h"
 #include "get_opt.h"
+#include "Thread.h"
 
 #ifdef USE_JEMALLOC
 extern "C"
@@ -92,7 +93,7 @@ int32_t                    savefd_out = -1;
 int32_t                    savefd_err = -1;
 std::string                start_service_set;
 //////////////////////////////////////////////////////////////////////////
-void sig_term(int32_t signo)
+void sig_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
 {
     __ENTER_FUNCTION
     std::unique_lock<std::mutex> lock(g_tem_mutex, std::try_to_lock);
@@ -165,8 +166,17 @@ int32_t main(int32_t argc, char* argv[])
         daemon(1, 1);
         // daemon_init();
     }
+    //block all sig ,除了SIGFPE和SIGSEGV
+    sigset_t block_mask;
+    sigfillset(&block_mask);
+    sigdelset(&block_mask, SIGFPE);
+    sigdelset(&block_mask, SIGSEGV);
+    sigprocmask(SIG_BLOCK, &block_mask, NULL);
 
     G_INITSEGV();
+
+    
+
     setlocale(LC_ALL, "en_US.UTF-8");
     tzset();
     std::string setting_filename = "res/service_cfg.json";
@@ -244,7 +254,7 @@ int32_t main(int32_t argc, char* argv[])
         exit(-1);
     }
     fmt::print("service {} load succ.\n", start_service_set);
-
+    LOGDEBUG("main ThreadID:{}", get_cur_thread_id());
     FILE* pStdOutFile = fopen((logpath + "/stdout.log").c_str(), "w+");
     if(pStdOutFile == NULL)
     {
@@ -263,12 +273,27 @@ int32_t main(int32_t argc, char* argv[])
     dup2(fileno(pStdOutFile), STDERR_FILENO);
     fclose(pStdOutFile);
     pStdOutFile = NULL;
-
-    signal(SIGTERM, sig_term);
-    signal(SIGINT, sig_term);
-    signal(SIGQUIT, sig_term);
-
     start_jemalloc_backgroud_thread();
+
+    {
+        //当前主线程处理该信号
+        sigset_t unblock_mask;
+        sigemptyset(&unblock_mask);
+        sigaddset(&unblock_mask, SIGTERM);
+        sigaddset(&unblock_mask, SIGINT);
+        sigaddset(&unblock_mask, SIGQUIT);
+        pthread_sigmask(SIG_UNBLOCK, &unblock_mask, NULL);
+
+        struct sigaction sa;
+        sigfillset(&sa.sa_mask); //block all sa when process
+        sa.sa_flags     = SA_SIGINFO;
+        sa.sa_sigaction = &sig_term;
+        sigaction(SIGTERM, &sa, NULL);
+        sigaction(SIGINT, &sa, NULL);
+        sigaction(SIGQUIT, &sa, NULL);
+    }
+
+
 
     BaseCode::InitMonitorLog("comm");
     while(true)

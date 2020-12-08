@@ -11,6 +11,7 @@
 #include "ObjectHeap.h"
 #include "event2/event.h"
 #include "event2/thread.h"
+#include "Thread.h"
 //#include <brpc/global.h>
 void log_cb(int32_t severity, const char* msg)
 {
@@ -34,7 +35,7 @@ ServiceLoader::~ServiceLoader()
 void ServiceLoader::Destory()
 {
     __ENTER_FUNCTION
-    LOGMESSAGE("service_loader StartDestory:{}", getpid());
+    LOGMESSAGE("service_loader StartDestory:{}", get_cur_thread_id());
     for(auto it = m_setService.rbegin(); it != m_setService.rend(); it++)
     {
         __ENTER_FUNCTION
@@ -53,7 +54,7 @@ void ServiceLoader::Destory()
 #endif
     }
     m_setModule.clear();
-    LOGMESSAGE("service_loader StopDestory:{}", getpid());
+    LOGMESSAGE("service_loader StopDestory:{}", get_cur_thread_id());
     ReleaseMessageRoute();
     ReleaseGlobalSetting();
     __LEAVE_FUNCTION

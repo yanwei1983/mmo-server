@@ -408,7 +408,7 @@ static void IOThreadProc(event_base* pBase, const std::string& _thread_name, con
     __ENTER_FUNCTION
     pthread_setname_np(pthread_self(), _thread_name.c_str());
     BaseCode::SetNdc(_thread_name);
-    LOGMESSAGE("ThreadID:{}", get_cur_thread_id());
+    LOGDEBUG("ThreadCreate:{} ThreadID:{}",_thread_name, get_cur_thread_id());
     int32_t result = 0;
     do
     {
@@ -423,6 +423,7 @@ static void IOThreadProc(event_base* pBase, const std::string& _thread_name, con
         LOGNETERROR("CNetworkService {} IOThread Close with ERROR:", idService);
     }
     LOGNETDEBUG("CNetworkService IOThread Close:{}", idService);
+    LOGDEBUG("ThreadExit:{} ThreadID:{}",_thread_name, get_cur_thread_id());
     BaseCode::ClearNdc();
     __LEAVE_FUNCTION
 }

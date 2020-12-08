@@ -121,7 +121,7 @@ bool CMysqlConnection::Connect(const std::string& host,
             "DB AsyncThread",
             [this, host, user, password, db, port, client_flag]() {
                 __ENTER_FUNCTION
-                LOGMESSAGE("ThreadID:{}", get_cur_thread_id());
+                LOGDEBUG("ThreadCreate:DBAsyncThread ThreadID:{}", get_cur_thread_id());
 
                 {
                     std::unique_lock lock(g_mysql_init_mutex);
@@ -162,7 +162,7 @@ bool CMysqlConnection::Connect(const std::string& host,
                 LOGDBDEBUG("mysql async_connect to {}:{} {} succ.", host, port, db);
                 __LEAVE_FUNCTION
             },
-            []() { BaseCode::ClearNdc(); });
+            []() { LOGDEBUG("ThreadExit:DBAsyncThread ThreadID:{}", get_cur_thread_id()); BaseCode::ClearNdc(); });
 
         while(m_AsyncThread->IsReady() == false)
         {
