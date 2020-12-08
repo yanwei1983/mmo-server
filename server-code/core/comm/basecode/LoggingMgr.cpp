@@ -32,7 +32,7 @@ namespace BaseCode
     int32_t g_log_skilldebug = LOG_LEVEL_DEBUG;
 } // namespace BaseCode
 
-static char g_logPath[1024] =".";
+static char g_logPath[1024] ="./log";
 static bool g_log_start = false;
 void BaseCode::InitMonitorLog(const std::string& logname)
 {
