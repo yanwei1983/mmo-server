@@ -17,6 +17,8 @@ void export_to_lua(lua_State* L, void* pManager)
     lua_tinker::class_def<RobotClientManager>(L, "DelClient", &RobotClientManager::DelClient);
     lua_tinker::class_def<RobotClientManager>(L, "RegisterCMD", &RobotClientManager::RegisterCMD);
     lua_tinker::class_def<RobotClientManager>(L, "GetProcessCMD", &RobotClientManager::GetProcessCMD);
+    lua_tinker::class_def<RobotClientManager>(L, "GetClientCount", &RobotClientManager::GetClientCount);
+    lua_tinker::class_def<RobotClientManager>(L, "AddTimedCallback", &RobotClientManager::AddTimedCallback); 
     lua_tinker::set(L, "robot_manager", (RobotClientManager*)pManager);
 
     pb_luahelper::init_lua(L);
@@ -48,7 +50,7 @@ RobotClientManager::RobotClientManager(uint32_t nRobStart, uint32_t nRobAmount, 
     param.tWaitTime = 200;
     param.bPersist  = true;
 
-    m_pEventManager->ScheduleEvent(param, m_Event);
+    m_pEventManager->ScheduleEvent(param, m_EventScriptGC);
 }
 
 RobotClientManager::~RobotClientManager()
@@ -74,4 +76,22 @@ RobotClientPtr RobotClientManager::ConnectServer(const char* addr, int32_t port)
 void RobotClientManager::DelClient(const RobotClientPtr& pClient)
 {
     m_setClient.erase(pClient);
+}
+
+
+
+void RobotClientManager::AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name, bool bPersist)
+{
+    __ENTER_FUNCTION
+
+    CEventEntryCreateParam param;
+    param.evType = 0;
+    param.cb     = [this, _func_name = func_name]() 
+    {
+        ExecScript<void>(_func_name.c_str(), this);
+    };
+    param.tWaitTime = tIntervalMS;
+    param.bPersist  = bPersist;
+    m_pEventManager->ScheduleEvent(param, m_EventList);
+    __LEAVE_FUNCTION
 }

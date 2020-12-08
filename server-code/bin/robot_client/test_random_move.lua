@@ -196,8 +196,8 @@ function OnRecv_SC_ENTERMAP(client, buffer, size)
 		error("SC_ENTERMAP ParseFromArray fail");
 		return;
 	end
-	print_clientmsg(client, "enter map succ.");
-
+	print_debugmsg(client, "enter map succ.");
+	g_succ_clinet_count = g_succ_clinet_count+1;
 	local info = g_clientinfo[client:GetClientID()];
 	if info.hp == 0 then
 		local send_msg = ProtobufMessageWarp("CS_REBORN");
@@ -284,4 +284,12 @@ function main(start_idx, max_players)
 		end
 	end
 	
+	if(g_print_debug == false)then
+		robot_manager:AddTimedCallback(2000, "OnTimer", true);
+	end
+end
+
+g_succ_clinet_count = 0;
+function OnTimer()
+	print("client:", robot_manager:GetClientCount(), "enter:", g_succ_clinet_count);
 end
