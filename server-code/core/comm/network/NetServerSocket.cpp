@@ -8,7 +8,7 @@
 #include "event2/buffer.h"
 #include "event2/util.h"
 
-CServerSocket::CServerSocket(CNetworkService* pService, CNetEventHandler* pEventHandler, bool bReconnect)
+CServerSocket::CServerSocket(CNetworkService* pService,const CNetEventHandlerSharedPtr& pEventHandler, bool bReconnect)
     : CNetSocket(pService, pEventHandler)
     , m_bReconnect(bReconnect)
     , m_pReconnectEvent(nullptr)
@@ -49,9 +49,9 @@ void CServerSocket::Interrupt(bool bClearEventHandler)
     LOGNETDEBUG("CServerSocket Interrupt {}:{}", GetAddrString(), GetPort());
     if(bClearEventHandler)
     {
-        if(m_pEventHandler)
-            m_pEventHandler->OnUnbindSocket(this);
-        m_pEventHandler = nullptr;
+        if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnUnbindSocket(shared_from_this());
+        m_pEventHandler.reset();
     }
     if(GetStatus() == NSS_READY || GetStatus() == NSS_CONNECTING)
     {
@@ -82,7 +82,7 @@ void CServerSocket::_OnError(const std::string& what)
 
     if(m_nReconnectTimes > 0 && m_bReconnect)
     {
-        m_pService->_RemoveSocket(this);
+        m_pService->_RemoveSocket(shared_from_this());
         if(m_pBufferevent)
         {
             bufferevent_setfd(m_pBufferevent, INVALID_SOCKET);
@@ -99,9 +99,9 @@ void CServerSocket::_OnError(const std::string& what)
         struct timeval reconnet_dealy = {5, 0};
         event_add(m_pReconnectEvent, &reconnet_dealy);
         SetStatus(NSS_WAIT_RECONNECT);
-        m_pService->_AddConnectingSocket(this);
-        if(m_pEventHandler)
-            m_pEventHandler->OnWaitReconnect(this);
+        m_pService->_AddConnectingSocket(shared_from_this());
+        if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnWaitReconnect(shared_from_this());
         LOGNETDEBUG("CServerSocket _OnError Reconnect Wait,5s, {}:{}", GetAddrString(), GetPort());
     }
     else
@@ -121,9 +121,10 @@ void CServerSocket::_OnReconnect(int32_t fd, short what, void* ctx)
     __ENTER_FUNCTION
 
     CServerSocket* pSocket = (CServerSocket*)ctx;
+    auto shared_socket = pSocket->shared_from_this();
     LOGNETDEBUG("CServerSocket Reconnect:{}::{}", pSocket->GetAddrString(), pSocket->GetPort());
 
-    if(pSocket->GetService()->_AsyncReconnect(pSocket) == false)
+    if(pSocket->GetService()->_AsyncReconnect(std::static_pointer_cast<CServerSocket>(shared_socket)) == false)
     {
         pSocket->OnDisconnected();
     }
@@ -134,7 +135,7 @@ void CServerSocket::_OnSocketConnectorEvent(bufferevent* b, short what, void* ct
 {
     __ENTER_FUNCTION
     CServerSocket* pSocket = (CServerSocket*)ctx;
-
+    auto shared_socket = pSocket->shared_from_this();
     if(what == BEV_EVENT_CONNECTED)
     {
         int32_t fd = bufferevent_getfd(b);
@@ -142,7 +143,7 @@ void CServerSocket::_OnSocketConnectorEvent(bufferevent* b, short what, void* ct
         pSocket->set_sock_nodely();
         pSocket->set_sock_quickack();
         pSocket->SetSocket(fd);
-        pSocket->GetService()->_AddSocket(pSocket);
+        pSocket->GetService()->_AddSocket(shared_socket);
         bufferevent_setcb(b, _OnSocketRead, _OnSendOK, _OnSocketEvent, ctx);
         pSocket->SetStatus(NSS_READY);
         pSocket->OnConnected();
@@ -166,8 +167,8 @@ void CServerSocket::_OnSocketConnectorEvent(bufferevent* b, short what, void* ct
 void CServerSocket::OnRecvTimeout(bool& bReconnect)
 {
     __ENTER_FUNCTION
-    if(m_pEventHandler)
-        m_pEventHandler->OnRecvTimeout(this);
+    if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnRecvTimeout(shared_from_this());
 
     bReconnect = m_bReconnect;
     __LEAVE_FUNCTION
@@ -178,24 +179,24 @@ void CServerSocket::OnStartConnect()
 {
     __ENTER_FUNCTION
 
-    if(m_pEventHandler)
-        m_pEventHandler->OnStartConnect(this);
+    if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnStartConnect(shared_from_this());
     __LEAVE_FUNCTION
 }
 
 void CServerSocket::OnConnected()
 {
     __ENTER_FUNCTION
-    if(m_pEventHandler)
-        m_pEventHandler->OnConnected(this);
+    if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnConnected(shared_from_this());
     __LEAVE_FUNCTION
 }
 
 void CServerSocket::OnConnectFailed()
 {
     __ENTER_FUNCTION
-    if(m_pEventHandler)
-        m_pEventHandler->OnConnectFailed(this);
+    if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnConnectFailed(shared_from_this());
 
     _OnError("AsyncConnectFailed");
     __LEAVE_FUNCTION

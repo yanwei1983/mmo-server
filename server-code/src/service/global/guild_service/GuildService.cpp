@@ -88,18 +88,9 @@ bool CGuildService::Init(const ServerPort& nServerPort)
     return fales;
 }
 
-void CGuildService::OnLogicThreadProc()
-{
-    CServiceCommon::OnLogicThreadProc();
-}
 
 void CGuildService::OnLogicThreadCreate()
 {
     tls_pService = this;
     CServiceCommon::OnLogicThreadCreate();
-}
-
-void CGuildService::OnLogicThreadExit()
-{
-    CServiceCommon::OnLogicThreadExit();
 }

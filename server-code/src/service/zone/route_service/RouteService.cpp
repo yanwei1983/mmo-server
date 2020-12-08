@@ -239,26 +239,10 @@ void CRouteService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
     }
 }
 
-void CRouteService::OnLogicThreadProc()
-{
-
-    constexpr int32_t MAX_PROCESS_PER_LOOP = 1000;
-    int32_t           nCount               = 0;
-    CNetworkMessage*  pMsg                 = nullptr;
-    if(m_pMessagePort)
-    {
-        // process message_port msg
-        while(nCount < MAX_PROCESS_PER_LOOP && m_pMessagePort->TakePortMsg(pMsg))
-        {
-            OnProcessMessage(pMsg);
-            SAFE_DELETE(pMsg);
-        }
-    }
-}
 
 void CRouteService::OnLogicThreadCreate()
 {
     tls_pService = this;
+    CServiceCommon::OnLogicThreadCreate();
 }
 
-void CRouteService::OnLogicThreadExit() {}

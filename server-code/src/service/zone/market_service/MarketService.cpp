@@ -72,18 +72,9 @@ bool CMarketService::Init(const ServerPort& nServerPort)
     return true;
 }
 
-void CMarketService::OnLogicThreadProc()
-{
-    CServiceCommon::OnLogicThreadProc();
-}
 
 void CMarketService::OnLogicThreadCreate()
 {
     tls_pService = this;
     CServiceCommon::OnLogicThreadCreate();
-}
-
-void CMarketService::OnLogicThreadExit()
-{
-    CServiceCommon::OnLogicThreadExit();
 }

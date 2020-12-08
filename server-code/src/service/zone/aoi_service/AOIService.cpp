@@ -147,11 +147,6 @@ void CAOIService::OnLogicThreadCreate()
     CServiceCommon::OnLogicThreadCreate();
 }
 
-void CAOIService::OnLogicThreadExit()
-{
-    CServiceCommon::OnLogicThreadExit();
-}
-
 bool CAOIService::SendProtoMsgToAIService(const proto_msg_t& msg) const
 {
     return SendProtoMsgToZonePort(GetAIServerPort(), msg);

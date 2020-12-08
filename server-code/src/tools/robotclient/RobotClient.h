@@ -21,13 +21,13 @@ public:
     static void initInLua(struct lua_State* L);
 
 public:
-    virtual void OnConnected(CNetSocket* pSocket);
-    virtual void OnConnectFailed(CNetSocket*);
-    virtual void OnDisconnected(CNetSocket*);
-    virtual void OnAccepted(CNetSocket*);
-    virtual void OnRecvData(CNetSocket*, byte* pBuffer, size_t len);
+    virtual void OnConnected(const CNetSocketSharedPtr& pSocket);
+    virtual void OnConnectFailed(const CNetSocketSharedPtr&);
+    virtual void OnDisconnected(const CNetSocketSharedPtr&);
+    virtual void OnAccepted(const CNetSocketSharedPtr&);
+    virtual void OnRecvData(const CNetSocketSharedPtr&, byte* pBuffer, size_t len);
     virtual void OnProcessMessage(CNetworkMessage*);
-    virtual void OnRecvTimeout(CNetSocket*);
+    virtual void OnRecvTimeout(const CNetSocketSharedPtr&);
 
     void AddEventCallBack(uint32_t nWaitMs, const std::string& func_name, bool bPersist);
     bool IsConnectServer();
@@ -44,8 +44,10 @@ private:
 
 private:
     RobotClientManager* m_pManager;
-    CNetSocket*         m_pServerSocket;
-    uint32_t            m_idClient;
+    CNetSocketWeakPtr   m_pServerSocket;
+    uint32_t            m_idClient = 0;
     CEventEntryPtr      m_Event;
 };
+using RobotClientPtr = std::shared_ptr<RobotClient>;
+
 #endif /* ROBOTCLIENT_H */

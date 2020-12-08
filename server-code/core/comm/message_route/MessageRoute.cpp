@@ -70,7 +70,6 @@ void CMessageRoute::Destory()
     for(auto& [k, v]: m_setMessagePort)
     {
         v->Destory();
-        SAFE_DELETE(v);
         LOGDEBUG("MessagePort {}Release.", k);
     }
     m_setMessagePort.clear();
@@ -485,7 +484,7 @@ bool CMessageRoute::IsConnected(const ServerPort& nServerPort)
         if(it->second->GetLocalPort() == true)
             return true;
         else
-            return it->second->GetRemoteSocketIdx() != INVALID_SOCKET_IDX;
+            return it->second->GetRemoteSocket() != nullptr;
     }
     else
     {
@@ -506,7 +505,7 @@ WorldID_t CMessageRoute::GetMergeTo(WorldID_t idWorld)
     return idWorld;
 }
 
-CMessagePort* CMessageRoute::QueryMessagePort(const ServerPort& nServerPort, bool bAutoConnectRemote /* = true*/)
+CMessagePortSharedPtr CMessageRoute::QueryMessagePort(const ServerPort& nServerPort, bool bAutoConnectRemote /* = true*/)
 {
     __ENTER_FUNCTION
     ServerPort DestServerPort(nServerPort);
@@ -531,25 +530,23 @@ CMessagePort* CMessageRoute::QueryMessagePort(const ServerPort& nServerPort, boo
     return nullptr;
 }
 
-CMessagePort* CMessageRoute::_ConnectRemoteServer(const ServerPort& nServerPort, const ServerAddrInfo& info)
+CMessagePortSharedPtr CMessageRoute::_ConnectRemoteServer(const ServerPort& nServerPort, const ServerAddrInfo& info)
 {
     __ENTER_FUNCTION
-    CMessagePort* pMessagePort = m_setMessagePort[nServerPort];
+    CMessagePortSharedPtr& pMessagePort = m_setMessagePort[nServerPort];
     if(pMessagePort == nullptr)
     {
-        pMessagePort = CMessagePort::CreateNew(nServerPort, this);
-
-        m_setMessagePort[nServerPort] = pMessagePort;
+        pMessagePort.reset(CMessagePort::CreateNew(nServerPort, this));
     }
     else
     {
-        if(pMessagePort->GetRemoteSocketIdx() != INVALID_SOCKET_IDX)
+        if(pMessagePort->GetRemoteSocket() != nullptr)
             return pMessagePort;
         if(pMessagePort->GetLocalPort() == true)
             return pMessagePort;
     }
     auto pRemoteSocket = m_pNetworkService->AsyncConnectTo(info.route_addr.c_str(), info.route_port, pMessagePort, true);
-    if(pRemoteSocket == nullptr)
+    if(pRemoteSocket.expired() == true)
     {
         LOGFATAL("CMessageRoute::ConnectRemoteServer AsyncConnectTo {}:{} fail", info.route_addr.c_str(), info.route_port);
         return nullptr;
@@ -625,7 +622,7 @@ void CMessageRoute::_CloseRemoteServer(const ServerPort& nServerPort)
     auto itPort = m_setMessagePort.find(nServerPort);
     if(itPort == m_setMessagePort.end())
         return;
-    CMessagePort* pPort = itPort->second;
+    CMessagePortSharedPtr pPort = itPort->second;
     if(pPort)
     {
         auto pRemoteSocket = pPort->GetRemoteSocket();
@@ -634,15 +631,13 @@ void CMessageRoute::_CloseRemoteServer(const ServerPort& nServerPort)
             pRemoteSocket->Interrupt(true);
             pPort->DetachRemoteSocket();
         }
-
-        SAFE_DELETE(pPort);
     }
     m_setMessagePort.erase(itPort);
     LOGMESSAGE("CMessageRoute::CloseRemoteServer:{}", nServerPort);
     __LEAVE_FUNCTION
 }
 
-CMessagePort* CMessageRoute::ConnectRemoteServer(const ServerPort& nServerPort)
+CMessagePortSharedPtr CMessageRoute::ConnectRemoteServer(const ServerPort& nServerPort)
 {
     __ENTER_FUNCTION
     auto pInfo = QueryServiceInfo(nServerPort);
@@ -658,31 +653,30 @@ CMessagePort* CMessageRoute::ConnectRemoteServer(const ServerPort& nServerPort)
     return nullptr;
 }
 
-CMessagePort* CMessageRoute::_ListenMessagePort(const ServerPort& nServerPort, const ServerAddrInfo& info)
+CMessagePortSharedPtr CMessageRoute::_ListenMessagePort(const ServerPort& nServerPort, const ServerAddrInfo& info)
 {
     __ENTER_FUNCTION
-    CMessagePort* pMessagePort = m_setMessagePort[nServerPort];
+    CMessagePortSharedPtr& pMessagePort = m_setMessagePort[nServerPort];
     if(pMessagePort != nullptr)
     {
         return pMessagePort;
     }
 
-    pMessagePort = CMessagePort::CreateNew(nServerPort, this);
+    pMessagePort.reset(CMessagePort::CreateNew(nServerPort, this));
     pMessagePort->SetLocalPort(true);
     if(m_pNetworkService->Listen(info.bind_addr.c_str(), info.route_port, pMessagePort) == nullptr)
     {
         LOGFATAL("ListenMessagePort {}:{} fail", info.route_addr.c_str(), info.route_port);
-        SAFE_DELETE(pMessagePort);
+        pMessagePort.reset();
         return nullptr;
     }
     LOGMESSAGE("CMessageRoute::ListenMessagePort:{}, {}:{}", nServerPort, info.route_addr.c_str(), info.route_port);
-    m_setMessagePort[nServerPort] = pMessagePort;
     return pMessagePort;
     __LEAVE_FUNCTION
     return nullptr;
 }
 
-void CMessageRoute::ForEach(const std::function<void(CMessagePort*)>& func)
+void CMessageRoute::ForEach(const std::function<void(const CMessagePortSharedPtr&)>& func)
 {
     __ENTER_FUNCTION
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -713,7 +707,7 @@ void CMessageRoute::ConnectAllRemoteServerWithWorldID(WorldID_t nWorldID)
     __LEAVE_FUNCTION
 }
 
-void CMessageRoute::CloseMessagePort(CMessagePort*& pMessagePort)
+void CMessageRoute::CloseMessagePort(const CMessagePortSharedPtr& pMessagePort)
 {
     __ENTER_FUNCTION
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -721,7 +715,6 @@ void CMessageRoute::CloseMessagePort(CMessagePort*& pMessagePort)
     auto it = m_setMessagePort.find(pMessagePort->GetServerPort());
     if(it != m_setMessagePort.end())
     {
-        SAFE_DELETE(pMessagePort);
         m_setMessagePort.erase(it);
     }
     __LEAVE_FUNCTION

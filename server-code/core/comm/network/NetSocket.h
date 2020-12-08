@@ -7,17 +7,18 @@
 
 #include <time.h>
 
-#include "Decryptor.h"
-#include "Encryptor.h"
-#include "EventEntry.h"
+
 #include "LockfreeQueue.h"
 #include "NetworkDefine.h"
 #include "NetworkMessage.h"
 #include "ObjectHeap.h"
 #include "PerSecondCount.h"
 
+#include <memory>
 class CNetworkService;
 class CNetEventHandler;
+using CNetEventHandlerSharedPtr = std::shared_ptr<CNetEventHandler>;
+using CNetEventHandlerWeakPtr = std::weak_ptr<CNetEventHandler>;
 
 enum NET_SOCKET_STATUS
 {
@@ -31,11 +32,12 @@ enum NET_SOCKET_STATUS
 
 struct bufferevent;
 struct event;
-
-class CNetSocket
+class CDecryptor;
+class CEncryptor;
+class CNetSocket : public std::enable_shared_from_this<CNetSocket>
 {
 public:
-    CNetSocket(CNetworkService* pService, CNetEventHandler* pEventHandler);
+    CNetSocket(CNetworkService* pService, const CNetEventHandlerSharedPtr& pEventHandler);
     virtual ~CNetSocket();
 
     virtual bool Init(bufferevent* pBufferEvent)    = 0;
@@ -89,7 +91,7 @@ public:
     size_t  GetWaitWriteSize();
     size_t  GetPacketSizeMax() const { return m_nPacketSizeMax; }
     void    SetPacketSizeMax(size_t val);
-    void    _SetEventHandler(CNetEventHandler* v) { m_pEventHandler = v; }
+    void    _SetEventHandler(const CNetEventHandlerSharedPtr& v) { m_pEventHandler = v; }
     void    DetachEventHandler();
     void set_sock_nodely();
     void set_sock_quickack();
@@ -113,9 +115,9 @@ protected:
 
 protected:
     CNetworkService*  m_pService;
-    CNetEventHandler* m_pEventHandler;
     bufferevent*      m_pBufferevent;
-
+    CNetEventHandlerWeakPtr m_pEventHandler;
+    
     struct evbuffer* m_Sendbuf;
 
     MPSCQueue<SendMsgData*> m_SendMsgQueue;
@@ -141,4 +143,7 @@ protected:
 
     std::atomic<uint64_t> m_nWaitWriteSize = 0;
 };
+
+using CNetSocketSharedPtr = std::shared_ptr<CNetSocket>;
+using CNetSocketWeakPtr = std::weak_ptr<CNetSocket>;
 #endif // NetSocket_h__

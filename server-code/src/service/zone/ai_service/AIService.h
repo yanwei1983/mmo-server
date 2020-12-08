@@ -30,7 +30,6 @@ public:
 public:
     virtual void OnLogicThreadProc() override;
     virtual void OnLogicThreadCreate() override;
-    virtual void OnLogicThreadExit() override;
 
     //发送消息给AIService
     bool SendProtoMsgToScene(const proto_msg_t& msg);

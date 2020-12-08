@@ -31,7 +31,6 @@ public:
 public:
     virtual void OnLogicThreadProc() override;
     virtual void OnLogicThreadCreate() override;
-    virtual void OnLogicThreadExit() override;
 
     //发送消息给AOIService
     bool SendProtoMsgToSceneService(const proto_msg_t& msg) const;

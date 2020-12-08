@@ -8,13 +8,13 @@ set -e
 
 use_make()
 {
-    CCACHE_SLOPPINESS=pch_defines,time_macros CC=clang-9 CXX=clang++-9 cmake -DDEBUG=OFF -DTIDY=OFF .. 
+    CCACHE_SLOPPINESS=pch_defines,time_macros CC=clang-9 CXX=clang++-9 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_ASAN=ON -DUSE_UBSAN=ON -DTIDY=OFF .. 
     make -j3
 }
 
 use_ninja()
 {
-    CCACHE_SLOPPINESS=pch_defines,time_macros CC=clang-9 CXX=clang++-9 cmake -DDEBUG=OFF -DTIDY=OFF -GNinja .. 
+    CCACHE_SLOPPINESS=pch_defines,time_macros CC=clang-9 CXX=clang++-9 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DUSE_ASAN=ON -DUSE_UBSAN=ON -DTIDY=OFF -GNinja .. 
     NINJA_STATUS="[%p/%f/%t %e] " ninja
 }
 

@@ -27,10 +27,19 @@ struct evconnlistener;
 struct lws_context;
 
 class CNetSocket;
+using CNetSocketSharedPtr = std::shared_ptr<CNetSocket>;
+using CNetSocketWeakPtr = std::weak_ptr<CNetSocket>;
 class CNetWebSocket;
 class CNetEventHandler;
+using CNetEventHandlerSharedPtr = std::shared_ptr<CNetEventHandler>;
+using CNetEventHandlerWeakPtr = std::weak_ptr<CNetEventHandler>;
 class CServerSocket;
+using CServerSocketSharedPtr = std::shared_ptr<CServerSocket>;
+using CServerSocketWeakPtr = std::weak_ptr<CServerSocket>;
 class CClientSocket;
+using CClientSocketSharedPtr = std::shared_ptr<CClientSocket>;
+using CClientSocketWeakPtr = std::weak_ptr<CClientSocket>;
+
 
 class CNetworkService
 {
@@ -40,16 +49,15 @@ public:
 
     void Destroy();
     //监听
-    evconnlistener* Listen(const char* addr, int32_t port, CNetEventHandler* pEventHandler);
+    evconnlistener* Listen(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler);
     bool            EnableListener(evconnlistener* listener, bool bEnable = false);
     // http监听
     bool ListenHttpPort(const char* addr, int32_t port, std::function<void(struct evhttp_request* req)> func);
     //阻塞连接到一个目标地址
-    CServerSocket* ConnectTo(const char* addr, int32_t port, CNetEventHandler* pEventHandler, bool bAutoReconnect = false);
+    CServerSocketWeakPtr ConnectTo(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect = false);
     //异步连接到一个目标地址
-    CServerSocket* AsyncConnectTo(const char* addr, int32_t port, CNetEventHandler* pEventHandler, bool bAutoReconnect = false);
-    bool           _Reconnect(CServerSocket* pSocket);
-    bool           _AsyncReconnect(CServerSocket* pSocket);
+    CServerSocketWeakPtr AsyncConnectTo(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect = false);
+    bool           _AsyncReconnect(const CServerSocketSharedPtr& pSocket);
 
     void BreakLoop();
     //开启独立的IO线程
@@ -62,8 +70,8 @@ public:
     //读取IO一次，如果开启了独立IO线程则不需调用
     void RunOnce();
 
-    virtual CServerSocket*       CreateServerSocket(CNetEventHandler* pHandle, bool bAutoReconnect);
-    virtual CClientSocket*       CreateClientSocket(CNetEventHandler* pHandle);
+    virtual CServerSocketSharedPtr       CreateServerSocket(const CNetEventHandlerSharedPtr& pHandle, bool bAutoReconnect);
+    virtual CClientSocketSharedPtr       CreateClientSocket(const CNetEventHandlerSharedPtr& pHandle);
     struct evhttp*               GetHttpHandle() const { return m_pHttpHandle; }
     bool                         GetIPCheck() const { return m_bIPCheck; }
     void                         SetIPCheck(bool val) { m_bIPCheck = val; }
@@ -95,19 +103,19 @@ public:
     PerSecondCount& GetSendBPS() { return m_SendBPS; }
 
 public:
-    void _AddSocket(CNetSocket* pSocket);
+    void _AddSocket(const CNetSocketSharedPtr& pSocket);
     void _CloseSocket(uint32_t nSocketIdx);
-    void _AddConnectingSocket(CNetSocket* pSocket);
-    void _RemoveSocket(CNetSocket* pSocket);
+    void _AddConnectingSocket(const CNetSocketSharedPtr& pSocket);
+    void _RemoveSocket(const CNetSocketSharedPtr& pSocket);
 
 public:
-    void _AddClosingSocket(CNetSocket* pSocket);
-    void _ReleaseSocket(CNetSocket* pSocket);
+    void _AddClosingSocket(const CNetSocketSharedPtr& pSocket);
+    void _ReleaseSocket(const CNetSocketSharedPtr& pSocket);
 
 public:
-    bool _AllocSocketIdx(CNetSocket* pSocket);
-    void _ReleaseSocketIdx(CNetSocket* pSocket);
-    CNetSocket* QuerySocketByIdx(uint16_t nSocketIdx);
+    bool _AllocSocketIdx(const CNetSocketSharedPtr& pSocket);
+    void _ReleaseSocketIdx(const CNetSocketSharedPtr& pSocket);
+    CNetSocketSharedPtr QuerySocketByIdx(uint16_t nSocketIdx);
 
 public:
     void JoinIOThread();
@@ -117,17 +125,17 @@ private:
 
 protected:
     event_base*                                     m_pBase;
-    std::map<evconnlistener*, CNetEventHandler*>    m_setListener;
+    std::map<evconnlistener*, CNetEventHandlerWeakPtr>    m_setListener;
     struct evhttp*                                  m_pHttpHandle = nullptr;
     std::function<void(struct evhttp_request* req)> m_funcOnReciveHttp;
     std::mutex                                      m_mutex;
 
 
-    std::map<SOCKET, CNetSocket*>   m_setSocket;
+    std::map<SOCKET, CNetSocketSharedPtr>   m_setSocket;
     std::deque<SocketIdx_t>         m_SocketIdxPool;
-    std::array<CNetSocket*, MAX_SOCKET_IDX> m_setSocketByIdx;
+    std::array<CNetSocketSharedPtr, MAX_SOCKET_IDX> m_setSocketByIdx;
 
-    std::unordered_set<CNetSocket*> m_setConnectingSocket;
+    std::unordered_set<CNetSocketSharedPtr> m_setConnectingSocket;
     
 
     MPSCQueue<CNetworkMessage*> m_MessageQueue;
@@ -138,7 +146,7 @@ protected:
     struct event*     m_pCloseSocketEvent               = nullptr;
     std::atomic<bool> m_bWaitingProcessCloseSocketEvent = false;
 
-    MPSCQueue<CNetSocket*> m_setClosingSocket;
+    MPSCQueue<CNetSocketSharedPtr> m_setClosingSocket;
 
     PerSecondCount m_RecvBPS;
     PerSecondCount m_SendBPS;

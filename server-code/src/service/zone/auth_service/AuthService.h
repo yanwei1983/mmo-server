@@ -25,9 +25,7 @@ public:
     CreateNewRealeaseImpl(CAuthService);
 
 public:
-    virtual void OnLogicThreadProc() override;
     virtual void OnLogicThreadCreate() override;
-    virtual void OnLogicThreadExit() override;
 
 public:
     CGMManager*   GetGMManager() const { return m_pGMManager.get(); }

@@ -11,6 +11,7 @@
 #include "ScriptManager.h"
 class CNetMSGProcess;
 class RobotClient;
+using RobotClientPtr = std::shared_ptr<RobotClient>;
 class RobotClientManager : public CNetworkService
 {
 public:
@@ -18,8 +19,8 @@ public:
     ~RobotClientManager();
 
 public:
-    RobotClient*    ConnectServer(const char* addr, int32_t port);
-    void            DelClient(RobotClient* pClient);
+    RobotClientPtr  ConnectServer(const char* addr, int32_t port);
+    void            DelClient(const RobotClientPtr& pClient);
     CNetMSGProcess* GetNetMessageProcess() const { return m_pNetMsgProcess.get(); }
     CEventManager*  GetEventManager() const { return m_pEventManager.get(); }
 
@@ -48,7 +49,7 @@ public:
 private:
     std::unique_ptr<CNetMSGProcess> m_pNetMsgProcess;
     std::unique_ptr<CEventManager>  m_pEventManager;
-    std::set<RobotClient*>          m_setClient;
+    std::set<RobotClientPtr>        m_setClient;
     CEventEntryPtr                  m_Event;
 
     std::unordered_map<uint16_t, std::string> m_CMDFuncMap;

@@ -8,7 +8,7 @@
 #include "event2/buffer.h"
 #include "event2/util.h"
 
-CClientSocket::CClientSocket(CNetworkService* pService, CNetEventHandler* pEventHandler)
+CClientSocket::CClientSocket(CNetworkService* pService, const CNetEventHandlerSharedPtr& pEventHandler)
     : CNetSocket(pService, pEventHandler)
 {
 }
@@ -43,9 +43,9 @@ void CClientSocket::Interrupt(bool bClearEventHandler)
     LOGNETDEBUG("CClientSocket Interrupt {}:{}", GetAddrString(), GetPort());
     if(bClearEventHandler)
     {
-        if(m_pEventHandler)
-            m_pEventHandler->OnUnbindSocket(this);
-        m_pEventHandler = nullptr;
+        if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnUnbindSocket(shared_from_this());
+        m_pEventHandler.reset();
     }
     if(GetStatus() == NSS_READY || GetStatus() == NSS_CONNECTING)
     {
@@ -73,7 +73,7 @@ void CClientSocket::_OnError(const std::string& what)
 void CClientSocket::OnAccepted()
 {
     __ENTER_FUNCTION
-    if(m_pEventHandler)
-        m_pEventHandler->OnAccepted(this);
+    if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnAccepted(shared_from_this());
     __LEAVE_FUNCTION
 }

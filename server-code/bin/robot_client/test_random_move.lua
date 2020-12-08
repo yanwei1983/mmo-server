@@ -196,7 +196,7 @@ function OnRecv_SC_ENTERMAP(client, buffer, size)
 		error("SC_ENTERMAP ParseFromArray fail");
 		return;
 	end
-	print_debugmsg(client, "enter map succ.");
+	print_clientmsg(client, "enter map succ.");
 
 	local info = g_clientinfo[client:GetClientID()];
 	if info.hp == 0 then
@@ -259,7 +259,7 @@ end
 
 InitBaseCodeInLua(this_lua);
 g_clientinfo = {} or g_clientinfo;
-g_print_debug = true
+g_print_debug = false
 function print_clientmsg(client,...)
 	print(string.format("[%s]", client:GetClientID()), ...)
 end

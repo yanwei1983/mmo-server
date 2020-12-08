@@ -299,22 +299,12 @@ struct evhttp_request* CGMProxyService::FindDelayResponse(uint64_t uid)
     return nullptr;
 }
 
-void CGMProxyService::OnLogicThreadProc()
-{
-
-    CServiceCommon::OnLogicThreadProc();
-}
-
 void CGMProxyService::OnLogicThreadCreate()
 {
     tls_pService = this;
     CServiceCommon::OnLogicThreadCreate();
 }
 
-void CGMProxyService::OnLogicThreadExit()
-{
-    CServiceCommon::OnLogicThreadExit();
-}
 
 bool CheckKVMap(const std::unordered_map<std::string, std::string>& kvmap)
 {

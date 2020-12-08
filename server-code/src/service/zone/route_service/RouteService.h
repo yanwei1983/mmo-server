@@ -22,9 +22,7 @@ public:
     CreateNewRealeaseImpl(CRouteService);
 
 public:
-    virtual void OnLogicThreadProc() override;
     virtual void OnLogicThreadCreate() override;
-    virtual void OnLogicThreadExit() override;
 
     virtual void OnProcessMessage(CNetworkMessage*) override;
 

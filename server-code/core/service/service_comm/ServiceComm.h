@@ -10,6 +10,8 @@
 
 class CMessageRoute;
 class CMessagePort;
+using CMessagePortSharedPtr = std::shared_ptr<CMessagePort>;
+using CMessagePortWeakPtr = std::weak_ptr<CMessagePort>;
 class CMonitorMgr;
 class CMysqlConnection;
 class CNetworkService;
@@ -42,14 +44,12 @@ public:
     export_lua ServiceType_t    GetServiceType() const { return GetServiceID().GetServiceType(); }
     export_lua ServiceIdx_t     GetServiceIdx() const { return GetServiceID().GetServiceIdx(); }
 
-    export_lua CNetworkService* GetNetworkService() const { return m_pNetworkService.get(); }
     export_lua const std::string& GetServiceName() const { return m_ServiceName; }
     void                          SetServiceName(const std::string& val) { m_ServiceName = val; }
     uint32_t                      GetMessageProcess() const { return m_nMessageProcess; }
     void                          SetMessageProcess(uint32_t val) { m_nMessageProcess = val; }
 
 public:
-    bool CreateNetworkService();
     bool CreateService(int32_t nWorkInterval /*= 100*/, class CMessagePortEventHandler* pEventHandler = nullptr);
 
 public:
@@ -136,8 +136,7 @@ public:
     virtual void OnServiceReadyFromCrash(const ServiceID& service_id) {}
 
 protected:
-    std::unique_ptr<CNetworkService> m_pNetworkService;
-    CMessagePort*                    m_pMessagePort;
+    CMessagePortWeakPtr              m_pMessagePort;
     ServerPort                       m_nServerPort;
 
     std::unique_ptr<db::tbld_dbinfo> m_globaldb_info;

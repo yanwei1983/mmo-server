@@ -22,9 +22,7 @@ public:
     CreateNewRealeaseImpl(CGMProxyService);
 
 public:
-    virtual void OnLogicThreadProc() override;
     virtual void OnLogicThreadCreate() override;
-    virtual void OnLogicThreadExit() override;
 
     void OnReciveHttp(struct evhttp_request* req);
 

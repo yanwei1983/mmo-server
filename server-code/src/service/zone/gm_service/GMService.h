@@ -35,9 +35,7 @@ public:
     const CGMService::HttpRequestHandleFunc* QueryHttpRequestHandler(const std::string& mothed) const;
 
 public:
-    virtual void OnLogicThreadProc() override;
     virtual void OnLogicThreadCreate() override;
-    virtual void OnLogicThreadExit() override;
 
 public:
     std::unique_ptr<CRPCService> m_pRPCService;

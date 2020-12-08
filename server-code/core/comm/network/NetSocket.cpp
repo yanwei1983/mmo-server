@@ -8,6 +8,9 @@
 #include "event2/buffer.h"
 #include "event2/util.h"
 
+#include "Decryptor.h"
+#include "Encryptor.h"
+
 #ifdef __linux
 #include <netinet/tcp.h>
 #else
@@ -17,7 +20,7 @@
 OBJECTHEAP_IMPLEMENTATION(CNetSocket, s_Heap);
 
 
-CNetSocket::CNetSocket(CNetworkService* pService, CNetEventHandler* pEventHandler)
+CNetSocket::CNetSocket(CNetworkService* pService, const CNetEventHandlerSharedPtr& pEventHandler)
     : m_pService(pService)
     , m_pEventHandler(pEventHandler)
     , m_pBufferevent(nullptr)
@@ -72,10 +75,10 @@ CNetSocket::~CNetSocket()
 
 void CNetSocket::DetachEventHandler()
 {
-    if(m_pEventHandler)
+    if(auto event_handler = m_pEventHandler.lock())
     {
-        m_pEventHandler->OnUnbindSocket(this);
-        m_pEventHandler = nullptr;
+        event_handler->OnUnbindSocket(shared_from_this());
+        m_pEventHandler.reset();
     }
 }
 
@@ -393,8 +396,8 @@ void CNetSocket::OnClosing()
     __ENTER_FUNCTION
     LOGNETDEBUG("CNetSocket OnClosing: {}:{}", GetAddrString(), GetPort());
 
-    if(m_pEventHandler)
-        m_pEventHandler->OnClosing(this);
+    if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnClosing(shared_from_this());
     __LEAVE_FUNCTION
 }
 
@@ -405,10 +408,11 @@ void CNetSocket::OnDisconnected()
     LOGNETDEBUG("CNetSocket OnDisconnected: {}:{}", GetAddrString(), GetPort());
 
     SetStatus(NSS_CLOSED);
-    if(m_pEventHandler)
-        m_pEventHandler->OnDisconnected(this);
-    m_pService->_RemoveSocket(this);
-    m_pService->_AddClosingSocket(this);
+    auto shared_ptr = shared_from_this();
+    if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnDisconnected(shared_ptr);
+    m_pService->_RemoveSocket(shared_ptr);
+    m_pService->_AddClosingSocket(shared_ptr);
     __LEAVE_FUNCTION
 }
 
@@ -448,16 +452,16 @@ void CNetSocket::OnRecvData(byte* pBuffer, size_t len)
             break;
     }
 
-    if(m_pEventHandler)
-        m_pEventHandler->OnRecvData(this, pBuffer, len);
+    if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnRecvData(shared_from_this(), pBuffer, len);
     __LEAVE_FUNCTION
 }
 
 void CNetSocket::OnRecvTimeout(bool& bReconnect)
 {
     __ENTER_FUNCTION
-    if(m_pEventHandler)
-        m_pEventHandler->OnRecvTimeout(this);
+    if(auto event_handler = m_pEventHandler.lock())
+            event_handler->OnRecvTimeout(shared_from_this());
 
     __LEAVE_FUNCTION
 }

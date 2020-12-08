@@ -12,6 +12,9 @@
 #include "NetworkDefine.h"
 
 class CMessagePort;
+using CMessagePortSharedPtr = std::shared_ptr<CMessagePort>;
+using CMessagePortWeakPtr = std::weak_ptr<CMessagePort>;
+
 class CNetworkService;
 class CServiceControl;
 class CMysqlConnection;
@@ -57,13 +60,13 @@ public:
     //返回服务器被合并到哪里了
     WorldID_t GetMergeTo(WorldID_t idWorld);
     //查询端口,如果不存在,是否自动连接远端
-    CMessagePort* QueryMessagePort(const ServerPort& nServerPort, bool bAutoConnectRemote = true);
+    CMessagePortSharedPtr QueryMessagePort(const ServerPort& nServerPort, bool bAutoConnectRemote = true);
     //连接远端,一般无需手动调用
-    CMessagePort* ConnectRemoteServer(const ServerPort& nServerPort);
+    CMessagePortSharedPtr ConnectRemoteServer(const ServerPort& nServerPort);
     //关闭端口
-    void CloseMessagePort(CMessagePort*& pMessagePort);
+    void CloseMessagePort(const CMessagePortSharedPtr& pMessagePort);
     //遍历所有端口
-    void ForEach(const std::function<void(CMessagePort*)>& func);
+    void ForEach(const std::function<void(const CMessagePortSharedPtr&)>& func);
     //通过worldid连接所有远端端口
     void ConnectAllRemoteServerWithWorldID(WorldID_t nWorldID);
     //关闭对应端口
@@ -85,9 +88,9 @@ public:
     
 protected:
     bool          ConnectServerInfoDB(const std::string& mysql_url);
-    CMessagePort* _ConnectRemoteServer(const ServerPort& nServerPort, const ServerAddrInfo& info);
+    CMessagePortSharedPtr _ConnectRemoteServer(const ServerPort& nServerPort, const ServerAddrInfo& info);
     //监听本地,一般无需手动调用, CreateAllMessagePort时已经调用了
-    CMessagePort*         _ListenMessagePort(const ServerPort& nServerPort, const ServerAddrInfo& info);
+    CMessagePortSharedPtr _ListenMessagePort(const ServerPort& nServerPort, const ServerAddrInfo& info);
     const ServerAddrInfo* _QueryServiceInfo(const ServerPort& nServerPort);
 
     void _ReadMergeList();
@@ -98,7 +101,7 @@ protected:
     WorldID_t m_nWorldID;
 
     std::mutex                                    m_mutex;
-    std::unordered_map<ServerPort, CMessagePort*> m_setMessagePort;
+    std::unordered_map<ServerPort, CMessagePortSharedPtr> m_setMessagePort;
 
     std::unique_ptr<CNetworkService>  m_pNetworkService;
     std::unique_ptr<CMysqlConnection> m_pServerInfoDB;

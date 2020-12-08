@@ -12,23 +12,21 @@
 #include "protomsg_to_cmd.h"
 RobotClient::RobotClient(RobotClientManager* pManager)
     : m_pManager(pManager)
-    , m_pServerSocket(nullptr)
-    , m_idClient(0)
 {
 }
 
 RobotClient::~RobotClient()
 {
-    if(m_pServerSocket)
+    if(auto pServerSocket = m_pServerSocket.lock())
     {
-        m_pServerSocket->Interrupt(true);
-        m_pServerSocket = nullptr;
+        pServerSocket->Interrupt(true);
+        m_pServerSocket.reset();
     }
 }
 
 void RobotClient::initInLua(struct lua_State* L)
 {
-    lua_tinker::class_add<RobotClient>(L, "RobotClient");
+    lua_tinker::class_add<RobotClient>(L, "RobotClient", true);
     lua_tinker::class_def<RobotClient>(L, "IsConnectServer", &RobotClient::IsConnectServer);
     lua_tinker::class_def<RobotClient>(L, "DisconnectServer", &RobotClient::DisconnectServer);
     lua_tinker::class_def<RobotClient>(L, "GetClientID", &RobotClient::GetClientID);
@@ -39,28 +37,26 @@ void RobotClient::initInLua(struct lua_State* L)
     pb_luahelper::init_lua(L);
 }
 
-void RobotClient::OnConnected(CNetSocket* pSocket)
+void RobotClient::OnConnected(const CNetSocketSharedPtr& pSocket)
 {
     m_pServerSocket = pSocket;
-
-    // call lua
 }
 
-void RobotClient::OnConnectFailed(CNetSocket*)
+void RobotClient::OnConnectFailed(const CNetSocketSharedPtr&)
 {
     LOGDEBUG("RobotClient::OnConnectFailed");
 }
 
-void RobotClient::OnDisconnected(CNetSocket*)
+void RobotClient::OnDisconnected(const CNetSocketSharedPtr&)
 {
-    m_pServerSocket = nullptr;
+    m_pServerSocket.reset();
 
     m_pManager->ExecScript<void>("OnDisconnected", this);
 }
 
-void RobotClient::OnAccepted(CNetSocket*) {}
+void RobotClient::OnAccepted(const CNetSocketSharedPtr&) {}
 
-void RobotClient::OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len)
+void RobotClient::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len)
 {
     MSG_HEAD* pHeader = (MSG_HEAD*)pBuffer;
     switch(pHeader->msg_cmd)
@@ -68,7 +64,8 @@ void RobotClient::OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len)
         case CMD_INTERRUPT:
         {
             LOGDEBUG("INITATIVE_CLOSE:{}", m_idClient);
-            static_cast<CServerSocket*>(pSocket)->SetReconnect(false);
+            CServerSocketSharedPtr pServerSocket = std::static_pointer_cast<CServerSocket>(pSocket);
+            pServerSocket->SetReconnect(false);
             DisconnectServer();
         }
         break;
@@ -108,7 +105,7 @@ void RobotClient::OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len)
 
 void RobotClient::OnProcessMessage(CNetworkMessage*) {}
 
-void RobotClient::OnRecvTimeout(CNetSocket*) {}
+void RobotClient::OnRecvTimeout(const CNetSocketSharedPtr&) {}
 
 void RobotClient::AddEventCallBack(uint32_t nWaitMs, const std::string& func_name, bool bPersist)
 {
@@ -124,23 +121,24 @@ void RobotClient::AddEventCallBack(uint32_t nWaitMs, const std::string& func_nam
 
 bool RobotClient::IsConnectServer()
 {
-    return m_pServerSocket != nullptr;
+    return m_pServerSocket.expired() == false;
 }
 
 void RobotClient::DisconnectServer()
 {
-    if(m_pServerSocket)
+    if(auto pServerSocket = m_pServerSocket.lock())
     {
-        m_pServerSocket->Interrupt(true);
-        m_pServerSocket = nullptr;
+        pServerSocket->Interrupt(true);
+        m_pServerSocket.reset();
     }
-    m_pManager->DelClient(this);
+    auto pClient = shared_from_this();
+    m_pManager->DelClient(std::static_pointer_cast<RobotClient>(pClient));
 }
 
 void RobotClient::SendToServer(const CNetworkMessage& msg)
 {
-    if(m_pServerSocket)
-        m_pServerSocket->SendNetworkMessage(msg);
+    if(auto pServerSocket = m_pServerSocket.lock())
+        pServerSocket->SendNetworkMessage(msg);
 }
 
 void RobotClient::SendProtobufToServer(proto_msg_t* pMsg)

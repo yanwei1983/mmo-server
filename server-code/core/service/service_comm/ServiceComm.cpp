@@ -17,8 +17,6 @@
 #include "serverinfodb.pb.h"
 
 CServiceCommon::CServiceCommon()
-    : m_pNetworkService(nullptr)
-    , m_pMessagePort(nullptr)
 {
 }
 
@@ -29,16 +27,10 @@ void CServiceCommon::DestoryServiceCommon()
     __ENTER_FUNCTION
     // GetMessageRoute()->CloseMessagePort(m_pMessagePort);
     StopLogicThread();
-    if(m_pMessagePort)
+    if(auto shared_ptr = m_pMessagePort.lock())
     {
-        m_pMessagePort->SetPortEventHandler(nullptr);
-        m_pMessagePort = nullptr;
-    }
-
-    if(m_pNetworkService)
-    {
-        m_pNetworkService->Destroy();
-        m_pNetworkService.reset();
+        shared_ptr->SetPortEventHandler(nullptr);
+        m_pMessagePort.reset();
     }
 
     if(m_pEventManager)
@@ -71,17 +63,6 @@ bool CServiceCommon::Init(const ServerPort& nServerPort)
     return true;
 }
 
-bool CServiceCommon::CreateNetworkService()
-{
-    __ENTER_FUNCTION
-    if(m_pNetworkService)
-        return false;
-    m_pNetworkService = std::make_unique<CNetworkService>();
-    return true;
-    __LEAVE_FUNCTION
-    return true;
-}
-
 bool CServiceCommon::CreateService(int32_t nWorkInterval /*= 100*/, class CMessagePortEventHandler* pEventHandler /*= nullptr*/)
 {
     __ENTER_FUNCTION
@@ -98,10 +79,14 @@ bool CServiceCommon::CreateService(int32_t nWorkInterval /*= 100*/, class CMessa
 bool CServiceCommon::ListenMessagePort(const std::string& service_name, CMessagePortEventHandler* pEventHandler /*= nullptr*/)
 {
     __ENTER_FUNCTION
-    m_pMessagePort = GetMessageRoute()->QueryMessagePort(GetServerPort(), false);
-    if(m_pMessagePort != nullptr && pEventHandler != nullptr)
-        m_pMessagePort->SetPortEventHandler(pEventHandler);
-    return m_pMessagePort != nullptr;
+    auto shared_ptr = GetMessageRoute()->QueryMessagePort(GetServerPort(), false);
+    if(shared_ptr != nullptr )
+    {
+        m_pMessagePort = shared_ptr;
+        if(pEventHandler != nullptr)
+            shared_ptr->SetPortEventHandler(pEventHandler);
+    }   
+    return shared_ptr != nullptr;
     __LEAVE_FUNCTION
     return false;
 }
@@ -147,19 +132,14 @@ void CServiceCommon::OnProcessMessage(CNetworkMessage* pNetworkMsg)
 void CServiceCommon::OnLogicThreadProc()
 {
     __ENTER_FUNCTION
-    if(m_pNetworkService)
-    {
-        m_pNetworkService->RunOnce();
-    }
-
     constexpr int32_t MAX_PROCESS_PER_LOOP = 1000;
     int32_t           nCount               = 0;
 
     CNetworkMessage* pMsg = nullptr;
-    if(m_pMessagePort)
+    if(auto pMessagePort = m_pMessagePort.lock())
     {
         // process message_port msg
-        while(nCount < MAX_PROCESS_PER_LOOP && m_pMessagePort->TakePortMsg(pMsg))
+        while(nCount < MAX_PROCESS_PER_LOOP && pMessagePort->TakePortMsg(pMsg))
         {
             nCount++;
             OnProcessMessage(pMsg);
@@ -169,19 +149,7 @@ void CServiceCommon::OnLogicThreadProc()
 
     m_nMessageProcess += nCount;
 
-    // process message from client
-    if(m_pNetworkService)
-    {
-        nCount = 0;
-        while(nCount < MAX_PROCESS_PER_LOOP && m_pNetworkService->_GetMessageQueue().get(pMsg))
-        {
-            nCount++;
-            OnProcessMessage(pMsg);
-            SAFE_DELETE(pMsg);
-        }
-    }
 
-    m_nMessageProcess += nCount;
     //定时器回掉
     m_pEventManager->OnTimer();
 
@@ -346,7 +314,7 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
         if(vs.GetServerPort().GetWorldID() == GetWorldID())
         {
             // trans msg in same world
-            CMessagePort* pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
+            CMessagePortSharedPtr pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
             if(pMessagePort)
             {
                 return pMessagePort->SendMsgToPort(msg);
@@ -359,7 +327,7 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
         else if (GetServiceID().GetServiceType() == ROUTE_SERVICE && vs.GetServerPort().GetServiceType() == ROUTE_SERVICE)
         {
             // route_service send msg to other route
-            CMessagePort* pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
+            CMessagePortSharedPtr pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
             if(pMessagePort)
             {
                 return pMessagePort->SendMsgToPort(msg);
@@ -381,7 +349,7 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
     else if(GetMessageRoute() && vs.GetServerPort() == m_nServerPort)
     {
         //send to this service
-        CMessagePort* pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
+        CMessagePortSharedPtr pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
         if(pMessagePort)
         {
             return pMessagePort->SendMsgToPort(msg);
@@ -395,20 +363,7 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
     else if(vs.GetServerPort().IsVaild() == false && vs.GetSocketIdx() != 0)
     {
         // direct send message
-        if(m_pNetworkService)
-        {
-            if(msg.IsBroadcast())
-            {
-                m_pMonitorMgr->AddSendInfo_broad(msg.GetCmd(), msg.GetSize());
-                m_pNetworkService->BrocastMsg(msg, 0);
-            }
-            else
-            {
-                m_pMonitorMgr->AddSendInfo(msg.GetCmd(), msg.GetSize());
-                return m_pNetworkService->SendSocketMsgByIdx(msg.GetTo().GetSocketIdx(), msg, false);
-            }
-        }
-
+        LOGWARNING("Message Want Send from:{} To:{} Cmd:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd() );
         return false;
     }
     else

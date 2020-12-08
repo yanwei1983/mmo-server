@@ -216,19 +216,10 @@ const CGMService::HttpRequestHandleFunc* CGMService::QueryHttpRequestHandler(con
     return nullptr;
 }
 
-void CGMService::OnLogicThreadProc()
-{
 
-    CServiceCommon::OnLogicThreadProc();
-}
 
 void CGMService::OnLogicThreadCreate()
 {
     tls_pService = this;
     CServiceCommon::OnLogicThreadCreate();
-}
-
-void CGMService::OnLogicThreadExit()
-{
-    CServiceCommon::OnLogicThreadExit();
 }

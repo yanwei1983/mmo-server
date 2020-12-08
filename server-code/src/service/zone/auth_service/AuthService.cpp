@@ -88,10 +88,6 @@ bool CAuthService::Init(const ServerPort& nServerPort)
     return true;
 }
 
-void CAuthService::OnLogicThreadProc()
-{
-    CServiceCommon::OnLogicThreadProc();
-}
 
 void CAuthService::OnLogicThreadCreate()
 {
@@ -99,7 +95,3 @@ void CAuthService::OnLogicThreadCreate()
     CServiceCommon::OnLogicThreadCreate();
 }
 
-void CAuthService::OnLogicThreadExit()
-{
-    CServiceCommon::OnLogicThreadExit();
-}

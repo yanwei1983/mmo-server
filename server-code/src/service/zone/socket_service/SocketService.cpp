@@ -2,6 +2,7 @@
 
 #include <functional>
 #include "NetworkService.h"
+#include "NetEventHandler.h"
 #include "EventManager.h"
 #include "MemoryHelp.h"
 #include "MessagePort.h"
@@ -61,10 +62,35 @@ void SetSocketServicePtr(CSocketService* ptr)
     tls_pService = ptr;
 }
 
+
+
+class CSocketServiceNetEventHandler : public CNetEventHandler
+{
+public:
+    CSocketServiceNetEventHandler(CSocketService* pService)
+    :m_pService(pService)
+    {}
+    virtual void OnDisconnected(const CNetSocketSharedPtr& pSocket) override
+    {
+        m_pService->OnDisconnected(pSocket);
+    }
+    virtual void OnAccepted(const CNetSocketSharedPtr& pSocket) override
+    {
+        m_pService->OnAccepted(pSocket);
+    }
+    virtual void OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len) override
+    {
+        m_pService->OnRecvData(pSocket,pBuffer,len);
+    }
+
+    CSocketService* m_pService;
+};
+
 //////////////////////////////////////////////////////////////////////////
 CSocketService::CSocketService()
 {
     m_tLastDisplayTime.Startup(20);
+
 }
 
 CSocketService::~CSocketService() {}
@@ -84,7 +110,11 @@ void CSocketService::Destory()
         tls_pService = nullptr;
     };
     DestoryServiceCommon();
-
+    if(m_pNetworkService)
+    {
+        m_pNetworkService->Destroy();
+        m_pNetworkService.reset();
+    }
     for(auto& [k, v]: m_setVirtualSocket)
     {
         SAFE_DELETE(v);
@@ -107,7 +137,7 @@ bool CSocketService::Init(const ServerPort& nServerPort)
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
     };
-
+    m_pNetEventHandler = std::make_shared<CSocketServiceNetEventHandler>(this);
     const ServerAddrInfo* pAddrInfo = GetMessageRoute()->QueryServiceInfo(GetServerPort());
     if(pAddrInfo == nullptr)
     {
@@ -118,7 +148,7 @@ bool CSocketService::Init(const ServerPort& nServerPort)
     CHECKF(CreateNetworkService());
 
     //开启对外监听端口
-    if(GetNetworkService()->Listen(pAddrInfo->bind_addr.c_str(), pAddrInfo->publish_port, this) == nullptr)
+    if(GetNetworkService()->Listen(pAddrInfo->bind_addr.c_str(), pAddrInfo->publish_port, m_pNetEventHandler) == nullptr)
     {
         return false;
     }
@@ -146,6 +176,17 @@ bool CSocketService::Init(const ServerPort& nServerPort)
     __LEAVE_FUNCTION
 
     return false;
+}
+
+bool CSocketService::CreateNetworkService()
+{
+    __ENTER_FUNCTION
+    if(m_pNetworkService)
+        return false;
+    m_pNetworkService = std::make_unique<CNetworkService>();
+    return true;
+    __LEAVE_FUNCTION
+    return true;
 }
 
 void CSocketService::MapClientByUserID(OBJID idUser, CGameClient* pClient)
@@ -225,15 +266,14 @@ void CSocketService::RemoveClient(const VirtualSocket& vs)
     }
 }
 
-
-void CSocketService::OnDisconnected(CNetSocket* pSocket)
+void CSocketService::OnDisconnected(const CNetSocketSharedPtr& pSocket)
 {
     __ENTER_FUNCTION
     RemoveClient(VirtualSocket::CreateVirtualSocket(GetServerPort(), pSocket->GetSocketIdx()));
     __LEAVE_FUNCTION
 }
 
-void CSocketService::OnAccepted(CNetSocket* pSocket)
+void CSocketService::OnAccepted(const CNetSocketSharedPtr& pSocket)
 {
     __ENTER_FUNCTION
 
@@ -255,7 +295,7 @@ void CSocketService::OnAccepted(CNetSocket* pSocket)
     __LEAVE_FUNCTION
 }
 
-void CSocketService::OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len)
+void CSocketService::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len)
 {
     __ENTER_FUNCTION
     m_nSocketMessageProcess++;
@@ -414,14 +454,25 @@ void CSocketService::OnLogicThreadCreate()
     CServiceCommon::OnLogicThreadCreate();
 }
 
-void CSocketService::OnLogicThreadExit()
-{
-    CServiceCommon::OnLogicThreadExit();
-}
 
 void CSocketService::OnLogicThreadProc()
 {
     __ENTER_FUNCTION
+    if(m_pNetworkService)
+    {
+        m_pNetworkService->RunOnce();
+
+        constexpr int32_t MAX_PROCESS_PER_LOOP = 1000;
+        uint32_t nCount = 0;
+        CNetworkMessage* pMsg = nullptr;
+        while(nCount < MAX_PROCESS_PER_LOOP && m_pNetworkService->_GetMessageQueue().get(pMsg))
+        {
+            nCount++;
+            OnProcessMessage(pMsg);
+            SAFE_DELETE(pMsg);
+        }
+        m_nMessageProcess += nCount;
+    }
     CServiceCommon::OnLogicThreadProc();
 
     if(m_tLastDisplayTime.ToNextTime())
@@ -456,4 +507,4 @@ void CSocketService::OnLogicThreadProc()
     __LEAVE_FUNCTION
 }
 
-void CSocketService::OnRecvTimeout(CNetSocket* pSocket) {}
+

@@ -6,7 +6,7 @@
 class CServerSocket : public CNetSocket
 {
 public:
-    CServerSocket(CNetworkService* pService, CNetEventHandler* pEventHandler, bool bReconnect);
+    CServerSocket(CNetworkService* pService, const CNetEventHandlerSharedPtr& pEventHandler, bool bReconnect);
     virtual ~CServerSocket();
 
     // init by connect to
@@ -36,5 +36,8 @@ private:
     event* m_pReconnectEvent;
     size_t m_nReconnectTimes;
 };
+
+using CServerSocketSharedPtr = std::shared_ptr<CServerSocket>;
+using CServerSocketWeakPtr = std::weak_ptr<CServerSocket>;
 
 #endif /* NETSERVERSOCKET_H */

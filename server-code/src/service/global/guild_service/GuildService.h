@@ -24,9 +24,8 @@ public:
     export_lua uint64_t CreateUID();
 
 public:
-    virtual void OnLogicThreadProc() override;
     virtual void OnLogicThreadCreate() override;
-    virtual void OnLogicThreadExit() override;
+
 
     CGuildManager*    GetGuildManager() const { return m_pGuildManager.get(); }
     CMysqlConnection* GetGlobalDB() const { return m_pGlobalDB.get(); }

@@ -58,7 +58,10 @@ private:
 
 struct event;
 class CNetMSGProcess;
-class CSocketService : public IService, public CServiceCommon, public CNetEventHandler
+class CSocketService;
+class CSocketServiceNetEventHandler;
+
+class CSocketService : public IService, public CServiceCommon
 {
     CSocketService();
     bool Init(const ServerPort& nServerPort);
@@ -70,15 +73,16 @@ public:
     export_lua const std::string& GetServiceName() const override { return CServiceCommon::GetServiceName(); }
     CreateNewRealeaseImpl(CSocketService);
 
+    bool CreateNetworkService();
+    CNetworkService* GetNetworkService()const {return m_pNetworkService.get();}
 public:
-    virtual void OnDisconnected(CNetSocket* pSocket) override;
-    virtual void OnAccepted(CNetSocket* pSocket) override;
-    virtual void OnRecvData(CNetSocket* pSocket, byte* pBuffer, size_t len) override;
-    virtual void OnRecvTimeout(CNetSocket* pSocket) override;
+    void OnDisconnected(const CNetSocketSharedPtr& pSocket);
+    void OnAccepted(const CNetSocketSharedPtr& pSocket);
+    void OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len);   
+    
 
     void         OnProcessMessage(CNetworkMessage*) override;
     virtual void OnLogicThreadCreate() override;
-    virtual void OnLogicThreadExit() override;
     virtual void OnLogicThreadProc() override;
     virtual void OnAllWaitedServiceReady() override;
 
@@ -91,10 +95,11 @@ public:
     bool         DelClientByUserID(OBJID idUser);
 
 private:
+    std::unique_ptr<CNetworkService>      m_pNetworkService;
     std::mutex                            m_mutex;
     std::map<VirtualSocket, CGameClient*> m_setVirtualSocket;
     std::map<OBJID, CGameClient*>         m_mapClientByUserID;
-
+    std::shared_ptr<CSocketServiceNetEventHandler> m_pNetEventHandler;
     // CUIDFactory m_UIDFactory;
 
     std::deque<uint16_t> m_SocketPool;

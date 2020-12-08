@@ -6,7 +6,7 @@
 class CClientSocket : public CNetSocket
 {
 public:
-    CClientSocket(CNetworkService* pService, CNetEventHandler* pEventHandler);
+    CClientSocket(CNetworkService* pService, const CNetEventHandlerSharedPtr& pEventHandler);
     virtual ~CClientSocket();
 
     // init by accept
@@ -17,5 +17,7 @@ public:
     virtual void OnAccepted();
     virtual void _OnError(const std::string& what) override;
 };
+using CClientSocketSharedPtr = std::shared_ptr<CClientSocket>;
+using CClientSocketWeakPtr = std::weak_ptr<CClientSocket>;
 
 #endif /* NETCLIENTSOCKET_H */

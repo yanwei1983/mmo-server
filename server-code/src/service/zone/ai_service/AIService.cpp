@@ -191,7 +191,3 @@ void CAIService::OnLogicThreadCreate()
     CServiceCommon::OnLogicThreadCreate();
 }
 
-void CAIService::OnLogicThreadExit()
-{
-    CServiceCommon::OnLogicThreadExit();
-}

@@ -55,27 +55,23 @@ RobotClientManager::~RobotClientManager()
 {
     BreakLoop();
     JoinIOThread();
-    for(RobotClient* pClient: m_setClient)
-    {
-        SAFE_DELETE(pClient);
-    }
     m_setClient.clear();
     Destroy();
 }
 
-RobotClient* RobotClientManager::ConnectServer(const char* addr, int32_t port)
+RobotClientPtr RobotClientManager::ConnectServer(const char* addr, int32_t port)
 {
-    RobotClient* pClient = new RobotClient(this);
-    if(AsyncConnectTo(addr, port, pClient) == nullptr)
+    RobotClientPtr pClient = std::make_shared<RobotClient>(this);
+    auto pSocket = AsyncConnectTo(addr, port, pClient);
+    if(pSocket.expired())
     {
-        SAFE_DELETE(pClient);
         return nullptr;
     }
+    m_setClient.emplace(pClient);
     return pClient;
 }
 
-void RobotClientManager::DelClient(RobotClient* pClient)
+void RobotClientManager::DelClient(const RobotClientPtr& pClient)
 {
     m_setClient.erase(pClient);
-    SAFE_DELETE(pClient);
 }
