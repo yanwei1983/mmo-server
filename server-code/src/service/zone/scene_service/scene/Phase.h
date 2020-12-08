@@ -63,7 +63,7 @@ public:
     export_lua bool SendSceneMessage(const proto_msg_t& msg) const;
 
     //增加一个延时回调脚本
-    export_lua void AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name);
+    export_lua void AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name, bool bPersist);
     export_lua void ClearAllCllback();
 
 public:

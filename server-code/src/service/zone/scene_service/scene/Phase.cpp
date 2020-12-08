@@ -142,7 +142,7 @@ bool CPhase::SendSceneMessage(const proto_msg_t& msg) const
     return false;
 }
 
-void CPhase::AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name)
+void CPhase::AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name, bool bPersist)
 {
     __ENTER_FUNCTION
     if(m_pMap->GetScriptID() == 0)
@@ -155,7 +155,7 @@ void CPhase::AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name
         ScriptManager()->TryExecScript<void>(SCRIPT_MAP, pThis->m_pMap->GetScriptID(), _func_name.c_str(), pThis);
     };
     param.tWaitTime = tIntervalMS;
-    param.bPersist  = false;
+    param.bPersist  = bPersist;
     EventManager()->ScheduleEvent(param, m_EventList);
     __LEAVE_FUNCTION
 }
