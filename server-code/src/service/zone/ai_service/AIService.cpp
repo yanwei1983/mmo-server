@@ -144,7 +144,8 @@ void CAIService::OnLogicThreadProc()
 {
     __ENTER_FUNCTION
     CServiceCommon::OnLogicThreadProc();
-
+    // lua step gc
+    m_pScriptManager->OnTimer(TimeGetMonotonic());
     AISceneManager()->OnTimer();
 
     if(m_tLastDisplayTime.ToNextTime())
