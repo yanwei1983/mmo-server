@@ -16,7 +16,7 @@ void CAIActor::AddToViewList(CSceneObject* pActor)
     {
         CastTo<CAIMonster>()->SetAISleep(false);
     }
-    LOGACTORDEBUG(GetID(), "ViewList add:{}", pActor->GetID());
+    LOGACTORDEBUG(GetID(), "ViewList add:{} size:{}", pActor->GetID(), GetCurrentViewActorCount());
     __LEAVE_FUNCTION
 }
 
@@ -25,6 +25,6 @@ void CAIActor::RemoveFromViewList(CSceneObject* pActor, OBJID idActor, bool bEra
     __ENTER_FUNCTION
     CSceneObject::RemoveFromViewList(pActor,idActor,bErase);
 
-    LOGACTORDEBUG(GetID(), "ViewList del:{}", idActor);
+    LOGACTORDEBUG(GetID(), "ViewList del:{} size:{}", idActor, GetCurrentViewActorCount());
     __LEAVE_FUNCTION
 }
