@@ -95,7 +95,7 @@ private:
     uint32_t m_curSceneState;
     bool     m_bDelThis = false;
 
-    CEventEntryQueue            m_StatusEventList;
+    CEventEntryQueue            m_EventList;
     std::unique_ptr<CMapValSet> m_pMapValSet;
 
     std::map<OBJID, bool> m_OwnerIDSet;

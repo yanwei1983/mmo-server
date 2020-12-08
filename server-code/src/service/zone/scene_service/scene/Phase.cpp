@@ -156,13 +156,13 @@ void CPhase::AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name
     };
     param.tWaitTime = tIntervalMS;
     param.bPersist  = false;
-    EventManager()->ScheduleEvent(param, m_StatusEventList);
+    EventManager()->ScheduleEvent(param, m_EventList);
     __LEAVE_FUNCTION
 }
 
 void CPhase::ClearAllCllback()
 {
-    m_StatusEventList.Clear();
+    m_EventList.Clear();
 }
 
 CNpc* CPhase::CreateNpc(uint32_t idNpcType, const CPos2D& pos, float face)
