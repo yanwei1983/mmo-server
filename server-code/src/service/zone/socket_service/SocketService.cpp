@@ -240,6 +240,7 @@ CGameClient* CSocketService::QueryClient(const VirtualSocket& vs)
 void CSocketService::AddClient(const VirtualSocket& vs, CGameClient* pClient)
 {
     m_setVirtualSocket[vs] = pClient;
+    m_NonAuthClientCount++;
 }
 
 void CSocketService::RemoveClient(const VirtualSocket& vs)
@@ -256,6 +257,7 @@ void CSocketService::RemoveClient(const VirtualSocket& vs)
         }
         else
         {
+            m_NonAuthClientCount--;
             ServerMSG::SocketClose msg;
             msg.set_vs(vs);
             SendProtoMsgToZonePort(ServerPort(GetServerPort().GetWorldID(), AUTH_SERVICE, GetServerPort().GetServiceIdx()), msg);
@@ -341,6 +343,11 @@ void CSocketService::OnAllWaitedServiceReady()
     __LEAVE_FUNCTION
 }
 
+void CSocketService::OnAuthSucc(CGameClient* pClient)
+{
+    m_NonAuthClientCount--;
+}
+
 ON_SERVERMSG(CSocketService, ServiceReady)
 {
     SocketService()->OnWaitedServiceReady(ServerPort(msg.serverport()).GetServiceID());
@@ -391,6 +398,7 @@ ON_SERVERMSG(CSocketService, SocketAuth)
         pClient->SetAuth(true);
         pClient->SetMessageAllow(CLIENT_MSG_ID_BEGIN, CLIENT_MSG_ID_END);
         pClient->SetDestServerPort(ServerPort(SocketService()->GetWorldID(), WORLD_SERVICE, 0));
+        SocketService()->OnAuthSucc(pClient);
 
         ServerMSG::SocketLogin login_msg;
         login_msg.set_vs(msg.vs());
@@ -458,36 +466,24 @@ void CSocketService::OnLogicThreadCreate()
 void CSocketService::OnLogicThreadProc()
 {
     __ENTER_FUNCTION
-    if(m_pNetworkService)
-    {
-        m_pNetworkService->RunOnce();
+    m_pNetworkService->RunOnce();
 
-        constexpr int32_t MAX_PROCESS_PER_LOOP = 1000;
-        uint32_t nCount = 0;
-        CNetworkMessage* pMsg = nullptr;
-        while(nCount < MAX_PROCESS_PER_LOOP && m_pNetworkService->_GetMessageQueue().get(pMsg))
-        {
-            nCount++;
-            OnProcessMessage(pMsg);
-            SAFE_DELETE(pMsg);
-        }
-        m_nMessageProcess += nCount;
-    }
     CServiceCommon::OnLogicThreadProc();
 
     if(m_tLastDisplayTime.ToNextTime())
     {
-        std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\nMessageProcess:{}\tSocketMsg:{}\tMem:{}"),
-                                      GetMessageProcess(),
-                                      m_nSocketMessageProcess,
-                                      get_thread_memory_allocted()) +
-                          fmt::format(FMT_STRING("\nRecvTotal:{}\tRecvAvg:{}"),
-                                      GetNetworkService()->GetRecvBPS().GetTotal(),
-                                      GetNetworkService()->GetRecvBPS().GetAvgBPS()) +
-                          fmt::format(FMT_STRING("\nSendTotal:{}\tSendAvg:{}"),
-                                      GetNetworkService()->GetSendBPS().GetTotal(),
-                                      GetNetworkService()->GetSendBPS().GetAvgBPS());
+        std::string buf = std::string("\n======================================================================");
+        buf += fmt::format(FMT_STRING("\nClient:{}\tNotAuth:{}"), m_setVirtualSocket.size(), m_NonAuthClientCount);
+        buf += fmt::format(FMT_STRING("\nServerMsgProcess:{}\tSocketMsgRecv:{}\tMem:{}"),
+                           GetMessageProcess(),
+                           m_nSocketMessageProcess,
+                           get_thread_memory_allocted());
+        buf += fmt::format(FMT_STRING("\nRecvTotal:{}\tRecvAvg:{}"),
+                           GetNetworkService()->GetRecvBPS().GetTotal(),
+                           GetNetworkService()->GetRecvBPS().GetAvgBPS());
+        buf += fmt::format(FMT_STRING("\nSendTotal:{}\tSendAvg:{}"),
+                           GetNetworkService()->GetSendBPS().GetTotal(),
+                           GetNetworkService()->GetSendBPS().GetAvgBPS());
 
         GetMessageRoute()->ForEach([&buf](auto pMessagePort) {
             if(pMessagePort && pMessagePort->GetWriteBufferSize())

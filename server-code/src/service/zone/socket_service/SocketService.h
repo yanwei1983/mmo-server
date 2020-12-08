@@ -80,7 +80,7 @@ public:
     void OnAccepted(const CNetSocketSharedPtr& pSocket);
     void OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len);   
     
-
+    void         OnAuthSucc(CGameClient* pClient);
     void         OnProcessMessage(CNetworkMessage*) override;
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadProc() override;
@@ -106,7 +106,7 @@ private:
 
     uint64_t m_nSocketMessageProcess    = 0;
     uint64_t m_nWebSocketMessageProcess = 0;
-
+    uint64_t m_NonAuthClientCount       = 0;
     CMyTimer m_tLastDisplayTime;
 };
 
