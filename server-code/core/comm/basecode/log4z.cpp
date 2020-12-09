@@ -1601,11 +1601,9 @@ bool LogerManager::openLogger(LogData* pLog)
         name = pLogger->_name;
         path = pLogger->_path;
 
-        char buf[500] = {0};
         if(pLogger->_monthdir)
         {
-            fmt::format_to_n(buf, 500, "{:%Y_/%m/}", t);
-            path += buf;
+            path += fmt::format("{:%Y_/%m/}", t);
         }
 
         if(!isDirectory(path))

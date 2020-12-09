@@ -303,22 +303,27 @@ int32_t main(int32_t argc, char* argv[])
         // PurgeJemalloc();
         auto alloc_from_obj_heap = get_alloc_from_object_heap();
         auto result              = get_memory_status();
-        LOGMONITOR("obj_heap: {:.2f}, "
-                   "alloc: {:.2f}, "
-                   "active: {:.2f}, "
-                   "meta: {:.2f}, "
-                   "res: {:.2f}, "
-                   "map: {:.2f}, "
-                   "ret: {:.2f}, "
-                   "n_thread: {}",
+
+        LOGMONITOR("obj_heap:{:.2f}m, "
+                   "alloc:{:.2f}m, "
+                   "active:{:.2f}m, "
+                   "phy:{:.2f}m, "
+                   "ext:{:.2f}m, "
+                   "vm:{:.2f}m, "
+                   "meta:{:.2f}m, "
+                   "meta_thp:{:.2f}m, "
+                   "n_thread:{}"
+                   "t_runtime:{}",
                    alloc_from_obj_heap / 1024.0f / 1024.0f,
                    result.allocted / 1024.0f / 1024.0f,
                    result.active / 1024.0f / 1024.0f,
-                   result.metadata / 1024.0f / 1024.0f,
                    result.resident / 1024.0f / 1024.0f,
                    result.mapped / 1024.0f / 1024.0f,
                    result.retained / 1024.0f / 1024.0f,
-                   result.num_threads);
+                   result.metadata / 1024.0f / 1024.0f,
+                   result.metadata_thp / 1024.0f / 1024.0f,
+                   result.num_threads,
+                   result.back_runtime);
 
         sleep(60);
         __LEAVE_FUNCTION

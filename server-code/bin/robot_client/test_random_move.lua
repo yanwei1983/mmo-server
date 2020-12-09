@@ -197,7 +197,10 @@ function OnRecv_SC_ENTERMAP(client, buffer, size)
 		return;
 	end
 	print_debugmsg(client, "enter map succ.");
-	g_succ_clinet_count = g_succ_clinet_count+1;
+	if g_succ_clinet[client:GetClientID()] == nil then
+		g_succ_clinet[client:GetClientID()] = true;
+		g_succ_clinet_count = g_succ_clinet_count+1;
+	end
 	local info = g_clientinfo[client:GetClientID()];
 	if info.hp == 0 then
 		local send_msg = ProtobufMessageWarp("CS_REBORN");
@@ -289,6 +292,7 @@ function main(start_idx, max_players)
 	end
 end
 
+g_succ_clinet={}
 g_succ_clinet_count = 0;
 function OnTimer()
 	print("client:", robot_manager:GetClientCount(), "enter:", g_succ_clinet_count);

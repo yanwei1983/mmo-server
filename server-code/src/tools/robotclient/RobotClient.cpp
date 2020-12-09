@@ -89,14 +89,14 @@ void RobotClient::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, 
             std::string func_name = m_pManager->GetProcessCMD(pHeader->msg_cmd);
             if(func_name.empty() == false)
             {
-                LOGDEBUG("process net_msg:{}", pHeader->msg_cmd);
+                LOGTRACE("process net_msg:{}", pHeader->msg_cmd);
                 m_pManager->ExecScript<void>(func_name.c_str(), this, pBuffer + sizeof(MSG_HEAD), len - sizeof(MSG_HEAD));
                 // m_pManager->GetScriptManager()->FullGC();
             }
             else
             {
 
-                LOGDEBUG("not find processer net_msg:{}", pHeader->msg_cmd);
+                LOGTRACE("not find processer net_msg:{}", pHeader->msg_cmd);
             }
         }
         break;

@@ -5,9 +5,9 @@
   },
   "debug": 
   {
-    "log_lev": "LOG_LEVEL_TRACE",
+    "log_lev": "LOG_LEVEL_DEBUG",
     "log_aidebug": "LOG_LEVEL_DEBUG",
-    "log_actordebug": "LOG_LEVEL_TRACE",
+    "log_actordebug": "LOG_LEVEL_DEBUG",
     "log_skilldebug": "LOG_LEVEL_DEBUG"
   }
 }

@@ -67,21 +67,34 @@ memory_status get_memory_status()
 {
     memory_status result;
 #ifdef USE_JEMALLOC
-    size_t   len   = sizeof(size_t);
+    size_t   len   = sizeof(uint64_t);
     uint64_t epoch = 1;
     je_mallctl("epoch", &epoch, &len, &epoch, len);
 
     je_mallctl("stats.allocated", &result.allocted, &len, NULL, 0);
     je_mallctl("stats.active", &result.active, &len, NULL, 0);
-    je_mallctl("stats.metadata", &result.metadata, &len, NULL, 0);
-    je_mallctl("stats.resident", &result.resident, &len, NULL, 0);
     je_mallctl("stats.mapped", &result.mapped, &len, NULL, 0);
+    je_mallctl("stats.metadata", &result.metadata, &len, NULL, 0);
+    je_mallctl("stats.metadata_thp", &result.metadata_thp, &len, NULL, 0);
+    je_mallctl("stats.resident", &result.resident, &len, NULL, 0);
+    
     je_mallctl("stats.retained", &result.retained, &len, NULL, 0);
     je_mallctl("stats.background_thread.num_threads", &result.num_threads, &len, NULL, 0);
+    je_mallctl("stats.background_thread.run_interval", &result.back_runtime, &len, NULL, 0);
+    
 #endif
     return result;
 }
 
+void open_jemalloc_thp()
+{
+#ifdef USE_JEMALLOC
+    char metadata_thp[]="auto";
+    je_mallctl("opt.metadata_thp", nullptr, nullptr, &metadata_thp, sizeof(metadata_thp));
+    char thp[]="default";
+    je_mallctl("opt.thp", nullptr, nullptr, &thp, sizeof(thp));
+#endif
+}
 void start_jemalloc_backgroud_thread()
 {
 #ifdef USE_JEMALLOC
@@ -90,6 +103,9 @@ void start_jemalloc_backgroud_thread()
     je_mallctl("background_thread", nullptr, nullptr, &option, sizeof(bool));
     option = true;
     je_mallctl("opt.background_thread", nullptr, nullptr, &option, sizeof(bool));
+
+
+    
 #endif
 }
 

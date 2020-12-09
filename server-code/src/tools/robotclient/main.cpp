@@ -86,15 +86,24 @@ int main(int argc, char* argv[])
         // std::this_thread::yield();
         // PurgeJemalloc();
         auto result = get_memory_status();
-        LOGMONITOR("Allocated: {:.2f}, active: {:.2f}, metadata: {:.2f}, resident: {:.2f}, mapped: {:.2f}, retained: {:.2f}, "
-                   "num_threads: {}",
+        LOGMONITOR("alloc:{:.2f}m, "
+                   "active:{:.2f}m, "
+                   "phy:{:.2f}m, "
+                   "ext:{:.2f}m, "
+                   "vm:{:.2f}m, "
+                   "meta:{:.2f}m, "
+                   "meta_thp:{:.2f}m, "
+                   "n_thread:{}"
+                   "t_runtime:{}",
                    result.allocted / 1024.0f / 1024.0f,
                    result.active / 1024.0f / 1024.0f,
-                   result.metadata / 1024.0f / 1024.0f,
                    result.resident / 1024.0f / 1024.0f,
                    result.mapped / 1024.0f / 1024.0f,
                    result.retained / 1024.0f / 1024.0f,
-                   result.num_threads);
+                   result.metadata / 1024.0f / 1024.0f,
+                   result.metadata_thp / 1024.0f / 1024.0f,
+                   result.num_threads,
+                   result.back_runtime);
 
         LOGMONITOR("CNetSocket:{} CNetworkMessage: {}", CNetSocket::s_Heap.GetAllocedSize(), CNetworkMessage::s_Heap.GetAllocedSize());
         LOGMONITOR("ProtobufMessageWarp:{} ConstProtobufMessageWarp:{} ConstRepeatedProtobufMessageWarp:{} ",
