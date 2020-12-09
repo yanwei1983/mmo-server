@@ -434,8 +434,9 @@ void CPlayer::OnLogin(bool bLogin, const SceneIdx& idxScene, float fPosX, float 
             }
         }
     }
-
-    Vector2 findpos = pCurScene->FindPosNearby(Vector2(fPosX, fPosY), fRange);
+    auto result = pCurScene->FindPosNearby(Vector2(fPosX, fPosY), fRange);
+    CHECK(result);
+    Vector2 findpos = result.value();
 
     m_idLoadingScene = pCurScene->GetID();
     m_fLoadingPosX   = findpos.x;

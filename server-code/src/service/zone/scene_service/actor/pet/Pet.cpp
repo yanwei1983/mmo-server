@@ -164,7 +164,10 @@ void CPet::CallOut()
 
     _SetPhaseID(pOwner->GetPhaseID());
     auto findPos = pOwner->GetCurrentScene()->FindPosNearby(Vector2(pOwner->GetPosX(), pOwner->GetPosY()), 2.0f);
-    pOwner->GetCurrentScene()->EnterMap(this, findPos.x, findPos.y, 0.0f);
+    if(findPos)
+    {
+        pOwner->GetCurrentScene()->EnterMap(this, findPos.value().x, findPos.value().y, 0.0f);
+    }
 
     __LEAVE_FUNCTION
 }

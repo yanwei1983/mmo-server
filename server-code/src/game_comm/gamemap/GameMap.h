@@ -51,7 +51,7 @@ public:
     export_lua uint32_t GetSPRegionIdx(float x, float y) const;
     export_lua float    GetHigh(float x, float y) const;
 
-    export_lua Vector2 FindPosNearby(const Vector2& pos, float range) const;
+    export_lua std::optional<Vector2> FindPosNearby(const Vector2& pos, float range) const;
     export_lua std::optional<Vector2> LineFindCanStand(const Vector2& src, const Vector2& dest) const;
     export_lua std::optional<Vector2> LineFindCanJump(const Vector2& src, const Vector2& dest) const;
 

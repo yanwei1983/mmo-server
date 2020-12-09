@@ -88,26 +88,26 @@ bool CGameMap::IsPassDisable(float x, float y) const
 {
     __ENTER_FUNCTION
     if(m_pMapData == nullptr)
-        return false;
-    if(!IsInsideMap(x, y))
-        return false;
+        return true;
+    if(IsInsideMap(x, y) == false)
+        return true;
 
     return m_pMapData->IsPassDisable(x, y);
     __LEAVE_FUNCTION
-    return false;
+    return true;
 }
 
 bool CGameMap::IsJumpDisable(float x, float y) const
 {
     __ENTER_FUNCTION
     if(m_pMapData == nullptr)
-        return false;
+        return true;
     if(!IsInsideMap(x, y))
-        return false;
+        return true;
 
     return m_pMapData->IsJumpDisable(x, y);
     __LEAVE_FUNCTION
-    return false;
+    return true;
 }
 
 bool CGameMap::IsPvPDisable(float x, float y) const
@@ -118,7 +118,7 @@ bool CGameMap::IsPvPDisable(float x, float y) const
 
     return m_pMapData->IsPVPDisable(x, y);
     __LEAVE_FUNCTION
-    return false;
+    return true;
 }
 
 bool CGameMap::IsStallDisable(float x, float y) const
@@ -129,7 +129,7 @@ bool CGameMap::IsStallDisable(float x, float y) const
 
     return m_pMapData->IsStallDisable(x, y);
     __LEAVE_FUNCTION
-    return false;
+    return true;
 }
 
 bool CGameMap::IsPlaceDisable(float x, float y) const
@@ -140,7 +140,7 @@ bool CGameMap::IsPlaceDisable(float x, float y) const
 
     return m_pMapData->IsPlaceDisable(x, y);
     __LEAVE_FUNCTION
-    return false;
+    return true;
 }
 
 bool CGameMap::IsRecordDisable(float x, float y) const
@@ -151,7 +151,7 @@ bool CGameMap::IsRecordDisable(float x, float y) const
 
     return m_pMapData->IsRecordDisable(x, y);
     __LEAVE_FUNCTION
-    return false;
+    return true;
 }
 
 bool CGameMap::IsDropDisable(float x, float y) const
@@ -162,14 +162,14 @@ bool CGameMap::IsDropDisable(float x, float y) const
 
     return m_pMapData->IsDropDisable(x, y);
     __LEAVE_FUNCTION
-    return false;
+    return true;
 }
 
 bool CGameMap::IsPvPFree(float x, float y) const
 {
     __ENTER_FUNCTION
     if(!IsInsideMap(x, y))
-        return true;
+        return false;
 
     return m_pMapData->IsPvPFree(x, y);
     __LEAVE_FUNCTION
@@ -184,7 +184,7 @@ bool CGameMap::IsDeadNoDrop(float x, float y) const
 
     return m_pMapData->IsDeadNoDrop(x, y);
     __LEAVE_FUNCTION
-    return false;
+    return true;
 }
 
 const Cfg_Phase* CGameMap::GetPhaseDataById(uint64_t idPhase) const
@@ -280,14 +280,20 @@ std::optional<Vector2> CGameMap::LineFindCanJump(const Vector2& src, const Vecto
     return {};
 }
 
-Vector2 CGameMap::FindPosNearby(const Vector2& pos, float range) const
+std::optional<Vector2> CGameMap::FindPosNearby(const Vector2& pos, float range) const
 {
     __ENTER_FUNCTION
     if(range <= 0.0f)
-        return pos;
+    {
+        if(IsPassDisable(pos.x, pos.y) == false)
+        {
+            return pos;
+        }
+        return {};
+    }
 
     if(m_pMapData == nullptr)
-        return pos;
+        return {};
 
     for(int32_t i = 0; i < 10; i++)
     {
@@ -299,7 +305,7 @@ Vector2 CGameMap::FindPosNearby(const Vector2& pos, float range) const
         }
     }
     __LEAVE_FUNCTION
-    return pos;
+    return {};
 }
 
 void CGameMap::_AddData(const Cfg_Scene_EnterPoint& iter)

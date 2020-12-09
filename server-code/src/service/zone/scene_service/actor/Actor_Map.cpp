@@ -19,10 +19,13 @@ void CActor::FlyTo(const Vector2& pos)
 
     CHECK(GetCurrentScene());
     CPhase* pPhase = static_cast<CPhase*>(GetCurrentScene());
-    pPhase->LeaveMap(this, pPhase->GetMapID());
-    m_pScene     = nullptr;
     auto findPos = pPhase->FindPosNearby(pos, 2.0f);
-    pPhase->EnterMap(this, findPos.x, findPos.y, GetFace());
+    if(findPos)
+    {
+        pPhase->LeaveMap(this, pPhase->GetMapID());
+        m_pScene     = nullptr;
+        pPhase->EnterMap(this, findPos.value().x, findPos.value().y, GetFace());
+    }
 
     __LEAVE_FUNCTION
 }

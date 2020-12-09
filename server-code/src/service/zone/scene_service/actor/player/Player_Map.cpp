@@ -175,6 +175,14 @@ void CPlayer::_FlyPhase(CSceneBase* pTargetPhase, float fPosX, float fPosY, floa
     CHECK(pTargetPhase);
     auto idTargetMap = pTargetPhase->GetSceneIdx().GetMapID();
     LOGACTORDEBUG( GetID(), "Player FlyMap:{} pos:{:.2f} {:.2f} {:.2f}",idTargetMap, fPosX, fPosY, fRange);
+    Vector2 targetPos(fPosX, fPosY);
+    if(pOldPhase->GetSceneIdx().GetMapID() == idTargetMap)
+    {
+        //判断所在位置是否是障碍
+        auto findPos = pTargetPhase->FindPosNearby(Vector2(fPosX, fPosY), fRange);
+        CHECK(findPos);
+        targetPos = findPos.value();
+    }
 
     pOldPhase->LeaveMap(this, idTargetMap);
     m_pScene = nullptr;
@@ -182,9 +190,7 @@ void CPlayer::_FlyPhase(CSceneBase* pTargetPhase, float fPosX, float fPosY, floa
     //只要地图一样就不需要reloading
     if(pOldPhase->GetSceneIdx().GetMapID() == idTargetMap)
     {
-        //判断所在位置是否是障碍
-        auto findPos = pTargetPhase->FindPosNearby(Vector2(fPosX, fPosY), fRange);
-        pTargetPhase->EnterMap(this, findPos.x, findPos.y, fFace);
+        pTargetPhase->EnterMap(this, targetPos.x, targetPos.y, fFace);
     }
     else
     {

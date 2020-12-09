@@ -96,7 +96,12 @@ CSceneObject* CSceneBase::QuerySceneObj(OBJID idObj) const
 bool CSceneBase::EnterMap(CSceneObject* pActor, float fPosX, float fPosY, float fFace)
 {
     __ENTER_FUNCTION
-    CHECKF(m_pSceneTree->IsInsideScene(fPosX, fPosY));
+    if(m_pSceneTree->IsInsideScene(fPosX, fPosY) == false)
+    {
+        LOGERROR("EnterMap Pos Fail id:{} pos:{},{} scene:{} map:{}", pActor->GetID(), fPosX, fPosY, GetID(), GetMapID());
+        LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7)));
+        return false;
+    }
 
     if(pActor->IsPlayer())
         m_setPlayer[pActor->GetID()] = pActor;
@@ -134,12 +139,13 @@ void CSceneBase::_LeaveMap(CSceneObject* pActor, uint16_t idTargetMap /*= 0*/)
     
 }
 
-Vector2 CSceneBase::FindPosNearby(const Vector2& pos, float range) const
+std::optional<Vector2> CSceneBase::FindPosNearby(const Vector2& pos, float range) const
 {
     __ENTER_FUNCTION
+    CHECK_RET_FMT(m_pSceneTree->IsInsideScene(pos.x, pos.y), {}, "pos:{},{}", pos.x, pos.y);
     return m_pMap->FindPosNearby(pos, range);
     __LEAVE_FUNCTION
-    return pos;
+    return {};
 }
 
 void CSceneBase::AddDynaRegion(uint32_t nRegionType, const FloatRect& rect)
