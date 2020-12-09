@@ -202,6 +202,8 @@ function OnRecv_SC_ENTERMAP(client, buffer, size)
 		g_succ_clinet_count = g_succ_clinet_count+1;
 	end
 	local info = g_clientinfo[client:GetClientID()];
+	info.record_posx = msg.x;
+	info.record_posy = msg.y;
 	if info.hp == 0 then
 		local send_msg = ProtobufMessageWarp("CS_REBORN");
 		send_msg.reborn_type = 2;
@@ -250,8 +252,20 @@ function SendMove(client)
 	local send_msg = ProtobufMessageWarp("CS_MOVE");
 	local info = g_clientinfo[client:GetClientID()];
 	send_msg.scene_idx=info.scene_idx;
-	send_msg.x = info.posx + random_float(-1.0, 1.0);
-	send_msg.y = info.posy + random_float(-1.0, 1.0);
+	local target_pos = info.target_pos;
+	local cur_pos = Vector2(info.posx, info.posy);
+	local dis = GameMath.distance(record_pos, cur_pos);
+	if dis < 0.1 then
+		target_pos.x = info.record_posx + random_float(-10, 10);
+		target_pos.y = info.record_posy + random_float(-10, 10);
+	end
+	local dir = cur_pos - target_pos;
+	dir.normalise();
+	local new_pos = dir * random_float(0.5, 2.0);
+
+	send_msg.x = new_pos.x;
+	send_msg.y = new_pos.y;
+	
 	client:SendProtobufToServer(GetProtobufMessagePtr(send_msg) );
 	print_debugmsg(client, "sendmove x:", send_msg.x, ",y:", send_msg.y);
 	
