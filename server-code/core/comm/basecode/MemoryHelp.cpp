@@ -68,7 +68,7 @@ memory_status get_memory_status()
     memory_status result;
 #ifdef USE_JEMALLOC
     size_t   len   = sizeof(uint64_t);
-    uint64_t epoch = 1;
+    static uint64_t epoch = 1;
     je_mallctl("epoch", &epoch, &len, &epoch, len);
 
     je_mallctl("stats.allocated", &result.allocted, &len, NULL, 0);
@@ -81,6 +81,12 @@ memory_status get_memory_status()
     je_mallctl("stats.retained", &result.retained, &len, NULL, 0);
     je_mallctl("stats.background_thread.num_threads", &result.num_threads, &len, NULL, 0);
     je_mallctl("stats.background_thread.run_interval", &result.back_runtime, &len, NULL, 0);
+    
+    // je_mallctl("arenas.narenas", &result.narenas, &len, NULL, 0);
+    // je_mallctl("arenas.quantum", &result.quantum, &len, NULL, 0);
+    // je_mallctl("arenas.page", &result.page, &len, NULL, 0);
+    // je_mallctl("arenas.dirty_decay_ms", &result.dirty_decay_ms, &len, NULL, 0);
+    // je_mallctl("arenas.muzzy_decay_ms", &result.muzzy_decay_ms, &len, NULL, 0);
     
 #endif
     return result;
@@ -117,5 +123,12 @@ void stop_jemalloc_backgroud_thread()
     je_mallctl("background_thread", nullptr, nullptr, &option, sizeof(bool));
     option = false;
     je_mallctl("opt.background_thread", nullptr, nullptr, &option, sizeof(bool));
+#endif
+}
+
+void purge_jemalloc()
+{
+#ifdef USE_JEMALLOC
+    je_mallctl("arenas.4096.purge", 0, 0, 0, 0);
 #endif
 }

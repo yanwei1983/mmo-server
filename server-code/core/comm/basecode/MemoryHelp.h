@@ -16,12 +16,19 @@ struct memory_status
 
     uint64_t num_threads  = 0;
     uint64_t back_runtime = 0;
+
+    uint64_t narenas = 0;
+    uint64_t quantum = 0;
+    uint64_t page = 0;
+    uint64_t dirty_decay_ms = 0;
+    uint64_t muzzy_decay_ms = 0;
 };
 
 uint64_t      get_thread_memory_allocted();
 memory_status get_memory_status();
 
 void open_jemalloc_thp();
+void purge_jemalloc();
 void start_jemalloc_backgroud_thread();
 void stop_jemalloc_backgroud_thread();
 

@@ -150,15 +150,11 @@ void sig_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
 //	return (0);				/* success */
 //}
 
-void PurgeJemalloc()
-{
-#ifdef USE_JEMALLOC
-    je_mallctl("arenas.4096.purge", 0, 0, 0, 0);
-#endif
-}
+
 
 int32_t main(int32_t argc, char* argv[])
 {
+    open_jemalloc_thp();
     get_opt opt(argc, (const char**)argv);
     //请小心使用daemon/fork,这样会导致在main函数之前创建的线程被干掉
     if(opt.has("--daemon") || opt.has("-d"))
@@ -304,16 +300,16 @@ int32_t main(int32_t argc, char* argv[])
         auto alloc_from_obj_heap = get_alloc_from_object_heap();
         auto result              = get_memory_status();
 
-        LOGMONITOR("obj_heap:{:.2f}m, "
-                   "alloc:{:.2f}m, "
-                   "active:{:.2f}m, "
-                   "phy:{:.2f}m, "
-                   "ext:{:.2f}m, "
-                   "vm:{:.2f}m, "
-                   "meta:{:.2f}m, "
-                   "meta_thp:{:.2f}m, "
-                   "n_thread:{}"
-                   "t_runtime:{}",
+        LOGMONITOR("obj_heap: {:.2f}m, "
+                   "alloc: {:.2f}m, "
+                   "active: {:.2f}m, "
+                   "rss: {:.2f}m, "
+                   "ext: {:.2f}m, "
+                   "vm: {:.2f}m, "
+                   "meta: {:.2f}m, "
+                   "meta_thp: {:.2f}m, "
+                   "n_thread: {} "
+                   "t_runtime: {}ms",
                    alloc_from_obj_heap / 1024.0f / 1024.0f,
                    result.allocted / 1024.0f / 1024.0f,
                    result.active / 1024.0f / 1024.0f,
@@ -323,7 +319,7 @@ int32_t main(int32_t argc, char* argv[])
                    result.metadata / 1024.0f / 1024.0f,
                    result.metadata_thp / 1024.0f / 1024.0f,
                    result.num_threads,
-                   result.back_runtime);
+                   result.back_runtime/1000/1000);
 
         sleep(60);
         __LEAVE_FUNCTION
