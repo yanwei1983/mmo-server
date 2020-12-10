@@ -90,7 +90,6 @@ public:
     void    SetLogWriteHighWateMark(size_t val) { m_nLogWriteHighWateMark = val; }
     size_t  GetWaitWriteSize();
     size_t  GetPacketSizeMax() const { return m_nPacketSizeMax; }
-    void    SetPacketSizeMax(size_t val);
     void    _SetEventHandler(const CNetEventHandlerSharedPtr& v) { m_pEventHandler = v; }
     void    DetachEventHandler();
     void set_sock_nodely();
@@ -136,7 +135,7 @@ protected:
     std::unique_ptr<CDecryptor> m_pDecryptor;
     std::unique_ptr<CEncryptor> m_pEncryptor;
     size_t                      m_nPacketSizeMax;
-    size_t                      m_nLogWriteHighWateMark = 4 * 1024 * 1024; // default log when output>=4M
+    size_t                      m_nLogWriteHighWateMark; // default log when output>=4M
     std::unique_ptr<byte[]>     m_ReadBuff;
     unsigned short              m_nLastProcessMsgCMD = 0;
     unsigned short              m_nLastCMDSize       = 0;

@@ -49,13 +49,13 @@ void CServiceCommon::DestoryServiceCommon()
     __LEAVE_FUNCTION
 }
 
-bool CServiceCommon::Init(const ServerPort& nServerPort)
+bool CServiceCommon::Init(const ServerPort& nServerPort, bool bEventManagerPause)
 {
     __ENTER_FUNCTION
     m_nServerPort    = nServerPort;
     m_ServiceName    = ::GetServiceName(nServerPort.GetServiceID());
     m_pNetMsgProcess = std::make_unique<CNetMSGProcess>();
-    m_pEventManager.reset(CEventManager::CreateNew(nullptr));
+    m_pEventManager.reset(CEventManager::CreateNew(nullptr, bEventManagerPause));
     CHECKF(m_pEventManager.get());
     m_pMonitorMgr.reset(CMonitorMgr::CreateNew());
     CHECKF(m_pMonitorMgr.get());

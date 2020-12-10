@@ -30,7 +30,8 @@ CNetSocket::CNetSocket(CNetworkService* pService, const CNetEventHandlerSharedPt
     , m_nSocketIdx(INVALID_SOCKET_IDX)
     , m_pDecryptor(nullptr)
     , m_pEncryptor(nullptr)
-    , m_nPacketSizeMax(_MAX_MSGSIZE)
+    , m_nPacketSizeMax(pEventHandler?pEventHandler->GetPacketSizeMax():_MAX_MSGSIZE)
+    , m_nLogWriteHighWateMark(pEventHandler?pEventHandler->GetLogWriteHighWateMark():_MAX_MSGSIZE* 1024)
     , m_socket(INVALID_SOCKET)
     , m_ReadBuff{std::make_unique<byte[]>(m_nPacketSizeMax)}
 {
@@ -382,14 +383,6 @@ size_t CNetSocket::GetWaitWriteSize()
     return m_nWaitWriteSize;
 }
 
-void CNetSocket::SetPacketSizeMax(size_t val)
-{
-    if(m_nPacketSizeMax != val)
-    {
-        m_nPacketSizeMax = val;
-        m_ReadBuff       = std::make_unique<byte[]>(val);
-    }
-}
 
 void CNetSocket::OnClosing()
 {

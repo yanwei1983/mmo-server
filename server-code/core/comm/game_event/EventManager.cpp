@@ -13,8 +13,9 @@ CEventManager::~CEventManager()
     Destory();
 }
 
-bool CEventManager::Init(event_base* base)
+bool CEventManager::Init(event_base* base, bool bPause/* = true*/)
 {
+    m_bPause = bPause;
     if(base == nullptr)
     {
         m_pBase    = event_base_new();

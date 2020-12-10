@@ -83,7 +83,6 @@ void CMessagePort::OnConnected(const CNetSocketSharedPtr& pSocket)
     msg.msg_size = sizeof(MSG_HEAD);
     pSocket->_SendMsg((byte*)&msg, sizeof(msg));
     //服务器间通信扩充recv缓冲区大小
-    pSocket->SetPacketSizeMax(_MAX_MSGSIZE * 10);
     pSocket->SetLogWriteHighWateMark(100 * 1024 * 1024);
 
     LOGNETDEBUG("MessagePort:{} OnConnected {}:{}", GetServerPort().GetServiceID(), pSocket->GetAddrString(), pSocket->GetPort());
@@ -139,9 +138,6 @@ void CMessagePort::OnAccepted(const CNetSocketSharedPtr& pSocket)
 {
     __ENTER_FUNCTION
     LOGNETDEBUG("MessagePort:{} OnAccpet {}:{}", GetServerPort().GetServiceID(), pSocket->GetAddrString(), pSocket->GetPort());
-    //服务器间通信扩充recv缓冲区大小
-    pSocket->SetPacketSizeMax(_MAX_MSGSIZE * 10);
-    pSocket->SetLogWriteHighWateMark(100 * 1024 * 1024);
     if(auto pHandler = m_pPortEventHandler.load())
     {
         pHandler->OnPortAccepted(pSocket);

@@ -3,3 +3,8 @@ thread:brpc
 mutex:brpc
 signal:brpc
 deadlock:brpc
+called_from_lib:libjemalloc.so
+thread:jemalloc
+mutex:jemalloc
+signal:jemalloc
+deadlock:jemalloc

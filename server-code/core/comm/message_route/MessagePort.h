@@ -48,6 +48,8 @@ public:
     bool Init(const ServerPort& nServerPort, CMessageRoute* pRoute);
 
 public:
+    virtual size_t GetPacketSizeMax() const override {return _MAX_MSGSIZE * 10;}
+    virtual size_t GetLogWriteHighWateMark() const override {return _MAX_MSGSIZE * 1024;}
     virtual void OnBindSocket(const CNetSocketSharedPtr& pSocket) override;
     virtual void OnUnbindSocket(const CNetSocketSharedPtr& pSocket) override;
     virtual void OnStartConnect(const CNetSocketSharedPtr& pSocket) override;

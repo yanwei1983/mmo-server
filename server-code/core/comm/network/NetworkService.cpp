@@ -52,6 +52,10 @@ void CNetworkService::Destroy()
         event_free(m_pCloseSocketEvent);
         m_pCloseSocketEvent = nullptr;
     }
+    for(auto& v: m_setSocketByIdx)
+    {
+        v.reset();
+    }
 
     for(auto& v: m_setListener)
     {
@@ -66,7 +70,7 @@ void CNetworkService::Destroy()
 
     m_setSocket.clear();
     m_setConnectingSocket.clear();
-
+    
     _ProceseClosingSocket();
 
     if(m_pHttpHandle != nullptr)
@@ -101,6 +105,7 @@ bool CNetworkService::EnableListener(evconnlistener* listener, bool bEnable)
     }
     else
     {
+        std::lock_guard<std::mutex> lock(m_mutexListener);
         for(const auto& pair_val: m_setListener)
         {
             if(bEnable)
@@ -176,8 +181,10 @@ evconnlistener* CNetworkService::Listen(const char* addr, int32_t port, const CN
         return nullptr;
     }
     evconnlistener_set_error_cb(pListener, accept_error_cb);
-
-    m_setListener[pListener] = pEventHandler;
+    {
+        std::lock_guard<std::mutex> lock(m_mutexListener);
+        m_setListener.emplace(pListener,pEventHandler);
+    }
     LOGNETDEBUG("CNetworkService::Listen:{}:{}", addr, port);
 
     return pListener;
@@ -498,7 +505,7 @@ void CNetworkService::OnAccept(int32_t fd, sockaddr* addr, int32_t, evconnlisten
         evutil_closesocket(fd);
         return;
     }
-    CNetEventHandlerSharedPtr pEventHandler = m_setListener[listener].lock();
+    CNetEventHandlerSharedPtr pEventHandler = QueryListenerEventHander(listener);
     CClientSocketSharedPtr    pSocket = CreateClientSocket(pEventHandler);
     CHECK(pSocket);
     pSocket->SetAddrAndPort(szHost, uPort);
@@ -513,13 +520,27 @@ void CNetworkService::OnAccept(int32_t fd, sockaddr* addr, int32_t, evconnlisten
     __LEAVE_FUNCTION
 }
 
+CNetEventHandlerSharedPtr CNetworkService::QueryListenerEventHander(evconnlistener* listener)
+{
+    __ENTER_FUNCTION
+    std::lock_guard<std::mutex> lock(m_mutexListener);
+    auto it_find = m_setListener.find(listener);
+    if(it_find != m_setListener.end())
+        return it_find->second.lock();
+    __LEAVE_FUNCTION
+    return {};
+}
+
 CNetSocketSharedPtr CNetworkService::QuerySocketByIdx(uint16_t nSocketIdx)
 {
+    __ENTER_FUNCTION
     if(nSocketIdx == INVALID_SOCKET_IDX)
         return nullptr;
     std::lock_guard<std::mutex> lock(m_mutex);
     CHECKF_V(nSocketIdx < m_setSocketByIdx.size(), nSocketIdx);
     return m_setSocketByIdx[nSocketIdx];
+    __LEAVE_FUNCTION
+    return nullptr;
 }
 
 

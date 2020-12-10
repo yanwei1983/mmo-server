@@ -94,7 +94,7 @@ bool CWorldService::Init(const ServerPort& nServerPort)
     scope_exit += []() {
         tls_pService = nullptr;
     };
-    CServiceCommon::Init(nServerPort);
+    CServiceCommon::Init(nServerPort,true);
     auto oldNdc = BaseCode::SetNdc(GetServiceName());
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
@@ -302,7 +302,7 @@ void CWorldService::OnAllWaitedServiceReady()
             SendProtoMsgToZonePort(serverport, send_msg);
         }
     }
-
+    GetEventManager()->Pause(false);
     __LEAVE_FUNCTION
 }
 

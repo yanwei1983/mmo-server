@@ -122,13 +122,14 @@ public:
 
 private:
     void _ProceseClosingSocket();
-
+    CNetEventHandlerSharedPtr QueryListenerEventHander(evconnlistener* listener);
 protected:
     event_base*                                     m_pBase;
     std::map<evconnlistener*, CNetEventHandlerWeakPtr>    m_setListener;
     struct evhttp*                                  m_pHttpHandle = nullptr;
     std::function<void(struct evhttp_request* req)> m_funcOnReciveHttp;
     std::mutex                                      m_mutex;
+    std::mutex                                      m_mutexListener;
 
 
     std::map<SOCKET, CNetSocketSharedPtr>   m_setSocket;

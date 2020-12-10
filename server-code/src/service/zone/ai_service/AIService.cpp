@@ -89,7 +89,7 @@ bool CAIService::Init(const ServerPort& nServerPort)
         tls_pService = nullptr;
     };
 
-    CServiceCommon::Init(nServerPort);
+    CServiceCommon::Init(nServerPort, true);
     auto oldNdc = BaseCode::SetNdc(GetServiceName());
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
@@ -123,7 +123,7 @@ bool CAIService::Init(const ServerPort& nServerPort)
     uint32_t FrameInterval = 1000 / FrameCount;
     if(CreateService(FrameInterval) == false)
         return false;
-    EventManager()->Pause(true);
+    
     ServerMSG::ServiceReady msg;
     msg.set_serverport(GetServerPort());
 

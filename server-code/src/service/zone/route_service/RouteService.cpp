@@ -57,7 +57,7 @@ bool CRouteService::Init(const ServerPort& nServerPort)
     scope_exit += []() {
         tls_pService = nullptr;
     };
-    CServiceCommon::Init(nServerPort);
+    CServiceCommon::Init(nServerPort, true);
     auto oldNdc = BaseCode::SetNdc(GetServiceName());
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
@@ -68,7 +68,7 @@ bool CRouteService::Init(const ServerPort& nServerPort)
 
     if(CreateService(100) == false)
         return false;
-
+    GetEventManager()->Pause(false);
 
 
     if(GetWorldID() != 0)

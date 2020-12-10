@@ -82,7 +82,7 @@ bool CAOIService::Init(const ServerPort& nServerPort)
         tls_pService = nullptr;
     };
 
-    CServiceCommon::Init(nServerPort);
+    CServiceCommon::Init(nServerPort, true);
     auto oldNdc = BaseCode::SetNdc(GetServiceName());
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
@@ -125,9 +125,7 @@ void CAOIService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\nEvent:{}\tActive:{}\tMem:{}"),
-                                      EventManager()->GetEventCount(),
-                                      EventManager()->GetRunningEventCount(),
+                          fmt::format(FMT_STRING("\tMem:{}"),
                                       get_thread_memory_allocted());
         auto pMessagePort = GetMessageRoute()->QueryMessagePort(GetSceneServerPort(), false);
         if(pMessagePort)

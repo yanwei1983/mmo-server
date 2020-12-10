@@ -15,7 +15,7 @@ struct event;
 class CEventManager : public NoncopyableT<CEventManager>
 {
     CEventManager();
-    bool Init(event_base* base);
+    bool Init(event_base* base, bool bPause = true);
 
 public:
     CreateNewImpl(CEventManager);
@@ -66,6 +66,6 @@ protected:
     std::unordered_map<uint32_t, uint32_t> m_CountEntryByType;
     
     struct event*                      m_pScheduleWaitEvent = nullptr;
-    bool                               m_bPause             = false;
+    std::atomic<bool>                  m_bPause             = false;
 };
 #endif // EventManager_h__

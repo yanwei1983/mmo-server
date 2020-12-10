@@ -301,17 +301,18 @@ enum LogDataType
 struct LoggerInfo
 {
     //! attribute
-    std::string _key;                                       // logger key
-    std::string _name;                                      // one logger one name.
-    std::string _path           = LOG4Z_DEFAULT_PATH;       // path for log file.
-    int32_t     _level          = LOG4Z_DEFAULT_LEVEL;      // filter level
-    bool        _display        = LOG4Z_DEFAULT_DISPLAY;    // display to screen
-    bool        _outfile        = LOG4Z_DEFAULT_OUTFILE;    // output to file
-    bool        _monthdir       = LOG4Z_DEFAULT_MONTHDIR;   // create directory per month
-    uint32_t    _limitsize      = LOG4Z_DEFAULT_LIMITSIZE;  // limit file's size, unit Million byte.
-    bool        _enable         = false;                    // logger is enable
-    bool        _fileLine       = LOG4Z_DEFAULT_SHOWSUFFIX; // enable/disable the log's suffix.(file name:line number)
-    time_t      _logReserveTime = 0;                        // log file reserve time. unit is time second.
+    std::string          _key;                                       // logger key
+    std::string          _name;                                      // one logger one name.
+    std::string          _path           = LOG4Z_DEFAULT_PATH;       // path for log file.
+    std::atomic<int32_t> _level          = LOG4Z_DEFAULT_LEVEL;      // filter level
+    std::atomic<bool>    _enable         = false;                    // logger is enable
+    std::atomic<bool>    _fileLine       = LOG4Z_DEFAULT_SHOWSUFFIX; // enable/disable the log's suffix.(file name:line number)
+   
+    bool                 _display        = LOG4Z_DEFAULT_DISPLAY;    // display to screen
+    bool                 _outfile        = LOG4Z_DEFAULT_OUTFILE;    // output to file
+    bool                 _monthdir       = LOG4Z_DEFAULT_MONTHDIR;   // create directory per month
+    uint32_t             _limitsize      = LOG4Z_DEFAULT_LIMITSIZE;  // limit file's size, unit Million byte.
+    time_t               _logReserveTime = 0;                        // log file reserve time. unit is time second.
     //! runtime info
     time_t                _curFileCreateTime = 0; // file create time
     uint32_t              _curFileIndex      = 0; // rolling file index
@@ -392,7 +393,7 @@ private:
 
     //! config file name
     std::string _configFile;
-
+    std::mutex m_mutex;
     //! logger id manager, [logger name]:[logger id].
     std::map<std::string, LoggerId> _ids;
     // the last used id of _loggers
@@ -1233,6 +1234,7 @@ LoggerId LogerManager::createLogger(const char* key)
     trimLogConfig(copyKey);
 
     LoggerId newID = LOG4Z_INVALID_LOGGER_ID;
+    std::lock_guard<std::mutex> lock(m_mutex);
     {
         std::map<std::string, LoggerId>::iterator iter = _ids.find(copyKey);
         if(iter != _ids.end())
@@ -1247,11 +1249,12 @@ LoggerId LogerManager::createLogger(const char* key)
             showColorText("log4z: CreateLogger can not create|writeover, because loggerid need < LOGGER_MAX! \r\n", LOG_LEVEL_FATAL);
             return LOG4Z_INVALID_LOGGER_ID;
         }
-        newID                   = ++_lastId;
+        newID                   = _lastId+1;
         _ids[copyKey]           = newID;
         _loggers[newID]._enable = true;
         _loggers[newID]._key    = copyKey;
         _loggers[newID]._name   = copyKey;
+        ++_lastId;
     }
 
     return newID;
@@ -1365,6 +1368,7 @@ bool LogerManager::pushLog(LogData* pLog, const char* file, int32_t line)
 //! 查找ID
 LoggerId LogerManager::findLogger(const char* key)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     std::map<std::string, LoggerId>::iterator iter;
     iter = _ids.find(key);
     if(iter != _ids.end())

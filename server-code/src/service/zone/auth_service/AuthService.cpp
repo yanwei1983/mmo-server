@@ -60,7 +60,7 @@ bool CAuthService::Init(const ServerPort& nServerPort)
         tls_pService = nullptr;
     };
 
-    CServiceCommon::Init(nServerPort);
+    CServiceCommon::Init(nServerPort, false);
     auto oldNdc = BaseCode::SetNdc(GetServiceName());
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);

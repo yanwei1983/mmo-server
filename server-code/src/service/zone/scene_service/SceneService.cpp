@@ -117,7 +117,7 @@ bool CSceneService::Init(const ServerPort& nServerPort)
     scope_exit += []() {
         tls_pService = nullptr;
     };
-    CServiceCommon::Init(nServerPort);
+    CServiceCommon::Init(nServerPort, true);
     auto oldNdc = BaseCode::SetNdc(GetServiceName());
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
@@ -539,7 +539,7 @@ void CSceneService::OnLogicThreadExit()
 void CSceneService::OnAllWaitedServiceReady()
 {
     __ENTER_FUNCTION
-
+    GetEventManager()->Pause(false);
     if(SceneService()->IsSharedZone() == false)
     {
         ServerMSG::ServiceReady send;

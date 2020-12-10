@@ -1,0 +1,1 @@
+kill -3 `ps -x | grep bin/binary | grep -v grep | awk '{print $1}'`

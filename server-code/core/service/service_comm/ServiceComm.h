@@ -29,7 +29,7 @@ export_lua class CServiceCommon : public NoncopyableT<CServiceCommon>
 {
 protected:
     CServiceCommon();
-    bool Init(const ServerPort& nServerPort);
+    bool Init(const ServerPort& nServerPort, bool bEventManagerPause = true);
 
 public:
     virtual ~CServiceCommon();
