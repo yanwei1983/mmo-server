@@ -1,0 +1,34 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            
+            "defines": [],
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64",
+            "compilerPath": "/usr/bin/clang++-9",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "includePath": [
+                "${workspaceFolder}/server-code/src/**",
+                "${workspaceFolder}/server-code/core/**"        
+            ],
+            "browse": {
+                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+                "path": [
+                    "${workspaceFolder}/server-code/src/**",
+                    "${workspaceFolder}/server-code/core/**",
+                    "${workspaceFolder}/server-code/depends/src/**",
+                    "/usr/include/c++/",
+                    "/usr/include/x86_64-linux-gnu/",
+                    "/usr/include/x86_64-linux-gnu/c++/",
+                    "/usr/include/linux/",
+                    "/usr/include/"
+                ]
+            }
+            
+            
+        }
+    ],
+    "version": 4
+}
