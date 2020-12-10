@@ -88,6 +88,11 @@ bool CAuthService::Init(const ServerPort& nServerPort)
     return true;
 }
 
+void CAuthService::OnLogicThreadProc()
+{
+    CServiceCommon::OnLogicThreadProc();
+    m_pAuthManager->ProcessResult();
+}
 
 void CAuthService::OnLogicThreadCreate()
 {

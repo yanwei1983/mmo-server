@@ -27,7 +27,6 @@ TARGET_LINK_LIBRARIES(gm_service
   libservice_comm.so
   librpcservice_comm.so
   libbrpc.so
-  libfmt.so
   pthread
   rt
   dl

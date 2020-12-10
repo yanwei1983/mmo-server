@@ -72,7 +72,7 @@ public:
 
     void _AddResult(result_function_t&& result_func);
 
-    void PorcessResult(int32_t nMaxProcess = -1);
+    void ProcessResult(int32_t nMaxProcess = -1);
 
     bool IsReady() const;
 

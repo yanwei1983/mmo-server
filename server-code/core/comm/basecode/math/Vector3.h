@@ -101,18 +101,18 @@ public:
 
     export_lua inline bool operator==(const Vector3& rkVector) const { return (x == rkVector.x && y == rkVector.y && z == rkVector.z); }
 
-    export_lua inline bool operator!=(const Vector3& rkVector) const { return (x != rkVector.x || y != rkVector.y || z != rkVector.z); }
+    inline bool operator!=(const Vector3& rkVector) const { return (x != rkVector.x || y != rkVector.y || z != rkVector.z); }
 
     // arithmetic operations
-    inline Vector3 operator+(const Vector3& rkVector) const { return Vector3(x + rkVector.x, y + rkVector.y, z + rkVector.z); }
+    export_lua inline Vector3 operator+(const Vector3& rkVector) const { return Vector3(x + rkVector.x, y + rkVector.y, z + rkVector.z); }
 
-    inline Vector3 operator-(const Vector3& rkVector) const { return Vector3(x - rkVector.x, y - rkVector.y, z - rkVector.z); }
+    export_lua inline Vector3 operator-(const Vector3& rkVector) const { return Vector3(x - rkVector.x, y - rkVector.y, z - rkVector.z); }
 
-    inline Vector3 operator*(const float fScalar) const { return Vector3(x * fScalar, y * fScalar, z * fScalar); }
+    export_lua inline Vector3 operator*(const float fScalar) const { return Vector3(x * fScalar, y * fScalar, z * fScalar); }
 
-    inline Vector3 operator*(const Vector3& rhs) const { return Vector3(x * rhs.x, y * rhs.y, z * rhs.z); }
+    export_lua inline Vector3 operator*(const Vector3& rhs) const { return Vector3(x * rhs.x, y * rhs.y, z * rhs.z); }
 
-    inline Vector3 operator/(const float fScalar) const
+    export_lua inline Vector3 operator/(const float fScalar) const
     {
         assert(fScalar != 0.0);
 
@@ -121,7 +121,7 @@ public:
         return Vector3(x * fInv, y * fInv, z * fInv);
     }
 
-    inline Vector3 operator/(const Vector3& rhs) const { return Vector3(x / rhs.x, y / rhs.y, z / rhs.z); }
+    export_lua inline Vector3 operator/(const Vector3& rhs) const { return Vector3(x / rhs.x, y / rhs.y, z / rhs.z); }
 
     inline const Vector3& operator+() const { return *this; }
 

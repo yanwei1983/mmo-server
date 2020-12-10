@@ -29,7 +29,6 @@ TARGET_LINK_LIBRARIES(world_service
  libmydbtable.so 
  libservice_comm.so
  libgamemap.so
- libfmt.so
  pthread
  rt
  dl

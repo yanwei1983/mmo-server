@@ -233,7 +233,7 @@ void CWorkerThread::_AddResult(result_function_t&& result_func)
     m_ResultList.push(std::move(result_func));
 }
 
-void CWorkerThread::PorcessResult(int32_t nMaxProcess)
+void CWorkerThread::ProcessResult(int32_t nMaxProcess)
 {
     // call by main thread
     int32_t               nProcessed = 0;

@@ -27,7 +27,6 @@ TARGET_LINK_LIBRARIES(aoi_service
  libmyproto.so 
  libservice_comm.so 
  libgamemap.so 
- libfmt.so
  pthread
  rt
  dl

@@ -18,7 +18,6 @@ TARGET_LINK_LIBRARIES(db_tester
  libmydb.so
  libmysqlclient.a
  libmydbtable.so
- libfmt.so
  ssl
  crypto
  z

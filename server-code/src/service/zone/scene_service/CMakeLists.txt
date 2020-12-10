@@ -61,7 +61,6 @@ TARGET_LINK_LIBRARIES(scene_service
  libservice_comm.so 
  libgamemap.so 
  libscript.so
- libfmt.so
  pthread
  rt
  dl

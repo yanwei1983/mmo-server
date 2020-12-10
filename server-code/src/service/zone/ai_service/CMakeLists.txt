@@ -58,7 +58,6 @@ TARGET_LINK_LIBRARIES(ai_service
  libservice_comm.so 
  libgamemap.so 
  libscript.so
- libfmt.so
  pthread
  rt
  dl

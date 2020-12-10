@@ -18,7 +18,6 @@ TARGET_LINK_LIBRARIES(db_check
  libmydb.so
  libmysqlclient.a
  libmydbtable.so
- libfmt.so
  crypto_comm
  ssl
  crypto

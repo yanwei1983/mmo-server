@@ -253,8 +253,12 @@ function SendMove(client)
 	local info = g_clientinfo[client:GetClientID()];
 	send_msg.scene_idx=info.scene_idx;
 	local target_pos = info.target_pos;
+	if(target_pos == nil)then
+		info.target_pos = Vector2(info.record_posx, info.record_posx);
+		target_pos = info.target_pos;
+	end
 	local cur_pos = Vector2(info.posx, info.posy);
-	local dis = GameMath.distance(record_pos, cur_pos);
+	local dis = GameMath.distance(target_pos, cur_pos);
 	if dis < 0.1 then
 		target_pos.x = info.record_posx + random_float(-10, 10);
 		target_pos.y = info.record_posy + random_float(-10, 10);

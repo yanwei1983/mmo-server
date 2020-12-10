@@ -21,7 +21,6 @@ TARGET_LINK_LIBRARIES(service_loader
  libevent_extra.so
  libmessage_route.so
  libbasecode.so
- libfmt.so
  protobuf
  pthread
  ssl

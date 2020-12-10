@@ -30,7 +30,6 @@ TARGET_LINK_LIBRARIES(gmproxy_service
  libmyproto.so 
  libservice_comm.so 
  librpcservice_comm.so
- libfmt.so
  pthread
  brpc
  rt

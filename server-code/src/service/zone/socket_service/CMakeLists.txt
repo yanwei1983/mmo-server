@@ -15,14 +15,12 @@ set_target_properties(socket_service PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 #指定库输出路径
 SET(LIBRARY_OUTPUT_PATH ${LIBRARIES})
-ADD_DEPENDENCIES(socket_service basecode network myproto service_comm)
+ADD_DEPENDENCIES(socket_service basecode network service_comm)
 # 指定额外的链接库
 TARGET_LINK_LIBRARIES(socket_service
  libbasecode.so 
- libnetwork.so 
- libmyproto.so 
  libservice_comm.so
- libfmt.so
+ libnetwork.so 
  pthread
  rt
  dl

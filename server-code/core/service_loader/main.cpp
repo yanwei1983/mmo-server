@@ -92,6 +92,19 @@ std::mutex                 g_tem_mutex;
 int32_t                    savefd_out = -1;
 int32_t                    savefd_err = -1;
 std::string                start_service_set;
+
+void destory_all()
+{
+    if(g_pLoader)
+    {
+        g_pLoader->Destory();
+        plock->unlock();
+        plock.reset();
+        BaseCode::StopLog();
+        SAFE_DELETE(g_pLoader);
+        stop_jemalloc_backgroud_thread();
+    }
+}
 //////////////////////////////////////////////////////////////////////////
 void sig_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
 {
@@ -101,20 +114,12 @@ void sig_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
     {
         return;
     }
-    if(g_pLoader)
-    {
-        g_pLoader->Destory();
-        stop_jemalloc_backgroud_thread();
-        if(savefd_out != -1)
-            dup2(savefd_out, STDOUT_FILENO);
-        if(savefd_err != -1)
-            dup2(savefd_err, STDERR_FILENO);
-        fmt::print("service {} destory.\n", start_service_set);
-        plock->unlock();
-        plock.reset();
-        BaseCode::StopLog();
-        SAFE_DELETE(g_pLoader);
-    }
+    destory_all();
+    if(savefd_out != -1)
+        dup2(savefd_out, STDOUT_FILENO);
+    if(savefd_err != -1)
+        dup2(savefd_err, STDERR_FILENO);
+    fmt::print("service {} destory.\n", start_service_set);
     __LEAVE_FUNCTION
     exit(1);
     // std::quick_exit(1);
@@ -149,7 +154,6 @@ void sig_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
 //
 //	return (0);				/* success */
 //}
-
 
 
 int32_t main(int32_t argc, char* argv[])
@@ -212,7 +216,6 @@ int32_t main(int32_t argc, char* argv[])
     BaseCode::InitLog(logpath, log_lev);
     BaseCode::SetNdc("service_loader");
     g_pLoader = new ServiceLoader();
-
     if(opt.has("--start"))
         start_service_set = opt["--start"];
 
@@ -241,12 +244,8 @@ int32_t main(int32_t argc, char* argv[])
 
     if(g_pLoader->Load(setting_filename, nWorldID, create_service_set) == false)
     {
-        g_pLoader->Destory();
-        plock->unlock();
-        plock.reset();
-        BaseCode::StopLog();
+        destory_all();
         fmt::print(stderr, "service {} load fail.\n", start_service_set);
-        SAFE_DELETE(g_pLoader);
         exit(-1);
     }
     fmt::print("service {} load succ.\n", start_service_set);
@@ -254,12 +253,8 @@ int32_t main(int32_t argc, char* argv[])
     FILE* pStdOutFile = fopen((logpath + "/stdout.log").c_str(), "w+");
     if(pStdOutFile == NULL)
     {
-        g_pLoader->Destory();
-        plock->unlock();
-        plock.reset();
-        BaseCode::StopLog();
+        destory_all();
         fmt::print(stderr, "open stdout.log fail.\n");
-        SAFE_DELETE(g_pLoader);
         exit(-1);
     }
 
@@ -290,7 +285,7 @@ int32_t main(int32_t argc, char* argv[])
     }
 
 
-
+    
     BaseCode::InitMonitorLog("comm");
     while(true)
     {

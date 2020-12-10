@@ -97,18 +97,18 @@ public:
 
     export_lua inline bool operator==(const Vector2& rkVector) const { return (x == rkVector.x && y == rkVector.y); }
 
-    export_lua inline bool operator!=(const Vector2& rkVector) const { return (x != rkVector.x || y != rkVector.y); }
+    inline bool operator!=(const Vector2& rkVector) const { return (x != rkVector.x || y != rkVector.y); }
 
     // arithmetic operations
-    inline Vector2 operator+(const Vector2& rkVector) const { return Vector2(x + rkVector.x, y + rkVector.y); }
+    export_lua inline Vector2 operator+(const Vector2& rkVector) const { return Vector2(x + rkVector.x, y + rkVector.y); }
 
-    inline Vector2 operator-(const Vector2& rkVector) const { return Vector2(x - rkVector.x, y - rkVector.y); }
+    export_lua inline Vector2 operator-(const Vector2& rkVector) const { return Vector2(x - rkVector.x, y - rkVector.y); }
 
-    inline Vector2 operator*(const float fScalar) const { return Vector2(x * fScalar, y * fScalar); }
+    export_lua inline Vector2 operator*(const float fScalar) const { return Vector2(x * fScalar, y * fScalar); }
 
-    inline Vector2 operator*(const Vector2& rhs) const { return Vector2(x * rhs.x, y * rhs.y); }
+    export_lua inline Vector2 operator*(const Vector2& rhs) const { return Vector2(x * rhs.x, y * rhs.y); }
 
-    inline Vector2 operator/(const float fScalar) const
+    export_lua inline Vector2 operator/(const float fScalar) const
     {
         assert(fScalar != 0.0);
 
@@ -117,7 +117,7 @@ public:
         return Vector2(x * fInv, y * fInv);
     }
 
-    inline Vector2 operator/(const Vector2& rhs) const { return Vector2(x / rhs.x, y / rhs.y); }
+    export_lua inline Vector2 operator/(const Vector2& rhs) const { return Vector2(x / rhs.x, y / rhs.y); }
 
     inline const Vector2& operator+() const { return *this; }
 

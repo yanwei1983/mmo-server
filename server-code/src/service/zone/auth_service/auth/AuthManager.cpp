@@ -1,6 +1,5 @@
 #include "AuthManager.h"
 
-#include <brpc/channel.h>
 
 #include "AuthService.h"
 #include "GMManager.h"
@@ -8,10 +7,22 @@
 #include "MsgProcessRegister.h"
 #include "msg/world_service.pb.h"
 #include "server_msg/server_side.pb.h"
+#include <curlpp/cURLpp.hpp>
+#include <curlpp/Easy.hpp>
+#include <curlpp/Options.hpp>
+#include <curlpp/Infos.hpp>
+
+#include <sstream>
 
 const char* AUTH_URL = "https://example.com";
+constexpr const char* AUTH_SERVER_SIGNATURE = "test";
+constexpr int32_t     AUTH_KEY_CANUSE_SECS  = 180;
 
-CAuthManager::CAuthManager() {}
+
+CAuthManager::CAuthManager() 
+{
+    curlpp::initialize();
+}
 
 CAuthManager::~CAuthManager()
 {
@@ -20,110 +31,84 @@ CAuthManager::~CAuthManager()
 
 void CAuthManager::Destory()
 {
-    for(auto [k,v] : m_AuthList)
+    if(m_threadAuth)
     {
-        brpc::StartCancel(brpc::CallId{v});
+        m_threadAuth->Stop();
+        m_threadAuth->Join();
+        m_threadAuth.reset();
     }
-    for(auto [k,v] : m_AuthList)
-    {
-        brpc::Join(brpc::CallId{v});
-    }
-    m_pAuthChannel.reset();
 }
 
 bool CAuthManager::Init(CAuthService* pService)
 {
-    m_pAuthChannel = std::make_unique<brpc::Channel>();
-    brpc::ChannelOptions options;
-    options.protocol = brpc::PROTOCOL_HTTP;
-    options.connection_type = brpc::CONNECTION_TYPE_POOLED;
-    options.timeout_ms = 50000 /*milliseconds*/; // 5s
-    options.max_retry  = 3;
-
-    // options.ssl_options.enable = true;
-    if(m_pAuthChannel->Init(AUTH_URL, "", &options) != 0)
-    {
-        LOGERROR("Fail to initialize AuthUrl:{}", AUTH_URL);
-        return false;
-    }
-
+    m_threadAuth = std::make_unique<CWorkerThread>("auth_thread");
     return true;
 }
 
-bool CAuthManager::IsAuthing(const std::string& openid) const
+bool CAuthManager::IsAuthing(const VirtualSocket& vs) const
 {
-    return m_AuthList.find(openid) != m_AuthList.end();
+    return m_AuthDataList.find(vs) != m_AuthDataList.end();
 }
 
 bool CAuthManager::Auth(const std::string& openid, const std::string& auth, const VirtualSocket& vs)
 {
     __ENTER_FUNCTION
-    brpc::Controller* cntl     = new brpc::Controller;
-    cntl->http_request().uri() = AUTH_URL;
-    cntl->http_request().set_method(brpc::HTTP_METHOD_POST);
-    std::string post_data = fmt::format(FMT_STRING("open_id={}&auth={}"), openid, auth);
-    cntl->request_attachment().append(post_data);
-    auto call_id       = cntl->call_id().value;
-    m_AuthList[openid] = call_id;
-    m_AuthVSList[vs]   = call_id;
-    auto& auth_data    = m_AuthDataList[call_id];
-    auth_data.open_id  = openid;
-    auth_data.from     = vs;
 
-    struct local
-    {
-        static void _OnAuthResult(brpc::Controller* cntl, CAuthManager* pThis, uint64_t call_id)
+    auto& auth_data    = m_AuthDataList[vs];
+    auth_data.open_id  = openid;
+    auth_data.from     = vs;  
+
+
+    m_threadAuth->AddJob([this, openid_ = openid, auth_ = auth, vs_ = vs]() {
+        try
         {
-            if(cntl->Failed())
-            {
-                pThis->_AddResult(std::bind(&CAuthManager::_OnAuthFail, pThis, call_id, cntl->ErrorText()));
-            }
-            else if(cntl->http_response().status_code() != brpc::HTTP_STATUS_OK)
+            curlpp::Easy request;
+
+            using namespace curlpp::Options;
+            request.setOpt(Url(AUTH_URL));
+            std::string post_data = fmt::format(FMT_STRING("open_id={}&auth={}"), openid_, auth_);
+            request.setOpt(PostFields(post_data));
+            request.perform();
+
+            auto response_code = curlpp::infos::ResponseCode::get(request);
+            constexpr uint32_t HTTP_OK = 200;
+            if(response_code != HTTP_OK)
             {
                 std::stringstream buf;
-                buf << cntl->response_attachment();
-                pThis->_AddResult(std::bind(&CAuthManager::_OnAuthFail, pThis, call_id, buf.str()));
+                buf << request;
+                m_threadAuth->_AddResult(std::bind(&CAuthManager::_OnAuthFail, this, vs_,buf.str()));
             }
             else
             {
-                pThis->_AddResult(std::bind(&CAuthManager::_OnAuthSucc, pThis, call_id));
+                m_threadAuth->_AddResult(std::bind(&CAuthManager::_OnAuthSucc, this, vs_));
             }
+            
         }
-    };
-    google::protobuf::Closure* done = brpc::NewCallback(&local::_OnAuthResult, cntl, this, call_id);
+        catch(curlpp::LogicError& e)
+        {
+         
+            m_threadAuth->_AddResult(std::bind(&CAuthManager::_OnAuthFail, this, vs_, e.what()));
+        }
+        catch(curlpp::RuntimeError& e)
+        {
+            m_threadAuth->_AddResult(std::bind(&CAuthManager::_OnAuthFail, this, vs_, e.what()));
+        }
+    });
 
-    m_pAuthChannel->CallMethod(NULL, cntl, NULL, NULL, done);
-    if(cntl->Failed())
-    {
-        LOGERROR("Fail to callMethod Auth:{}", AUTH_URL);
-        return false;
-    }
 
     return true;
     __LEAVE_FUNCTION
     return false;
 }
 
-void CAuthManager::_AddResult(std::function<void()>&& result_func)
+void CAuthManager::ProcessResult()
 {
-    // call by worker thread
-    m_ResultList.push(std::move(result_func));
+    m_threadAuth->ProcessResult();
 }
 
-void CAuthManager::PorcessResult()
+void CAuthManager::_OnAuthFail(const VirtualSocket& vs, const std::string& str_detail)
 {
-    // call by main thread
-
-    std::function<void()> result_func;
-    while(m_ResultList.get(result_func))
-    {
-        result_func();
-    }
-}
-
-void CAuthManager::_OnAuthFail(uint64_t call_id, const std::string& str_detail)
-{
-    auto it = m_AuthDataList.find(call_id);
+    auto it = m_AuthDataList.find(vs);
     if(it == m_AuthDataList.end())
         return;
     auto& auth_data = it->second;
@@ -134,14 +119,12 @@ void CAuthManager::_OnAuthFail(uint64_t call_id, const std::string& str_detail)
     msg.set_detail(str_detail);
     AuthService()->SendMsgToVirtualSocket(auth_data.from, msg);
 
-    m_AuthList.erase(auth_data.open_id);
-    m_AuthVSList.erase(auth_data.from);
     m_AuthDataList.erase(it);
 }
 
-void CAuthManager::_OnAuthSucc(uint64_t call_id)
+void CAuthManager::_OnAuthSucc(const VirtualSocket& vs)
 {
-    auto it = m_AuthDataList.find(call_id);
+    auto it = m_AuthDataList.find(vs);
     if(it == m_AuthDataList.end())
         return;
     auto& auth_data = it->second;
@@ -159,35 +142,19 @@ void CAuthManager::_OnAuthSucc(uint64_t call_id)
     result_msg.set_last_succ_key(md5str);
     AuthService()->SendMsgToVirtualSocket(auth_data.from, result_msg);
 
-    m_AuthList.erase(auth_data.open_id);
-    m_AuthVSList.erase(auth_data.from);
     m_AuthDataList.erase(it);
 }
 
 void CAuthManager::CancleAuth(const VirtualSocket& vs)
 {
-    auto it = m_AuthVSList.find(vs);
-    if(it == m_AuthVSList.end())
+    auto it = m_AuthDataList.find(vs);
+    if(it == m_AuthDataList.end())
         return;
 
-    auto call_id = it->second;
-    auto it_data = m_AuthDataList.find(call_id);
-    if(it_data == m_AuthDataList.end())
-        return;
+    LOGLOGIN("Actor:{} AuthCancle.", it->second.open_id);
 
-    const auto& open_id = it_data->second.open_id;
-    auto        it_auth = m_AuthList.find(open_id);
-    if(it_auth == m_AuthList.end())
-        return;
-    LOGLOGIN("Actor:{} AuthCancle.", open_id);
-    m_AuthVSList.erase(it);
-    m_AuthList.erase(it_auth);
-    m_AuthDataList.erase(it_data);
+    m_AuthDataList.erase(it);
 }
-
-void CAuthManager::OnAuthThreadCreate() {}
-
-void CAuthManager::OnAuthThreadFinish() {}
 
 bool CAuthManager::CheckProgVer(const std::string& prog_ver) const
 {
@@ -202,9 +169,9 @@ ON_SERVERMSG(CAuthService, SocketClose)
 ON_MSG(CAuthService, CS_LOGIN)
 {
     CHECK(msg.openid().empty() == false);
-    if(AuthManager()->IsAuthing(msg.openid()))
+    if(AuthManager()->IsAuthing(pMsg->GetFrom()))
     {
-        LOGLOGIN("Actor:{} IsAleardyInAuth.", msg.openid().c_str());
+        LOGLOGIN("VS:{} Actor:{} IsAleardyInAuth.", pMsg->GetFrom(), msg.openid());
 
         //当前正在验证，通知客户端
         SC_LOGIN result_msg;

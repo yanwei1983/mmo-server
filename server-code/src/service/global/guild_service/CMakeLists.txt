@@ -26,7 +26,6 @@ TARGET_LINK_LIBRARIES(guild_service
  libmyproto.so 
  libmydbtable.so 
  libservice_comm.so  
- libfmt.so
  pthread
  rt
  dl

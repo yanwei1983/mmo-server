@@ -1236,6 +1236,7 @@ void visit_contnet(Visitor_Content* pContent, std::string& os, std::string& os_s
                 }
 
                 if(refData.is_static)
+                {
                     snprintf(szBuf,
                              4096,
                              "lua_tinker::class_def_static<%s>(L, \"%s\",&%s%s);\n",
@@ -1243,14 +1244,32 @@ void visit_contnet(Visitor_Content* pContent, std::string& os, std::string& os_s
                              v.first.c_str(),
                              (pContent->getAccessPrifix() + v.first).c_str(),
                              def_params.c_str());
+                }
                 else
-                    snprintf(szBuf,
-                             4096,
-                             "lua_tinker::class_def<%s>(L, \"%s\",&%s%s);\n",
-                             pContent->getAccessName().c_str(),
-                             function_name_conver(v.first).c_str(),
-                             (pContent->getAccessPrifix() + v.first).c_str(),
-                             def_params.c_str());
+                {
+                    std::string new_func_name = function_name_conver(v.first);
+                    if(new_func_name == v.first)
+                    {
+                        snprintf(szBuf,
+                                 4096,
+                                 "lua_tinker::class_def<%s>(L, \"%s\",&%s%s);\n",
+                                 pContent->getAccessName().c_str(),
+                                 new_func_name.c_str(),
+                                 (pContent->getAccessPrifix() + v.first).c_str(),
+                                 def_params.c_str());
+                    }
+                    else
+                    {
+                        snprintf(szBuf,
+                                 4096,
+                                 "lua_tinker::class_def<%s>(L, \"%s\",(%s)&%s%s);\n",
+                                 pContent->getAccessName().c_str(),
+                                 new_func_name.c_str(),
+                                 refData.funcptr_type.c_str(),
+                                 (pContent->getAccessPrifix() + v.first).c_str(),
+                                 def_params.c_str());
+                    }
+                }
                 os += szBuf;
             }
             else

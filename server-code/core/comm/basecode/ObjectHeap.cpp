@@ -46,8 +46,6 @@ CObjectHeap::CObjectHeap(const std::string& szClassName, size_t OneSize)
     , m_lNumAllocsInHeap(0)
     , m_lMaxAllocsInHeap(0)
 {
-    BaseCode::MyLogMsg("objheap",  true, __FILE__, __LINE__, "ObjectHeap {} create", m_strName.c_str());
-
 #if defined(HEAP_DEBUG)
     m_setCallFrame = new CALLFRAME_NODE;
 #endif
@@ -57,7 +55,7 @@ CObjectHeap::~CObjectHeap()
 {
     if(m_lNumAllocsInHeap != 0)
     {
-        BaseCode::MyLogMsg("objheap",  true, __FILE__, __LINE__, "ObjectHeap {} was not clear:{}", m_strName.c_str(), m_lNumAllocsInHeap.load());
+        BaseCode::MyLogMsg("objheap",  true, __FILE__, __LINE__, "ObjectHeap {} was not clear:{} {:p}", m_strName.c_str(), m_lNumAllocsInHeap.load(), (void*)this);
 
 #if defined(HEAP_DEBUG)
         {
@@ -71,7 +69,6 @@ CObjectHeap::~CObjectHeap()
 #endif
     }
 
-    BaseCode::MyLogMsg("objheap",  true, __FILE__, __LINE__, "ObjectHeap {} destory", m_strName.c_str());
 }
 
 bool CObjectHeap::IsValidPt(void* p)

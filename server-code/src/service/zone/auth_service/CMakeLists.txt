@@ -15,16 +15,12 @@ set_target_properties(auth_service PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 #指定库输出路径
 SET(LIBRARY_OUTPUT_PATH ${LIBRARIES})
-ADD_DEPENDENCIES(auth_service basecode network mydb myproto mydbtable service_comm)
+ADD_DEPENDENCIES(auth_service basecode service_comm)
 # 指定额外的链接库
 TARGET_LINK_LIBRARIES(auth_service
  libbasecode.so 
- libmydb.so 
- libmyproto.so 
- libmydbtable.so 
  libservice_comm.so  
- libfmt.so
- brpc
+ libcurlpp.so
  pthread
  rt
  dl

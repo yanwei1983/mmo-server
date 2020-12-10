@@ -19,7 +19,6 @@ ADD_DEPENDENCIES(rpcservice_comm basecode)
 TARGET_LINK_LIBRARIES(rpcservice_comm
  libbasecode.so
  libbrpc.so
- libfmt.so
  pthread
  rt
  dl

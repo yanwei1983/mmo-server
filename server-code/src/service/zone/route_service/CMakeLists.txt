@@ -25,7 +25,6 @@ TARGET_LINK_LIBRARIES(route_service
  libmydbtable.so 
  libservice_comm.so  
  libgamemap.so
- libfmt.so
  pthread
  rt
  dl

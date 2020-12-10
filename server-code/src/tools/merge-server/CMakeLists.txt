@@ -18,7 +18,6 @@ TARGET_LINK_LIBRARIES(merge-server
  libmydb.so
  libmysqlclient.a
  libmydbtable.so
- libfmt.so
  crypto_comm
  ssl
  crypto
