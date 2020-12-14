@@ -254,18 +254,30 @@ function SendMove(client)
 	send_msg.scene_idx=info.scene_idx;
 	local target_pos = info.target_pos;
 	if(target_pos == nil)then
-		info.target_pos = Vector2(info.record_posx, info.record_posx);
+		info.target_pos = Vector2(info.record_posx, info.record_posy);
 		target_pos = info.target_pos;
+		print_debugmsg(client, "target_pos x:", target_pos.x, ",y:", target_pos.y);
 	end
 	local cur_pos = Vector2(info.posx, info.posy);
 	local dis = GameMath.distance(target_pos, cur_pos);
+	print_debugmsg(client, "dis:", dis);
 	if dis < 0.1 then
-		target_pos.x = info.record_posx + random_float(-10, 10);
-		target_pos.y = info.record_posy + random_float(-10, 10);
+		if target_pos.x > 10 then
+			target_pos.x = info.record_posx + random_float(-10, 10);
+		else
+			target_pos.x = info.record_posx + random_float(0, 20);
+		end
+		if target_pos.y > 10 then
+			target_pos.y = info.record_posy + random_float(-10, 10);
+		else
+			target_pos.y = info.record_posy + random_float(0, 20);
+		end
+		print_debugmsg(client, "target_new_pos x:", target_pos.x, ",y:", target_pos.y);
 	end
-	local dir = cur_pos - target_pos;
-	dir.normalise();
-	local new_pos = dir * random_float(0.5, 2.0);
+	local dir = target_pos - cur_pos;
+	local new_dis = dir:normalise();
+	--print_debugmsg(client, "dir_normalise x:", dir.x, ",y:", dir.y);
+	local new_pos = cur_pos + dir * random_float(math.min(new_dis,0.2), 1.5);
 
 	send_msg.x = new_pos.x;
 	send_msg.y = new_pos.y;
@@ -280,7 +292,7 @@ end
 
 InitBaseCodeInLua(this_lua);
 g_clientinfo = {} or g_clientinfo;
-g_print_debug = false
+g_print_debug = true
 function print_clientmsg(client,...)
 	print(string.format("[%s]", client:GetClientID()), ...)
 end
@@ -293,6 +305,10 @@ end
 function main(start_idx, max_players)
 	
 	print("enter main start:",start_idx, " to ", start_idx+max_players-1)
+	if(max_players > 1) then
+		g_print_debug = false
+	end
+
 	for i=start_idx,max_players+start_idx-1 do
 		local ip = "172.28.1.254";
 		local port_list = {18031,18032};
