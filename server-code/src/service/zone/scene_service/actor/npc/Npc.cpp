@@ -176,10 +176,9 @@ void CNpc::ActiveNpc(CPlayer* pPlayer)
     if(find)
     {
         ScriptManager()->ExecStackScriptFunc<void>(this);
-        
+
         return;
-        
-    }  
+    }
 
     _ActiveNpc(pPlayer);
     __LEAVE_FUNCTION

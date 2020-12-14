@@ -10,7 +10,6 @@
 #include "ObjectHeap.h"
 #include "lua_tinker.h"
 
-
 class CLUAScriptManager : public NoncopyableT<CLUAScriptManager>
 {
 public:
@@ -19,7 +18,12 @@ public:
 
 private:
     CLUAScriptManager();
-    bool Init(const std::string& name, InitRegisterFunc func, void* pInitParam, const char* search_path = "script", const char* main_file_name = "main.lua", bool bExecMain = true);
+    bool Init(const std::string& name,
+              InitRegisterFunc   func,
+              void*              pInitParam,
+              const char*        search_path    = "script",
+              const char*        main_file_name = "main.lua",
+              bool               bExecMain      = true);
 
 public:
     CreateNewImpl(CLUAScriptManager);
@@ -40,7 +44,7 @@ public:
     void    SetLuaGCStepTick(int32_t val) { m_nLuaGCStepTick = val; }
 
 public:
-    void RegistScriptType(uint32_t idScriptType, const std::string& table_name);
+    void               RegistScriptType(uint32_t idScriptType, const std::string& table_name);
     const std::string& ScriptTypeToName(uint32_t idScriptType) const;
 
     //注册一个函数回调名
@@ -58,12 +62,10 @@ public:
         std::string funcName = fmt::format("{}[{}].{}", ScriptTypeToName(idScriptType), idScript, FuncName);
 
         return _ExecScript<RVal>(funcName.c_str(), std::forward<Args>(args)...);
-         __LEAVE_FUNCTION
+        __LEAVE_FUNCTION
         return RVal();
     }
 
-    
-    
     bool QueryScriptFunc(uint32_t idScriptType, uint64_t idScript, const std::string& FuncName);
 
     template<typename RVal, typename... Args>
@@ -78,12 +80,11 @@ public:
         {
             CHECK_RETTYPE(lua_isfunction(m_pLua, -1), RVal);
         }
-        
+
         return lua_tinker::call_stackfunc<RVal>(m_pLua, std::forward<Args>(args)...);
         __LEAVE_FUNCTION
         return RVal();
     }
-
 
     template<typename RVal, typename... Args>
     RVal TryExecScript(uint32_t idScriptType, uint64_t idScript, const std::string& FuncName, Args&&... args)
@@ -97,17 +98,17 @@ public:
         if(table_ref_ptr == nullptr)
             return RVal();
         auto table_onstack = table_ref_ptr->push_table_to_stack();
-        bool succ = table_onstack.get_to_stack(FuncName.data());
+        bool succ          = table_onstack.get_to_stack(FuncName.data());
         if(succ == false)
             return RVal();
-        
+
         auto func = lua_tinker::detail::stack_obj::get_top(m_pLua);
         if(func.is_function() == false)
         {
             func.remove();
             return RVal();
         }
-        
+
         return lua_tinker::call_stackfunc<RVal>(m_pLua, std::forward<Args>(args)...);
         __LEAVE_FUNCTION
         return RVal();
@@ -125,6 +126,7 @@ public:
         __LEAVE_FUNCTION
         return RVal();
     }
+
 private:
     const lua_tinker::table_ref* QueryScriptTable(const std::string& table_name) const;
 
@@ -141,8 +143,8 @@ private:
 
 private:
     std::unordered_map<uint32_t, std::unordered_set<uint64_t> > m_Data;
-    std::unordered_map<uint32_t, std::string> m_ScriptTableName;
-    
+    std::unordered_map<uint32_t, std::string>                   m_ScriptTableName;
+
     std::unordered_map<std::string, lua_tinker::table_ref> m_script_table;
 };
 

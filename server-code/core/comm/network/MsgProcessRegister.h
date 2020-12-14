@@ -7,8 +7,8 @@
 #include <utility>
 
 #include "BaseCode.h"
-#include "NetworkMessage.h"
 #include "NetMSGProcess.h"
+#include "NetworkMessage.h"
 
 template<class T, class FuncType>
 void ProcessMsg(CNetworkMessage* pMsg, FuncType func)

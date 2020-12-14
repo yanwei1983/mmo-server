@@ -21,7 +21,7 @@ void CPlayer::SendAttribToClient()
     __LEAVE_FUNCTION
 }
 
-void CPlayer::RecalcAttrib(bool bClearCache /*= false*/, bool bNotify  /*= true */)
+void CPlayer::RecalcAttrib(bool bClearCache /*= false*/, bool bNotify /*= true */)
 {
     __ENTER_FUNCTION
     if(bClearCache == true)
@@ -33,7 +33,7 @@ void CPlayer::RecalcAttrib(bool bClearCache /*= false*/, bool bNotify  /*= true 
     }
 
     CActor::RecalcAttrib(bClearCache, bNotify);
-    
+
     SendAttribToClient();
 
     __LEAVE_FUNCTION

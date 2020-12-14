@@ -1,8 +1,8 @@
 #include "Common.pb.h"
 #include "ScriptManager.h"
 #include "msg/ts_cmd.pb.h"
-#include "pb_luahelper.h"
 #include "msg/zone_service.pb.h"
+#include "pb_luahelper.h"
 
 extern void ai2lua(lua_State* L);
 

@@ -47,7 +47,7 @@ namespace lua_tinker
                 return stack_obj(L, lua_gettop(L));
             }
 
-            void    reset(int32_t nIdx = 0){_stack_pos = nIdx;}
+            void reset(int32_t nIdx = 0) { _stack_pos = nIdx; }
 
             bool    is_vaild() const { return _stack_pos != 0; }
             int32_t get_type() const { return is_vaild() && lua_type(L, _stack_pos); }
@@ -100,10 +100,7 @@ namespace lua_tinker
                     lua_pushvalue(L, _stack_pos);
             }
 
-            bool is_top() const
-            {
-                return lua_gettop(L) == _stack_pos;
-            }
+            bool is_top() const { return lua_gettop(L) == _stack_pos; }
 
             stack_obj get_lenobj() const
             {

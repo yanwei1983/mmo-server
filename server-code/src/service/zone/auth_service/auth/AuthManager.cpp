@@ -1,5 +1,11 @@
 #include "AuthManager.h"
 
+#include <sstream>
+
+#include <curlpp/Easy.hpp>
+#include <curlpp/Infos.hpp>
+#include <curlpp/Options.hpp>
+#include <curlpp/cURLpp.hpp>
 
 #include "AuthService.h"
 #include "GMManager.h"
@@ -7,19 +13,12 @@
 #include "MsgProcessRegister.h"
 #include "msg/world_service.pb.h"
 #include "server_msg/server_side.pb.h"
-#include <curlpp/cURLpp.hpp>
-#include <curlpp/Easy.hpp>
-#include <curlpp/Options.hpp>
-#include <curlpp/Infos.hpp>
 
-#include <sstream>
-
-const char* AUTH_URL = "https://example.com";
+const char*           AUTH_URL              = "https://example.com";
 constexpr const char* AUTH_SERVER_SIGNATURE = "test";
 constexpr int32_t     AUTH_KEY_CANUSE_SECS  = 180;
 
-
-CAuthManager::CAuthManager() 
+CAuthManager::CAuthManager()
 {
     curlpp::initialize();
 }
@@ -54,10 +53,9 @@ bool CAuthManager::Auth(const std::string& openid, const std::string& auth, cons
 {
     __ENTER_FUNCTION
 
-    auto& auth_data    = m_AuthDataList[vs];
-    auth_data.open_id  = openid;
-    auth_data.from     = vs;  
-
+    auto& auth_data   = m_AuthDataList[vs];
+    auth_data.open_id = openid;
+    auth_data.from    = vs;
 
     m_threadAuth->AddJob([this, openid_ = openid, auth_ = auth, vs_ = vs]() {
         try
@@ -70,23 +68,22 @@ bool CAuthManager::Auth(const std::string& openid, const std::string& auth, cons
             request.setOpt(PostFields(post_data));
             request.perform();
 
-            auto response_code = curlpp::infos::ResponseCode::get(request);
-            constexpr uint32_t HTTP_OK = 200;
+            auto               response_code = curlpp::infos::ResponseCode::get(request);
+            constexpr uint32_t HTTP_OK       = 200;
             if(response_code != HTTP_OK)
             {
                 std::stringstream buf;
                 buf << request;
-                m_threadAuth->_AddResult(std::bind(&CAuthManager::_OnAuthFail, this, vs_,buf.str()));
+                m_threadAuth->_AddResult(std::bind(&CAuthManager::_OnAuthFail, this, vs_, buf.str()));
             }
             else
             {
                 m_threadAuth->_AddResult(std::bind(&CAuthManager::_OnAuthSucc, this, vs_));
             }
-            
         }
         catch(curlpp::LogicError& e)
         {
-         
+
             m_threadAuth->_AddResult(std::bind(&CAuthManager::_OnAuthFail, this, vs_, e.what()));
         }
         catch(curlpp::RuntimeError& e)
@@ -94,7 +91,6 @@ bool CAuthManager::Auth(const std::string& openid, const std::string& auth, cons
             m_threadAuth->_AddResult(std::bind(&CAuthManager::_OnAuthFail, this, vs_, e.what()));
         }
     });
-
 
     return true;
     __LEAVE_FUNCTION

@@ -3,13 +3,12 @@
 #include "CheckUtil.h"
 #include "MessageRoute.h"
 #include "NetServerSocket.h"
-#include "NetworkService.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
+#include "NetworkService.h"
 #include "msg_internal.pb.h"
 
-CMessagePort::CMessagePort()
-{}
+CMessagePort::CMessagePort() {}
 
 bool CMessagePort::Init(const ServerPort& nServerPort, CMessageRoute* pRoute)
 {
@@ -37,7 +36,7 @@ void CMessagePort::Destory()
     {
         auto socket_idx_list_copy = m_SocketIdxList;
         m_SocketIdxList.clear();
-        for(auto socket_idx : socket_idx_list_copy)
+        for(auto socket_idx: socket_idx_list_copy)
         {
             if(socket_idx != INVALID_SOCKET_IDX)
             {
@@ -45,7 +44,7 @@ void CMessagePort::Destory()
             }
         }
     }
-    
+
     m_pRemoteSocket.reset();
     m_pPortEventHandler = nullptr;
     __LEAVE_FUNCTION
@@ -59,16 +58,15 @@ bool CMessagePort::TakePortMsg(CNetworkMessage*& msg)
     return false;
 }
 
-void CMessagePort::OnBindSocket(const CNetSocketSharedPtr& pSocket) 
+void CMessagePort::OnBindSocket(const CNetSocketSharedPtr& pSocket)
 {
     m_SocketIdxList.insert(pSocket->GetSocketIdx());
 }
 
-void CMessagePort::OnUnbindSocket(const CNetSocketSharedPtr& pSocket) 
+void CMessagePort::OnUnbindSocket(const CNetSocketSharedPtr& pSocket)
 {
     m_SocketIdxList.erase(pSocket->GetSocketIdx());
 }
-
 
 void CMessagePort::OnStartConnect(const CNetSocketSharedPtr& pSocket)
 {
@@ -91,7 +89,6 @@ void CMessagePort::OnConnected(const CNetSocketSharedPtr& pSocket)
         pHandler->OnPortConnected(pSocket);
     }
 
-    
     __LEAVE_FUNCTION
 }
 
@@ -103,7 +100,7 @@ void CMessagePort::OnConnectFailed(const CNetSocketSharedPtr& pSocket)
     {
         pHandler->OnPortConnectFailed(pSocket);
     }
-    
+
     __LEAVE_FUNCTION
 }
 
@@ -133,7 +130,6 @@ void CMessagePort::OnClosing(const CNetSocketSharedPtr& pSocket)
     LOGNETTRACE("MessagePort:{} OnClosing {}:{}", GetServerPort().GetServiceID(), pSocket->GetAddrString(), pSocket->GetPort());
 }
 
- 
 void CMessagePort::OnAccepted(const CNetSocketSharedPtr& pSocket)
 {
     __ENTER_FUNCTION
@@ -168,7 +164,7 @@ void CMessagePort::DetachRemoteSocket()
         pSocket->DetachEventHandler();
     else
         m_pRemoteSocket.reset();
-    
+
     __LEAVE_FUNCTION
 }
 
@@ -222,7 +218,7 @@ size_t CMessagePort::GetWriteBufferSize()
     if(auto shared_ptr = m_pRemoteSocket.lock())
     {
         size_t nNeedWrite = shared_ptr->GetWaitWriteSize();
-        return nNeedWrite;       
+        return nNeedWrite;
     }
     __LEAVE_FUNCTION
     return 0;
@@ -265,7 +261,6 @@ void CMessagePort::_SendMsgToRemoteSocket(const CNetworkMessage& msg)
     if(auto shared_ptr = m_pRemoteSocket.lock())
         m_pRoute->GetNetworkService()->SendSocketMsgByIdx(shared_ptr->GetSocketIdx(), send_msg, false);
 
-    
     __LEAVE_FUNCTION
 }
 
@@ -283,7 +278,6 @@ bool CMessagePort::SendMsgToPort(const CNetworkMessage& msg)
             pHandler->OnPortRecvData(*pMsg);
         }
         return true;
-
     }
     else
     {

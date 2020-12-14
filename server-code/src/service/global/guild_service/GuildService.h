@@ -26,7 +26,6 @@ public:
 public:
     virtual void OnLogicThreadCreate() override;
 
-
     CGuildManager*    GetGuildManager() const { return m_pGuildManager.get(); }
     CMysqlConnection* GetGlobalDB() const { return m_pGlobalDB.get(); }
 

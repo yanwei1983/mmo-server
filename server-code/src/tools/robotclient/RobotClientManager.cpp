@@ -6,8 +6,8 @@
 #include "NetworkMessage.h"
 #include "RobotClient.h"
 #include "msg/ts_cmd.pb.h"
-#include "pb_luahelper.h"
 #include "msg/zone_service.pb.h"
+#include "pb_luahelper.h"
 
 void export_to_lua(lua_State* L, void* pManager)
 {
@@ -18,7 +18,7 @@ void export_to_lua(lua_State* L, void* pManager)
     lua_tinker::class_def<RobotClientManager>(L, "RegisterCMD", &RobotClientManager::RegisterCMD);
     lua_tinker::class_def<RobotClientManager>(L, "GetProcessCMD", &RobotClientManager::GetProcessCMD);
     lua_tinker::class_def<RobotClientManager>(L, "GetClientCount", &RobotClientManager::GetClientCount);
-    lua_tinker::class_def<RobotClientManager>(L, "AddTimedCallback", &RobotClientManager::AddTimedCallback); 
+    lua_tinker::class_def<RobotClientManager>(L, "AddTimedCallback", &RobotClientManager::AddTimedCallback);
     lua_tinker::set(L, "robot_manager", (RobotClientManager*)pManager);
 
     pb_luahelper::init_lua(L);
@@ -28,7 +28,7 @@ void export_to_lua(lua_State* L, void* pManager)
     pb_luahelper::export_protobuf_enum_to_lua(L, PK_MODE_descriptor());
     pb_luahelper::export_protobuf_enum_to_lua(L, TalkChannel_descriptor());
     pb_luahelper::export_protobuf_enum_to_lua(L, TaskState_descriptor());
-    
+
     pb_luahelper::export_protobuf_enum_to_lua(L, CS_CMD_descriptor());
     pb_luahelper::export_protobuf_enum_to_lua(L, SC_CMD_descriptor());
 }
@@ -64,7 +64,7 @@ RobotClientManager::~RobotClientManager()
 RobotClientPtr RobotClientManager::ConnectServer(const char* addr, int32_t port)
 {
     RobotClientPtr pClient = std::make_shared<RobotClient>(this);
-    auto pSocket = AsyncConnectTo(addr, port, pClient);
+    auto           pSocket = AsyncConnectTo(addr, port, pClient);
     if(pSocket.expired())
     {
         return nullptr;
@@ -78,16 +78,13 @@ void RobotClientManager::DelClient(const RobotClientPtr& pClient)
     m_setClient.erase(pClient);
 }
 
-
-
 void RobotClientManager::AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name, bool bPersist)
 {
     __ENTER_FUNCTION
 
     CEventEntryCreateParam param;
     param.evType = 0;
-    param.cb     = [this, _func_name = func_name]() 
-    {
+    param.cb     = [this, _func_name = func_name]() {
         ExecScript<void>(_func_name.c_str(), this);
     };
     param.tWaitTime = tIntervalMS;

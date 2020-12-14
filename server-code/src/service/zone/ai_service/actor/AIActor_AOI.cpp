@@ -23,7 +23,7 @@ void CAIActor::AddToViewList(CSceneObject* pActor)
 void CAIActor::RemoveFromViewList(CSceneObject* pActor, OBJID idActor, bool bErase)
 {
     __ENTER_FUNCTION
-    CSceneObject::RemoveFromViewList(pActor,idActor,bErase);
+    CSceneObject::RemoveFromViewList(pActor, idActor, bErase);
 
     LOGACTORDEBUG(GetID(), "ViewList del:{} size:{}", idActor, GetCurrentViewActorCount());
     __LEAVE_FUNCTION

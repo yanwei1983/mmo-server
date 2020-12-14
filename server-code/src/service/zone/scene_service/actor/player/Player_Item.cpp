@@ -132,7 +132,7 @@ bool CPlayer::UseItem(uint32_t nGridInBag, uint32_t nCount /* = 1*/)
         if(nCanUseCount < nCount)
             nCount = nCanUseCount;
 
-        bool find = ScriptManager()->QueryScriptFunc(SCRIPT_ITEM,pItemType->GetScriptID(), "OnBatchUseCheck");
+        bool find = ScriptManager()->QueryScriptFunc(SCRIPT_ITEM, pItemType->GetScriptID(), "OnBatchUseCheck");
         if(find)
         {
             nCount = ScriptManager()->ExecStackScriptFunc<uint32_t>(pItem, nCount, this);

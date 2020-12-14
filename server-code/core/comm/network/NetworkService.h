@@ -19,7 +19,7 @@
 #include "Thread.h"
 
 constexpr uint16_t INVALID_SOCKET_IDX = 0xFFFF;
-constexpr uint16_t MAX_SOCKET_IDX = 0x8000;
+constexpr uint16_t MAX_SOCKET_IDX     = 0x8000;
 
 struct event_base;
 struct event;
@@ -28,18 +28,17 @@ struct lws_context;
 
 class CNetSocket;
 using CNetSocketSharedPtr = std::shared_ptr<CNetSocket>;
-using CNetSocketWeakPtr = std::weak_ptr<CNetSocket>;
+using CNetSocketWeakPtr   = std::weak_ptr<CNetSocket>;
 class CNetWebSocket;
 class CNetEventHandler;
 using CNetEventHandlerSharedPtr = std::shared_ptr<CNetEventHandler>;
-using CNetEventHandlerWeakPtr = std::weak_ptr<CNetEventHandler>;
+using CNetEventHandlerWeakPtr   = std::weak_ptr<CNetEventHandler>;
 class CServerSocket;
 using CServerSocketSharedPtr = std::shared_ptr<CServerSocket>;
-using CServerSocketWeakPtr = std::weak_ptr<CServerSocket>;
+using CServerSocketWeakPtr   = std::weak_ptr<CServerSocket>;
 class CClientSocket;
 using CClientSocketSharedPtr = std::shared_ptr<CClientSocket>;
-using CClientSocketWeakPtr = std::weak_ptr<CClientSocket>;
-
+using CClientSocketWeakPtr   = std::weak_ptr<CClientSocket>;
 
 class CNetworkService
 {
@@ -57,27 +56,27 @@ public:
     CServerSocketWeakPtr ConnectTo(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect = false);
     //异步连接到一个目标地址
     CServerSocketWeakPtr AsyncConnectTo(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect = false);
-    bool           _AsyncReconnect(const CServerSocketSharedPtr& pSocket);
+    bool                 _AsyncReconnect(const CServerSocketSharedPtr& pSocket);
 
     void BreakLoop();
     //开启独立的IO线程
-    void StartIOThread(const std::string&    thread_name,
+    void StartIOThread(const std::string&      thread_name,
                        std::function<void()>&& time_out_func = std::function<void()>(),
-                       uint32_t              time_out_ms   = 60 * 60,
-                       const ServiceID&      idService     = 0);
+                       uint32_t                time_out_ms   = 60 * 60,
+                       const ServiceID&        idService     = 0);
     void OnIOThreadTimeOut();
 
     //读取IO一次，如果开启了独立IO线程则不需调用
     void RunOnce();
 
-    virtual CServerSocketSharedPtr       CreateServerSocket(const CNetEventHandlerSharedPtr& pHandle, bool bAutoReconnect);
-    virtual CClientSocketSharedPtr       CreateClientSocket(const CNetEventHandlerSharedPtr& pHandle);
-    struct evhttp*               GetHttpHandle() const { return m_pHttpHandle; }
-    bool                         GetIPCheck() const { return m_bIPCheck; }
-    void                         SetIPCheck(bool val) { m_bIPCheck = val; }
-    size_t                       GetIPCheckNum() const { return m_nIPCheckNum; }
-    void                         SetIPCheckNum(size_t val) { m_nIPCheckNum = val; }
-    MPSCQueue<CNetworkMessage*>& _GetMessageQueue() { return m_MessageQueue; }
+    virtual CServerSocketSharedPtr CreateServerSocket(const CNetEventHandlerSharedPtr& pHandle, bool bAutoReconnect);
+    virtual CClientSocketSharedPtr CreateClientSocket(const CNetEventHandlerSharedPtr& pHandle);
+    struct evhttp*                 GetHttpHandle() const { return m_pHttpHandle; }
+    bool                           GetIPCheck() const { return m_bIPCheck; }
+    void                           SetIPCheck(bool val) { m_bIPCheck = val; }
+    size_t                         GetIPCheckNum() const { return m_nIPCheckNum; }
+    void                           SetIPCheckNum(size_t val) { m_nIPCheckNum = val; }
+    MPSCQueue<CNetworkMessage*>&   _GetMessageQueue() { return m_MessageQueue; }
 
 public:
     static void accept_conn_cb(evconnlistener*, int32_t fd, struct sockaddr* addr, int32_t socklen, void* arg);
@@ -87,8 +86,8 @@ public:
     void OnAccept(int32_t fd, struct sockaddr* addr, int32_t, evconnlistener* listener);
 
 public:
-    event_base*    GetEVBase() const { return m_pBase; }
-    size_t         GetSocketAmount();
+    event_base* GetEVBase() const { return m_pBase; }
+    size_t      GetSocketAmount();
     // socket广播消息
     void BrocastMsg(const CNetworkMessage& msg, SOCKET execpt_this);
     //直接发送Socket消息
@@ -113,31 +112,30 @@ public:
     void _ReleaseSocket(const CNetSocketSharedPtr& pSocket);
 
 public:
-    bool _AllocSocketIdx(const CNetSocketSharedPtr& pSocket);
-    void _ReleaseSocketIdx(const CNetSocketSharedPtr& pSocket);
+    bool                _AllocSocketIdx(const CNetSocketSharedPtr& pSocket);
+    void                _ReleaseSocketIdx(const CNetSocketSharedPtr& pSocket);
     CNetSocketSharedPtr QuerySocketByIdx(uint16_t nSocketIdx);
 
 public:
     void JoinIOThread();
 
 private:
-    void _ProceseClosingSocket();
+    void                      _ProceseClosingSocket();
     CNetEventHandlerSharedPtr QueryListenerEventHander(evconnlistener* listener);
+
 protected:
-    event_base*                                     m_pBase;
-    std::map<evconnlistener*, CNetEventHandlerWeakPtr>    m_setListener;
-    struct evhttp*                                  m_pHttpHandle = nullptr;
-    std::function<void(struct evhttp_request* req)> m_funcOnReciveHttp;
-    std::mutex                                      m_mutex;
-    std::mutex                                      m_mutexListener;
+    event_base*                                        m_pBase;
+    std::map<evconnlistener*, CNetEventHandlerWeakPtr> m_setListener;
+    struct evhttp*                                     m_pHttpHandle = nullptr;
+    std::function<void(struct evhttp_request* req)>    m_funcOnReciveHttp;
+    std::mutex                                         m_mutex;
+    std::mutex                                         m_mutexListener;
 
-
-    std::map<SOCKET, CNetSocketSharedPtr>   m_setSocket;
-    std::deque<SocketIdx_t>         m_SocketIdxPool;
+    std::map<SOCKET, CNetSocketSharedPtr>           m_setSocket;
+    std::deque<SocketIdx_t>                         m_SocketIdxPool;
     std::array<CNetSocketSharedPtr, MAX_SOCKET_IDX> m_setSocketByIdx;
 
     std::unordered_set<CNetSocketSharedPtr> m_setConnectingSocket;
-    
 
     MPSCQueue<CNetworkMessage*> m_MessageQueue;
 
@@ -168,6 +166,5 @@ protected:
 
     std::function<void()> m_IOThreadTimeOutFunc;
 };
-
 
 #endif // NetworkService_h__

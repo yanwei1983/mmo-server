@@ -17,9 +17,9 @@ struct memory_status
     uint64_t num_threads  = 0;
     uint64_t back_runtime = 0;
 
-    uint64_t narenas = 0;
-    uint64_t quantum = 0;
-    uint64_t page = 0;
+    uint64_t narenas        = 0;
+    uint64_t quantum        = 0;
+    uint64_t page           = 0;
     uint64_t dirty_decay_ms = 0;
     uint64_t muzzy_decay_ms = 0;
 };

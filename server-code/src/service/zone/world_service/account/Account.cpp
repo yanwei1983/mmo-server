@@ -141,7 +141,7 @@ bool CAccount::CreateActor(const std::string& name, uint32_t dwProf, uint32_t dw
     const CGameMap* pMap = MapManager()->QueryMap(pBornPos->GetMapID());
     CHECKF_V(pMap, pBornPos->GetMapID());
     Vector2 bornPos(pBornPos->GetPosX(), pBornPos->GetPoxY());
-    auto findPos = pMap->FindPosNearby(bornPos, pBornPos->GetRange());
+    auto    findPos = pMap->FindPosNearby(bornPos, pBornPos->GetRange());
     CHECKF(findPos);
     bornPos = findPos.value();
     SceneIdx bornScene(pMap->GetZoneID(), pBornPos->GetMapID(), 0);

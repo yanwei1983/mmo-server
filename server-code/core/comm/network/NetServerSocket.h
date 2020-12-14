@@ -38,6 +38,6 @@ private:
 };
 
 using CServerSocketSharedPtr = std::shared_ptr<CServerSocket>;
-using CServerSocketWeakPtr = std::weak_ptr<CServerSocket>;
+using CServerSocketWeakPtr   = std::weak_ptr<CServerSocket>;
 
 #endif /* NETSERVERSOCKET_H */

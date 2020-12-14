@@ -1,9 +1,7 @@
 #ifndef SERVICECOMM_H
 #define SERVICECOMM_H
 #include "BaseCode.h"
-
 #include "NetworkDefine.h"
-
 #include "ServiceDefine.h"
 #include "UIDFactory.h"
 //#include <google/protobuf/descriptor.pb.h>
@@ -11,7 +9,7 @@
 class CMessageRoute;
 class CMessagePort;
 using CMessagePortSharedPtr = std::shared_ptr<CMessagePort>;
-using CMessagePortWeakPtr = std::weak_ptr<CMessagePort>;
+using CMessagePortWeakPtr   = std::weak_ptr<CMessagePort>;
 class CMonitorMgr;
 class CMysqlConnection;
 class CNetworkService;
@@ -136,8 +134,8 @@ public:
     virtual void OnServiceReadyFromCrash(const ServiceID& service_id) {}
 
 protected:
-    CMessagePortWeakPtr              m_pMessagePort;
-    ServerPort                       m_nServerPort;
+    CMessagePortWeakPtr m_pMessagePort;
+    ServerPort          m_nServerPort;
 
     std::unique_ptr<db::tbld_dbinfo> m_globaldb_info;
     std::unique_ptr<CNormalThread>   m_pLogicThread;

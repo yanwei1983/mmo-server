@@ -18,6 +18,6 @@ public:
     virtual void _OnError(const std::string& what) override;
 };
 using CClientSocketSharedPtr = std::shared_ptr<CClientSocket>;
-using CClientSocketWeakPtr = std::weak_ptr<CClientSocket>;
+using CClientSocketWeakPtr   = std::weak_ptr<CClientSocket>;
 
 #endif /* NETCLIENTSOCKET_H */

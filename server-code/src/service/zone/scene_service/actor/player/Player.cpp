@@ -345,7 +345,7 @@ void CPlayer::OnLogin(bool bLogin, const SceneIdx& idxScene, float fPosX, float 
     else
     {
         LOGACTORDEBUG(GetID(), "CPlayer::OnLoginChangeZone");
-    }   
+    }
 
     if(bLogin)
     {
@@ -443,7 +443,6 @@ void CPlayer::OnLogin(bool bLogin, const SceneIdx& idxScene, float fPosX, float 
     m_fLoadingPosY   = findpos.y;
     m_fLoadingFace   = fFace;
 
-    
     RecalcAttrib(true, false);
     SendPlayerInfoToClient();
     //通知前端读取场景
@@ -619,8 +618,6 @@ void CPlayer::ProcessMsg()
     __LEAVE_FUNCTION
 }
 
-
-
 bool CPlayer::CheckCanMove(const Vector2& posTarget, bool bSet)
 {
     __ENTER_FUNCTION
@@ -641,7 +638,7 @@ bool CPlayer::CheckCanMove(const Vector2& posTarget, bool bSet)
     float can_move_dis = float(passed_time + MOVE_TIME_TOLERANCE) / 1000.0f * move_spd;
     can_move_dis       = std::min(can_move_dis, move_spd);
 
-    float move_dis = GameMath::distance(GetPos(), posTarget);
+    float           move_dis      = GameMath::distance(GetPos(), posTarget);
     constexpr float move_step_min = 0.01f; //最小移动距离
     if(move_dis < move_step_min)
     {
@@ -655,7 +652,7 @@ bool CPlayer::CheckCanMove(const Vector2& posTarget, bool bSet)
         return false;
     }
 
-    return CActor::CheckCanMove( posTarget, bSet);
+    return CActor::CheckCanMove(posTarget, bSet);
     __LEAVE_FUNCTION
     return false;
 }

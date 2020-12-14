@@ -7,8 +7,8 @@
 #include "SceneManager.h"
 #include "SceneService.h"
 #include "SceneTree.h"
-#include "ScriptManager.h"
 #include "ScriptCallBackType.h"
+#include "ScriptManager.h"
 #include "msg/zone_service.pb.h"
 #include "protomsg_to_cmd.h"
 #include "server_msg/server_side.pb.h"
@@ -18,12 +18,12 @@ void CActor::FlyTo(const Vector2& pos)
     __ENTER_FUNCTION
 
     CHECK(GetCurrentScene());
-    CPhase* pPhase = static_cast<CPhase*>(GetCurrentScene());
-    auto findPos = pPhase->FindPosNearby(pos, 2.0f);
+    CPhase* pPhase  = static_cast<CPhase*>(GetCurrentScene());
+    auto    findPos = pPhase->FindPosNearby(pos, 2.0f);
     if(findPos)
     {
         pPhase->LeaveMap(this, pPhase->GetMapID());
-        m_pScene     = nullptr;
+        m_pScene = nullptr;
         pPhase->EnterMap(this, findPos.value().x, findPos.value().y, GetFace());
     }
 

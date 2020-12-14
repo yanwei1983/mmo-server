@@ -216,8 +216,6 @@ const CGMService::HttpRequestHandleFunc* CGMService::QueryHttpRequestHandler(con
     return nullptr;
 }
 
-
-
 void CGMService::OnLogicThreadCreate()
 {
     tls_pService = this;

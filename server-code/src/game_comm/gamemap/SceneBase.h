@@ -44,14 +44,14 @@ public:
     export_lua CSceneObject* QueryPlayer(OBJID idObj) const;
 
     export_lua virtual std::optional<Vector2> FindPosNearby(const Vector2& pos, float range) const;
-    export_lua virtual bool    IsPassDisable(float x, float y, uint32_t actor_type) const;
-    export_lua virtual bool    IsPvPDisable(float x, float y) const;
-    export_lua virtual bool    IsStallDisable(float x, float y) const;
-    export_lua virtual bool    IsPlaceDisable(float x, float y) const;
-    export_lua virtual bool    IsRecordDisable(float x, float y) const;
-    export_lua virtual bool    IsDropDisable(float x, float y) const;
-    export_lua virtual bool    IsPvPFree(float x, float y) const;
-    export_lua virtual bool    IsDeadNoDrop(float x, float y) const;
+    export_lua virtual bool                   IsPassDisable(float x, float y, uint32_t actor_type) const;
+    export_lua virtual bool                   IsPvPDisable(float x, float y) const;
+    export_lua virtual bool                   IsStallDisable(float x, float y) const;
+    export_lua virtual bool                   IsPlaceDisable(float x, float y) const;
+    export_lua virtual bool                   IsRecordDisable(float x, float y) const;
+    export_lua virtual bool                   IsDropDisable(float x, float y) const;
+    export_lua virtual bool                   IsPvPFree(float x, float y) const;
+    export_lua virtual bool                   IsDeadNoDrop(float x, float y) const;
 
     export_lua virtual uint32_t GetSPRegionIdx(float x, float y) const;
     export_lua virtual float    GetHigh(float x, float y) const;

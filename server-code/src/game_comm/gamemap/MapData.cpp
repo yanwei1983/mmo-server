@@ -122,11 +122,10 @@ std::optional<Vector2> CMapData::LineFindCanStand(const Vector2& src, const Vect
     if(xWidth == xDestWidth && yHeight == yDestHeight)
         return dest;
 
-    Vector2 result = src;
-    int32_t last_x = xWidth;
-    int32_t last_y = yHeight;
-    auto test_func = [this, src, dest, &last_x, &last_y, &result](int32_t x, int32_t y) -> bool 
-    {
+    Vector2 result    = src;
+    int32_t last_x    = xWidth;
+    int32_t last_y    = yHeight;
+    auto    test_func = [this, src, dest, &last_x, &last_y, &result](int32_t x, int32_t y) -> bool {
         if(_getGridData(x, y).bPassDisable == true)
         {
             Vector2 pos((float(last_x) + 0.5f) * m_fGirdWidth, (float(last_y) + 0.5f) * m_fGirdHeight);
@@ -178,8 +177,7 @@ std::optional<Vector2> CMapData::LineFindCanJump(const Vector2& src, const Vecto
     int32_t last_y    = yHeight;
     float   last_high = fSrcHigh;
 
-    auto func = [this, src, dest, &result, &last_x, &last_y, &last_high](int32_t x, int32_t y) -> bool
-    {
+    auto func = [this, src, dest, &result, &last_x, &last_y, &last_high](int32_t x, int32_t y) -> bool {
         if(_getGridData(x, y).bPassDisable == true || _getGridData(x, y).bJumpDisable == true)
         {
             Vector2 pos((float(last_x) + 0.5f) * m_fGirdWidth, (float(last_y) + 0.5f) * m_fGirdHeight);

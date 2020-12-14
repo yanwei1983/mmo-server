@@ -9,6 +9,7 @@
 #include "AIService.h"
 #include "AISkill.h"
 #include "AIType.h"
+#include "GameEventDef.h"
 #include "GameMap.h"
 #include "GameMapDef.h"
 #include "HateList.h"
@@ -16,11 +17,10 @@
 #include "ScriptCallBackType.h"
 #include "ScriptManager.h"
 #include "SkillType.h"
-#include "GameEventDef.h"
 #include "config/Cfg_Scene_Patrol.pb.h"
 
 constexpr int32_t MOVE_PER_WAIT_MS = 500; //每500ms向zone发送一次移动消息
-constexpr float DIS_VERY_CLOSE = 0.01f;
+constexpr float   DIS_VERY_CLOSE   = 0.01f;
 
 CActorAI::CActorAI() {}
 
@@ -231,7 +231,7 @@ bool CActorAI::ToIdle()
             return true;
         }
     }
-    
+
     return _ToIdle();
     __LEAVE_FUNCTION
     return false;
@@ -458,7 +458,6 @@ void CActorAI::ProcessAttack()
             return;
         }
     }
-        
 
     _ProcessAttack(pTarget);
     __LEAVE_FUNCTION
@@ -467,7 +466,7 @@ void CActorAI::ProcessAttack()
 void CActorAI::ProcessRandMove()
 {
     __ENTER_FUNCTION
-    if(GameMath::distance(GetActor()->GetPos(),m_posTarget) <= 0.01f)
+    if(GameMath::distance(GetActor()->GetPos(), m_posTarget) <= 0.01f)
     {
         ToIdle();
         return;
@@ -521,7 +520,7 @@ void CActorAI::ProcessApproach()
     float fDis  = vDir.normalise();
     m_posTarget = pTarget->GetPos() + vDir * m_fTargetDis;
 
-    if(GameMath::distance(GetActor()->GetPos(),m_posTarget) > DIS_VERY_CLOSE)
+    if(GameMath::distance(GetActor()->GetPos(), m_posTarget) > DIS_VERY_CLOSE)
     {
         auto result = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
         if(result)
@@ -540,14 +539,14 @@ void CActorAI::ProcessApproach()
     {
         ToSkill();
     }
-    
+
     __LEAVE_FUNCTION
 }
 
 void CActorAI::ProcessEscape()
 {
     __ENTER_FUNCTION
-    if(GameMath::distance(GetActor()->GetPos(),m_posTarget) > DIS_VERY_CLOSE)
+    if(GameMath::distance(GetActor()->GetPos(), m_posTarget) > DIS_VERY_CLOSE)
     {
         auto result = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
         if(result)
@@ -572,7 +571,7 @@ void CActorAI::ProcessEscape()
 void CActorAI::ProcessGoback()
 {
     __ENTER_FUNCTION
-    if(GameMath::distance(GetActor()->GetPos(),m_posTarget) > DIS_VERY_CLOSE)
+    if(GameMath::distance(GetActor()->GetPos(), m_posTarget) > DIS_VERY_CLOSE)
     {
         auto result = PathFind()->SearchStep(m_posTarget, GetActor()->GetMoveSpeed());
         if(result)
@@ -580,11 +579,10 @@ void CActorAI::ProcessGoback()
             GetActor()->MoveToTarget(result.value());
             LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "From {} MoveToTarget {}", GetActor()->GetPos(), result.value());
             AddNextCall(MOVE_PER_WAIT_MS);
-            
         }
         else
         {
-           //没有找到路径
+            //没有找到路径
             // flyto
             GetActor()->FlyTo(m_posTarget);
             LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "From {} FlyTo {}", GetActor()->GetPos(), m_posTarget);
@@ -980,11 +978,10 @@ OBJID CActorAI::SearchEnemy()
     if(find)
     {
         OBJID idTarget = ScriptManager()->ExecStackScriptFunc<OBJID>(this);
-       
+
         LOGAIDEBUG(GetAIData().ai_debug(), GetActor()->GetID(), "AI: TryExecScript SearchEnemy Succ");
         return idTarget;
     }
-
 
     return _SearchEnemy();
 

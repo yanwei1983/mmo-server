@@ -26,11 +26,7 @@ ON_MSG(CAIService, SC_POS_CHANGE)
     CHECK(msg.scene_idx() == pActor->GetCurrentScene()->GetSceneIdx());
 
     pActor->_SetPos(Vector2(msg.posx(), msg.posy()));
-    LOGACTORDEBUG(pActor->GetID(),
-                  "MoveTo {} {:.2f}, {:.2f}",
-                  pActor->GetCurrentScene()->GetMapID(),
-                  pActor->GetPosX(),
-                  pActor->GetPosY());
+    LOGACTORDEBUG(pActor->GetID(), "MoveTo {} {:.2f}, {:.2f}", pActor->GetCurrentScene()->GetMapID(), pActor->GetPosX(), pActor->GetPosY());
     __LEAVE_FUNCTION
 }
 
@@ -62,10 +58,10 @@ ON_SERVERMSG(CAIService, AOIChange)
         {
             pActor->AddToViewList(pTarget);
             pTarget->AddToViewList(pActor);
-        }        
+        }
     }
     LOGACTORDEBUG(pActor->GetID(),
-                  "ViewListChange cur:{} add:{} del:{}",                 
+                  "ViewListChange cur:{} add:{} del:{}",
                   pActor->GetCurrentViewActorCount(),
                   msg.actor_add_size(),
                   msg.actor_del_size());

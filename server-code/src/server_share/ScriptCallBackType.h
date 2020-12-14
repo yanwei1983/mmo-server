@@ -3,8 +3,7 @@
 
 #include "magic_enum.h"
 
-export_lua enum ScriptType
-{
+export_lua enum ScriptType {
     SCRIPT_ITEM,
     SCRIPT_MAP,
     SCRIPT_MONSTER,
@@ -16,6 +15,5 @@ export_lua enum ScriptType
     SCRIPT_AI,
     SCRIPT_MAX
 };
-
 
 #endif /* SCRIPTCALLBACKTYPE_H */

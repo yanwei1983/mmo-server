@@ -11,11 +11,11 @@
 #include "MessagePort.h"
 #include "MessageRoute.h"
 #include "MonitorMgr.h"
+#include "MsgProcessRegister.h"
 #include "MsgWorldProcess.h"
 #include "MysqlConnection.h"
 #include "MysqlTableCheck.h"
 #include "NetMSGProcess.h"
-#include "MsgProcessRegister.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "SystemVars.h"
@@ -94,7 +94,7 @@ bool CWorldService::Init(const ServerPort& nServerPort)
     scope_exit += []() {
         tls_pService = nullptr;
     };
-    CServiceCommon::Init(nServerPort,true);
+    CServiceCommon::Init(nServerPort, true);
     auto oldNdc = BaseCode::SetNdc(GetServiceName());
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
@@ -141,8 +141,6 @@ bool CWorldService::Init(const ServerPort& nServerPort)
     m_pSystemVarSet.reset(CSystemVarSet::CreateNew());
     CHECKF(m_pSystemVarSet.get());
 
-
-
     //设置等待哪些服ready
     GetMessageRoute()->ForeachServiceInfoByWorldID(GetWorldID(), false, [this](const ServerAddrInfo* info) {
         ServiceType_t idServiceType = info->idServiceType;
@@ -156,11 +154,8 @@ bool CWorldService::Init(const ServerPort& nServerPort)
         return true;
     });
 
-
     if(CreateService(100) == false)
         return false;
-
-    
 
     return true;
     __LEAVE_FUNCTION

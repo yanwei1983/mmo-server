@@ -46,16 +46,15 @@ int main(int argc, char** argv)
     __ENTER_FUNCTION
     get_opt opt(argc, (const char**)argv);
 
-    
-    std::string serverinfo_url   = opt["--surl"];
-    uint32_t    zone_id          = atoi(opt["--zone_id"].c_str());
+    std::string serverinfo_url = opt["--surl"];
+    uint32_t    zone_id        = atoi(opt["--zone_id"].c_str());
 
     std::string logpath = "./log/";
     if(opt.has("--logpath"))
     {
         logpath = opt["--logpath"];
     }
-    BaseCode::InitLog(logpath+"/db_check"); 
+    BaseCode::InitLog(logpath + "/db_check");
     BaseCode::SetNdc("db_check");
 
     if(opt.has("--cryptourl"))
@@ -68,8 +67,7 @@ int main(int argc, char** argv)
         fmt::printf("example:  db_check --surl=xxx --zone_id=x --cryptourl --fix --logpath=xxx ");
         return -1;
     }
-    
-    
+
     CMysqlConnection serverinfodb;
     CHECKF(serverinfodb.Connect(serverinfo_url));
     if(opt.has("--fix"))
@@ -84,12 +82,10 @@ int main(int argc, char** argv)
         CHECKF(MysqlTableCheck::CheckAllTable<SERVERINFODB_TABLE_LIST>(&serverinfodb));
         fmt::printf("procrss finish\n");
     }
-    
-    
+
     auto globaldb = ConnectGameDB(&serverinfodb, 0);
     CHECKF(globaldb);
 
-    
     if(opt.has("--fix"))
     {
         fmt::printf("start check and fix GlobalDB and ZoneDB!\n");

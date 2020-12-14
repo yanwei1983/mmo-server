@@ -21,7 +21,6 @@
 #include <typeindex>
 #include <typeinfo>
 
-
 //#include<set>
 #include <map>
 //#include<vector>
@@ -79,7 +78,7 @@ namespace lua_tinker
 
     // close callback func
     typedef std::function<void(lua_State*)> Lua_Close_CallBack_Func;
-    void register_lua_close_callback(lua_State* L, Lua_Close_CallBack_Func&& callback_func);
+    void                                    register_lua_close_callback(lua_State* L, Lua_Close_CallBack_Func&& callback_func);
 
     // error callback
     typedef int32_t (*error_call_back_fn)(lua_State* L);
@@ -542,7 +541,6 @@ namespace lua_tinker
             };
             return detail::pop<RVal>::apply(L);
         }
-           
 
         // push value_list to lua stack //here need a T/T*/T& not a T&&
         void push_args(lua_State* L);
@@ -1748,7 +1746,6 @@ namespace lua_tinker
     RVal dofile(lua_State* L, const char* filename)
     {
 
-
         if(luaL_loadfile(L, filename) != 0)
         {
             print_error(L, "%s", lua_tostring(L, -1));
@@ -1767,7 +1764,7 @@ namespace lua_tinker
     RVal dobuffer(lua_State* L, const char* buff, size_t sz)
     {
         if(luaL_loadbuffer(L, buff, sz, "lua_tinker::dobuffer()") != 0)
-         {
+        {
             print_error(L, "%s", lua_tostring(L, -1));
             return detail::pop_nil<RVal>(L);
         }
@@ -1794,13 +1791,13 @@ namespace lua_tinker
     template<typename RVal, typename... Args>
     RVal call_stackfunc(lua_State* L, Args&&... arg)
     {
-        //top = func
+        // top = func
         lua_getglobal(L, ERROR_CALLBACK_NAME);
-        //top = errfunc | func
-        int32_t errfunc = lua_gettop(L)-1;
+        // top = errfunc | func
+        int32_t errfunc = lua_gettop(L) - 1;
         lua_insert(L, errfunc);
-        //top = func | errfunc 
-        
+        // top = func | errfunc
+
         detail::push_args(L, std::forward<Args>(arg)...);
 
         if(lua_pcall(L, sizeof...(Args), detail::pop<RVal>::nresult, errfunc) != LUA_OK)
@@ -2383,11 +2380,11 @@ namespace lua_tinker
             void dec_ref();
 
             bool validate();
-            
+
             template<typename Key>
             void _push_key(Key&& key)
             {
-                if constexpr(std::is_convertible_v<Key,lua_Integer>)
+                if constexpr(std::is_convertible_v<Key, lua_Integer>)
                 {
                     lua_pushinteger(m_L, key);
                 }
@@ -2454,15 +2451,12 @@ namespace lua_tinker
                         lua_pop(m_L, 1); // pop func
                         print_error(m_L, "lua_tinker::call() attempt to call table[`%d'] (not a function)", key);
                     }
-                    
                 }
 
-                //return nil
+                // return nil
                 return detail::pop_nil<RVal>(m_L);
-                
-                
             }
-            
+
             size_t len() const
             {
                 lua_len(m_L, m_index);
@@ -2621,13 +2615,13 @@ namespace lua_tinker
         template<typename... Args>
         RVal operator()(Args&&... args) const
         {
-            
+
             lua_rawgeti(m_L, LUA_REGISTRYINDEX, m_regidx);
             if(lua_isfunction(m_L, -1) == false)
             {
                 lua_pop(m_L, 1); // pop func
                 print_error(m_L, "lua_tinker::call() attempt to call register_func[`%d'] (not a function)", m_regidx);
-                
+
                 return detail::pop_nil<RVal>(m_L);
             }
             return call_stackfunc<RVal>(m_L, std::forward<Args>(args)...);

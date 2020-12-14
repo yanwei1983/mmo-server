@@ -4,7 +4,6 @@
 #include "ActorManager.h"
 #include "ActorStatusSet.h"
 #include "CoolDown.h"
-
 #include "GameEventDef.h"
 #include "GameLog.h"
 #include "Monster.h"
@@ -411,11 +410,11 @@ void CActor::RecalcAttrib(bool bClearCache /*= false*/, bool bNotify /* = true *
     }
     if(GetHP() > GetHPMax())
     {
-        SetProperty(PROP_HP, GetHPMax(), (bNotify)?SYNC_ALL_DELAY:SYNC_FALSE);
+        SetProperty(PROP_HP, GetHPMax(), (bNotify) ? SYNC_ALL_DELAY : SYNC_FALSE);
     }
     if(GetMP() > GetMPMax())
     {
-        SetProperty(PROP_MP, GetMPMax(), (bNotify)?SYNC_TRUE:SYNC_FALSE);
+        SetProperty(PROP_MP, GetMPMax(), (bNotify) ? SYNC_TRUE : SYNC_FALSE);
     }
     __LEAVE_FUNCTION
 }
@@ -433,7 +432,7 @@ bool CActor::CheckCanMove(const Vector2& posTarget, bool bSet)
         LOGACTORTRACE(GetID(), "move to from x:{} y:{} to x:{} y:{} pass_disable", GetPos().x, GetPos().y, posTarget.x, posTarget.y);
         return false;
     }
-    uint32_t now         = TimeGetMonotonic();
+    uint32_t now = TimeGetMonotonic();
     if(bSet)
         SetLastMoveTime(now);
     return true;
@@ -461,8 +460,6 @@ bool CActor::ForceMoveTo(const Vector2& posTarget)
         SceneService()->SendProtoMsgToAIService(msg);
 
     UpdateViewList(false);
-    
-
 
     m_pStatusSet->OnMove();
     return true;
@@ -490,8 +487,6 @@ bool CActor::MoveTo(const Vector2& posTarget, bool bCheckMove)
         SceneService()->SendProtoMsgToAIService(msg);
 
     UpdateViewList(false);
-    
-
 
     m_pStatusSet->OnMove();
     return true;

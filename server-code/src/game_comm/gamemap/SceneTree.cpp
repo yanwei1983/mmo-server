@@ -45,9 +45,14 @@ bool CSceneTree::Init(const CGameMap* pMap, const CPos2D& vBasePos, float fWidth
         m_setCollision.resize(pMapData->GetGirdCount());
     }
 
-    LOGDEBUG("CSceneTree::Init {:p} MapData:{},width:{},height{},BasePos:{},{} GridRange:{}", 
-            (void*)this,
-            pMapData->GetMapTemplateID(), m_fWidth, m_fHeight, m_BasePos.x, m_BasePos.y, m_nTileDefaultGridRange);
+    LOGDEBUG("CSceneTree::Init {:p} MapData:{},width:{},height{},BasePos:{},{} GridRange:{}",
+             (void*)this,
+             pMapData->GetMapTemplateID(),
+             m_fWidth,
+             m_fHeight,
+             m_BasePos.x,
+             m_BasePos.y,
+             m_nTileDefaultGridRange);
     return true;
 }
 
@@ -218,8 +223,12 @@ void CSceneTree::_SetSceneTileGridRange(uint32_t val)
         LOGERROR("map size error!!!!! width = {}, height = {}", pMapData->GetWidth(), pMapData->GetHeight());
         return;
     }
-    
-    LOGDEBUG("map:{} resize  ViewIn:{} ViewOut:{} Tiles:{}", pMapData->GetMapTemplateID(),  m_nViewRangeIn, m_nViewRangeOut, m_nTileWidth * m_nTileHeight);
+
+    LOGDEBUG("map:{} resize  ViewIn:{} ViewOut:{} Tiles:{}",
+             pMapData->GetMapTemplateID(),
+             m_nViewRangeIn,
+             m_nViewRangeOut,
+             m_nTileWidth * m_nTileHeight);
 
     m_setTile.resize(m_nTileWidth * m_nTileHeight);
 

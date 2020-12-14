@@ -3,7 +3,7 @@
 #define RESUME_SIG  SIGUSR2
 #define SUSPEND_SIG SIGUSR1
 
-static thread_local int32_t  suspended = 0; // per-thread flag
+static thread_local int32_t suspended = 0; // per-thread flag
 
 void resume_handler(int32_t sig, siginfo_t* pInfo, void* pVoid)
 {
@@ -25,8 +25,8 @@ void suspend_handler(int32_t sig, siginfo_t* pInfo, void* pVoid)
     } while(suspended);
 }
 
-CNormalThread::CNormalThread(int32_t                    nWorkIntervalMS,
-                             const std::string&         thread_name /*= std::string()*/,
+CNormalThread::CNormalThread(int32_t                      nWorkIntervalMS,
+                             const std::string&           thread_name /*= std::string()*/,
                              on_thread_event_function_t&& on_thread_process_func /*= on_thread_event_function_t()*/,
                              on_thread_event_function_t&& on_thread_create_func /*= on_thread_event_function_t()*/,
                              on_thread_event_function_t&& on_thread_finish_func /*= on_thread_event_function_t() */)
@@ -78,14 +78,13 @@ void CNormalThread::ThreadFunc()
 {
     __ENTER_FUNCTION
     SetTid(pthread_self());
-    
+
     //允许线程处理SUSPEND_SIG和RESUME_SIG
     sigset_t unblock_mask;
     sigemptyset(&unblock_mask);
     sigaddset(&unblock_mask, SUSPEND_SIG);
     sigaddset(&unblock_mask, RESUME_SIG);
     pthread_sigmask(SIG_UNBLOCK, &unblock_mask, NULL);
-
 
     struct sigaction sa;
     sigfillset(&sa.sa_mask);

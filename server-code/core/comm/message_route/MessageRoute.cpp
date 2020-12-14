@@ -7,8 +7,8 @@
 #include "MysqlTableCheck.h"
 #include "NetClientSocket.h"
 #include "NetServerSocket.h"
-#include "NetworkService.h"
 #include "NetSocket.h"
+#include "NetworkService.h"
 #include "NormalCrypto.h"
 #include "serverinfodb.h"
 
@@ -58,7 +58,7 @@ void CMessageRoute::Destory()
     LOGDEBUG("MessageRoute BreakLoop.");
     m_pNetworkService->BreakLoop();
     m_pNetworkService->JoinIOThread();
-    
+
     m_setServerInfoByWorldID.clear();
     m_setServerInfo.clear();
     m_MergeList.clear();
@@ -551,7 +551,6 @@ CMessagePortSharedPtr CMessageRoute::_ConnectRemoteServer(const ServerPort& nSer
         LOGFATAL("CMessageRoute::ConnectRemoteServer AsyncConnectTo {}:{} fail", info.route_addr.c_str(), info.route_port);
         return nullptr;
     }
-    
 
     LOGMESSAGE("CMessageRoute::ConnectRemoteServer:{}, {}:{}", nServerPort, info.route_addr.c_str(), info.route_port);
 

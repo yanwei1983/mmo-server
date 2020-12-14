@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
                    result.metadata / 1024.0f / 1024.0f,
                    result.metadata_thp / 1024.0f / 1024.0f,
                    result.num_threads,
-                   result.back_runtime/1000/1000);
+                   result.back_runtime / 1000 / 1000);
 
         LOGMONITOR("CNetSocket:{} CNetworkMessage: {}", CNetSocket::s_Heap.GetAllocedSize(), CNetworkMessage::s_Heap.GetAllocedSize());
         LOGMONITOR("ProtobufMessageWarp:{} ConstProtobufMessageWarp:{} ConstRepeatedProtobufMessageWarp:{} ",

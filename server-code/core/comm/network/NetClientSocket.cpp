@@ -2,6 +2,7 @@
 
 #include <event2/bufferevent.h>
 #include <event2/event.h>
+
 #include "NetEventHandler.h"
 #include "NetworkMessage.h"
 #include "NetworkService.h"
@@ -74,6 +75,6 @@ void CClientSocket::OnAccepted()
 {
     __ENTER_FUNCTION
     if(auto event_handler = m_pEventHandler.lock())
-            event_handler->OnAccepted(shared_from_this());
+        event_handler->OnAccepted(shared_from_this());
     __LEAVE_FUNCTION
 }

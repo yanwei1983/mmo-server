@@ -80,7 +80,12 @@ void LogLuaDebug(const char* txt)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
-bool CLUAScriptManager::Init(const std::string& name, InitRegisterFunc func, void* pInitParam, const char* search_path /*= "script"*/, const char* main_file_name /*= "main.lua"*/, bool bExecMain)
+bool CLUAScriptManager::Init(const std::string& name,
+                             InitRegisterFunc   func,
+                             void*              pInitParam,
+                             const char*        search_path /*= "script"*/,
+                             const char*        main_file_name /*= "main.lua"*/,
+                             bool               bExecMain)
 {
     m_pInitRegisterFunc = func;
     m_pInitParam        = pInitParam;
@@ -114,7 +119,7 @@ bool CLUAScriptManager::Init(const std::string& name, InitRegisterFunc func, voi
     {
         m_pInitRegisterFunc(m_pLua, m_pInitParam);
     }
-    
+
     if(search_path)
     {
         lua_tinker::table_onstack table(m_pLua, "package");
@@ -186,13 +191,11 @@ void CLUAScriptManager::FullGC()
     lua_gc(m_pLua, LUA_GCCOLLECT, 0);
 }
 
-
 void CLUAScriptManager::RegistScriptType(uint32_t idScriptType, const std::string& table_name)
 {
-    m_ScriptTableName.emplace(idScriptType,table_name);
+    m_ScriptTableName.emplace(idScriptType, table_name);
     auto stack_obj = lua_tinker::detail::stack_obj::new_table(m_pLua);
     stack_obj.set_to_global(table_name.c_str());
-
 
     CHECK(m_script_table.count(table_name) == 0);
 
@@ -225,15 +228,13 @@ bool CLUAScriptManager::IsRegisted(uint32_t idScriptType, uint64_t idScript) con
     const auto& refSet = it_find->second;
     if(refSet.count(idScript) > 0)
     {
-        return true; 
+        return true;
     }
     else
     {
         return false;
     }
-    
 }
-
 
 const lua_tinker::table_ref* CLUAScriptManager::QueryScriptTable(const std::string& table_name) const
 {
@@ -241,7 +242,7 @@ const lua_tinker::table_ref* CLUAScriptManager::QueryScriptTable(const std::stri
     auto it = m_script_table.find(table_name);
     if(it != m_script_table.end())
         return &it->second;
-    
+
     __LEAVE_FUNCTION
     return nullptr;
 }
@@ -255,14 +256,14 @@ bool CLUAScriptManager::QueryScriptFunc(uint32_t idScriptType, uint64_t idScript
         return false;
     auto table_ref_ptr = QueryScriptTable(ScriptTypeToName(idScriptType));
     CHECKF(table_ref_ptr);
-        
+
     auto table_onstack = table_ref_ptr->push_table_to_stack();
-    bool succ = table_onstack.get_to_stack(FuncName.data());
+    bool succ          = table_onstack.get_to_stack(FuncName.data());
     if(succ == true)
     {
         if(lua_isfunction(m_pLua, -1) == true)
             return true;
-        
+
         lua_pop(m_pLua, 1);
     }
 

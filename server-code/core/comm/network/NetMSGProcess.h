@@ -42,6 +42,7 @@ public:
         }
         return std::to_string(cmd);
     }
+
 private:
     std::unordered_map<uint16_t, MessageHandler> m_FuncMap;
     std::unordered_map<uint16_t, std::string>    m_CmdNameMap;

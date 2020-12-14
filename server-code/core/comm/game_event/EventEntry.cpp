@@ -65,7 +65,7 @@ void CEventEntry::Cancel()
             event_del(m_pevTimer);
             m_pManager->SubRunningEventCount();
         }
-        m_pCallBack = nullptr; 
+        m_pCallBack = nullptr;
     }
     __LEAVE_FUNCTION
 }
@@ -84,7 +84,6 @@ bool CEventEntry::IsWaitTrigger() const
     return false;
 }
 
-
 bool CEventEntry::IsVaild() const
 {
     return m_pevTimer && m_pCallBack;
@@ -99,16 +98,16 @@ void CEventEntry::Clear()
         event_del(m_pevTimer);
         m_pManager->SubRunningEventCount();
     }
-    m_pCallBack = nullptr; 
+    m_pCallBack = nullptr;
     __LEAVE_FUNCTION
 }
 
 void CEventEntry::Set(const CEventEntryCreateParam& param)
 {
-    m_evType        = param.evType;
-    m_pCallBack     = param.cb;
-    m_tWaitTime     = param.tWaitTime;
-    m_bPersist      = param.bPersist;
+    m_evType    = param.evType;
+    m_pCallBack = param.cb;
+    m_tWaitTime = param.tWaitTime;
+    m_bPersist  = param.bPersist;
 }
 
 void CEventEntry::Release()
@@ -121,7 +120,7 @@ void CEventEntry::Release()
     {
         m_pManager->_DeleteManagedEvent(this_ptr);
     }
-     
+
     m_pManager->ReleaseEvent(this_ptr);
 
     __LEAVE_FUNCTION
@@ -167,9 +166,9 @@ bool CEventEntry::CreateEvTimer(event_base* base)
 void CEventEntry::Trigger()
 {
     __ENTER_FUNCTION
-   
+
     if(m_pCallBack)
-    {       
+    {
         auto call_back = m_pCallBack;
         call_back();
     }
@@ -307,7 +306,6 @@ void CEventEntryQueue::ClearByType(uint32_t evType)
         {
             it++;
         }
-        
     }
     __LEAVE_FUNCTION
 }
@@ -315,7 +313,7 @@ void CEventEntryQueue::ClearByType(uint32_t evType)
 void CEventEntryQueue::Clear_IF(const std::function<bool(const CEventEntrySharedPtr&)>& func)
 {
     __ENTER_FUNCTION
-    for(auto it = m_setEntry.begin(); it != m_setEntry.end(); )
+    for(auto it = m_setEntry.begin(); it != m_setEntry.end();)
     {
         CEventEntrySharedPtr pEntry = it->lock();
         if(pEntry && func(pEntry) == true)
@@ -327,7 +325,6 @@ void CEventEntryQueue::Clear_IF(const std::function<bool(const CEventEntryShared
         {
             it++;
         }
-        
     }
     __LEAVE_FUNCTION
 }

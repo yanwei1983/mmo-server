@@ -10,19 +10,19 @@
 #include "AISkill.h"
 #include "AIType.h"
 #include "EventManager.h"
+#include "GameEventDef.h"
 #include "MapManager.h"
 #include "MemoryHelp.h"
 #include "MessagePort.h"
 #include "MessageRoute.h"
 #include "MonitorMgr.h"
 #include "MonsterType.h"
-#include "NetMSGProcess.h"
 #include "MsgProcessRegister.h"
+#include "NetMSGProcess.h"
 #include "NetworkMessage.h"
-#include "server_msg/server_side.pb.h"
-#include "ScriptManager.h"
 #include "ScriptCallBackType.h"
-#include "GameEventDef.h"
+#include "ScriptManager.h"
+#include "server_msg/server_side.pb.h"
 
 static thread_local CAIService* tls_pService;
 CAIService*                     AIService()
@@ -123,7 +123,7 @@ bool CAIService::Init(const ServerPort& nServerPort)
     uint32_t FrameInterval = 1000 / FrameCount;
     if(CreateService(FrameInterval) == false)
         return false;
-    
+
     ServerMSG::ServiceReady msg;
     msg.set_serverport(GetServerPort());
 
@@ -151,11 +151,8 @@ void CAIService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(),
-                           get_thread_memory_allocted());
-        buf += fmt::format(FMT_STRING("\nEvent:{}\tActive:{}"),
-                           EventManager()->GetEventCount(),
-                           EventManager()->GetRunningEventCount());
+                          fmt::format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(), get_thread_memory_allocted());
+        buf += fmt::format(FMT_STRING("\nEvent:{}\tActive:{}"), EventManager()->GetEventCount(), EventManager()->GetRunningEventCount());
 
         for(const auto& [k, v]: EventManager()->GetCountEntryByManagerType())
         {
@@ -191,4 +188,3 @@ void CAIService::OnLogicThreadCreate()
     tls_pService = this;
     CServiceCommon::OnLogicThreadCreate();
 }
-

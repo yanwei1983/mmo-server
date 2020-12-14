@@ -55,7 +55,14 @@ CObjectHeap::~CObjectHeap()
 {
     if(m_lNumAllocsInHeap != 0)
     {
-        BaseCode::MyLogMsg("objheap",  true, __FILE__, __LINE__, "ObjectHeap {} was not clear:{} {:p}", m_strName.c_str(), m_lNumAllocsInHeap.load(), (void*)this);
+        BaseCode::MyLogMsg("objheap",
+                           true,
+                           __FILE__,
+                           __LINE__,
+                           "ObjectHeap {} was not clear:{} {:p}",
+                           m_strName.c_str(),
+                           m_lNumAllocsInHeap.load(),
+                           (void*)this);
 
 #if defined(HEAP_DEBUG)
         {
@@ -68,7 +75,6 @@ CObjectHeap::~CObjectHeap()
         }
 #endif
     }
-
 }
 
 bool CObjectHeap::IsValidPt(void* p)

@@ -67,7 +67,7 @@ memory_status get_memory_status()
 {
     memory_status result;
 #ifdef USE_JEMALLOC
-    size_t   len   = sizeof(uint64_t);
+    size_t          len   = sizeof(uint64_t);
     static uint64_t epoch = 1;
     je_mallctl("epoch", &epoch, &len, &epoch, len);
 
@@ -77,17 +77,17 @@ memory_status get_memory_status()
     je_mallctl("stats.metadata", &result.metadata, &len, NULL, 0);
     je_mallctl("stats.metadata_thp", &result.metadata_thp, &len, NULL, 0);
     je_mallctl("stats.resident", &result.resident, &len, NULL, 0);
-    
+
     je_mallctl("stats.retained", &result.retained, &len, NULL, 0);
     je_mallctl("stats.background_thread.num_threads", &result.num_threads, &len, NULL, 0);
     je_mallctl("stats.background_thread.run_interval", &result.back_runtime, &len, NULL, 0);
-    
+
     // je_mallctl("arenas.narenas", &result.narenas, &len, NULL, 0);
     // je_mallctl("arenas.quantum", &result.quantum, &len, NULL, 0);
     // je_mallctl("arenas.page", &result.page, &len, NULL, 0);
     // je_mallctl("arenas.dirty_decay_ms", &result.dirty_decay_ms, &len, NULL, 0);
     // je_mallctl("arenas.muzzy_decay_ms", &result.muzzy_decay_ms, &len, NULL, 0);
-    
+
 #endif
     return result;
 }
@@ -95,9 +95,9 @@ memory_status get_memory_status()
 void open_jemalloc_thp()
 {
 #ifdef USE_JEMALLOC
-    char metadata_thp[]="auto";
+    char metadata_thp[] = "auto";
     je_mallctl("opt.metadata_thp", nullptr, nullptr, &metadata_thp, sizeof(metadata_thp));
-    char thp[]="default";
+    char thp[] = "default";
     je_mallctl("opt.thp", nullptr, nullptr, &thp, sizeof(thp));
 #endif
 }
@@ -110,8 +110,6 @@ void start_jemalloc_backgroud_thread()
     option = true;
     je_mallctl("opt.background_thread", nullptr, nullptr, &option, sizeof(bool));
 
-
-    
 #endif
 }
 

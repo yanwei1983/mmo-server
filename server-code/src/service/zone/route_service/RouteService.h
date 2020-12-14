@@ -2,7 +2,6 @@
 #define RouteService_h__
 
 #include "IService.h"
-
 #include "NetSocket.h"
 #include "ServiceComm.h"
 #include "UIDFactory.h"

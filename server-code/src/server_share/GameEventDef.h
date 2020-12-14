@@ -3,7 +3,7 @@
 
 enum GameEventType
 {
-    EVENTID_UNKNOW=0,
+    EVENTID_UNKNOW = 0,
     EVENTID_DEL_ACTOR,
     EVENTID_FLY_MAP,
     EVENTID_BROCAST_SHOW,

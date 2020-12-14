@@ -6,9 +6,8 @@
 #include <vector>
 
 #include "EventEntry.h"
-#include "NetSocket.h"
-
 #include "NetEventHandler.h"
+#include "NetSocket.h"
 class RobotClientManager;
 class CNetSocket;
 

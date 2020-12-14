@@ -8,7 +8,6 @@
 CAIPathFinder_Normal::CAIPathFinder_Normal(CAIActor* pActor)
     : m_pActor(pActor)
 {
-    
 }
 
 std::optional<Vector2> CAIPathFinder_Normal::SearchStep(const Vector2& dest, float move_spd)
@@ -52,7 +51,6 @@ std::optional<Vector2> CAIPathFinder_Normal::SearchStep(const Vector2& dest, flo
             {
                 return new_pos;
             }
-
         }
         return {};
     }

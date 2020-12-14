@@ -25,10 +25,10 @@
 #include "MonitorMgr.h"
 #include "Monster.h"
 #include "MonsterType.h"
+#include "MsgProcessRegister.h"
 #include "MsgSceneProcess.h"
 #include "MysqlConnection.h"
 #include "NetMSGProcess.h"
-#include "MsgProcessRegister.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "NpcType.h"
@@ -197,8 +197,6 @@ bool CSceneService::Init(const ServerPort& nServerPort)
     if(CreateService(FrameInterval) == false)
         return false;
 
-    
-
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -275,7 +273,7 @@ void CSceneService::PushMsgToMessagePool(const VirtualSocket& vs, CNetworkMessag
     __LEAVE_FUNCTION
 }
 
-size_t CSceneService::GetMessagePoolMsgCount(const VirtualSocket& vs)const
+size_t CSceneService::GetMessagePoolMsgCount(const VirtualSocket& vs) const
 {
     __ENTER_FUNCTION
     auto itFind = m_MessagePoolBySocket.find(vs);
@@ -299,7 +297,7 @@ std::unique_ptr<CNetworkMessage> CSceneService::PopMsgFromMessagePool(const Virt
     if(refList.empty())
         return nullptr;
 
-    std::unique_ptr<CNetworkMessage> pMsg( refList.front().release() );
+    std::unique_ptr<CNetworkMessage> pMsg(refList.front().release());
     refList.pop_front();
     return pMsg;
     __LEAVE_FUNCTION
@@ -447,11 +445,8 @@ void CSceneService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(),
-                           get_thread_memory_allocted());
-        buf += fmt::format(FMT_STRING("\nEvent:{}\tActive:{}"),
-                           EventManager()->GetEventCount(),
-                           EventManager()->GetRunningEventCount());
+                          fmt::format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(), get_thread_memory_allocted());
+        buf += fmt::format(FMT_STRING("\nEvent:{}\tActive:{}"), EventManager()->GetEventCount(), EventManager()->GetRunningEventCount());
 
         for(const auto& [k, v]: EventManager()->GetCountEntryByManagerType())
         {
@@ -469,7 +464,6 @@ void CSceneService::OnLogicThreadProc()
                 buf += fmt::format(FMT_STRING("\nEvType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
             }
         }
-
 
         buf += fmt::format(FMT_STRING("\nUser:{}\tMonster:{}"), ActorManager()->GetUserCount(), ActorManager()->GetMonsterCount()) +
                fmt::format(FMT_STRING("\nLoading:{}\tSaveing:{}\tReady:{}"),
@@ -495,7 +489,7 @@ void CSceneService::OnLogicThreadProc()
                                player_count,
                                actor_count);
         });
-        
+
         //检查ai,world,socket1-5如果是源端socket的话,有多少缓冲区堆积
         auto check_func = [&buf](const ServerPort& serverport) {
             auto pMessagePort = GetMessageRoute()->QueryMessagePort(serverport, false);

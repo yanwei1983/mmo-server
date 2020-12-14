@@ -88,7 +88,6 @@ void CAIActor::FlyTo(const Vector2& posTarget)
     msg.set_x(posTarget.x);
     msg.set_y(posTarget.y);
     AIService()->SendProtoMsgToScene(msg);
- 
 
     __LEAVE_FUNCTION
 }
@@ -96,12 +95,12 @@ void CAIActor::FlyTo(const Vector2& posTarget)
 void CAIActor::MoveToTarget(const Vector2& posTarget)
 {
     __ENTER_FUNCTION
-    Vector2 dir = (posTarget - m_Pos);
-    float   dis = dir.normalise();
+    Vector2 dir      = (posTarget - m_Pos);
+    float   dis      = dir.normalise();
     Vector2 move_pos = m_Pos;
     if(dis < GetMoveSpeed())
     {
-       move_pos = posTarget;
+        move_pos = posTarget;
     }
     else
     {

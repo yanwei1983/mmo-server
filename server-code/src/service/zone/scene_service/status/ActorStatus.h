@@ -95,7 +95,7 @@ public:
     }
     export_lua CActor* GetOwner() const { return m_pOwner; }
     export_lua const CStatusType* Type() const { return m_pType; }
-    export_lua uint64_t GetScriptID() const;
+    export_lua uint64_t           GetScriptID() const;
 
     export_lua bool     IsValid() const;
     export_lua uint32_t GetID() const { return m_info.id_status; }

@@ -4,11 +4,11 @@
 #include "AIMonster.h"
 #include "AIPhase.h"
 #include "AIService.h"
+#include "GameEventDef.h"
 #include "GameMap.h"
 #include "GameMapDef.h"
 #include "MapManager.h"
 #include "MonsterType.h"
-#include "GameEventDef.h"
 #include "config/Cfg_Scene_MonsterGenerator.pb.h"
 #include "server_msg/server_side.pb.h"
 

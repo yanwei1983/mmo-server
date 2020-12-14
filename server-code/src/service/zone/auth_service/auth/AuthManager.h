@@ -10,8 +10,6 @@
 #include "NetworkDefine.h"
 #include "Thread.h"
 
-
-
 class CAuthService;
 
 class CAuthManager : public NoncopyableT<CAuthManager>
@@ -44,8 +42,8 @@ private:
         VirtualSocket from;
     };
     std::unordered_map<VirtualSocket, ST_AUTH_DATA> m_AuthDataList;
-    MPSCQueue<std::function<void()>>           m_ResultList;
-    uint64_t                                   m_CallIdx = 0;
+    MPSCQueue<std::function<void()>>                m_ResultList;
+    uint64_t                                        m_CallIdx = 0;
 
     std::unique_ptr<CWorkerThread> m_threadAuth;
 };

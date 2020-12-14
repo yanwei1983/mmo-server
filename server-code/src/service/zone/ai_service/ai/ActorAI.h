@@ -115,9 +115,9 @@ public:
     export_lua bool ToPatrolWait(uint32_t wait_min, uint32_t wait_max);
 
 protected:
-    void ProcessAttack();
+    void            ProcessAttack();
     export_lua void _ProcessAttack(CAIActor* pTarget);
-    void ProcessRandMove();
+    void            ProcessRandMove();
     //! 空闲状态处理
     void ProcessIdle();
     //! 前进状态处理

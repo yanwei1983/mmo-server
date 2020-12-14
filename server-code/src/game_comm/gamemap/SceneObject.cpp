@@ -297,8 +297,13 @@ bool CSceneObject::_UpdateViewList()
     uint32_t use_manhattan         = scene_tree->IsViewManhattanDistance();
     uint32_t view_range_in_square  = scene_tree->GetViewRangeInSquare();
     uint32_t view_range_out_square = scene_tree->GetViewRangeOutSquare();
-    LOGACTORTRACE(GetID(), "ViewStep0: m_ViewActors:{} max:{} view_in:{} view_out:{} use_manha:{} ",
-        m_ViewActors.size(), viewcount_max, view_range_in_square, view_range_out_square, use_manhattan);
+    LOGACTORTRACE(GetID(),
+                  "ViewStep0: m_ViewActors:{} max:{} view_in:{} view_out:{} use_manha:{} ",
+                  m_ViewActors.size(),
+                  viewcount_max,
+                  view_range_in_square,
+                  view_range_out_square,
+                  use_manhattan);
     // 广播集算法修改测试
     //////////////////////////////////////////////////////////////////////////
     // step1: 获取当前广播集范围内的对象
@@ -311,8 +316,7 @@ bool CSceneObject::_UpdateViewList()
                              view_range_in_square,
                              view_range_out_square,
                              viewcount_max,
-                             use_manhattan](CSceneTile* pSceneTile)
-        {
+                             use_manhattan](CSceneTile* pSceneTile) {
             CHECK(pSceneTile);
             const auto& actor_list = *pSceneTile;
             for(CSceneObject* pActor: actor_list)
@@ -371,9 +375,12 @@ bool CSceneObject::_UpdateViewList()
 
         scene_tree->foreach_SceneTileInSight(GetPosX(), GetPosY(), foreach_func);
     }
-    
-    LOGACTORTRACE(GetID(), "ViewStep0: setBCActor:{} viewout:{} viewin:{} ",
-        setBCActor.size(), actor_viewin_withdis.size(), actor_viewout_withdis.size());
+
+    LOGACTORTRACE(GetID(),
+                  "ViewStep0: setBCActor:{} viewout:{} viewin:{} ",
+                  setBCActor.size(),
+                  actor_viewin_withdis.size(),
+                  actor_viewout_withdis.size());
 
     if(viewcount_max > 0 && setBCActor.size() < viewcount_max)
     {
@@ -395,10 +402,9 @@ bool CSceneObject::_UpdateViewList()
             it++;
         }
 
-        LOGACTORTRACE(GetID(), "ViewStep1-1: setBCActor:{}",setBCActor.size() );
+        LOGACTORTRACE(GetID(), "ViewStep1-1: setBCActor:{}", setBCActor.size());
     }
-    
-    
+
     //////////////////////////////////////////////////////////////////////////
     // setp2: 计算当前广播集与旧广播集的差集——这部分是新进入视野的
     BROADCAST_SET setBCActorAdd;
@@ -407,7 +413,7 @@ bool CSceneObject::_UpdateViewList()
                    m_ViewActors.begin(),
                    m_ViewActors.end(),
                    std::insert_iterator(setBCActorAdd, setBCActorAdd.begin()));
-    LOGACTORTRACE(GetID(), "ViewStep2: setBCActorAdd:{}",setBCActorAdd.size());
+    LOGACTORTRACE(GetID(), "ViewStep2: setBCActorAdd:{}", setBCActorAdd.size());
     //////////////////////////////////////////////////////////////////////////
     // step3: 计算旧广播集与当前广播集的差集——这部分是可能需要离开视野的
     BROADCAST_SET setBCActorDel;
@@ -416,7 +422,7 @@ bool CSceneObject::_UpdateViewList()
                    setBCActor.begin(),
                    setBCActor.end(),
                    std::insert_iterator(setBCActorDel, setBCActorDel.begin()));
-    LOGACTORTRACE(GetID(), "ViewStep3: setBCActorDel:{}",setBCActorDel.size());
+    LOGACTORTRACE(GetID(), "ViewStep3: setBCActorDel:{}", setBCActorDel.size());
     if(viewcount_max > 0 && setBCActor.size() < viewcount_max)
     {
         //计算待删除列表还可以保留多少个
@@ -437,7 +443,7 @@ bool CSceneObject::_UpdateViewList()
             it++;
         }
     }
-    
+
     OnAOIProcess(setBCActorDel, setBCActor, setBCActorAdd);
     return true;
 }

@@ -150,8 +150,7 @@ void CPhase::AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name
 
     CEventEntryCreateParam param;
     param.evType = EVENTID_PHASE_TIMECALL;
-    param.cb     = [pThis = this, _func_name = func_name]() 
-    {
+    param.cb     = [pThis = this, _func_name = func_name]() {
         ScriptManager()->TryExecScript<void>(SCRIPT_MAP, pThis->m_pMap->GetScriptID(), _func_name.c_str(), pThis);
     };
     param.tWaitTime = tIntervalMS;

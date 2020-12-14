@@ -59,7 +59,7 @@ bool CMarketService::Init(const ServerPort& nServerPort)
         BaseCode::SetNdc(oldNdc);
     };
 
-     //注册消息
+    //注册消息
     RegisterAllMsgProcess<CMarketService>(GetNetMsgProcess());
 
     if(CreateService(100) == false)
@@ -71,7 +71,6 @@ bool CMarketService::Init(const ServerPort& nServerPort)
     SendProtoMsgToZonePort(ServerPort(GetWorldID(), WORLD_SERVICE, 0), msg);
     return true;
 }
-
 
 void CMarketService::OnLogicThreadCreate()
 {

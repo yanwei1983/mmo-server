@@ -4,22 +4,20 @@
 
 #include "CheckUtil.h"
 #include "DB2PB.h"
-#include "NetworkService.h"
-#include "NetMSGProcess.h"
 #include "EventManager.h"
 #include "GlobalSetting.h"
 #include "MessagePort.h"
 #include "MessageRoute.h"
 #include "MonitorMgr.h"
 #include "MysqlConnection.h"
+#include "NetMSGProcess.h"
+#include "NetworkService.h"
 #include "NormalCrypto.h"
+#include "protomsg_to_cmd.h"
 #include "serverinfodb.h"
 #include "serverinfodb.pb.h"
-#include "protomsg_to_cmd.h"
 
-CServiceCommon::CServiceCommon()
-{
-}
+CServiceCommon::CServiceCommon() {}
 
 CServiceCommon::~CServiceCommon() {}
 
@@ -81,12 +79,12 @@ bool CServiceCommon::ListenMessagePort(const std::string& service_name, CMessage
 {
     __ENTER_FUNCTION
     auto shared_ptr = GetMessageRoute()->QueryMessagePort(GetServerPort(), false);
-    if(shared_ptr != nullptr )
+    if(shared_ptr != nullptr)
     {
         m_pMessagePort = shared_ptr;
         if(pEventHandler != nullptr)
             shared_ptr->SetPortEventHandler(pEventHandler);
-    }   
+    }
     return shared_ptr != nullptr;
     __LEAVE_FUNCTION
     return false;
@@ -150,7 +148,6 @@ void CServiceCommon::OnLogicThreadProc()
 
     m_nMessageProcess += nCount;
 
-
     //定时器回掉
     m_pEventManager->OnTimer();
 
@@ -165,7 +162,6 @@ void CServiceCommon::OnLogicThreadCreate()
 }
 
 void CServiceCommon::OnLogicThreadExit() {}
-
 
 bool CServiceCommon::ForwardProtoMsgToPlayer(const ServerPort& nServerPort, uint64_t id_player, const proto_msg_t& msg) const
 {
@@ -300,7 +296,7 @@ bool CServiceCommon::TransmitMsgToAllRouteExcept(const CNetworkMessage* pMsg, co
 bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
 {
     __ENTER_FUNCTION
-    LOGNETTRACE("SendMsgToZonePort from:{} To:{} Cmd:{} ForwardCount:{}", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
+    LOGNETTRACE("SendMsgToZonePort from:{} To:{} Cmd:{} ForwardCount:{}", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount());
     const auto& vs = msg.GetTo();
     if(vs.IsVaild() == false)
     {
@@ -321,10 +317,14 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
             }
             else
             {
-                LOGWARNING("SendMsgToZonePort world from:{} To:{} Cmd:{} ForwardCount:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
+                LOGWARNING("SendMsgToZonePort world from:{} To:{} Cmd:{} ForwardCount:{} Worng.",
+                           msg.GetFrom(),
+                           msg.GetTo(),
+                           msg.GetCmd(),
+                           msg.GetForwardCount());
             }
         }
-        else if (GetServiceID().GetServiceType() == ROUTE_SERVICE && vs.GetServerPort().GetServiceType() == ROUTE_SERVICE)
+        else if(GetServiceID().GetServiceType() == ROUTE_SERVICE && vs.GetServerPort().GetServiceType() == ROUTE_SERVICE)
         {
             // route_service send msg to other route
             CMessagePortSharedPtr pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
@@ -334,7 +334,11 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
             }
             else
             {
-                LOGWARNING("SendMsgToZonePort trans from:{} To:{} Cmd:{} ForwardCount:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
+                LOGWARNING("SendMsgToZonePort trans from:{} To:{} Cmd:{} ForwardCount:{} Worng.",
+                           msg.GetFrom(),
+                           msg.GetTo(),
+                           msg.GetCmd(),
+                           msg.GetForwardCount());
             }
         }
         else
@@ -348,7 +352,7 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
     }
     else if(GetMessageRoute() && vs.GetServerPort() == m_nServerPort)
     {
-        //send to this service
+        // send to this service
         CMessagePortSharedPtr pMessagePort = GetMessageRoute()->QueryMessagePort(vs.GetServerPort());
         if(pMessagePort)
         {
@@ -356,19 +360,23 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
         }
         else
         {
-            LOGWARNING("SendMsgToZonePort local from:{} To:{} Cmd:{} ForwardCount:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
+            LOGWARNING("SendMsgToZonePort local from:{} To:{} Cmd:{} ForwardCount:{} Worng.",
+                       msg.GetFrom(),
+                       msg.GetTo(),
+                       msg.GetCmd(),
+                       msg.GetForwardCount());
         }
         return false;
     }
     else if(vs.GetServerPort().IsVaild() == false && vs.GetSocketIdx() != 0)
     {
         // direct send message
-        LOGWARNING("Message Want Send from:{} To:{} Cmd:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd() );
+        LOGWARNING("Message Want Send from:{} To:{} Cmd:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd());
         return false;
     }
     else
     {
-        LOGWARNING("Message Want Send from:{} To:{} Cmd:{} ForwardCount:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount() );
+        LOGWARNING("Message Want Send from:{} To:{} Cmd:{} ForwardCount:{} Worng.", msg.GetFrom(), msg.GetTo(), msg.GetCmd(), msg.GetForwardCount());
         return false;
     }
 

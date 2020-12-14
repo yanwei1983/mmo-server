@@ -3,13 +3,13 @@
 #include "Actor.h"
 #include "ActorAttrib.h"
 #include "ActorStatusSet.h"
+#include "GameEventDef.h"
 #include "SceneService.h"
 #include "ScriptCallBackType.h"
 #include "ScriptManager.h"
 #include "SkillFSM.h"
 #include "StatusType.h"
 #include "gamedb.h"
-#include "GameEventDef.h"
 #include "msg/zone_service.pb.h"
 AttachStatusInfo CStatusType::CloneInfo() const
 {

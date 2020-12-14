@@ -73,7 +73,7 @@ namespace
             LOGERROR(GetStackTraceString(CallFrameMap(2)));
         else
             BaseCode::MyLogMsgX("segv", true, GetStackTraceString(CallFrameMap(2)).c_str());
-        
+
         MAKE_THROW_FRAME(nullp);
         handle_segv();
     }

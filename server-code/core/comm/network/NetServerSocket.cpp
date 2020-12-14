@@ -2,13 +2,14 @@
 
 #include <event2/bufferevent.h>
 #include <event2/event.h>
+
 #include "NetEventHandler.h"
 #include "NetworkMessage.h"
 #include "NetworkService.h"
 #include "event2/buffer.h"
 #include "event2/util.h"
 
-CServerSocket::CServerSocket(CNetworkService* pService,const CNetEventHandlerSharedPtr& pEventHandler, bool bReconnect)
+CServerSocket::CServerSocket(CNetworkService* pService, const CNetEventHandlerSharedPtr& pEventHandler, bool bReconnect)
     : CNetSocket(pService, pEventHandler)
     , m_bReconnect(bReconnect)
     , m_pReconnectEvent(nullptr)
@@ -120,8 +121,8 @@ void CServerSocket::_OnReconnect(int32_t fd, short what, void* ctx)
 {
     __ENTER_FUNCTION
 
-    CServerSocket* pSocket = (CServerSocket*)ctx;
-    auto shared_socket = pSocket->shared_from_this();
+    CServerSocket* pSocket       = (CServerSocket*)ctx;
+    auto           shared_socket = pSocket->shared_from_this();
     LOGNETDEBUG("CServerSocket Reconnect:{}::{}", pSocket->GetAddrString(), pSocket->GetPort());
 
     if(pSocket->GetService()->_AsyncReconnect(std::static_pointer_cast<CServerSocket>(shared_socket)) == false)
@@ -134,8 +135,8 @@ void CServerSocket::_OnReconnect(int32_t fd, short what, void* ctx)
 void CServerSocket::_OnSocketConnectorEvent(bufferevent* b, short what, void* ctx)
 {
     __ENTER_FUNCTION
-    CServerSocket* pSocket = (CServerSocket*)ctx;
-    auto shared_socket = pSocket->shared_from_this();
+    CServerSocket* pSocket       = (CServerSocket*)ctx;
+    auto           shared_socket = pSocket->shared_from_this();
     if(what == BEV_EVENT_CONNECTED)
     {
         int32_t fd = bufferevent_getfd(b);
@@ -150,8 +151,8 @@ void CServerSocket::_OnSocketConnectorEvent(bufferevent* b, short what, void* ct
         bufferevent_enable(b, EV_READ | EV_WRITE | EV_PERSIST);
         pSocket->_SetTimeout();
         LOGNETDEBUG("CServerSocket::SocketConnectSucc:{}:{}  SendWait:{}", pSocket->GetAddrString(), pSocket->GetPort(), pSocket->m_nWaitWriteSize);
-       
-        bufferevent_write_buffer(b, pSocket->m_Sendbuf);                
+
+        bufferevent_write_buffer(b, pSocket->m_Sendbuf);
     }
     else
     {
@@ -168,19 +169,18 @@ void CServerSocket::OnRecvTimeout(bool& bReconnect)
 {
     __ENTER_FUNCTION
     if(auto event_handler = m_pEventHandler.lock())
-            event_handler->OnRecvTimeout(shared_from_this());
+        event_handler->OnRecvTimeout(shared_from_this());
 
     bReconnect = m_bReconnect;
     __LEAVE_FUNCTION
 }
-
 
 void CServerSocket::OnStartConnect()
 {
     __ENTER_FUNCTION
 
     if(auto event_handler = m_pEventHandler.lock())
-            event_handler->OnStartConnect(shared_from_this());
+        event_handler->OnStartConnect(shared_from_this());
     __LEAVE_FUNCTION
 }
 
@@ -188,7 +188,7 @@ void CServerSocket::OnConnected()
 {
     __ENTER_FUNCTION
     if(auto event_handler = m_pEventHandler.lock())
-            event_handler->OnConnected(shared_from_this());
+        event_handler->OnConnected(shared_from_this());
     __LEAVE_FUNCTION
 }
 
@@ -196,7 +196,7 @@ void CServerSocket::OnConnectFailed()
 {
     __ENTER_FUNCTION
     if(auto event_handler = m_pEventHandler.lock())
-            event_handler->OnConnectFailed(shared_from_this());
+        event_handler->OnConnectFailed(shared_from_this());
 
     _OnError("AsyncConnectFailed");
     __LEAVE_FUNCTION

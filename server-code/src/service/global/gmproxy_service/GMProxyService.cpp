@@ -231,8 +231,6 @@ bool CGMProxyService::Init(const ServerPort& nServerPort)
     if(CreateService(200) == false)
         return false;
 
-    
-
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -304,7 +302,6 @@ void CGMProxyService::OnLogicThreadCreate()
     tls_pService = this;
     CServiceCommon::OnLogicThreadCreate();
 }
-
 
 bool CheckKVMap(const std::unordered_map<std::string, std::string>& kvmap)
 {

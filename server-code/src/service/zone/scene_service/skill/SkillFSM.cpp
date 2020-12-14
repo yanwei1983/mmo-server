@@ -6,6 +6,7 @@
 #include "Bullet.h"
 #include "BulletType.h"
 #include "CoolDown.h"
+#include "GameEventDef.h"
 #include "GameLog.h"
 #include "GameMap.h"
 #include "GameMapDef.h"
@@ -16,7 +17,6 @@
 #include "ScriptCallBackType.h"
 #include "ScriptManager.h"
 #include "SkillType.h"
-#include "GameEventDef.h"
 #include "msg/zone_service.pb.h"
 CSkillFSM::CSkillFSM() {}
 
@@ -457,7 +457,8 @@ void _SkillEffectInRange(CActor* pOwner, const CSkillType* pSkillType, OBJID idT
     CSkillFSM::AddBullet(pOwner, pSkillType->GetBulletTypeID(), idTarget, posTarget, vecTarget);
     CSkillFSM::AttachStatus(pOwner, pSkillType, vecTarget);
 
-    ScriptManager()->TryExecScript<void>(SCRIPT_SKILL, pSkillType->GetScirptID(), "OnSkillEffect", pOwner, idTarget, posTarget, pSkillType, nApplyTimes);
+    ScriptManager()
+        ->TryExecScript<void>(SCRIPT_SKILL, pSkillType->GetScirptID(), "OnSkillEffect", pOwner, idTarget, posTarget, pSkillType, nApplyTimes);
     __LEAVE_FUNCTION
 }
 

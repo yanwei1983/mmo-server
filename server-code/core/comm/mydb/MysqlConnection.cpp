@@ -117,51 +117,48 @@ bool CMysqlConnection::Connect(const std::string& host,
 
     if(bCreateAsync)
     {
-        m_AsyncThread = std::make_unique<CWorkerThread>(
-            "DB AsyncThread",
-            [this, host, user, password, db, port, client_flag]() {
-                __ENTER_FUNCTION
-                
+        m_AsyncThread = std::make_unique<CWorkerThread>("DB AsyncThread", [this, host, user, password, db, port, client_flag]() {
+            __ENTER_FUNCTION
 
-                {
-                    std::unique_lock lock(g_mysql_init_mutex);
-                    m_pAsyncHandle.reset(mysql_init(0));
-                }
-                // mysql_options(m_pAsyncHandle.get(), MYSQL_SET_CHARSET_NAME, MYSQL_AUTODETECT_CHARSET_NAME);
+            {
+                std::unique_lock lock(g_mysql_init_mutex);
+                m_pAsyncHandle.reset(mysql_init(0));
+            }
+            // mysql_options(m_pAsyncHandle.get(), MYSQL_SET_CHARSET_NAME, MYSQL_AUTODETECT_CHARSET_NAME);
 
-                constexpr int32_t nConnectTimeOut = 10;
-                constexpr int32_t nWriteTimeOut   = 5;
-                constexpr int32_t nReadTimeOut    = 5;
-                constexpr bool    bReconnect      = true;
-                int32_t           nError          = 0;
-                nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_SET_CHARSET_NAME, "utf8mb4");
-                nError |= mysql_set_character_set(m_pAsyncHandle.get(), "utf8mb4");
-                nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_OPT_CONNECT_TIMEOUT, &nConnectTimeOut);
-                nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_OPT_WRITE_TIMEOUT, &nWriteTimeOut);
-                nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_OPT_READ_TIMEOUT, &nReadTimeOut);
-                nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_OPT_RECONNECT, &bReconnect);
-                if(nError)
-                {
-                    const char* error_str = mysql_error(m_pAsyncHandle.get());
-                    LOGDBERROR("mysql_error:{} when set_options.", error_str);
-                }
+            constexpr int32_t nConnectTimeOut = 10;
+            constexpr int32_t nWriteTimeOut   = 5;
+            constexpr int32_t nReadTimeOut    = 5;
+            constexpr bool    bReconnect      = true;
+            int32_t           nError          = 0;
+            nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_SET_CHARSET_NAME, "utf8mb4");
+            nError |= mysql_set_character_set(m_pAsyncHandle.get(), "utf8mb4");
+            nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_OPT_CONNECT_TIMEOUT, &nConnectTimeOut);
+            nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_OPT_WRITE_TIMEOUT, &nWriteTimeOut);
+            nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_OPT_READ_TIMEOUT, &nReadTimeOut);
+            nError |= mysql_options(m_pAsyncHandle.get(), MYSQL_OPT_RECONNECT, &bReconnect);
+            if(nError)
+            {
+                const char* error_str = mysql_error(m_pAsyncHandle.get());
+                LOGDBERROR("mysql_error:{} when set_options.", error_str);
+            }
 
-                MYSQL* h = mysql_real_connect(m_pAsyncHandle.get(),
-                                              host.c_str(),
-                                              user.c_str(),
-                                              password.c_str(),
-                                              db.c_str(),
-                                              port,
-                                              nullptr,
-                                              client_flag | CLIENT_REMEMBER_OPTIONS);
-                if(h == nullptr || h != m_pAsyncHandle.get())
-                {
-                    LOGDBFATAL("mysql async connect to {}:{} {} fail.", host, port, db);
-                    // log error
-                }
-                LOGDBDEBUG("mysql async_connect to {}:{} {} succ.", host, port, db);
-                __LEAVE_FUNCTION
-            });
+            MYSQL* h = mysql_real_connect(m_pAsyncHandle.get(),
+                                          host.c_str(),
+                                          user.c_str(),
+                                          password.c_str(),
+                                          db.c_str(),
+                                          port,
+                                          nullptr,
+                                          client_flag | CLIENT_REMEMBER_OPTIONS);
+            if(h == nullptr || h != m_pAsyncHandle.get())
+            {
+                LOGDBFATAL("mysql async connect to {}:{} {} fail.", host, port, db);
+                // log error
+            }
+            LOGDBDEBUG("mysql async_connect to {}:{} {} succ.", host, port, db);
+            __LEAVE_FUNCTION
+        });
 
         while(m_AsyncThread->IsReady() == false)
         {

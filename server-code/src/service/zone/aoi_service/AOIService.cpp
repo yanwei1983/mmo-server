@@ -11,8 +11,8 @@
 #include "MessagePort.h"
 #include "MessageRoute.h"
 #include "MonitorMgr.h"
-#include "NetMSGProcess.h"
 #include "MsgProcessRegister.h"
+#include "NetMSGProcess.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "server_msg/server_side.pb.h"
@@ -125,8 +125,7 @@ void CAOIService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\tMem:{}"),
-                                      get_thread_memory_allocted());
+                          fmt::format(FMT_STRING("\tMem:{}"), get_thread_memory_allocted());
         auto pMessagePort = GetMessageRoute()->QueryMessagePort(GetSceneServerPort(), false);
         if(pMessagePort)
         {

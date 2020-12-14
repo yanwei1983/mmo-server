@@ -21,7 +21,7 @@ public:
 public:
     RobotClientPtr  ConnectServer(const char* addr, int32_t port);
     void            DelClient(const RobotClientPtr& pClient);
-    size_t          GetClientCount()const {return m_setClient.size();}
+    size_t          GetClientCount() const { return m_setClient.size(); }
     CNetMSGProcess* GetNetMessageProcess() const { return m_pNetMsgProcess.get(); }
     CEventManager*  GetEventManager() const { return m_pEventManager.get(); }
 
@@ -50,11 +50,11 @@ public:
     void AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name, bool bPersist);
 
 private:
-    std::unique_ptr<CNetMSGProcess> m_pNetMsgProcess;
-    std::unique_ptr<CEventManager>  m_pEventManager;
-    std::set<RobotClientPtr>        m_setClient;
-    CEventEntryPtr                  m_EventScriptGC;
-    CEventEntryQueue                m_EventList;
+    std::unique_ptr<CNetMSGProcess>           m_pNetMsgProcess;
+    std::unique_ptr<CEventManager>            m_pEventManager;
+    std::set<RobotClientPtr>                  m_setClient;
+    CEventEntryPtr                            m_EventScriptGC;
+    CEventEntryQueue                          m_EventList;
     std::unordered_map<uint16_t, std::string> m_CMDFuncMap;
     std::unique_ptr<CLUAScriptManager>        m_pScriptManager;
 };

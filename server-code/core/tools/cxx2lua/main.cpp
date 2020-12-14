@@ -1894,7 +1894,7 @@ int main(int argc, char** argv)
 
     Visitor_Content content;
     CXIndex         Index = clang_createIndex(0, 0);
-    clang_CXIndex_setGlobalOptions(Index, clang_CXIndex_getGlobalOptions(Index) );
+    clang_CXIndex_setGlobalOptions(Index, clang_CXIndex_getGlobalOptions(Index));
     std::fstream temp_file(temp_filename.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc);
     for(const auto& cpp: szCppFiles)
     {

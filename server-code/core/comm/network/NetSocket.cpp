@@ -2,14 +2,14 @@
 
 #include <event2/bufferevent.h>
 #include <event2/event.h>
+
+#include "Decryptor.h"
+#include "Encryptor.h"
 #include "NetEventHandler.h"
 #include "NetworkMessage.h"
 #include "NetworkService.h"
 #include "event2/buffer.h"
 #include "event2/util.h"
-
-#include "Decryptor.h"
-#include "Encryptor.h"
 
 #ifdef __linux
 #include <netinet/tcp.h>
@@ -18,7 +18,6 @@
 #endif
 
 OBJECTHEAP_IMPLEMENTATION(CNetSocket, s_Heap);
-
 
 CNetSocket::CNetSocket(CNetworkService* pService, const CNetEventHandlerSharedPtr& pEventHandler)
     : m_pService(pService)
@@ -30,16 +29,18 @@ CNetSocket::CNetSocket(CNetworkService* pService, const CNetEventHandlerSharedPt
     , m_nSocketIdx(INVALID_SOCKET_IDX)
     , m_pDecryptor(nullptr)
     , m_pEncryptor(nullptr)
-    , m_nPacketSizeMax(pEventHandler?pEventHandler->GetPacketSizeMax():_MAX_MSGSIZE)
-    , m_nLogWriteHighWateMark(pEventHandler?pEventHandler->GetLogWriteHighWateMark():_MAX_MSGSIZE* 1024)
+    , m_nPacketSizeMax(pEventHandler ? pEventHandler->GetPacketSizeMax() : _MAX_MSGSIZE)
+    , m_nLogWriteHighWateMark(pEventHandler ? pEventHandler->GetLogWriteHighWateMark() : _DEFAULT_LOGWRITEHIGHWATEMARK)
     , m_socket(INVALID_SOCKET)
     , m_ReadBuff{std::make_unique<byte[]>(m_nPacketSizeMax)}
 {
-    m_pEventSendMsg = evuser_new(pService->GetEVBase(), [](int,short,void* ctx)
-    {
-        CNetSocket* pThis = (CNetSocket*)ctx;
-        pThis->_SendAllMsg();
-    }, this);
+    m_pEventSendMsg = evuser_new(
+        pService->GetEVBase(),
+        [](int, short, void* ctx) {
+            CNetSocket* pThis = (CNetSocket*)ctx;
+            pThis->_SendAllMsg();
+        },
+        this);
 }
 
 CNetSocket::~CNetSocket()
@@ -188,7 +189,7 @@ bool CNetSocket::_SendMsg(byte* pBuffer, size_t len)
             bufferevent_flush(m_pBufferevent, EV_WRITE, BEV_FLUSH);
         size_t nNeedWrite = evbuffer_get_length(bufferevent_get_output(m_pBufferevent));
         m_nWaitWriteSize  = nNeedWrite;
-        if(nNeedWrite > m_nLogWriteHighWateMark)
+        if(nNeedWrite > m_nLogWriteHighWateMark * _MAX_MSGSIZE)
         {
             LOGNETERROR("Write Buffer {}:{} oversize:{}", GetAddrString(), GetPort(), nNeedWrite);
         }
@@ -330,7 +331,7 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         else if(what & BEV_EVENT_WRITING)
         {
             err_msg = "write timeout";
-            bClose = true;
+            bClose  = true;
             LOGNETDEBUG("CNetSocket write timeout {}:{}", pSocket->GetAddrString(), pSocket->GetPort());
         }
     }
@@ -338,10 +339,10 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
     {
         int32_t     err    = evutil_socket_geterror(bufferevent_getfd(b));
         const char* errstr = evutil_socket_error_to_string(err);
-        
+
         LOGNETDEBUG("CNetSocket error[{}]: {}, {}:{}", err, errstr, pSocket->GetAddrString(), pSocket->GetPort());
         err_msg = errstr;
-        bClose = true;
+        bClose  = true;
     }
     if(what & BEV_EVENT_EOF)
     {
@@ -349,7 +350,7 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
         //尝试将剩余的接收缓冲区内的消息处理完(判断是否是主动关闭)
         pSocket->_OnReceive(b);
         bufferevent_setcb(b, nullptr, nullptr, nullptr, nullptr);
-        bClose = true;
+        bClose  = true;
         err_msg = "eof";
     }
     if(bClose)
@@ -383,17 +384,15 @@ size_t CNetSocket::GetWaitWriteSize()
     return m_nWaitWriteSize;
 }
 
-
 void CNetSocket::OnClosing()
 {
     __ENTER_FUNCTION
     LOGNETDEBUG("CNetSocket OnClosing: {}:{}", GetAddrString(), GetPort());
 
     if(auto event_handler = m_pEventHandler.lock())
-            event_handler->OnClosing(shared_from_this());
+        event_handler->OnClosing(shared_from_this());
     __LEAVE_FUNCTION
 }
-
 
 void CNetSocket::OnDisconnected()
 {
@@ -403,7 +402,7 @@ void CNetSocket::OnDisconnected()
     SetStatus(NSS_CLOSED);
     auto shared_ptr = shared_from_this();
     if(auto event_handler = m_pEventHandler.lock())
-            event_handler->OnDisconnected(shared_ptr);
+        event_handler->OnDisconnected(shared_ptr);
     m_pService->_RemoveSocket(shared_ptr);
     m_pService->_AddClosingSocket(shared_ptr);
     __LEAVE_FUNCTION
@@ -446,7 +445,7 @@ void CNetSocket::OnRecvData(byte* pBuffer, size_t len)
     }
 
     if(auto event_handler = m_pEventHandler.lock())
-            event_handler->OnRecvData(shared_from_this(), pBuffer, len);
+        event_handler->OnRecvData(shared_from_this(), pBuffer, len);
     __LEAVE_FUNCTION
 }
 
@@ -454,7 +453,7 @@ void CNetSocket::OnRecvTimeout(bool& bReconnect)
 {
     __ENTER_FUNCTION
     if(auto event_handler = m_pEventHandler.lock())
-            event_handler->OnRecvTimeout(shared_from_this());
+        event_handler->OnRecvTimeout(shared_from_this());
 
     __LEAVE_FUNCTION
 }

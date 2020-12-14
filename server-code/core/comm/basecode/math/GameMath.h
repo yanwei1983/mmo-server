@@ -524,7 +524,6 @@ export_lua namespace GameMath
     }
 };
 
-
 template<>
 struct fmt::formatter<Vector2> : public fmt::formatter<float>
 {
@@ -535,7 +534,6 @@ struct fmt::formatter<Vector2> : public fmt::formatter<float>
         return fmt::format_to(ctx.out(), "({}:{})", v.x, v.y);
     }
 };
-
 
 template<>
 struct fmt::formatter<Vector3> : public fmt::formatter<float>
@@ -548,7 +546,6 @@ struct fmt::formatter<Vector3> : public fmt::formatter<float>
     }
 };
 
-
 template<>
 struct fmt::formatter<Rect> : public fmt::formatter<long>
 {
@@ -560,7 +557,6 @@ struct fmt::formatter<Rect> : public fmt::formatter<long>
     }
 };
 
-
 template<>
 struct fmt::formatter<FloatRect> : public fmt::formatter<float>
 {
@@ -571,6 +567,5 @@ struct fmt::formatter<FloatRect> : public fmt::formatter<float>
         return fmt::format_to(ctx.out(), "({}:{}:{}:{})", v.left, v.top, v.right, v.bottom);
     }
 };
-
 
 #endif //__GAMEMATH_H_

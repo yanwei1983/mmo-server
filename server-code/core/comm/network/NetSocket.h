@@ -2,23 +2,21 @@
 #define NetSocket_h__
 
 #include <deque>
+#include <memory>
 #include <numeric>
 #include <string>
 
 #include <time.h>
-
 
 #include "LockfreeQueue.h"
 #include "NetworkDefine.h"
 #include "NetworkMessage.h"
 #include "ObjectHeap.h"
 #include "PerSecondCount.h"
-
-#include <memory>
 class CNetworkService;
 class CNetEventHandler;
 using CNetEventHandlerSharedPtr = std::shared_ptr<CNetEventHandler>;
-using CNetEventHandlerWeakPtr = std::weak_ptr<CNetEventHandler>;
+using CNetEventHandlerWeakPtr   = std::weak_ptr<CNetEventHandler>;
 
 enum NET_SOCKET_STATUS
 {
@@ -92,8 +90,8 @@ public:
     size_t  GetPacketSizeMax() const { return m_nPacketSizeMax; }
     void    _SetEventHandler(const CNetEventHandlerSharedPtr& v) { m_pEventHandler = v; }
     void    DetachEventHandler();
-    void set_sock_nodely();
-    void set_sock_quickack();
+    void    set_sock_nodely();
+    void    set_sock_quickack();
 
     bool _SendMsg(byte* pBuffer, size_t len);
 
@@ -113,14 +111,14 @@ protected:
     void PostSend();
 
 protected:
-    CNetworkService*  m_pService;
-    bufferevent*      m_pBufferevent;
+    CNetworkService*        m_pService;
+    bufferevent*            m_pBufferevent;
     CNetEventHandlerWeakPtr m_pEventHandler;
-    
+
     struct evbuffer* m_Sendbuf;
 
     MPSCQueue<SendMsgData*> m_SendMsgQueue;
-    struct event*    m_pEventSendMsg; 
+    struct event*           m_pEventSendMsg;
 
     std::string m_strAddr;
     int32_t     m_nPort;
@@ -144,5 +142,5 @@ protected:
 };
 
 using CNetSocketSharedPtr = std::shared_ptr<CNetSocket>;
-using CNetSocketWeakPtr = std::weak_ptr<CNetSocket>;
+using CNetSocketWeakPtr   = std::weak_ptr<CNetSocket>;
 #endif // NetSocket_h__

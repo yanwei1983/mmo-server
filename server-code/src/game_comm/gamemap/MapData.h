@@ -71,16 +71,16 @@ public:
 
     export_lua std::optional<Vector2> LineFindCanStand(const Vector2& src, const Vector2& dest) const;
     export_lua std::optional<Vector2> LineFindCanJump(const Vector2& src, const Vector2& dest) const;
-    export_lua bool    IsPassDisable(float x, float y) const { return _getGridData(x, y).bPassDisable == TRUE; }
-    export_lua bool    IsJumpDisable(float x, float y) const { return _getGridData(x, y).bJumpDisable == TRUE; }
-    export_lua bool    IsPVPDisable(float x, float y) const { return _getGridData(x, y).bPvPDisable == TRUE; }
-    export_lua bool    IsStallDisable(float x, float y) const { return _getGridData(x, y).bStallDisable == TRUE; }
-    export_lua bool    IsPlaceDisable(float x, float y) const { return _getGridData(x, y).bPlaceDisable == TRUE; }
-    export_lua bool    IsRecordDisable(float x, float y) const { return _getGridData(x, y).bRecordDisable == TRUE; }
-    export_lua bool    IsDropDisable(float x, float y) const { return _getGridData(x, y).bDropDisable == TRUE; }
-    export_lua bool    IsPvPFree(float x, float y) const { return _getGridData(x, y).bPvPFree == TRUE; }
-    export_lua bool    IsDeadNoDrop(float x, float y) const { return _getGridData(x, y).bDeadNoDrop == TRUE; }
-    export_lua bool    CanCollision(uint32_t self_type, uint32_t other_type) const { return HasFlag(m_CollisionMask[self_type], (1 << other_type)); }
+    export_lua bool                   IsPassDisable(float x, float y) const { return _getGridData(x, y).bPassDisable == TRUE; }
+    export_lua bool                   IsJumpDisable(float x, float y) const { return _getGridData(x, y).bJumpDisable == TRUE; }
+    export_lua bool                   IsPVPDisable(float x, float y) const { return _getGridData(x, y).bPvPDisable == TRUE; }
+    export_lua bool                   IsStallDisable(float x, float y) const { return _getGridData(x, y).bStallDisable == TRUE; }
+    export_lua bool                   IsPlaceDisable(float x, float y) const { return _getGridData(x, y).bPlaceDisable == TRUE; }
+    export_lua bool                   IsRecordDisable(float x, float y) const { return _getGridData(x, y).bRecordDisable == TRUE; }
+    export_lua bool                   IsDropDisable(float x, float y) const { return _getGridData(x, y).bDropDisable == TRUE; }
+    export_lua bool                   IsPvPFree(float x, float y) const { return _getGridData(x, y).bPvPFree == TRUE; }
+    export_lua bool                   IsDeadNoDrop(float x, float y) const { return _getGridData(x, y).bDeadNoDrop == TRUE; }
+    export_lua bool CanCollision(uint32_t self_type, uint32_t other_type) const { return HasFlag(m_CollisionMask[self_type], (1 << other_type)); }
 
     export_lua uint32_t GetSPRegionIdx(float x, float y) const { return _getGridData(x, y).nSPRegionIdx; }
     export_lua float    GetHigh(float x, float y) const { return (float(_getGridData(x, y).nHigh) / 255.0f) * m_fGridHighFactor; }
@@ -105,7 +105,7 @@ private:
 
     //地图信息
     std::unique_ptr<MapGridData[]> m_pGridData;
-    std::array<uint32_t,32>        m_CollisionMask;
+    std::array<uint32_t, 32>       m_CollisionMask;
 
     //
 };

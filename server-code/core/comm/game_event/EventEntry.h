@@ -3,8 +3,8 @@
 
 #include <functional>
 #include <map>
-#include <set>
 #include <memory>
+#include <set>
 
 #include "BaseCode.h"
 #include "ObjectHeap.h"
@@ -53,8 +53,10 @@ public:
     bool     IsCanceled() const;
     bool     IsWaitTrigger() const;
     bool     IsVaild() const;
+
 private:
     bool CreateEvTimer(event_base* base);
+
 public:
     OBJECTHEAP_DECLARATION(s_heap);
 
@@ -69,7 +71,7 @@ private:
     friend class CEventManager;
 };
 using CEventEntrySharedPtr = std::shared_ptr<CEventEntry>;
-using CEventEntryWeakPtr = std::weak_ptr<CEventEntry>;
+using CEventEntryWeakPtr   = std::weak_ptr<CEventEntry>;
 
 class CEventEntryMap
 {
@@ -78,15 +80,15 @@ public:
     ~CEventEntryMap();
 
 public:
-    void               Clear();
-    bool               Cancel(uint32_t evType);
-    void               ClearByType(uint32_t evType);
+    void                 Clear();
+    bool                 Cancel(uint32_t evType);
+    void                 ClearByType(uint32_t evType);
     CEventEntrySharedPtr Query(uint32_t evType) const;
 
 protected:
     CEventEntryWeakPtr& GetRef(uint32_t evType);
     CEventEntryWeakPtr& operator[](uint32_t evType);
-    bool          Set(const CEventEntrySharedPtr& pEntry);
+    bool                Set(const CEventEntrySharedPtr& pEntry);
 
 protected:
     std::map<uint32_t, CEventEntryWeakPtr> m_setEntry;
@@ -124,9 +126,9 @@ public:
     bool IsWaitTrigger();
 
 protected:
-    CEventEntrySharedPtr  Query() const;
-    CEventEntryWeakPtr& GetRef();
-    bool          Set(const CEventEntrySharedPtr& pEntry);
+    CEventEntrySharedPtr Query() const;
+    CEventEntryWeakPtr&  GetRef();
+    bool                 Set(const CEventEntrySharedPtr& pEntry);
 
 protected:
     CEventEntryWeakPtr m_pEntry;

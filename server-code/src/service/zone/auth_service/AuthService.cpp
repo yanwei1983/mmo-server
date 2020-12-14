@@ -10,7 +10,6 @@
 #include "MsgProcessRegister.h"
 #include "MysqlConnection.h"
 #include "NetMSGProcess.h"
-#include "MsgProcessRegister.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
 #include "server_msg/server_side.pb.h"
@@ -80,7 +79,7 @@ bool CAuthService::Init(const ServerPort& nServerPort)
 
     if(CreateService(100) == false)
         return false;
-    
+
     ServerMSG::ServiceReady msg;
     msg.set_serverport(GetServerPort());
 
@@ -99,4 +98,3 @@ void CAuthService::OnLogicThreadCreate()
     tls_pService = this;
     CServiceCommon::OnLogicThreadCreate();
 }
-

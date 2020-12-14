@@ -1,11 +1,11 @@
 #ifndef SceneService_h__
 #define SceneService_h__
 
+#include "BaseCode.h"
 #include "IService.h"
 #include "MyTimer.h"
 #include "ServiceComm.h"
 #include "game_common_def.h"
-#include "BaseCode.h"
 
 class CMapManager;
 class CSystemVarSet;
@@ -96,7 +96,7 @@ private:
 private:
     CUIDFactory                       m_UIDFactory;
     std::unique_ptr<CMysqlConnection> m_pGlobalDB;
-    
+
     std::unordered_map<uint16_t, std::unique_ptr<CMysqlConnection>> m_GameDBMap;
 
     CMyTimer m_tLastDisplayTime;

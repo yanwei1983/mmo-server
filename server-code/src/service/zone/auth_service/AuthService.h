@@ -27,6 +27,7 @@ public:
 public:
     virtual void OnLogicThreadCreate() override;
     virtual void OnLogicThreadProc() override;
+
 public:
     CGMManager*   GetGMManager() const { return m_pGMManager.get(); }
     CAuthManager* GetAuthManager() const { return m_pAuthManager.get(); }

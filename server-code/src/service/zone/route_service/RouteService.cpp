@@ -70,7 +70,6 @@ bool CRouteService::Init(const ServerPort& nServerPort)
         return false;
     GetEventManager()->Pause(false);
 
-
     if(GetWorldID() != 0)
     {
         ServerMSG::ServiceReady msg;
@@ -79,7 +78,6 @@ bool CRouteService::Init(const ServerPort& nServerPort)
     }
     return true;
 }
-
 
 ON_SERVERMSG(CRouteService, ServiceRegister)
 {
@@ -97,7 +95,7 @@ ON_SERVERMSG(CRouteService, ServiceRegister)
 
         //注册30秒发送一次ready
         CEventEntryCreateParam param;
-        //param.evType = EVENTID_SEND_READY;
+        // param.evType = EVENTID_SEND_READY;
         param.cb = []() {
             RouteService()->SendServiceReady();
         };
@@ -205,7 +203,10 @@ void CRouteService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
         }
         else if(pNetworkMsg->GetBroadcastType() == BROADCAST_INCLUDE)
         {
-            LOGNETTRACE("TransmitMsgToThisZoneWithServiceType From:{} To:{} Cmd:{}", pNetworkMsg->GetFrom(), pNetworkMsg->GetTo(), pNetworkMsg->GetCmd());
+            LOGNETTRACE("TransmitMsgToThisZoneWithServiceType From:{} To:{} Cmd:{}",
+                        pNetworkMsg->GetFrom(),
+                        pNetworkMsg->GetTo(),
+                        pNetworkMsg->GetCmd());
             for(const auto& server_type: pNetworkMsg->GetBroadcastTo())
             {
                 TransmitMsgToThisZoneWithServiceType(pNetworkMsg, server_type);
@@ -213,7 +214,10 @@ void CRouteService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
         }
         else if(pNetworkMsg->GetBroadcastType() == BROADCAST_EXCLUDE)
         {
-            LOGNETTRACE("TransmitMsgToThisZoneAllPortExcept From:{} To:{} Cmd:{}", pNetworkMsg->GetFrom(), pNetworkMsg->GetTo(), pNetworkMsg->GetCmd());
+            LOGNETTRACE("TransmitMsgToThisZoneAllPortExcept From:{} To:{} Cmd:{}",
+                        pNetworkMsg->GetFrom(),
+                        pNetworkMsg->GetTo(),
+                        pNetworkMsg->GetCmd());
             std::set<ServiceType_t> exclude_list(pNetworkMsg->GetBroadcastTo().begin(), pNetworkMsg->GetBroadcastTo().end());
             TransmitMsgToThisZoneAllPortExcept(pNetworkMsg, exclude_list);
         }
@@ -239,10 +243,8 @@ void CRouteService::OnProcessMessage(CNetworkMessage* pNetworkMsg)
     }
 }
 
-
 void CRouteService::OnLogicThreadCreate()
 {
     tls_pService = this;
     CServiceCommon::OnLogicThreadCreate();
 }
-

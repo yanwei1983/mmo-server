@@ -18,8 +18,8 @@
 #include "ServiceDefine.h"
 #include "ServiceLoader.h"
 #include "StringAlgo.h"
-#include "get_opt.h"
 #include "Thread.h"
+#include "get_opt.h"
 
 #ifdef USE_JEMALLOC
 extern "C"
@@ -155,7 +155,6 @@ void sig_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
 //	return (0);				/* success */
 //}
 
-
 int32_t main(int32_t argc, char* argv[])
 {
     open_jemalloc_thp();
@@ -166,7 +165,7 @@ int32_t main(int32_t argc, char* argv[])
         daemon(1, 1);
         // daemon_init();
     }
-    //block all sig ,除了SIGFPE和SIGSEGV
+    // block all sig ,除了SIGFPE和SIGSEGV
     sigset_t block_mask;
     sigfillset(&block_mask);
     sigdelset(&block_mask, SIGFPE);
@@ -174,8 +173,6 @@ int32_t main(int32_t argc, char* argv[])
     sigprocmask(SIG_BLOCK, &block_mask, NULL);
 
     G_INITSEGV();
-
-    
 
     setlocale(LC_ALL, "en_US.UTF-8");
     tzset();
@@ -276,7 +273,7 @@ int32_t main(int32_t argc, char* argv[])
         pthread_sigmask(SIG_UNBLOCK, &unblock_mask, NULL);
 
         struct sigaction sa;
-        sigfillset(&sa.sa_mask); //block all sa when process
+        sigfillset(&sa.sa_mask); // block all sa when process
         sa.sa_flags     = SA_SIGINFO;
         sa.sa_sigaction = &sig_term;
         sigaction(SIGTERM, &sa, NULL);
@@ -284,8 +281,6 @@ int32_t main(int32_t argc, char* argv[])
         sigaction(SIGQUIT, &sa, NULL);
     }
 
-
-    
     BaseCode::InitMonitorLog("comm");
     while(true)
     {
@@ -314,7 +309,7 @@ int32_t main(int32_t argc, char* argv[])
                    result.metadata / 1024.0f / 1024.0f,
                    result.metadata_thp / 1024.0f / 1024.0f,
                    result.num_threads,
-                   result.back_runtime/1000/1000);
+                   result.back_runtime / 1000 / 1000);
 
         sleep(60);
         __LEAVE_FUNCTION

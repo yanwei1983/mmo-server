@@ -1,15 +1,16 @@
 #include "SocketService.h"
 
 #include <functional>
-#include "NetworkService.h"
-#include "NetEventHandler.h"
+
 #include "EventManager.h"
 #include "MemoryHelp.h"
 #include "MessagePort.h"
 #include "MessageRoute.h"
 #include "MonitorMgr.h"
 #include "MsgProcessRegister.h"
+#include "NetEventHandler.h"
 #include "NetSocket.h"
+#include "NetworkService.h"
 #include "msg/ts_cmd.pb.h"
 #include "msg/world_service.pb.h"
 #include "protomsg_to_cmd.h"
@@ -62,26 +63,16 @@ void SetSocketServicePtr(CSocketService* ptr)
     tls_pService = ptr;
 }
 
-
-
 class CSocketServiceNetEventHandler : public CNetEventHandler
 {
 public:
     CSocketServiceNetEventHandler(CSocketService* pService)
-    :m_pService(pService)
-    {}
-    virtual void OnDisconnected(const CNetSocketSharedPtr& pSocket) override
+        : m_pService(pService)
     {
-        m_pService->OnDisconnected(pSocket);
     }
-    virtual void OnAccepted(const CNetSocketSharedPtr& pSocket) override
-    {
-        m_pService->OnAccepted(pSocket);
-    }
-    virtual void OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len) override
-    {
-        m_pService->OnRecvData(pSocket,pBuffer,len);
-    }
+    virtual void OnDisconnected(const CNetSocketSharedPtr& pSocket) override { m_pService->OnDisconnected(pSocket); }
+    virtual void OnAccepted(const CNetSocketSharedPtr& pSocket) override { m_pService->OnAccepted(pSocket); }
+    virtual void OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len) override { m_pService->OnRecvData(pSocket, pBuffer, len); }
 
     CSocketService* m_pService;
 };
@@ -90,7 +81,6 @@ public:
 CSocketService::CSocketService()
 {
     m_tLastDisplayTime.Startup(20);
-
 }
 
 CSocketService::~CSocketService() {}
@@ -132,12 +122,12 @@ bool CSocketService::Init(const ServerPort& nServerPort)
     scope_exit += []() {
         tls_pService = nullptr;
     };
-    CServiceCommon::Init(nServerPort,true);
+    CServiceCommon::Init(nServerPort, true);
     auto oldNdc = BaseCode::SetNdc(GetServiceName());
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
     };
-    m_pNetEventHandler = std::make_shared<CSocketServiceNetEventHandler>(this);
+    m_pNetEventHandler              = std::make_shared<CSocketServiceNetEventHandler>(this);
     const ServerAddrInfo* pAddrInfo = GetMessageRoute()->QueryServiceInfo(GetServerPort());
     if(pAddrInfo == nullptr)
     {
@@ -160,16 +150,12 @@ bool CSocketService::Init(const ServerPort& nServerPort)
     //			return false;
     //		}
 
-
     // SetIPCheck(true);
     RegisterAllMsgProcess<CSocketService>(GetNetMsgProcess());
     AddWaitServiceReady(ServiceID{AUTH_SERVICE, GetServiceID().GetServiceIdx()});
 
-   
     if(CreateService(100) == false)
         return false;
-
-    
 
     return true;
 
@@ -317,7 +303,7 @@ void CSocketService::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffe
         return;
     }
     m_pMonitorMgr->CmdProcessAdd(pHead->msg_cmd);
-    
+
     switch(pHead->msg_cmd)
     {
         default:
@@ -463,7 +449,6 @@ void CSocketService::OnLogicThreadCreate()
     CServiceCommon::OnLogicThreadCreate();
 }
 
-
 void CSocketService::OnLogicThreadProc()
 {
     __ENTER_FUNCTION
@@ -503,5 +488,3 @@ void CSocketService::OnLogicThreadProc()
 
     __LEAVE_FUNCTION
 }
-
-

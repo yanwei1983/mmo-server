@@ -32,9 +32,9 @@ namespace BaseCode
     int32_t g_log_skilldebug = LOG_LEVEL_DEBUG;
 } // namespace BaseCode
 
-static char g_logPath[1024] ="./log";
-static bool g_log_start = false;
-void BaseCode::InitMonitorLog(const std::string& logname)
+static char g_logPath[1024] = "./log";
+static bool g_log_start     = false;
+void        BaseCode::InitMonitorLog(const std::string& logname)
 {
     using namespace zsummer::log4z;
     BaseCode::s_monitor_logger = ILog4zManager::getRef().createLogger(logname.c_str());
@@ -45,9 +45,9 @@ void BaseCode::InitMonitorLog(const std::string& logname)
     LOGDEBUG("InitMonitor:{}", logname);
 }
 
-namespace 
+namespace
 {
-    std::tuple<FILE*,struct tm> logFileOpen(const char* pszName, bool logData)
+    std::tuple<FILE*, struct tm> logFileOpen(const char* pszName, bool logData)
     {
         if(!pszName)
             return {};
@@ -62,16 +62,15 @@ namespace
             szLogName = fmt::format("{}/{}.log", g_logPath, pszName);
 
         FILE* fp = fopen(szLogName.c_str(), "a+");
-        return {fp,localtime_c};
+        return {fp, localtime_c};
     }
-}
-
+} // namespace
 
 void BaseCode::MyLogMsgX(const char* pszName, bool logData, const char* pszBuffer)
 {
     if(!pszBuffer)
         return;
-    auto [fp,localtime_c] = logFileOpen(pszName, logData);
+    auto [fp, localtime_c] = logFileOpen(pszName, logData);
     if(fp == nullptr)
         return;
 
@@ -82,7 +81,7 @@ void BaseCode::MyLogMsgX(const char* pszName, bool logData, const char* pszBuffe
 
 void BaseCode::MyLogMsgX(const char* pszName, bool logData, const char* pSrcFile, int32_t line, const char* pszBuffer)
 {
-    auto [fp,localtime_c] = logFileOpen(pszName, logData);
+    auto [fp, localtime_c] = logFileOpen(pszName, logData);
     if(fp == nullptr)
         return;
 
@@ -116,8 +115,7 @@ void BaseCode::InitLog(const std::string& path, int32_t log_lev)
         strcpy(g_logPath, path.c_str());
     }
 
-    auto set_func = [path](int32_t loggerID)
-    {
+    auto set_func = [path](int32_t loggerID) {
         ILog4zManager::getRef().setLoggerDisplay(loggerID, false);
         ILog4zManager::getRef().setLoggerLimitsize(loggerID, 800);
         if(path.empty() == false)
@@ -125,7 +123,7 @@ void BaseCode::InitLog(const std::string& path, int32_t log_lev)
             ILog4zManager::getRef().setLoggerPath(loggerID, path.c_str());
         }
     };
-    
+
     {
         set_func(BaseCode::s_debug_logger);
         set_func(BaseCode::s_error_logger);
@@ -166,17 +164,16 @@ void BaseCode::SetLogLev(int log_lev)
     ILog4zManager::getRef().setLoggerLevel(BaseCode::s_ai_logger, log_lev);
     ILog4zManager::getRef().setLoggerLevel(BaseCode::s_login_logger, log_lev);
     ILog4zManager::getRef().setLoggerLevel(BaseCode::s_gm_logger, log_lev);
-    
 }
 
 void BaseCode::CreateExtLogDir()
 {
     if(g_log_aidebug >= 0)
-        createRecursionDir(fmt::format("{}{}",g_logPath,"/aidebug"));
+        createRecursionDir(fmt::format("{}{}", g_logPath, "/aidebug"));
     if(g_log_skilldebug >= 0)
-        createRecursionDir(fmt::format("{}{}",g_logPath,"/skilldebug"));
+        createRecursionDir(fmt::format("{}{}", g_logPath, "/skilldebug"));
     if(g_log_actordebug >= 0)
-        createRecursionDir(fmt::format("{}{}",g_logPath,"/actordebug"));
+        createRecursionDir(fmt::format("{}{}", g_logPath, "/actordebug"));
 }
 
 void BaseCode::StopLog()

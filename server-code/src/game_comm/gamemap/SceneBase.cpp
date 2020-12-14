@@ -36,7 +36,7 @@ bool CSceneBase::InitSceneTree(const CPos2D& vBasePos, float fWidth, float fHeig
     CHECKF(pSceneTree);
     m_pSceneTree.reset(pSceneTree);
 
-    LOGDEBUG("CSceneBase::InitSceneTree {} {:p} Tree:{:p}", GetID(),(void*)this,(void*)pSceneTree);
+    LOGDEBUG("CSceneBase::InitSceneTree {} {:p} Tree:{:p}", GetID(), (void*)this, (void*)pSceneTree);
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -51,7 +51,7 @@ bool CSceneBase::LinkSceneTree(CSceneBase* pLinkScene)
     }
 
     m_pSceneTree = pLinkScene->m_pSceneTree;
-    LOGDEBUG("CSceneBase::InitSceneTree {} {:p} Tree:{:p}", GetID(),(void*)this,(void*)m_pSceneTree.get());
+    LOGDEBUG("CSceneBase::InitSceneTree {} {:p} Tree:{:p}", GetID(), (void*)this, (void*)m_pSceneTree.get());
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -76,7 +76,7 @@ CSceneObject* CSceneBase::QueryPlayer(OBJID idObj) const
         return it->second;
     }
     __LEAVE_FUNCTION
-    
+
     return nullptr;
 }
 
@@ -89,7 +89,7 @@ CSceneObject* CSceneBase::QuerySceneObj(OBJID idObj) const
         return it->second;
     }
     __LEAVE_FUNCTION
-    
+
     return nullptr;
 }
 
@@ -136,7 +136,6 @@ void CSceneBase::_LeaveMap(CSceneObject* pActor, uint16_t idTargetMap /*= 0*/)
 
     m_pSceneTree->CheckNeedResizeSceneTile(m_setPlayer.size());
     __LEAVE_FUNCTION
-    
 }
 
 std::optional<Vector2> CSceneBase::FindPosNearby(const Vector2& pos, float range) const
@@ -153,7 +152,6 @@ void CSceneBase::AddDynaRegion(uint32_t nRegionType, const FloatRect& rect)
     __ENTER_FUNCTION
     m_DynaRegionDataSet[nRegionType].AddDynaRegion(rect);
     __LEAVE_FUNCTION
-    
 }
 
 void CSceneBase::ClearDynaRegion(uint32_t nRegionType)
@@ -161,7 +159,6 @@ void CSceneBase::ClearDynaRegion(uint32_t nRegionType)
     __ENTER_FUNCTION
     m_DynaRegionDataSet[nRegionType].Clear();
     __LEAVE_FUNCTION
-    
 }
 
 bool CSceneBase::IsPassDisable(float x, float y, uint32_t actor_type) const

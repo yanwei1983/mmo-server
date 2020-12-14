@@ -13,7 +13,7 @@
 
 class CMessagePort;
 using CMessagePortSharedPtr = std::shared_ptr<CMessagePort>;
-using CMessagePortWeakPtr = std::weak_ptr<CMessagePort>;
+using CMessagePortWeakPtr   = std::weak_ptr<CMessagePort>;
 
 class CNetworkService;
 class CServiceControl;
@@ -85,9 +85,9 @@ public:
 public:
     CMysqlConnection* GetServerInfoDB() const { return m_pServerInfoDB.get(); }
     CNetworkService*  GetNetworkService() const { return m_pNetworkService.get(); }
-    
+
 protected:
-    bool          ConnectServerInfoDB(const std::string& mysql_url);
+    bool                  ConnectServerInfoDB(const std::string& mysql_url);
     CMessagePortSharedPtr _ConnectRemoteServer(const ServerPort& nServerPort, const ServerAddrInfo& info);
     //监听本地,一般无需手动调用, CreateAllMessagePort时已经调用了
     CMessagePortSharedPtr _ListenMessagePort(const ServerPort& nServerPort, const ServerAddrInfo& info);
@@ -100,7 +100,7 @@ protected:
 protected:
     WorldID_t m_nWorldID;
 
-    std::mutex                                    m_mutex;
+    std::mutex                                            m_mutex;
     std::unordered_map<ServerPort, CMessagePortSharedPtr> m_setMessagePort;
 
     std::unique_ptr<CNetworkService>  m_pNetworkService;

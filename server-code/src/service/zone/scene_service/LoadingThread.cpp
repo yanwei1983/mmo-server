@@ -46,7 +46,6 @@ void CLoadingThread::Destory()
                     pData->pPlayer->SaveInfo();
                     SAFE_DELETE(pData->pPlayer);
                 }
-                
             }
             SAFE_DELETE(pData);
         }
@@ -161,7 +160,7 @@ void CLoadingThread::CancleOnWaitList(OBJID idPlayer)
         {
             // remove this
             m_nLoadingCount--;
-            LOGACTORDEBUG(idPlayer, "remove from loading" );
+            LOGACTORDEBUG(idPlayer, "remove from loading");
         }
         else
         {
@@ -277,7 +276,7 @@ void CLoadingThread::OnThreadProcess()
             {
                 //保存成功， 放入ready列表，准备发送ChangeZone消息给TargetZone
                 pCurData->pPlayer->SaveInfo();
-                LOGACTORDEBUG(pCurData->idPlayer, "SaveingReady" );
+                LOGACTORDEBUG(pCurData->idPlayer, "SaveingReady");
                 if(pCurData->bChangeZone)
                 {
                     m_nReadyCount++;

@@ -174,7 +174,7 @@ void CPlayer::_FlyPhase(CSceneBase* pTargetPhase, float fPosX, float fPosY, floa
     CHECK(pOldPhase);
     CHECK(pTargetPhase);
     auto idTargetMap = pTargetPhase->GetSceneIdx().GetMapID();
-    LOGACTORDEBUG( GetID(), "Player FlyMap:{} pos:{:.2f} {:.2f} {:.2f}",idTargetMap, fPosX, fPosY, fRange);
+    LOGACTORDEBUG(GetID(), "Player FlyMap:{} pos:{:.2f} {:.2f} {:.2f}", idTargetMap, fPosX, fPosY, fRange);
     Vector2 targetPos(fPosX, fPosY);
     if(pOldPhase->GetSceneIdx().GetMapID() == idTargetMap)
     {
@@ -452,7 +452,7 @@ bool CPlayer::Reborn(uint32_t nRebornType)
             if(GetCurrentScene()->GetMap()->HasMapFlag(MAPFLAG_DISABLE_REBORN_STANDPOS) == true)
                 return false;
             //元宝检查
-            LOGACTORDEBUG(GetID(),"Player Reborn STANDPOS:{}",  GetCurrentScene()->GetMapID());
+            LOGACTORDEBUG(GetID(), "Player Reborn STANDPOS:{}", GetCurrentScene()->GetMapID());
             GetStatus()->DetachStatusByType(STATUSTYPE_DEAD);
             SetProperty(PROP_HP, GetHPMax(), SYNC_ALL_DELAY);
             FlyToPhase(GetCurrentScene(), GetPosX(), GetPosY(), 0.0f, GetFace());

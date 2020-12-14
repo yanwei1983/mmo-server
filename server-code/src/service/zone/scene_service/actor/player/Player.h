@@ -96,8 +96,9 @@ public:
 
     export_lua void BroadcastShow();
     export_lua bool IsTalkEnable(uint32_t nTalkChannel);
-    
+
     export_lua virtual bool CheckCanMove(const Vector2& posTarget, bool bSet = true) override;
+
 public:
     //属性
     export_lua virtual void     _SetProperty(uint32_t nType, uint32_t nVal, uint32_t nSync = SYNC_TRUE) override;

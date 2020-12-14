@@ -81,13 +81,10 @@ bool CGuildService::Init(const ServerPort& nServerPort)
     if(CreateService(100) == false)
         return false;
 
-    
-
     return true;
     __LEAVE_FUNCTION
     return fales;
 }
-
 
 void CGuildService::OnLogicThreadCreate()
 {

@@ -13,7 +13,7 @@ CEventManager::~CEventManager()
     Destory();
 }
 
-bool CEventManager::Init(event_base* base, bool bPause/* = true*/)
+bool CEventManager::Init(event_base* base, bool bPause /* = true*/)
 {
     m_bPause = bPause;
     if(base == nullptr)
@@ -122,17 +122,16 @@ bool CEventManager::ScheduleEvent(const CEventEntryCreateParam& param, CEventEnt
     auto pEntry = CreateEntry(param, EMT_ENTRY_QUEUE);
     CHECKF(pEntry);
     PushWait(pEntry);
-    
+
     return refEntryQueue.Add(pEntry);
 }
-
 
 bool CEventManager::ScheduleEvent(const CEventEntryCreateParam& param)
 {
     CHECKF(param.cb);
     CHECKF(param.tWaitTime >= 0);
 
-    auto pEntry = CreateEntry(param, EMT_EVMANAGER);    
+    auto pEntry = CreateEntry(param, EMT_EVMANAGER);
     {
         m_ManagedEntry.emplace(CEventEntryWeakPtr{pEntry});
     }
@@ -146,27 +145,27 @@ CEventEntrySharedPtr CEventManager::CreateOrResetEntry(const CEventEntryWeakPtr&
     CHECKF(param.tWaitTime >= 0);
 
     CEventEntrySharedPtr shared_entry_ptr;
-    
+
     if(pEntry.expired() == false)
     {
         shared_entry_ptr = pEntry.lock();
         if(shared_entry_ptr)
         {
             RemoveWait(shared_entry_ptr);
-            
+
             shared_entry_ptr->Clear();
             shared_entry_ptr->Set(param);
             return shared_entry_ptr;
         }
     }
-   
+
     shared_entry_ptr = CreateEntry(param, nManagerType);
     return shared_entry_ptr;
 }
 
 CEventEntrySharedPtr CEventManager::CreateEntry(const CEventEntryCreateParam& param, uint32_t nManagerType)
 {
-    CEventEntrySharedPtr pEntry{ new CEventEntry(this, param, nManagerType) };
+    CEventEntrySharedPtr pEntry{new CEventEntry(this, param, nManagerType)};
     if(pEntry)
     {
         if(pEntry->CreateEvTimer(m_pBase))
@@ -189,7 +188,6 @@ void CEventManager::ReleaseEvent(const CEventEntrySharedPtr& pEntry)
     m_CountEntryByType[pEntry->GetEventType()]--;
 }
 
-
 const std::unordered_map<uint32_t, uint32_t>& CEventManager::GetCountEntryByManagerType()
 {
     return m_CountEntryByManagerType;
@@ -199,7 +197,6 @@ const std::unordered_map<uint32_t, uint32_t>& CEventManager::GetCountEntryByType
 {
     return m_CountEntryByType;
 }
-
 
 void CEventManager::PushWait(const CEventEntrySharedPtr& pEntry)
 {
@@ -222,23 +219,21 @@ void CEventManager::PushWait(const CEventEntrySharedPtr& pEntry)
 
 void CEventManager::ScheduleWait()
 {
-    
+
     while(true)
-    {  
+    {
         CEventEntrySharedPtr pEntry;
         {
             if(m_setWaitEntry.empty())
                 return;
             pEntry = m_setWaitEntry.begin()->lock();
             m_setWaitEntry.erase(m_setWaitEntry.begin());
-           
         }
-        
+
         if(pEntry == nullptr)
             continue;
         if(pEntry->IsVaild() == false)
             continue;
-    
 
         int32_t nRet = -1;
         auto    it   = m_mapCommonTimeVal.find((uint32_t)pEntry->m_tWaitTime);
@@ -249,16 +244,15 @@ void CEventManager::ScheduleWait()
         else
         {
             struct timeval tv = {(long)pEntry->m_tWaitTime / 1000, (long)pEntry->m_tWaitTime % 1000 * 1000};
-            nRet = evtimer_add(pEntry->m_pevTimer, &tv);
+            nRet              = evtimer_add(pEntry->m_pevTimer, &tv);
         }
-        
 
         if(nRet == 0)
         {
             AddRunningEventCount();
             continue;
         }
-        
+
         // if evtimer_add fail,delete it
         pEntry->Release();
     }
@@ -281,7 +275,6 @@ void CEventManager::_DeleteManagedEvent(const CEventEntrySharedPtr& pEntry)
         }
     }
 }
-
 
 size_t CEventManager::GetEventCount()
 {
