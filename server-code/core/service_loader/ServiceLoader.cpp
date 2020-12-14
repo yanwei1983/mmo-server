@@ -23,7 +23,7 @@ ServiceLoader::ServiceLoader()
     event_enable_debug_mode();
     evthread_use_pthreads();
     event_set_log_callback(log_cb);
-    CreateGlobalSetting();
+    
     CreateMessageRoute();
 }
 
@@ -56,7 +56,6 @@ void ServiceLoader::Destory()
     m_setModule.clear();
     LOGMESSAGE("service_loader StopDestory:{}", get_cur_thread_id());
     ReleaseMessageRoute();
-    ReleaseGlobalSetting();
     __LEAVE_FUNCTION
 }
 
@@ -118,14 +117,10 @@ bool ServiceLoader::_StartService(const std::string& dll_name, WorldID_t idWorld
     return false;
 }
 
-bool ServiceLoader::Load(const std::string& setting_filename, WorldID_t nWorldID, const std::set<ServiceID>& create_service_set)
+bool ServiceLoader::Load(WorldID_t nWorldID, const std::set<ServiceID>& create_service_set)
 {
     __ENTER_FUNCTION
-    LOGMESSAGE("LoadServiceSetting Start file:{} world:{}", setting_filename, nWorldID);
-    if(GetGlobalSetting()->LoadSetting(setting_filename) == false)
-    {
-        return false;
-    }
+    LOGMESSAGE("LoadServiceSetting Start world:{}", nWorldID);
     //先将所有的Service存储到MessagePort中，这样当Service开启后，收到的ServiceMsg:service_addr如果没有收录就是新Service
     if(GetMessageRoute()->LoadServiceSetting(nWorldID) == false)
     {

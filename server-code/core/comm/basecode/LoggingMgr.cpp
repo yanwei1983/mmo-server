@@ -7,6 +7,7 @@
 #include "FileUtil.h"
 #include "Thread.h"
 #include "TimeUtil.h"
+#include "GlobalSetting.h"
 
 namespace BaseCode
 {
@@ -90,7 +91,7 @@ void BaseCode::MyLogMsgX(const char* pszName, bool logData, const char* pSrcFile
     fclose(fp);
 }
 
-void BaseCode::InitLog(const std::string& path, int32_t log_lev)
+void BaseCode::InitLog(const std::string& path)
 {
     using namespace zsummer::log4z;
     BaseCode::s_debug_logger   = ILog4zManager::getRef().createLogger("debug");
@@ -140,12 +141,56 @@ void BaseCode::InitLog(const std::string& path, int32_t log_lev)
         set_func(BaseCode::s_gm_logger);
     }
 
-    SetLogLev(log_lev);
+    SetDefaultLogLev();
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_lua_logger, false);
     ILog4zManager::getRef().setLoggerFileLine(BaseCode::s_gm_logger, false);
 
     ILog4zManager::getRef().start();
     g_log_start = true;
+}
+
+bool BaseCode::SetDefaultLogLev()
+{
+    using namespace zsummer::log4z;
+    auto pSetting = GetGlobalSetting();
+    CHECKF(pSetting);
+    const auto& json = pSetting->GetData();
+    const auto& log_setting = json["debug"]["log_default_lev"];
+
+    auto func =[&log_setting](auto loggerID, auto setting_name)->uint32_t
+    {
+        std::string value = log_setting[setting_name];
+
+        auto result = magic_enum::enum_cast<ENUM_LOG_LEVEL>(value);
+        if(result)
+        {
+            auto log_lev = enum_to(result.value());
+            if(loggerID > 0)
+                ILog4zManager::getRef().setLoggerLevel(loggerID, log_lev);  
+            return log_lev;      
+        }
+        return LOG_LEVEL_FATAL;
+    };
+
+    func(BaseCode::s_debug_logger, "debug");
+    func(BaseCode::s_error_logger, "error");
+    func(BaseCode::s_message_logger, "message");
+    func(BaseCode::s_warning_logger, "warning");
+    func(BaseCode::s_fatal_logger, "fatal");
+
+    func(BaseCode::s_network_logger, "network");
+    func(BaseCode::s_db_logger, "db");
+    func(BaseCode::s_stack_logger, "stack");
+    func(BaseCode::s_lua_logger, "lua");
+    func(BaseCode::s_ai_logger, "ai");
+    func(BaseCode::s_login_logger, "login");
+    func(BaseCode::s_gm_logger, "gm");
+
+    BaseCode::g_log_aidebug = func(0, "aidebug");
+    BaseCode::g_log_actordebug = func(0, "actordebug");
+    BaseCode::g_log_skilldebug = func(0, "skilldebug");
+
+    return true;
 }
 
 void BaseCode::SetLogLev(int log_lev)

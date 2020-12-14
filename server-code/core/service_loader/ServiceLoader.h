@@ -17,7 +17,7 @@ public:
     ServiceLoader();
     ~ServiceLoader();
 
-    bool Load(const std::string& setting_filename, WorldID_t nWorldID, const std::set<ServiceID>& create_service_set);
+    bool Load(WorldID_t nWorldID, const std::set<ServiceID>& create_service_set);
     void Destory();
     bool _StartService(const std::string& dll_name, WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx);
 

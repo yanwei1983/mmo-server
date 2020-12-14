@@ -5,9 +5,25 @@
   },
   "debug": 
   {
-    "log_lev": "LOG_LEVEL_DEBUG",
-    "log_aidebug": "LOG_LEVEL_DEBUG",
-    "log_actordebug": "LOG_LEVEL_DEBUG",
-    "log_skilldebug": "LOG_LEVEL_DEBUG"
+    "log_default_lev":
+    {
+      "default":"LOG_LEVEL_DEBUG",
+      "debug":"LOG_LEVEL_DEBUG",
+      "error":"LOG_LEVEL_DEBUG",
+      "message":"LOG_LEVEL_DEBUG",
+      "warning":"LOG_LEVEL_DEBUG",
+      "fatal":"LOG_LEVEL_DEBUG",
+      "network":"LOG_LEVEL_DEBUG",
+      "db":"LOG_LEVEL_DEBUG",
+      "stack":"LOG_LEVEL_DEBUG",
+      "lua":"LOG_LEVEL_DEBUG",
+      "ai":"LOG_LEVEL_DEBUG",
+      "login":"LOG_LEVEL_DEBUG",
+      "gm":"LOG_LEVEL_DEBUG",
+      "aidebug": "LOG_LEVEL_DEBUG",
+      "actordebug": "LOG_LEVEL_DEBUG",
+      "skilldebug": "LOG_LEVEL_DEBUG"
+    }
+   
   }
 }

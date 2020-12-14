@@ -20,6 +20,7 @@
 #include "StringAlgo.h"
 #include "Thread.h"
 #include "get_opt.h"
+#include "GlobalSetting.h"
 
 #ifdef USE_JEMALLOC
 extern "C"
@@ -103,6 +104,8 @@ void destory_all()
         BaseCode::StopLog();
         SAFE_DELETE(g_pLoader);
         stop_jemalloc_backgroud_thread();
+
+        ReleaseGlobalSetting();
     }
 }
 //////////////////////////////////////////////////////////////////////////
@@ -176,26 +179,11 @@ int32_t main(int32_t argc, char* argv[])
 
     setlocale(LC_ALL, "en_US.UTF-8");
     tzset();
-    std::string setting_filename = "res/service_cfg.json";
-    if(opt.has("--config"))
-    {
-        setting_filename = opt["--config"];
-    }
+    
     uint16_t nWorldID = 0;
     if(opt.has("--worldid"))
     {
         nWorldID = std::atoi(opt["--worldid"].c_str());
-    }
-
-    std::string logpath = "./log/";
-    if(opt.has("--logpath"))
-    {
-        logpath = opt["--logpath"];
-    }
-    int32_t log_lev = LOG_LEVEL_DEBUG;
-    if(opt.has("--loglev"))
-    {
-        log_lev = std::atoi(opt["--loglev"].c_str());
     }
 
     if(opt.has("--stop"))
@@ -210,7 +198,31 @@ int32_t main(int32_t argc, char* argv[])
         exit(0);
     }
 
-    BaseCode::InitLog(logpath, log_lev);
+    std::string setting_filename = "res/service_cfg.json";
+    if(opt.has("--config"))
+    {
+        setting_filename = opt["--config"];
+    }
+    CreateGlobalSetting();
+    if(GetGlobalSetting()->LoadSetting(setting_filename) == false)
+    {
+        fmt::print(std::cerr, "load LoadSetting from {} fail.\n",setting_filename); 
+        exit(-1);
+    }
+
+    std::string logpath = "./log/";
+    if(opt.has("--logpath"))
+    {
+        logpath = opt["--logpath"];
+    }
+    int32_t log_lev = LOG_LEVEL_DEBUG;
+    if(opt.has("--loglev"))
+    {
+        log_lev = std::atoi(opt["--loglev"].c_str());
+    }
+
+
+    BaseCode::InitLog(logpath);
     BaseCode::SetNdc("service_loader");
     g_pLoader = new ServiceLoader();
     if(opt.has("--start"))
@@ -223,7 +235,7 @@ int32_t main(int32_t argc, char* argv[])
         exit(-1);
     }
 
-    auto                vec_start_service = split_string(start_service_set, ",");
+    auto vec_start_service = split_string(start_service_set, ",");
     std::set<ServiceID> create_service_set;
     for(const auto& serviceid_str: vec_start_service)
     {
@@ -239,7 +251,7 @@ int32_t main(int32_t argc, char* argv[])
         }
     }
 
-    if(g_pLoader->Load(setting_filename, nWorldID, create_service_set) == false)
+    if(g_pLoader->Load(nWorldID, create_service_set) == false)
     {
         destory_all();
         fmt::print(stderr, "service {} load fail.\n", start_service_set);
