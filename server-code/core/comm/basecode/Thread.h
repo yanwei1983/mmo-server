@@ -19,9 +19,9 @@ public:
 public:
     CNormalThread(int32_t                    nWorkIntervalMS,
                   const std::string&         thread_name            = std::string(),
-                  on_thread_event_function_t on_thread_process_func = on_thread_event_function_t(),
-                  on_thread_event_function_t on_thread_create_func  = on_thread_event_function_t(),
-                  on_thread_event_function_t on_thread_finish_func  = on_thread_event_function_t());
+                  on_thread_event_function_t&& on_thread_process_func = on_thread_event_function_t(),
+                  on_thread_event_function_t&& on_thread_create_func  = on_thread_event_function_t(),
+                  on_thread_event_function_t&& on_thread_finish_func  = on_thread_event_function_t());
     ~CNormalThread();
     uint32_t GetTid() const { return m_tid; }
     void     SetTid(uint32_t val) { m_tid = val; }

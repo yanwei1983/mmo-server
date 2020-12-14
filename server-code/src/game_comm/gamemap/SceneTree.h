@@ -80,7 +80,7 @@ public:
     CSceneTile* GetSceneTileByPos(float x, float y);
     uint32_t    GetSceneTileIndexByPos(float x, float y) const;
     // 遍历自己视野内的SceneTile
-    bool foreach_SceneTileInSight(float x, float y, std::function<void(CSceneTile*)>&& func);
+    bool foreach_SceneTileInSight(float x, float y, const std::function<void(CSceneTile*)>& func);
 
     void       CheckNeedResizeSceneTile(uint32_t nPlayerCount);
     void       SetDynamicAdjustTileLevel(bool v) { m_bDynamicAdjustTileLevel = v; }

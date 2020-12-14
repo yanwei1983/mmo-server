@@ -110,7 +110,7 @@ public:
     size_t GetRankCount(uint32_t nRank);
     size_t GetRankLimit(uint32_t nRank);
 
-    void ForeachMember(std::function<void(const CGuildMemberInfo*)> func);
+    void ForeachMember(const std::function<void(const CGuildMemberInfo*)>& func);
 
 private:
     CGuildMemberInfo* CreateMemberInfo(OBJID idMember, uint32_t nRank);

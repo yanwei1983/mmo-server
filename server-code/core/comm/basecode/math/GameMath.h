@@ -207,7 +207,7 @@ export_lua namespace GameMath
     }
 
     //////////////////////////////////////////////////////////////////////
-    export_lua inline void DDALineForeach(int32_t x0, int32_t y0, int32_t x1, int32_t y1, std::function<bool(int32_t, int32_t)> func)
+    export_lua inline void DDALineForeach(int32_t x0, int32_t y0, int32_t x1, int32_t y1, const std::function<bool(int32_t, int32_t)>& func)
     {
         if(x0 == x1 && y0 == y1)
             return;

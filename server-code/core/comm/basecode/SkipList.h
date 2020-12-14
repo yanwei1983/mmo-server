@@ -143,7 +143,7 @@ public:
 
     /* Delete all the elements with rank between start and end from the skiplist.
      * Start and end are inclusive. Note that start and end need to be 1-based */
-    uint32_t DeleteByRank(uint32_t start, uint32_t end, std::function<void(uint64_t member, uint64_t score)> cb)
+    uint32_t DeleteByRank(uint32_t start, uint32_t end, const std::function<void(uint64_t member, uint64_t score)>& cb)
     {
         CSkipListNode* update[SKIPLIST_MAXLEVEL];
         uint32_t       traversed = 0, removed = 0;

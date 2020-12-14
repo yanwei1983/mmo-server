@@ -119,7 +119,7 @@ bool CNetworkService::EnableListener(evconnlistener* listener, bool bEnable)
     return false;
 }
 
-bool CNetworkService::ListenHttpPort(const char* addr, int32_t port, std::function<void(struct evhttp_request* req)> func)
+bool CNetworkService::ListenHttpPort(const char* addr, int32_t port, std::function<void(struct evhttp_request* req)>&& func)
 {
     __ENTER_FUNCTION
     if(m_pHttpHandle != nullptr)
@@ -382,7 +382,7 @@ static void IOThreadProc(event_base* pBase, const std::string& _thread_name, con
 }
 
 void CNetworkService::StartIOThread(const std::string&    thread_name,
-                                    std::function<void()> time_out_func,
+                                    std::function<void()>&& time_out_func,
                                     uint32_t              time_out_ms,
                                     const ServiceID&      idService)
 {

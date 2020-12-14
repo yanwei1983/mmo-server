@@ -35,7 +35,7 @@ inline void skip_utf8_bom(FILE* fp)
 export_lua inline bool scan_dir(const std::string&                                          parent_path,
                                 const std::string&                                          path,
                                 bool                                                        bRecursive,
-                                std::function<void(const std::string&, const std::string&)> func)
+                                const std::function<void(const std::string&, const std::string&)>& func)
 {
     std::string cur_dir = parent_path + "/" + path;
     DIR*        dp      = opendir(cur_dir.c_str());

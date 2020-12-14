@@ -52,7 +52,7 @@ public:
     evconnlistener* Listen(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler);
     bool            EnableListener(evconnlistener* listener, bool bEnable = false);
     // http监听
-    bool ListenHttpPort(const char* addr, int32_t port, std::function<void(struct evhttp_request* req)> func);
+    bool ListenHttpPort(const char* addr, int32_t port, std::function<void(struct evhttp_request* req)>&& func);
     //阻塞连接到一个目标地址
     CServerSocketWeakPtr ConnectTo(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect = false);
     //异步连接到一个目标地址
@@ -62,7 +62,7 @@ public:
     void BreakLoop();
     //开启独立的IO线程
     void StartIOThread(const std::string&    thread_name,
-                       std::function<void()> time_out_func = std::function<void()>(),
+                       std::function<void()>&& time_out_func = std::function<void()>(),
                        uint32_t              time_out_ms   = 60 * 60,
                        const ServiceID&      idService     = 0);
     void OnIOThreadTimeOut();

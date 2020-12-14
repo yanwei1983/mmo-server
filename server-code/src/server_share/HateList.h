@@ -56,7 +56,7 @@ public:
 
     ST_HATE_DATA* GetHate(OBJID idTarget) { return m_HateList[idTarget]; }
 
-    void FindIF(std::function<bool(ST_HATE_DATA*)> func)
+    void FindIF(const std::function<bool(ST_HATE_DATA*)>& func)
     {
         __ENTER_FUNCTION
         //将失效数据分离

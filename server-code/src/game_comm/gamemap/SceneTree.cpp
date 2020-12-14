@@ -79,7 +79,7 @@ uint32_t CSceneTree::GetSceneTileIndexByPos(float x, float y) const
     return cellx + celly * m_nTileWidth;
 }
 
-bool CSceneTree::foreach_SceneTileInSight(float x, float y, std::function<void(CSceneTile*)>&& func)
+bool CSceneTree::foreach_SceneTileInSight(float x, float y, const std::function<void(CSceneTile*)>& func)
 {
     float dx = x - m_BasePos.x;
     float dy = y - m_BasePos.y;

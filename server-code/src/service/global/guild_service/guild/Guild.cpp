@@ -415,7 +415,7 @@ size_t CGuild::GetRankLimit(uint32_t nRank)
     return 0;
 }
 
-void CGuild::ForeachMember(std::function<void(const CGuildMemberInfo*)> func)
+void CGuild::ForeachMember(const std::function<void(const CGuildMemberInfo*)>& func)
 {
     for(const auto& [member_id, info]: m_setMemberInfo)
     {
