@@ -129,27 +129,23 @@ cd ../..
 
 #挂接文件
 cd bin
-link_debug.sh 或者 link_release.sh
-link_depends_lib.sh
-
-
-#初始化数据库
-init_globaldb.sh
-init_zonedb.sh zone_1.config
+shell/dev/link_debug.sh 或者 lshell/dev/ink_release.sh
+shell/dev/link_depends_lib.sh
 
 
 #启动global
-./start_global.sh
+shell/run/global_one.sh start
 #分离式启动global
-./start_all_global.sh
+shell/run/all_global.sh start
 
 #启动zone
-./start_zone.sh 1001
+shell/run/all_zone.sh start 1001
 #分离式启动zone进程
-./start_zone_separat.sh 1001
+shell/run/zone_one.sh start 1001
+
 
 也可使用
-./service_loader --config=service.xml --start -d
+./service_loader --worldid=1001 --start -d
 ```
 
 
