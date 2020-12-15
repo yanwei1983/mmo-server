@@ -93,7 +93,7 @@
     },
     "cmake.configureEnvironment": {
         "USE_ASAN": "OFF",
-        "USE_TSAN": "ON",
+        "USE_TSAN": "OFF",
         "USE_UBSAN": "OFF",
         "TIDY": "OFF"
     },

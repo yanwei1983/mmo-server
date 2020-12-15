@@ -20,9 +20,9 @@
       "ai":"LOG_LEVEL_DEBUG",
       "login":"LOG_LEVEL_DEBUG",
       "gm":"LOG_LEVEL_DEBUG",
-      "aidebug": "LOG_LEVEL_DEBUG",
-      "actordebug": "LOG_LEVEL_DEBUG",
-      "skilldebug": "LOG_LEVEL_DEBUG"
+      "aidebug": "LOG_LEVEL_INFO",
+      "actordebug": "LOG_LEVEL_INFO",
+      "skilldebug": "LOG_LEVEL_INFO"
     }
    
   }
