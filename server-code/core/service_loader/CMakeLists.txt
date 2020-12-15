@@ -2,7 +2,7 @@ MESSAGE(STATUS "cmake: service_loader")
 # 搜索当前目录下所有文件
 file(GLOB_RECURSE SRCS "*.cc" "*.cpp" "*.c" "*.h" "*.hpp")
 
-
+try_enable_malloc()
 
 
 # 生成库文件

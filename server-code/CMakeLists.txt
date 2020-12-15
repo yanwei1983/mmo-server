@@ -87,6 +87,8 @@ ELSE()
 SET(LIB_FS "stdc++fs")
 ENDIF()
 
+macro(try_enable_malloc)
+
 IF(USE_ASAN)
   add_compile_options("-DUSE_ASAN")
   add_compile_options("-fsanitize=address")
@@ -97,6 +99,7 @@ IF(USE_ASAN)
   link_libraries("-fsanitize=address")
 
   SET(USE_TSAN 0)
+  SET(USE_JEMALLOC 0)
   message("asan:address")
 ENDIF(USE_ASAN)
 
@@ -105,14 +108,24 @@ IF(USE_UBSAN)
   add_compile_options("-fsanitize=undefined")
   link_libraries("-fsanitize=undefined")
   message("asan:undefined")
+  SET(USE_JEMALLOC 0)
 ENDIF(USE_UBSAN)
 
 IF(USE_TSAN)
   add_compile_options("-fsanitize=thread")
   link_libraries("-fsanitize=thread")
   message("asan:thread")
+  SET(USE_JEMALLOC 0)
 ENDIF(USE_TSAN)
 
+IF(USE_JEMALLOC)
+ADD_DEFINITIONS(-DUSE_JEMALLOC)
+set(JEMALLOC_LIB_NAME "libjemalloc.so")
+message("jemalloc:${JEMALLOC_LIB_NAME}")
+ELSE()
+ENDIF()
+
+endmacro(try_enable_malloc)
 
 #-----------------------------------------------------------------------------
 # Enable ccache if not already enabled by symlink masquerading and if no other
@@ -145,12 +158,7 @@ message("tidy:${MY_CLANG_TIDY_STR}")
 ELSE()
 ENDIF()
 
-IF(USE_JEMALLOC)
-ADD_DEFINITIONS(-DUSE_JEMALLOC)
-set(JEMALLOC_LIB_NAME "libjemalloc.so")
-message("jemalloc:${JEMALLOC_LIB_NAME}")
-ELSE()
-ENDIF()
+
 
 message(STATUS "CMAKE_CXX_COMPILER:" ${CMAKE_CXX_COMPILER})
 

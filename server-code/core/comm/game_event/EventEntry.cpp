@@ -10,7 +10,7 @@ CEventEntry::CEventEntry(CEventManager* pManager, const CEventEntryCreateParam& 
     , m_tWaitTime(param.tWaitTime)
     , m_evType(param.evType)
     , m_evManagerType(nManagerType)
-    , m_pCallBack(std::move(param.cb))
+    , m_pCallBack(param.cb)
     , m_bPersist(param.bPersist)
 {
 }

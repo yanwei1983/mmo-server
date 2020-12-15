@@ -129,6 +129,9 @@
     "C_Cpp.intelliSenseEngine": "Tag Parser",
     "clang-format.executable": "clang-format-9",
     "clang.executable": "clang++-9",
-    "clang.cxxflags": ["-std=c++17"],
+    "clang.cxxflags": [
+        "-std=c++17"
+    ],
+    "terminal.integrated.copyOnSelection": true,
     
 }
