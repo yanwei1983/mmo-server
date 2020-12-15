@@ -226,6 +226,13 @@
     }
 #endif
 
+#ifndef __LEAVE_FUNCTION_NO_LOG
+#define __LEAVE_FUNCTION_NO_LOG \
+    }                           \
+    catch(...) {}               \
+    }
+#endif
+
 #ifdef _DEBUG
 
 #ifndef CHECK_DEBUG

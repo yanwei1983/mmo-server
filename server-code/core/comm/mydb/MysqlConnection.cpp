@@ -17,7 +17,7 @@ CMysqlConnection::~CMysqlConnection()
     if(m_AsyncThread)
     {
         m_AsyncThread->Stop();
-        m_AsyncThread->Join();
+        m_AsyncThread->Join(true);
     }
     std::string* pStr = nullptr;
     while(m_MessageQueue.get(pStr))
@@ -117,7 +117,7 @@ bool CMysqlConnection::Connect(const std::string& host,
 
     if(bCreateAsync)
     {
-        m_AsyncThread = std::make_unique<CWorkerThread>("DB AsyncThread", [this, host, user, password, db, port, client_flag]() {
+        m_AsyncThread = std::make_unique<CWorkerThread>("DB AsyncThread", false, [this, host, user, password, db, port, client_flag]() {
             __ENTER_FUNCTION
 
             {
@@ -160,7 +160,7 @@ bool CMysqlConnection::Connect(const std::string& host,
             __LEAVE_FUNCTION
         });
 
-        while(m_AsyncThread->IsReady() == false)
+        while(m_AsyncThread->IsRunning() == false)
         {
             std::this_thread::yield();
         }
@@ -218,7 +218,7 @@ void CMysqlConnection::JoinAsyncThreadFinish()
     if(m_AsyncThread)
     {
         m_AsyncThread->Stop();
-        m_AsyncThread->Join();
+        m_AsyncThread->Join(true);
     }
     __LEAVE_FUNCTION
 }

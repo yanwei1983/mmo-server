@@ -48,12 +48,12 @@ inline std::string GetServiceName(const ServiceID& service_id)
         return "UNKNOWN";
     }
     auto service_type_strview = magic_enum::enum_name<SERVICE_TYPE>(static_cast<SERVICE_TYPE>(service_type));
-
-    std::string service_type_str{service_type_strview.data(), service_type_strview.size()};
+    auto service_type_strview_sample = service_type_strview;
+    service_type_strview_sample.remove_suffix(std::string_view("_SERVICE").size());
+    std::string service_type_str{service_type_strview_sample.data(), service_type_strview_sample.size()};
 
     if(service_id.GetServiceIdx() == 0)
     {
-
         return service_type_str;
     }
     else

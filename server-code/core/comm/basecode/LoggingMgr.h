@@ -6,7 +6,7 @@
 #include <fmt/format.h>
 
 #include "BaseType.h"
-#include "log4z.h"
+#include "LogImpl.h"
 
 struct NDC
 {
@@ -40,7 +40,6 @@ namespace BaseCode
     NDC*        getNdc();
     std::string getNdcStr();
     void        StopLog();
-    void        CreateExtLogDir();
     bool        SetDefaultLogLev();
     void        SetLogLev(int log_lev = LOG_LEVEL_DEBUG);
     bool        IsLogRunning();
@@ -61,28 +60,23 @@ namespace BaseCode
 
     extern thread_local int32_t s_monitor_logger;
 
-    extern int32_t g_log_aidebug;
-    extern int32_t g_log_actordebug;
-    extern int32_t g_log_skilldebug;
+    extern int32_t s_aidetail_logger;
+    extern int32_t s_actordetail_logger;
+    extern int32_t s_skilldetail_logger;
 } // namespace BaseCode
 
 #define LOGTRACE(...)  ZLOGFMT_TRACE(BaseCode::s_debug_logger, ##__VA_ARGS__)
 #define LOGDEBUG(...)  ZLOGFMT_DEBUG(BaseCode::s_debug_logger, ##__VA_ARGS__)
 #define LOGASSERT(...) ZLOGFMT_DEBUG(BaseCode::s_debug_logger, ##__VA_ARGS__)
 
-#define LOG_DETAIL_M(expr, g_log_lev, log_lev, log_dir, actor_id, fmtr, ...)                                                   \
-    if(expr && log_lev >= g_log_lev)                                                                                           \
-    {                                                                                                                          \
-        BaseCode::MyLogMsg(fmt::format(log_dir "/role_{}", actor_id).c_str(), false, __FILE__, __LINE__, fmtr, ##__VA_ARGS__); \
-    }
-
 #define LOGACTORDEBUG(actor_id, fmtr, ...) \
-    LOG_DETAIL_M(true, BaseCode::g_log_actordebug, LOG_LEVEL_DEBUG, "actordebug", actor_id, fmtr, ##__VA_ARGS__)
+    ZLOG_FORMAT_DETAIL(true, BaseCode::s_actordetail_logger, LOG_LEVEL_DEBUG, actor_id, __FILE_NAME__, __LINE__, fmtr, ##__VA_ARGS__)
 #define LOGACTORTRACE(actor_id, fmtr, ...) \
-    LOG_DETAIL_M(true, BaseCode::g_log_actordebug, LOG_LEVEL_TRACE, "actordebug", actor_id, fmtr, ##__VA_ARGS__)
+    ZLOG_FORMAT_DETAIL(true, BaseCode::s_actordetail_logger, LOG_LEVEL_TRACE, actor_id, __FILE_NAME__, __LINE__, fmtr, ##__VA_ARGS__)
 #define LOGSKILLDEBUG(expr, actor_id, fmtr, ...) \
-    LOG_DETAIL_M(expr, BaseCode::g_log_skilldebug, LOG_LEVEL_DEBUG, "skilldebug", actor_id, fmtr, ##__VA_ARGS__)
-#define LOGAIDEBUG(expr, actor_id, fmtr, ...) LOG_DETAIL_M(expr, BaseCode::g_log_aidebug, LOG_LEVEL_DEBUG, "aidebug", actor_id, fmtr, ##__VA_ARGS__)
+    ZLOG_FORMAT_DETAIL(expr, BaseCode::s_skilldetail_logger, LOG_LEVEL_DEBUG, actor_id, __FILE_NAME__, __LINE__, fmtr, ##__VA_ARGS__)
+#define LOGAIDEBUG(expr, actor_id, fmtr, ...) \
+    ZLOG_FORMAT_DETAIL(expr, BaseCode::s_aidetail_logger, LOG_LEVEL_DEBUG, actor_id, __FILE_NAME__, __LINE__, fmtr, ##__VA_ARGS__)
 
 #define LOGNETDEBUG(...) ZLOGFMT_DEBUG(BaseCode::s_network_logger, ##__VA_ARGS__)
 #define LOGNETINFO(...)  ZLOGFMT_INFO(BaseCode::s_network_logger, ##__VA_ARGS__)

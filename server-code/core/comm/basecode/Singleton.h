@@ -1,37 +1,56 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
 
-// thread unsafe
+template<class T>
+class SingletonNoRelease
+{
+protected:
+    SingletonNoRelease() {}
+public:
+    virtual ~SingletonNoRelease() {}
+
+    static T* getPtr()
+    {
+        static T s_ptr;
+        return &s_ptr;
+    }
+};
 
 template<class T>
-class Singleton
+class SingletonNeedCreate
 {
-    Singleton() {}
-
+protected:
+    SingletonNeedCreate() {}
 public:
-    virtual ~Singleton() {}
+    virtual ~SingletonNeedCreate() {}
 
-    T* Instance()
+    static T* Instance()
     {
-        if(m_ptr == nullptr)
-        {
-            if(m_bReleased)
-                return false;
-            m_ptr = new Singleton;
-        }
         return m_ptr;
     }
 
-    void Release()
+    static void CreateInstance()
     {
-        m_bReleased = true;
+        if(m_ptr == nullptr)
+        {
+            m_ptr = new T();
+        }
+    }
+
+    static void Release()
+    {
         if(m_ptr)
-            delete m_ptr;
-        m_ptr = nullptr;
+        {
+            T* p = nullptr;
+            if(m_ptr.exchange(p) == true)
+            {
+                delete p;
+            }
+        }
     }
 
 private:
-    T*   m_ptr       = nullptr;
-    bool m_bReleased = false;
+    static std::atomic<T*>   m_ptr = nullptr;
 };
+
 #endif /* SINGLETON_H */

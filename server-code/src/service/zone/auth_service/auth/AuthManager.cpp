@@ -33,14 +33,14 @@ void CAuthManager::Destory()
     if(m_threadAuth)
     {
         m_threadAuth->Stop();
-        m_threadAuth->Join();
+        m_threadAuth->Join(false);
         m_threadAuth.reset();
     }
 }
 
 bool CAuthManager::Init(CAuthService* pService)
 {
-    m_threadAuth = std::make_unique<CWorkerThread>("auth_thread");
+    m_threadAuth = std::make_unique<CWorkerThread>("auth_thread", false);
     return true;
 }
 

@@ -92,7 +92,8 @@ inline void fixPath(std::string& path)
     }
 }
 
-inline bool isDirectory(std::string path)
+
+inline bool isDirectory(const std::string& path)
 {
 #ifdef WIN32
     return PathIsDirectoryA(path.c_str()) ? true : false;
@@ -115,9 +116,9 @@ inline bool createRecursionDir(std::string path)
 {
     if(path.length() == 0)
         return true;
-    std::string sub;
+    
     fixPath(path);
-
+    std::string sub;
     std::string::size_type pos = path.find('/');
     while(pos != std::string::npos)
     {

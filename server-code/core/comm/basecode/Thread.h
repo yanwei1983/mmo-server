@@ -59,14 +59,36 @@ public:
     typedef std::function<void()> result_function_t;
 
 public:
-    CWorkerThread(const std::string&         thread_name           = std::string(),
-                  on_thread_event_function_t on_thread_create_func = on_thread_event_function_t(),
-                  on_thread_event_function_t on_thread_finish_func = on_thread_event_function_t());
+    CWorkerThread(const std::string& thread_name = std::string(), bool bWaitStart = false)
+    : m_ThreadName(thread_name)
+        , m_bWaitStart(bWaitStart)
+        , m_Thread{std::make_unique<std::thread>(std::bind(&CWorkerThread::ThreadFunc, this))}
+    {
+    }
+    
+    template<class event_func_t>
+    CWorkerThread(const std::string& thread_name, bool bWaitStart, event_func_t&& on_thread_create_func)
+        : m_ThreadName(thread_name)
+        , m_bWaitStart(bWaitStart)
+        , m_Thread{std::make_unique<std::thread>(std::bind(&CWorkerThread::ThreadFunc, this))}
+        , m_funcThreadCreate(std::forward<event_func_t>(on_thread_create_func))
+    {
+    }
+
+    template<class event_func_t>
+    CWorkerThread(const std::string& thread_name, bool bWaitStart, event_func_t&& on_thread_create_func, event_func_t&& on_thread_finish_func)
+        : m_ThreadName(thread_name)
+        , m_bWaitStart(bWaitStart)
+        , m_Thread{std::make_unique<std::thread>(std::bind(&CWorkerThread::ThreadFunc, this))}
+        , m_funcThreadCreate(std::forward<event_func_t>(on_thread_create_func))
+        , m_funcThreadFinish(std::forward<event_func_t>(on_thread_finish_func))
+    {
+    }
     ~CWorkerThread();
 
+    void Start();
     void Stop();
-
-    void Join();
+    void Join(bool bWaitAllJobFinish = true);
 
     void AddJob(job_function_t&& job_func);
 
@@ -74,18 +96,19 @@ public:
 
     void ProcessResult(int32_t nMaxProcess = -1);
 
-    bool IsReady() const;
-
+    bool IsRunning() const;
+   
     void ThreadFunc();
 
 private:
     MPSCQueue<job_function_t>    m_JobList;
     MPSCQueue<result_function_t> m_ResultList;
 
-    std::atomic<bool>       m_bStop    = false;
-    std::atomic<bool>       m_bIsReady = false;
+    std::atomic<bool>       m_bStop      = false;
+    std::atomic<bool>       m_bIsRunning = false;
     std::mutex              m_csCV;
     std::condition_variable m_cv;
+    bool                    m_bWaitStart;
 
     std::string                m_ThreadName;
     on_thread_event_function_t m_funcThreadCreate;

@@ -37,6 +37,7 @@ CNormalThread::CNormalThread(int32_t                      nWorkIntervalMS,
     , m_funcThreadFinish(std::move(on_thread_finish_func))
     , m_Thread{std::make_unique<std::thread>(std::bind(&CNormalThread::ThreadFunc, this))}
 {
+    CHECK_V(m_ThreadName.size() < 16, m_ThreadName);
 }
 
 CNormalThread::~CNormalThread()
@@ -79,6 +80,12 @@ void CNormalThread::ThreadFunc()
     __ENTER_FUNCTION
     SetTid(pthread_self());
 
+    if(m_ThreadName.empty() == false)
+    {
+        pthread_setname_np(pthread_self(), m_ThreadName.c_str());
+    }
+    BaseCode::SetNdc(m_ThreadName);
+
     //允许线程处理SUSPEND_SIG和RESUME_SIG
     sigset_t unblock_mask;
     sigemptyset(&unblock_mask);
@@ -95,11 +102,6 @@ void CNormalThread::ThreadFunc()
     sa.sa_sigaction = &suspend_handler;
     sigaction(SUSPEND_SIG, &sa, NULL);
 
-    if(m_ThreadName.empty() == false)
-    {
-        pthread_setname_np(pthread_self(), m_ThreadName.c_str());
-    }
-    BaseCode::SetNdc(m_ThreadName);
     LOGDEBUG("ThreadCreate:{} ThreadID:{}", m_ThreadName, get_cur_thread_id());
     if(m_funcThreadCreate)
     {
@@ -146,20 +148,24 @@ void CNormalThread::ThreadFunc()
     __LEAVE_FUNCTION
 }
 
-CWorkerThread::CWorkerThread(const std::string&         thread_name /*= std::string()*/,
-                             on_thread_event_function_t on_thread_create_func /*= on_thread_event_function_t()*/,
-                             on_thread_event_function_t on_thread_finish_func /*= on_thread_event_function_t()*/)
-    : m_ThreadName(thread_name)
-    , m_funcThreadCreate(std::move(on_thread_create_func))
-    , m_funcThreadFinish(std::move(on_thread_finish_func))
-    , m_Thread{std::make_unique<std::thread>(std::bind(&CWorkerThread::ThreadFunc, this))}
-{
-}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CWorkerThread::~CWorkerThread()
 {
     Stop();
     Join();
+}
+
+void CWorkerThread::Start()
+{
+    {
+        std::unique_lock<std::mutex> lk(m_csCV);
+        if(m_bWaitStart == false)
+            return;
+        m_bWaitStart = false;
+    }
+    m_cv.notify_one();
 }
 
 void CWorkerThread::ThreadFunc()
@@ -173,11 +179,17 @@ void CWorkerThread::ThreadFunc()
     BaseCode::SetNdc(m_ThreadName);
     LOGDEBUG("ThreadCreate:{} ThreadID:{}", m_ThreadName, get_cur_thread_id());
 
+    if(m_bWaitStart)
+    {
+        std::unique_lock<std::mutex> lk(m_csCV);
+        m_cv.wait(lk, [this]{return m_bWaitStart == false;});
+    }
+    
     if(m_funcThreadCreate)
     {
         m_funcThreadCreate();
     }
-    m_bIsReady = true;
+    m_bIsRunning = true;
     while(m_bStop.load() == false)
     {
         __ENTER_FUNCTION
@@ -201,6 +213,7 @@ void CWorkerThread::ThreadFunc()
     }
     LOGDEBUG("ThreadExit:{} ThreadID:{}", m_ThreadName, get_cur_thread_id());
     BaseCode::ClearNdc();
+    m_bIsRunning = false;
     __LEAVE_FUNCTION
 }
 
@@ -210,12 +223,20 @@ void CWorkerThread::Stop()
     m_cv.notify_one();
 }
 
-void CWorkerThread::Join()
+void CWorkerThread::Join(bool bWaitAllJobFinish)
 {
     if(m_Thread)
     {
         m_Thread->join();
         m_Thread.reset();
+        if(bWaitAllJobFinish)
+        {
+            std::function<void()> job_func;
+            while(m_JobList.get(job_func))
+            {
+                job_func();
+            }
+        }
     }
 }
 
@@ -247,7 +268,7 @@ void CWorkerThread::ProcessResult(int32_t nMaxProcess)
     }
 }
 
-bool CWorkerThread::IsReady() const
+bool CWorkerThread::IsRunning() const
 {
-    return m_bIsReady;
+    return m_bIsRunning;
 }

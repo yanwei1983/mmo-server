@@ -122,7 +122,6 @@ bool CSceneService::Init(const ServerPort& nServerPort)
     scope_exit += [oldNdc]() {
         BaseCode::SetNdc(oldNdc);
     };
-    BaseCode::CreateExtLogDir();
     m_UIDFactory.Init(GetServerPort().GetWorldID(), SCENE_SERVICE_UID_START + GetZoneID());
     m_MessagePoolBySocket.reserve(GUESS_MAX_PLAYER_COUNT);
     m_tLastDisplayTime.Startup(20);
