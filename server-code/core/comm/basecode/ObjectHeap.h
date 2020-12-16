@@ -23,7 +23,8 @@ public:
     virtual ~CObjectHeap();
 
     bool   IsValidPt(void* p);
-    void*  Alloc(size_t size);
+    void*  Alloc(std::size_t size);
+    void*  AlignAlloc(std::size_t size, std::align_val_t align);
     void   Free(void* ptr);
     size_t GetAllocedSize();
 
@@ -40,17 +41,37 @@ protected:
 #endif
 };
 
-#define OBJECTHEAP_DECLARATION(VAR)                               \
-public:                                                           \
-    void  operator delete(void* p) { VAR.Free(p); }               \
-    void* operator new(size_t size) { return VAR.Alloc(size); }   \
-    void  operator delete[](void* p) { VAR.Free(p); }             \
-    void* operator new[](size_t size) { return VAR.Alloc(size); } \
-                                                                  \
-public:                                                           \
-    static bool IsValidPt(void* p) { return VAR.IsValidPt(p); }   \
-                                                                  \
-public:                                                           \
+#define OBJECTHEAP_DECLARATION(VAR)                                                                                                        \
+public:                                                                                                                                    \
+    void* operator new(std::size_t size) { return VAR.Alloc(size); }                                                                       \
+    void* operator new[](std::size_t size) { return VAR.Alloc(size); }                                                                     \
+    void* operator new(std::size_t size, const std::nothrow_t&) noexcept { return VAR.Alloc(size); }                                       \
+    void* operator new[](std::size_t size, const std::nothrow_t&) noexcept { return VAR.Alloc(size); }                                     \
+    void  operator delete(void* ptr) noexcept { VAR.Free(ptr); }                                                                           \
+    void  operator delete[](void* ptr) noexcept { VAR.Free(ptr); }                                                                         \
+    void  operator delete(void* ptr, const std::nothrow_t&) noexcept { VAR.Free(ptr); }                                                    \
+    void  operator delete[](void* ptr, const std::nothrow_t&) noexcept { VAR.Free(ptr); }                                                  \
+                                                                                                                                           \
+public:                                                                                                                                    \
+    void operator delete(void* ptr, std::size_t size) noexcept { VAR.Free(ptr); }                                                          \
+    void operator delete[](void* ptr, std::size_t size) noexcept { VAR.Free(ptr); }                                                        \
+                                                                                                                                           \
+public:                                                                                                                                    \
+    void* operator new(std::size_t size, std::align_val_t align) { return VAR.AlignAlloc(size, align); }                                   \
+    void* operator new(std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept { return VAR.AlignAlloc(size, align); }   \
+    void* operator new[](std::size_t size, std::align_val_t align) { return VAR.AlignAlloc(size, align); }                                 \
+    void* operator new[](std::size_t size, std::align_val_t align, const std::nothrow_t&) noexcept { return VAR.AlignAlloc(size, align); } \
+    void  operator delete(void* ptr, std::align_val_t) noexcept { VAR.Free(ptr); }                                                         \
+    void  operator delete(void* ptr, std::align_val_t, const std::nothrow_t&) noexcept { VAR.Free(ptr); }                                  \
+    void  operator delete(void* ptr, std::size_t size, std::align_val_t al) noexcept { VAR.Free(ptr); }                                    \
+    void  operator delete[](void* ptr, std::align_val_t) noexcept { VAR.Free(ptr); }                                                       \
+    void  operator delete[](void* ptr, std::align_val_t, const std::nothrow_t&) noexcept { VAR.Free(ptr); }                                \
+    void  operator delete[](void* ptr, std::size_t size, std::align_val_t al) noexcept { VAR.Free(ptr); }                                  \
+                                                                                                                                           \
+public:                                                                                                                                    \
+    static bool IsValidPt(void* p) { return VAR.IsValidPt(p); }                                                                            \
+                                                                                                                                           \
+public:                                                                                                                                    \
     static CObjectHeap VAR;
 
 #define OBJECTHEAP_IMPLEMENTATION(T, VAR) CObjectHeap T::VAR(#T, sizeof(T));

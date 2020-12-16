@@ -86,6 +86,31 @@ bool CObjectHeap::IsValidPt(void* p)
 #endif
 }
 
+void* CObjectHeap::AlignAlloc(std::size_t size, std::align_val_t align)
+{
+#ifdef USE_JEMALLOC
+    void* result = je_aligned_alloc(enum_to(align), size);
+#else
+    void* result = aligned_alloc(align, size);
+#endif
+    if(result == nullptr)
+    {
+        throw std::bad_alloc();
+    }
+    g_alloc_from_object_heap_size += m_OneSize;
+
+    m_lNumAllocsInHeap++;
+    if(m_lNumAllocsInHeap > m_lMaxAllocsInHeap)
+        m_lMaxAllocsInHeap = m_lNumAllocsInHeap.load();
+
+#if defined(HEAP_DEBUG)
+    std::lock_guard<std::mutex> lock(m_mutexDebugInfo);
+    m_setDebugInfo[result] = m_setCallFrame->MakeCallFrame(1);
+#endif
+
+    return result;
+}
+
 void* CObjectHeap::Alloc(size_t size)
 {
 #ifdef USE_JEMALLOC
