@@ -7,7 +7,10 @@
 #include <google/protobuf/stubs/logging.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <sys/prctl.h>
 
 #include "BaseCode.h"
 #include "FileLock.h"
@@ -157,15 +160,94 @@ void sig_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
 //	return (0);				/* success */
 //}
 
+
+char** g_argv = nullptr;
+int32_t g_argc = 0;
+int g_child_pid = 0;
+void sig_notify_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
+{
+    kill(g_child_pid, SIGTERM);
+    std::exit(1);
+}
+
+void create_child_and_watch()
+{
+    do
+    {
+        g_child_pid = fork();
+        if(g_child_pid == 0)
+        {
+            //setsid();
+            return;
+        }
+        else
+        {
+            pthread_setname_np(pthread_self(), "child_watcher");
+            for(int i = 1; i < g_argc; i++)
+            {
+                auto len = strlen(g_argv[i]);
+                memset((void*)g_argv[i], 0, len);
+            }
+            strcpy(g_argv[1],"--watcher");
+            sigset_t unblock_mask;
+            sigemptyset(&unblock_mask);
+            sigaddset(&unblock_mask, SIGTERM);
+            sigaddset(&unblock_mask, SIGINT);
+            sigaddset(&unblock_mask, SIGQUIT);
+            pthread_sigmask(SIG_UNBLOCK, &unblock_mask, NULL);
+
+            struct sigaction sa;
+            sigfillset(&sa.sa_mask); // block all sa when process
+            sa.sa_flags     = SA_SIGINFO;
+            sa.sa_sigaction = &sig_notify_term;
+            sigaction(SIGTERM, &sa, NULL);
+            sigaction(SIGINT, &sa, NULL);
+            sigaction(SIGQUIT, &sa, NULL);
+
+            //father
+            int status = 0;
+            auto ret = waitpid(g_child_pid,&status,0);
+            bool bExited = WIFEXITED(status);
+            int nExitCode = 0;
+            if(bExited)
+            {
+                nExitCode = WEXITSTATUS(status);
+            }
+            bool bSignal = WIFSIGNALED(status);
+            int nSignCode = 0;
+            if(bSignal)
+            {
+                nSignCode = WTERMSIG(status);
+            }
+            bool bStoped = WIFSTOPPED(status);
+            int nStopCode = 0;
+            if(bStoped)
+            {
+                nStopCode =WSTOPSIG(status);
+            }
+
+            //printf("ret:%d exitc:%d signc:%d stopc:%d\r\n", ret, nExitCode, nSignCode, nStopCode);
+            if(nExitCode == 1 || nExitCode == 0 || nSignCode == SIGKILL)
+            {
+                //printf("stop watch\r\n");
+                std::exit(1);
+            }
+        }
+    } while (true);
+}
+
 int32_t main(int32_t argc, char* argv[])
 {
-    
+    g_argc = argc;
+    g_argv = argv;
     get_opt opt(argc, (const char**)argv);
     //请小心使用daemon/fork,这样会导致在main函数之前创建的线程被干掉
     if(opt.has("--daemon") || opt.has("-d"))
     {
         daemon(1, 1);
         // daemon_init();
+        if(opt.has("--watcher"))
+            create_child_and_watch();
     }
     // block all sig ,除了SIGFPE和SIGSEGV
     sigset_t block_mask;
@@ -206,7 +288,7 @@ int32_t main(int32_t argc, char* argv[])
     if(GetGlobalSetting()->LoadSetting(setting_filename) == false)
     {
         fmt::print(std::cerr, "load LoadSetting from {} fail.\n", setting_filename);
-        exit(-1);
+        exit(0);
     }
 
     std::string logpath = "./log/";
@@ -253,7 +335,7 @@ int32_t main(int32_t argc, char* argv[])
     {
         destory_all();
         fmt::print(stderr, "service {} load fail.\n", start_service_set);
-        exit(-1);
+        exit(0);
     }
     fmt::print("service {} load succ.\n", start_service_set);
     LOGDEBUG("main ThreadID:{}", get_cur_thread_id());
@@ -262,7 +344,7 @@ int32_t main(int32_t argc, char* argv[])
     {
         destory_all();
         fmt::print(stderr, "open stdout.log fail.\n");
-        exit(-1);
+        exit(0);
     }
 
     savefd_out = dup(STDOUT_FILENO);
