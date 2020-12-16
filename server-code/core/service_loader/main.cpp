@@ -103,7 +103,6 @@ void destory_all()
         plock.reset();
         BaseCode::StopLog();
         SAFE_DELETE(g_pLoader);
-        stop_jemalloc_backgroud_thread();
 
         ReleaseGlobalSetting();
     }
@@ -160,7 +159,7 @@ void sig_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
 
 int32_t main(int32_t argc, char* argv[])
 {
-    open_jemalloc_thp();
+    
     get_opt opt(argc, (const char**)argv);
     //请小心使用daemon/fork,这样会导致在main函数之前创建的线程被干掉
     if(opt.has("--daemon") || opt.has("-d"))
@@ -272,7 +271,7 @@ int32_t main(int32_t argc, char* argv[])
     dup2(fileno(pStdOutFile), STDERR_FILENO);
     fclose(pStdOutFile);
     pStdOutFile = NULL;
-    start_jemalloc_backgroud_thread();
+    
 
     {
         //当前主线程处理该信号
