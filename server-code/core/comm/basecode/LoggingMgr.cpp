@@ -5,9 +5,9 @@
 #include <fmt/printf.h>
 
 #include "FileUtil.h"
+#include "GlobalSetting.h"
 #include "Thread.h"
 #include "TimeUtil.h"
-#include "GlobalSetting.h"
 
 namespace BaseCode
 {
@@ -37,7 +37,8 @@ static char g_logPath[1024] = "./log";
 static bool g_log_start     = false;
 void        BaseCode::InitMonitorLog(const std::string& logname)
 {
-    BaseCode::s_monitor_logger = CLogManager::getPtr()->createLogger({.name = logname, .path = std::string(g_logPath) + "/monitor", .fileLine = false});
+    BaseCode::s_monitor_logger =
+        CLogManager::getPtr()->createLogger({.name = logname, .path = std::string(g_logPath) + "/monitor", .fileLine = false});
     LOGDEBUG("InitMonitor:{}", logname);
 }
 
@@ -94,16 +95,15 @@ int32_t getLogDefaultLev(const char* logger_name)
     __ENTER_FUNCTION
     auto pSetting = GetGlobalSetting();
     CHECKF(pSetting);
-    const auto& json = pSetting->GetData();
+    const auto& json        = pSetting->GetData();
     const auto& log_setting = json["debug"]["log_default_lev"];
 
-
-    std::string value = log_setting[logger_name];
-    auto result = magic_enum::enum_cast<ENUM_LOG_LEVEL>(value);
+    std::string value  = log_setting[logger_name];
+    auto        result = magic_enum::enum_cast<ENUM_LOG_LEVEL>(value);
     if(result)
     {
         auto log_lev = enum_to(result.value());
-        return log_lev;      
+        return log_lev;
     }
     __LEAVE_FUNCTION_NO_LOG
     return LOG_LEVEL_FATAL;

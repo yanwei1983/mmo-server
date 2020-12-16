@@ -11,6 +11,7 @@
 
 #include "BaseCode.h"
 #include "FileLock.h"
+#include "GlobalSetting.h"
 #include "LoggingMgr.h"
 #include "MemoryHelp.h"
 #include "ObjectHeap.h"
@@ -20,7 +21,6 @@
 #include "StringAlgo.h"
 #include "Thread.h"
 #include "get_opt.h"
-#include "GlobalSetting.h"
 
 #ifdef USE_JEMALLOC
 extern "C"
@@ -179,7 +179,7 @@ int32_t main(int32_t argc, char* argv[])
 
     setlocale(LC_ALL, "en_US.UTF-8");
     tzset();
-    
+
     uint16_t nWorldID = 0;
     if(opt.has("--worldid"))
     {
@@ -206,7 +206,7 @@ int32_t main(int32_t argc, char* argv[])
     CreateGlobalSetting();
     if(GetGlobalSetting()->LoadSetting(setting_filename) == false)
     {
-        fmt::print(std::cerr, "load LoadSetting from {} fail.\n",setting_filename); 
+        fmt::print(std::cerr, "load LoadSetting from {} fail.\n", setting_filename);
         exit(-1);
     }
 
@@ -221,7 +221,6 @@ int32_t main(int32_t argc, char* argv[])
         log_lev = std::atoi(opt["--loglev"].c_str());
     }
 
-
     BaseCode::InitLog(logpath);
     BaseCode::SetNdc("service_loader");
     g_pLoader = new ServiceLoader();
@@ -235,7 +234,7 @@ int32_t main(int32_t argc, char* argv[])
         exit(-1);
     }
 
-    auto vec_start_service = split_string(start_service_set, ",");
+    auto                vec_start_service = split_string(start_service_set, ",");
     std::set<ServiceID> create_service_set;
     for(const auto& serviceid_str: vec_start_service)
     {

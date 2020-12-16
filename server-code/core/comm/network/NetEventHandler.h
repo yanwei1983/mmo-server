@@ -2,6 +2,7 @@
 #define NETEVENTHANDLER_H
 
 #include <memory>
+
 #include "NetworkDefine.h"
 class CNetSocket;
 using CNetSocketSharedPtr = std::shared_ptr<CNetSocket>;

@@ -23,13 +23,13 @@ const static char LOG_COLOR[LOG_LEVEL_FATAL + 1][50] = {"\e[0m",
                                                         "\e[31m",      // red
                                                         "\e[32m",      // green
                                                         "\e[35m"};
-CLogManager* CLogManager::getInstance()
+CLogManager*      CLogManager::getInstance()
 {
     static CLogManager m;
     return &m;
 }
 
-CLogManager::CLogManager() 
+CLogManager::CLogManager()
 {
     LoggerConfig main_cfg;
     main_cfg.name = LOG_MAIN_LOGGER_KEY;

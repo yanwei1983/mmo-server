@@ -1,10 +1,11 @@
 #ifndef LOGMANAGER_H
 #define LOGMANAGER_H
 
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
-#include <memory>
+
 #include <errno.h>
 #include <fmt/format.h>
 #include <fmt/printf.h>
@@ -43,7 +44,6 @@ struct LogData
     uint64_t    detail;
     std::string ndc;     // ndc
     std::string content; // content
-    
 
     OBJECTHEAP_DECLARATION(s_heap);
 };
@@ -89,7 +89,7 @@ public:
     static CLogManager*        getInstance();
     inline static CLogManager& getRef() { return *getInstance(); }
     inline static CLogManager* getPtr() { return getInstance(); }
-    LoggerID createLogger(const LoggerConfig& cfg);
+    LoggerID                   createLogger(const LoggerConfig& cfg);
 
     bool start();
     bool stop();
@@ -136,18 +136,18 @@ private:
 };
 
 //! base macro.
-#define ZLOG_STREAM(id, level, file, line, log)                                               \
-    do                                                                                        \
-    {                                                                                         \
-        if(CLogManager::getPtr()->prePushLog(id, level))                                      \
-        {                                                                                     \
+#define ZLOG_STREAM(id, level, file, line, log)                                         \
+    do                                                                                  \
+    {                                                                                   \
+        if(CLogManager::getPtr()->prePushLog(id, level))                                \
+        {                                                                               \
             auto __pLog = CLogManager::getPtr()->makeLogData(id, level, 0, file, line); \
-            if(__pLog)                                                                        \
-            {                                                                                 \
-                __pLog->content = log;                                                        \
-                CLogManager::getPtr()->pushLog(__pLog);                            \
-            }                                                                                 \
-        }                                                                                     \
+            if(__pLog)                                                                  \
+            {                                                                           \
+                __pLog->content = log;                                                  \
+                CLogManager::getPtr()->pushLog(__pLog);                                 \
+            }                                                                           \
+        }                                                                               \
     } while(0)
 
 //! fast macro
@@ -181,12 +181,12 @@ private:
                 try                                                                     \
                 {                                                                       \
                     __pLog->content = fmt::format(logformat, ##__VA_ARGS__);            \
-                    CLogManager::getPtr()->pushLog(__pLog);                  \
+                    CLogManager::getPtr()->pushLog(__pLog);                             \
                 }                                                                       \
                 catch(fmt::format_error & e)                                            \
                 {                                                                       \
                     __pLog->content = fmt::format("format_error:%s", e.what());         \
-                    CLogManager::getPtr()->pushLog(__pLog);                  \
+                    CLogManager::getPtr()->pushLog(__pLog);                             \
                 }                                                                       \
             }                                                                           \
         }                                                                               \
@@ -203,12 +203,12 @@ private:
                 try                                                                             \
                 {                                                                               \
                     __pLog->content = fmt::format(logformat, ##__VA_ARGS__);                    \
-                    CLogManager::getPtr()->pushLog(__pLog);                          \
+                    CLogManager::getPtr()->pushLog(__pLog);                                     \
                 }                                                                               \
                 catch(fmt::format_error & e)                                                    \
                 {                                                                               \
                     __pLog->content = fmt::format("format_error:%s", e.what());                 \
-                    CLogManager::getPtr()->pushLog(__pLog);                          \
+                    CLogManager::getPtr()->pushLog(__pLog);                                     \
                 }                                                                               \
             }                                                                                   \
         }                                                                                       \

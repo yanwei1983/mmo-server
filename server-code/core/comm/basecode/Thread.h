@@ -60,12 +60,12 @@ public:
 
 public:
     CWorkerThread(const std::string& thread_name = std::string(), bool bWaitStart = false)
-    : m_ThreadName(thread_name)
+        : m_ThreadName(thread_name)
         , m_bWaitStart(bWaitStart)
         , m_Thread{std::make_unique<std::thread>(std::bind(&CWorkerThread::ThreadFunc, this))}
     {
     }
-    
+
     template<class event_func_t>
     CWorkerThread(const std::string& thread_name, bool bWaitStart, event_func_t&& on_thread_create_func)
         : m_ThreadName(thread_name)
@@ -97,7 +97,7 @@ public:
     void ProcessResult(int32_t nMaxProcess = -1);
 
     bool IsRunning() const;
-   
+
     void ThreadFunc();
 
 private:

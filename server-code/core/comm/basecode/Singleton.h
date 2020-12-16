@@ -6,6 +6,7 @@ class SingletonNoRelease
 {
 protected:
     SingletonNoRelease() {}
+
 public:
     virtual ~SingletonNoRelease() {}
 
@@ -21,13 +22,11 @@ class SingletonNeedCreate
 {
 protected:
     SingletonNeedCreate() {}
+
 public:
     virtual ~SingletonNeedCreate() {}
 
-    static T* Instance()
-    {
-        return m_ptr;
-    }
+    static T* Instance() { return m_ptr; }
 
     static void CreateInstance()
     {
@@ -50,7 +49,7 @@ public:
     }
 
 private:
-    static std::atomic<T*>   m_ptr = nullptr;
+    static std::atomic<T*> m_ptr = nullptr;
 };
 
 #endif /* SINGLETON_H */

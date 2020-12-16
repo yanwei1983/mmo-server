@@ -10,9 +10,9 @@
 #include "Misc.h"
 #include "export_lua.h"
 
-const size_t _MAX_MSGSIZE = 1024 * 4;
+const size_t _MAX_MSGSIZE                  = 1024 * 4;
 const size_t _DEFAULT_LOGWRITEHIGHWATEMARK = 1024; // packet*1024
-using WorldID_t            = uint16_t;
+using WorldID_t                            = uint16_t;
 
 using ServiceType_t = uint8_t;
 using ServiceIdx_t  = uint8_t;

@@ -23,7 +23,7 @@ ServiceLoader::ServiceLoader()
     event_enable_debug_mode();
     evthread_use_pthreads();
     event_set_log_callback(log_cb);
-    
+
     CreateMessageRoute();
 }
 

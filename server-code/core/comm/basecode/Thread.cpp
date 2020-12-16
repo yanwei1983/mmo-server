@@ -148,7 +148,6 @@ void CNormalThread::ThreadFunc()
     __LEAVE_FUNCTION
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CWorkerThread::~CWorkerThread()
@@ -182,9 +181,9 @@ void CWorkerThread::ThreadFunc()
     if(m_bWaitStart)
     {
         std::unique_lock<std::mutex> lk(m_csCV);
-        m_cv.wait(lk, [this]{return m_bWaitStart == false;});
+        m_cv.wait(lk, [this] { return m_bWaitStart == false; });
     }
-    
+
     if(m_funcThreadCreate)
     {
         m_funcThreadCreate();
