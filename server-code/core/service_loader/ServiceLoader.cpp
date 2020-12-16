@@ -49,9 +49,9 @@ void ServiceLoader::Destory()
     m_setService.clear();
     for(auto it = m_setModule.begin(); it != m_setModule.end(); it++)
     {
-#ifndef USE_ASAN
-        dlclose(it->second);
-#endif
+        //因为log模块可能正在使用__FILENAME__,这里close后,会导致__FILENAME__所在的内存被释放，导致core
+        //因为asan需要打印函数名，这里close后，会导致无法识别对应的地址
+        //dlclose(it->second);
     }
     m_setModule.clear();
     LOGMESSAGE("service_loader StopDestory:{}", get_cur_thread_id());
