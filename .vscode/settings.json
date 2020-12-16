@@ -95,7 +95,7 @@
         "USE_ASAN": "OFF",
         "USE_TSAN": "OFF",
         "USE_UBSAN": "OFF",
-        "TIDY": "OFF"
+        "TIDY": "ON"
     },
     "C_Cpp.experimentalFeatures": "Enabled",
     "C_Cpp.intelliSenseMemoryLimit": 1024,
