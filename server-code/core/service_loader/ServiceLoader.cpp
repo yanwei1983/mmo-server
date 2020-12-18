@@ -29,10 +29,10 @@ ServiceLoader::ServiceLoader()
 
 ServiceLoader::~ServiceLoader()
 {
-    Destory();
+    Destroy();
 }
 
-void ServiceLoader::Destory()
+void ServiceLoader::Destroy()
 {
     __ENTER_FUNCTION
     LOGMESSAGE("service_loader StartDestory:{}", get_cur_thread_id());

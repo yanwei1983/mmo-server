@@ -12,7 +12,7 @@ class CGlobalSetting : public NoncopyableT<CGlobalSetting>
 
 public:
     virtual ~CGlobalSetting();
-    bool Destory();
+    bool Destroy();
     CreateNewImpl(CGlobalSetting);
 
 public:

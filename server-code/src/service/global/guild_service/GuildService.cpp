@@ -35,11 +35,11 @@ CGuildService::~CGuildService() {}
 void CGuildService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CGuildService::Destory()
+void CGuildService::Destroy()
 {
     tls_pService = this;
     scope_guards scope_exit;

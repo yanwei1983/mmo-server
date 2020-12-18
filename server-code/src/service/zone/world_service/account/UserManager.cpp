@@ -8,7 +8,7 @@ CUserManager::CUserManager() {}
 
 CUserManager::~CUserManager()
 {
-    Destory();
+    Destroy();
 }
 
 bool CUserManager::Init()
@@ -16,7 +16,7 @@ bool CUserManager::Init()
     return true;
 }
 
-void CUserManager::Destory()
+void CUserManager::Destroy()
 {
     LOGDEBUG("CUserManager::Destory");
     for(auto& v: m_setUser)

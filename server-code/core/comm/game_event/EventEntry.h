@@ -38,7 +38,7 @@ public:
     ~CEventEntry();
 
 public:
-    void Destory();
+    void Destroy();
     void Cancel();
     void Clear();
     void Set(const CEventEntryCreateParam& param);

@@ -30,7 +30,7 @@ public:
 
 public:
     bool       Init(uint16_t idMap, uint16_t idMainPhaseType, uint64_t idPhase);
-    void       Destory();
+    void       Destroy();
     export_lua CPhase* CreatePhase(uint16_t idPhaseType, uint64_t idPhase);
     export_lua CPhase* CreatePhase(uint16_t idPhaseType, const Cfg_Phase* pPhaseData, uint64_t idPhase);
     export_lua CPhase* QueryPhase(uint64_t idPhase) const;

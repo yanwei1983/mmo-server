@@ -36,11 +36,11 @@ CAuthService::~CAuthService() {}
 
 void CAuthService::Release()
 {
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CAuthService::Destory()
+void CAuthService::Destroy()
 {
     tls_pService = this;
     scope_guards scope_exit;

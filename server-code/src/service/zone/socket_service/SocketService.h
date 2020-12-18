@@ -65,7 +65,7 @@ class CSocketService : public IService, public CServiceCommon
     CSocketService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CSocketService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;

@@ -32,7 +32,7 @@ public:
 public:
     size_t    GetAccountSize() const;
     size_t    GetWaitAccountSize() const;
-    void      Destory();
+    void      Destroy();
     CAccount* QueryAccountBySocket(const VirtualSocket& vs) const;
 
 private:

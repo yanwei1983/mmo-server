@@ -16,7 +16,7 @@ public:
     ~CSceneManager();
 
     bool       Init(uint32_t idZone);
-    void       Destory();
+    void       Destroy();
     export_lua CScene* _CreateStaticScene(uint16_t idMap);
     export_lua CPhase* CreatePhase(uint16_t idMap, uint16_t idPhaseType, uint64_t idPhase);
 

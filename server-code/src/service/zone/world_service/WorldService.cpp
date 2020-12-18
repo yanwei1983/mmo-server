@@ -58,11 +58,11 @@ CWorldService::~CWorldService() {}
 void CWorldService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CWorldService::Destory()
+void CWorldService::Destroy()
 {
     __ENTER_FUNCTION
     tls_pService = this;
@@ -72,13 +72,13 @@ void CWorldService::Destory()
     };
     StopLogicThread();
     if(m_pAccountManager)
-        m_pAccountManager->Destory();
+        m_pAccountManager->Destroy();
     m_pAccountManager.reset();
     if(m_pUserManager)
-        m_pUserManager->Destory();
+        m_pUserManager->Destroy();
     m_pUserManager.reset();
     if(m_pTeamManager)
-        m_pTeamManager->Destory();
+        m_pTeamManager->Destroy();
     m_pTeamManager.reset();
     DestoryServiceCommon();
 

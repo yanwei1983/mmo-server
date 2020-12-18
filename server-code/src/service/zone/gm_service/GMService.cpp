@@ -118,11 +118,11 @@ CGMService::~CGMService() {}
 void CGMService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CGMService::Destory()
+void CGMService::Destroy()
 {
     __ENTER_FUNCTION
     tls_pService = this;

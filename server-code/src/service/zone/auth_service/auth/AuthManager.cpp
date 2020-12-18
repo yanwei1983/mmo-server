@@ -25,10 +25,10 @@ CAuthManager::CAuthManager()
 
 CAuthManager::~CAuthManager()
 {
-    Destory();
+    Destroy();
 }
 
-void CAuthManager::Destory()
+void CAuthManager::Destroy()
 {
     if(m_threadAuth)
     {

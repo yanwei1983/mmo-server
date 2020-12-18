@@ -41,7 +41,7 @@ public:
     CreateNewImpl(CLoadingThread);
     ~CLoadingThread();
 
-    void Destory();
+    void Destroy();
 
     //添加玩家到等待登陆队列
     bool AddLoginPlayer(ST_LOADINGTHREAD_PROCESS_DATA&& data);

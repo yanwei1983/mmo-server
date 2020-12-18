@@ -19,7 +19,7 @@ public:
 public:
     ~CAOISceneManager();
 
-    void Destory();
+    void Destroy();
 
     CAOIScene* CreateScene(uint16_t idMap);
 

@@ -23,7 +23,7 @@ class CWorldService : public IService, public CServiceCommon
     CWorldService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CWorldService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;

@@ -75,11 +75,11 @@ CSceneService::~CSceneService() {}
 void CSceneService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CSceneService::Destory()
+void CSceneService::Destroy()
 {
     __ENTER_FUNCTION
 
@@ -91,13 +91,13 @@ void CSceneService::Destory()
 
     StopLogicThread();
     if(m_pLoadingThread)
-        m_pLoadingThread->Destory();
+        m_pLoadingThread->Destroy();
     m_pLoadingThread.reset();
     if(GetSceneManager())
-        GetSceneManager()->Destory();
+        GetSceneManager()->Destroy();
     m_pSceneManager.reset();
     if(GetActorManager())
-        GetActorManager()->Destory();
+        GetActorManager()->Destroy();
     m_pActorManager.reset();
 
     m_MessagePoolBySocket.clear();

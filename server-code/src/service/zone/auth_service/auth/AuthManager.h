@@ -19,7 +19,7 @@ class CAuthManager : public NoncopyableT<CAuthManager>
 
 public:
     CreateNewImpl(CAuthManager);
-    void Destory();
+    void Destroy();
 
 public:
     ~CAuthManager();

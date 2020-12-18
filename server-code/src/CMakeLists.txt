@@ -12,6 +12,8 @@ include_directories(${PROJECT_SOURCE_DIR}/src/game_comm/proto/common/)
 include_directories(${PROJECT_SOURCE_DIR}/src/game_comm/mydbtable/)
 include_directories(${PROJECT_SOURCE_DIR}/src/game_comm/mydbtable/db_proto)
 include_directories(${PROJECT_SOURCE_DIR}/src/game_comm/gamemap/)
+include_directories(${PROJECT_SOURCE_DIR}/src/game_comm/remote_imgui/imgui_comm/)
+include_directories(${PROJECT_SOURCE_DIR}/src/game_comm/remote_imgui/imgui_server/)
 
 
 

@@ -17,10 +17,10 @@ CEventEntry::CEventEntry(CEventManager* pManager, const CEventEntryCreateParam& 
 
 CEventEntry::~CEventEntry()
 {
-    Destory();
+    Destroy();
 }
 
-void CEventEntry::Destory()
+void CEventEntry::Destroy()
 {
     __ENTER_FUNCTION
     Cancel();

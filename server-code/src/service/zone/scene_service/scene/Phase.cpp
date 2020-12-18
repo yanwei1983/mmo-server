@@ -31,7 +31,7 @@ CPhase::CPhase() {}
 
 CPhase::~CPhase() {}
 
-void CPhase::Destory()
+void CPhase::Destroy()
 {
     __ENTER_FUNCTION
     LOGDEBUG("PhaseDestory:{} {} idPhase:{}", GetSceneIdx().GetMapID(), GetSceneIdx().GetPhaseIdx(), m_idPhase);
@@ -213,7 +213,7 @@ bool CPhase::CreateMultiMonster(const CreateMonsterParam& param, uint32_t nNum, 
     return false;
 }
 
-bool CPhase::CanDestory()
+bool CPhase::CanDestroy()
 {
     return m_setPlayer.empty() == true;
 }
@@ -282,7 +282,7 @@ void CPhase::_KickPlayer(const char* pszReason, CPlayer* pPlayer)
     }
 }
 
-bool CPhase::NeedDestory() const
+bool CPhase::NeedDestroy() const
 {
     return m_bDelThis;
 }

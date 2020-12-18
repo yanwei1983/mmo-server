@@ -15,7 +15,7 @@ public:
 public:
     ~CGMManager();
 
-    void Destory();
+    void Destroy();
     void Reload();
 
     uint32_t GetGMLevel(const std::string& openid) const;

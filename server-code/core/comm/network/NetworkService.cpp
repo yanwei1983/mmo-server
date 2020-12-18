@@ -119,7 +119,7 @@ bool CNetworkService::EnableListener(evconnlistener* listener, bool bEnable)
     return false;
 }
 
-bool CNetworkService::ListenHttpPort(const char* addr, int32_t port, std::function<void(struct evhttp_request* req)>&& func)
+bool CNetworkService::ListenHttpPort(const std::string& addr, int32_t port, std::function<void(struct evhttp_request* req)>&& func)
 {
     __ENTER_FUNCTION
     if(m_pHttpHandle != nullptr)
@@ -129,7 +129,7 @@ bool CNetworkService::ListenHttpPort(const char* addr, int32_t port, std::functi
     if(m_pHttpHandle == nullptr)
         return false;
 
-    int32_t ret = evhttp_bind_socket(m_pHttpHandle, addr, port);
+    int32_t ret = evhttp_bind_socket(m_pHttpHandle, addr.c_str(), port);
     if(ret != 0)
     {
         return false;
@@ -150,7 +150,7 @@ void CNetworkService::http_process_cb(struct evhttp_request* req, void* arg)
     __LEAVE_FUNCTION
 }
 
-evconnlistener* CNetworkService::Listen(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler)
+evconnlistener* CNetworkService::Listen(const std::string& addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler)
 {
     __ENTER_FUNCTION
     struct evutil_addrinfo  hits;
@@ -161,7 +161,7 @@ evconnlistener* CNetworkService::Listen(const char* addr, int32_t port, const CN
     hits.ai_protocol = IPPROTO_TCP;
     hits.ai_flags    = EVUTIL_AI_ADDRCONFIG;
 
-    if(evutil_getaddrinfo(addr, std::to_string(port).c_str(), &hits, &answer) != 0)
+    if(evutil_getaddrinfo(addr.c_str(), std::to_string(port).c_str(), &hits, &answer) != 0)
     {
         LOGNETERROR("CNetworkService::Listen:{}:{} evutil_getaddrinfo fail", addr, port);
         return nullptr;
@@ -192,7 +192,7 @@ evconnlistener* CNetworkService::Listen(const char* addr, int32_t port, const CN
     return nullptr;
 }
 
-CServerSocketWeakPtr CNetworkService::ConnectTo(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect)
+CServerSocketWeakPtr CNetworkService::ConnectTo(const std::string& addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect)
 {
     __ENTER_FUNCTION
     struct evutil_addrinfo  hits;
@@ -203,7 +203,7 @@ CServerSocketWeakPtr CNetworkService::ConnectTo(const char* addr, int32_t port, 
     hits.ai_protocol = IPPROTO_TCP;
     hits.ai_flags    = EVUTIL_AI_ADDRCONFIG;
 
-    if(evutil_getaddrinfo(addr, std::to_string(port).c_str(), &hits, &answer) != 0)
+    if(evutil_getaddrinfo(addr.c_str(), std::to_string(port).c_str(), &hits, &answer) != 0)
     {
         LOGNETERROR("CNetworkService::ConnectTo:{}:{} evutil_getaddrinfo fail", addr, port);
         return {};
@@ -245,7 +245,7 @@ CServerSocketWeakPtr CNetworkService::ConnectTo(const char* addr, int32_t port, 
     return {};
 }
 
-CServerSocketWeakPtr CNetworkService::AsyncConnectTo(const char*                      addr,
+CServerSocketWeakPtr CNetworkService::AsyncConnectTo(const std::string&               addr,
                                                      int32_t                          port,
                                                      const CNetEventHandlerSharedPtr& pEventHandler,
                                                      bool                             bAutoReconnect)
@@ -259,7 +259,7 @@ CServerSocketWeakPtr CNetworkService::AsyncConnectTo(const char*                
     hits.ai_protocol = IPPROTO_TCP;
     hits.ai_flags    = EVUTIL_AI_ADDRCONFIG;
 
-    if(evutil_getaddrinfo(addr, std::to_string(port).c_str(), &hits, &answer) != 0)
+    if(evutil_getaddrinfo(addr.c_str(), std::to_string(port).c_str(), &hits, &answer) != 0)
     {
         LOGNETERROR("CNetworkService::AsyncConnectTo:{}:{} evutil_getaddrinfo fail", addr, port);
 

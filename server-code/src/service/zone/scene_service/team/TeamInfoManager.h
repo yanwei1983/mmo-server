@@ -18,7 +18,7 @@ public:
     void OnSetLeader(OBJID idLeader);
     void OnAddMember(OBJID idMember);
     void OnDelMember(OBJID idMember);
-    void OnDestory();
+    void OnDestroy();
 
 public:
     export_lua size_t GetMemeberAmount() const;

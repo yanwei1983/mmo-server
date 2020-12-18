@@ -31,7 +31,7 @@ void ReleaseMessageRoute()
 {
     if(g_pMessageRoute)
     {
-        g_pMessageRoute->Destory();
+        g_pMessageRoute->Destroy();
         SAFE_DELETE(g_pMessageRoute);
     }
 }
@@ -45,10 +45,10 @@ CMessageRoute::CMessageRoute()
 
 CMessageRoute::~CMessageRoute()
 {
-    Destory();
+    Destroy();
 }
 
-void CMessageRoute::Destory()
+void CMessageRoute::Destroy()
 {
     __ENTER_FUNCTION
     if(m_pNetworkService == nullptr)
@@ -69,7 +69,7 @@ void CMessageRoute::Destory()
     LOGDEBUG("MessageRoute ReleasePort.");
     for(auto& [k, v]: m_setMessagePort)
     {
-        v->Destory();
+        v->Destroy();
         LOGDEBUG("MessagePort {}Release.", k);
     }
     m_setMessagePort.clear();

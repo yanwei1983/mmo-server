@@ -17,7 +17,7 @@ class CAIService : public IService, public CServiceCommon
     CAIService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CAIService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;

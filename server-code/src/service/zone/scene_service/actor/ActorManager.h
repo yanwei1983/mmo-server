@@ -40,7 +40,7 @@ public:
 public:
     ~CActorManager();
 
-    void Destory();
+    void Destroy();
 
     CActor*  QueryActor(OBJID id) const;
     CPlayer* QueryPlayer(const VirtualSocket& vs) const;

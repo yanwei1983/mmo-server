@@ -8,7 +8,7 @@ CAISceneManager::CAISceneManager() {}
 
 CAISceneManager::~CAISceneManager()
 {
-    Destory();
+    Destroy();
 }
 
 bool CAISceneManager::Init(uint32_t idZone)
@@ -16,7 +16,7 @@ bool CAISceneManager::Init(uint32_t idZone)
     return true;
 }
 
-void CAISceneManager::Destory()
+void CAISceneManager::Destroy()
 {
     __ENTER_FUNCTION
     for(auto& [k, v]: m_mapScene)

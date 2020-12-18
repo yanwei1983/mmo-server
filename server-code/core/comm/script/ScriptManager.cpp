@@ -60,7 +60,7 @@ CLUAScriptManager::CLUAScriptManager()
 ///////////////////////////////////////////////////////////////////////////////////////
 CLUAScriptManager::~CLUAScriptManager()
 {
-    Destory();
+    Destroy();
 }
 
 void InitBaseCodeInLua(lua_State* L)
@@ -140,7 +140,7 @@ bool CLUAScriptManager::Init(const std::string& name,
     return true;
 }
 
-void CLUAScriptManager::Destory()
+void CLUAScriptManager::Destroy()
 {
     if(m_pLua)
     {

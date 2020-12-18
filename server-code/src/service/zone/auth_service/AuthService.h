@@ -17,7 +17,7 @@ class CAuthService : public IService, public CServiceCommon
     CAuthService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CAuthService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;

@@ -29,10 +29,11 @@ CNetSocket::CNetSocket(CNetworkService* pService, const CNetEventHandlerSharedPt
     , m_nSocketIdx(INVALID_SOCKET_IDX)
     , m_pDecryptor(nullptr)
     , m_pEncryptor(nullptr)
-    , m_nPacketSizeMax(pEventHandler ? pEventHandler->GetPacketSizeMax() : _MAX_MSGSIZE)
+    , m_nSendPacketSizeMax(pEventHandler ? pEventHandler->GetSendPacketSizeMax() : _MAX_MSGSIZE)
+    , m_nRecvPacketSizeMax(pEventHandler ? pEventHandler->GetRecvPacketSizeMax() : _MAX_MSGSIZE)
     , m_nLogWriteHighWateMark(pEventHandler ? pEventHandler->GetLogWriteHighWateMark() : _DEFAULT_LOGWRITEHIGHWATEMARK)
     , m_socket(INVALID_SOCKET)
-    , m_ReadBuff{std::make_unique<byte[]>(m_nPacketSizeMax)}
+    , m_ReadBuff{std::make_unique<byte[]>(m_nRecvPacketSizeMax)}
 {
     m_pEventSendMsg = evuser_new(
         pService->GetEVBase(),
@@ -99,7 +100,7 @@ CNetSocket::SendMsgData::SendMsgData(const CNetworkMessage& msg)
 bool CNetSocket::SendNetworkMessage(CNetworkMessage&& msg)
 {
     __ENTER_FUNCTION
-    CHECKF(msg.GetSize() < GetPacketSizeMax());
+    CHECKF(msg.GetSize() < GetSendPacketSizeMax());
     SendMsgData* pData = new SendMsgData{std::move(msg)};
     m_SendMsgQueue.push(pData);
     PostSend();
@@ -111,7 +112,7 @@ bool CNetSocket::SendNetworkMessage(CNetworkMessage&& msg)
 bool CNetSocket::SendNetworkMessage(const CNetworkMessage& msg, bool bNeedDuplicate)
 {
     __ENTER_FUNCTION
-    CHECKF_FMT(msg.GetSize() < GetPacketSizeMax(), "msg_size:{} packsizemax:{}", msg.GetSize(), GetPacketSizeMax());
+    CHECKF_FMT(msg.GetSize() < GetSendPacketSizeMax(), "msg_size:{} packsizemax:{}", msg.GetSize(), GetSendPacketSizeMax());
     CNetworkMessage send_msg;
     send_msg.CopyRawMessage(msg);
     if(m_pEncryptor && bNeedDuplicate)
@@ -237,12 +238,12 @@ void CNetSocket::_OnReceive(bufferevent* b)
             return;
 
         MSG_HEAD* pHeader = (MSG_HEAD*)evbuffer_pullup(input, sizeof(MSG_HEAD));
-        if(pHeader->msg_size < sizeof(MSG_HEAD) || pHeader->msg_size > GetPacketSizeMax())
+        if(pHeader->msg_size < sizeof(MSG_HEAD) || pHeader->msg_size > GetRecvPacketSizeMax())
         {
             LOGNETERROR("CNetSocket _OnReceive Msg:{} size:{} > MaxSize:{}, LastProcessCMD:{}",
                         pHeader->msg_cmd,
                         pHeader->msg_size,
-                        GetPacketSizeMax(),
+                        GetRecvPacketSizeMax(),
                         m_nLastProcessMsgCMD);
             std::string data;
             for(size_t i = 0; i < m_nLastCMDSize; i++)
@@ -359,15 +360,13 @@ void CNetSocket::_OnSocketEvent(bufferevent* b, short what, void* ctx)
     __LEAVE_FUNCTION
 }
 
-void CNetSocket::SetAddrAndPort(const char* addr, int32_t port)
+void CNetSocket::SetAddrAndPort(const std::string& addr, int32_t port)
 {
     __ENTER_FUNCTION
-    if(addr == nullptr)
-        m_strAddr.clear();
-    else
-        m_strAddr = addr;
+    
+    m_strAddr = addr;
     m_nPort = port;
-    evutil_inet_pton(AF_INET, addr, &m_addr);
+    evutil_inet_pton(AF_INET, addr.c_str(), &m_addr);
     __LEAVE_FUNCTION
 }
 

@@ -19,12 +19,12 @@ CScene::CScene() {}
 
 CScene::~CScene() {}
 
-void CScene::Destory()
+void CScene::Destroy()
 {
     __ENTER_FUNCTION
     for(auto& [k, v]: m_setPhase)
     {
-        v->Destory();
+        v->Destroy();
     }
     m_setPhase.clear();
     m_setPhaseByIdx.clear();
@@ -147,7 +147,7 @@ bool CScene::DestoryPhase(uint64_t idPhase)
     pPhase->KickAllPlayer();
     auto idxSceneIdx = pPhase->GetSceneIdx();
     auto idxPhase    = pPhase->GetSceneIdx().GetPhaseIdx();
-    CHECKF(pPhase->CanDestory() == true);
+    CHECKF(pPhase->CanDestroy() == true);
     m_setPhaseByIdx.erase(idxPhase);
     m_setPhase.erase(idPhase);
     m_DynaIDPool.put(idxPhase);

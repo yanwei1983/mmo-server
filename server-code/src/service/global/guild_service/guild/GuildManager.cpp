@@ -11,7 +11,7 @@ CGuildManager::CGuildManager() {}
 
 CGuildManager::~CGuildManager()
 {
-    Destory();
+    Destroy();
 }
 
 bool CGuildManager::Init()
@@ -54,7 +54,7 @@ bool CGuildManager::Init()
     return false;
 }
 
-void CGuildManager::Destory()
+void CGuildManager::Destroy()
 {
     __ENTER_FUNCTION
     m_setGuildMember.clear();
@@ -146,7 +146,7 @@ bool CGuildManager::DestoryGuild(uint64_t idGuild)
     CGuild* pGuild = QueryGuild(idGuild);
     CHECKF(pGuild);
 
-    pGuild->OnDestory();
+    pGuild->OnDestroy();
     pGuild->SendGuildAction(SC_GUILDMEMBER_ACTION::GUILD_DESTORY, 0, 0);
 
     m_setGuild.erase(pGuild->GetGuildName());

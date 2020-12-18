@@ -13,10 +13,10 @@ CAccountManager::CAccountManager() {}
 
 CAccountManager::~CAccountManager()
 {
-    Destory();
+    Destroy();
 }
 
-void CAccountManager::Destory()
+void CAccountManager::Destroy()
 {
     LOGDEBUG("CAccountManager::Destory");
     for(auto& pair_v: m_setAccount)

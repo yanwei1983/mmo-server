@@ -41,13 +41,14 @@ class CMessagePort : public CNetEventHandler, public NoncopyableT<CMessagePort>,
 
 public:
     virtual ~CMessagePort();
-    void Destory();
+    void Destroy();
 
 public:
     bool Init(const ServerPort& nServerPort, CMessageRoute* pRoute);
 
 public:
-    virtual size_t GetPacketSizeMax() const override { return _MAX_MSGSIZE * 10; }
+    virtual size_t GetSendPacketSizeMax() const override { return _MAX_MSGSIZE * 1024; }//4M_1Packet
+    virtual size_t GetRecvPacketSizeMax() const override { return _MAX_MSGSIZE * 1024; }//4M_1Packet
     virtual size_t GetLogWriteHighWateMark() const override { return _DEFAULT_LOGWRITEHIGHWATEMARK; }
     virtual void   OnBindSocket(const CNetSocketSharedPtr& pSocket) override;
     virtual void   OnUnbindSocket(const CNetSocketSharedPtr& pSocket) override;

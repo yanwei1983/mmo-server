@@ -23,7 +23,7 @@ class CGMService : public IService, public CServiceCommon
     CGMService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CGMService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;

@@ -29,7 +29,7 @@ public:
     CreateNewImpl(CLUAScriptManager);
     ~CLUAScriptManager();
 
-    void Destory();
+    void Destroy();
     void Reload(const std::string& name, bool bExecMain);
 
     void LoadFilesInDir(const std::string& dir, bool bRecursive);

@@ -35,11 +35,11 @@ CRouteService::~CRouteService() {}
 void CRouteService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CRouteService::Destory()
+void CRouteService::Destroy()
 {
     tls_pService = this;
     scope_guards scope_exit;

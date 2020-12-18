@@ -23,7 +23,7 @@ public:
     CUser* QueryUserBySocket(const VirtualSocket& vs);
     CUser* CreateUser(class CAccount* pAccount, struct ST_ROLE_INFO* pInfo);
     void   RemoveUser(CUser*& pRemoveUser);
-    void   Destory();
+    void   Destroy();
 
 public:
 private:

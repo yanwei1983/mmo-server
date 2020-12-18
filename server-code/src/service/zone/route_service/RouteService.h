@@ -13,7 +13,7 @@ class CRouteService : public IService, public CServiceCommon
     CRouteService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CRouteService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;

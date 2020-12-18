@@ -15,11 +15,11 @@ REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 3, 2, 'libai_service.so
 REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 3, 3, 'libai_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+43, '', 0, 0, '0.0.0.0');
 REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 3, 4, 'libai_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+44, '', 0, 0, '0.0.0.0');
 REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 3, 5, 'libai_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+45, '', 0, 0, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 1, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+61, '', 0, 0, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 2, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+62, '', 0, 0, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 3, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+63, '', 0, 0, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 4, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+64, '', 0, 0, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 5, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+65, '', 0, 0, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 1, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+61, '', 0, 31061, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 2, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+62, '', 0, 31062, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 3, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+63, '', 0, 31063, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 4, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+64, '', 0, 31064, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 5, 'libaoi_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+65, '', 0, 31065, '0.0.0.0');
 
 #gateway
 REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 8, 1, 'libauth_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+81, '', 0, 0, '0.0.0.0');

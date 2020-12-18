@@ -99,7 +99,7 @@ bool CGuild::Init(CDBRecordPtr&& pDBRecord)
     return false;
 }
 
-void CGuild::OnDestory()
+void CGuild::OnDestroy()
 {
     ForeachMember([](const CGuildMemberInfo* pInfo) { GuildManager()->UnLinkGuildMember(pInfo->member_id()); });
 

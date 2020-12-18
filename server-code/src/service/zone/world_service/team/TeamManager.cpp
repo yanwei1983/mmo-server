@@ -11,7 +11,7 @@ CTeamManager::CTeamManager() {}
 
 CTeamManager::~CTeamManager()
 {
-    Destory();
+    Destroy();
 }
 
 bool CTeamManager::Init()
@@ -19,7 +19,7 @@ bool CTeamManager::Init()
     return true;
 }
 
-void CTeamManager::Destory()
+void CTeamManager::Destroy()
 {
     for(auto& [k, v]: m_setTeam)
     {

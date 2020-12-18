@@ -50,11 +50,11 @@ CAIService::~CAIService() {}
 void CAIService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CAIService::Destory()
+void CAIService::Destroy()
 {
     __ENTER_FUNCTION
 
@@ -66,7 +66,7 @@ void CAIService::Destory()
     StopLogicThread();
     if(m_pAISceneManager)
     {
-        m_pAISceneManager->Destory();
+        m_pAISceneManager->Destroy();
         m_pAISceneManager.reset();
     }
     if(m_pAIActorManager)

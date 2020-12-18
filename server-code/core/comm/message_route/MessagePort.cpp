@@ -20,11 +20,11 @@ bool CMessagePort::Init(const ServerPort& nServerPort, CMessageRoute* pRoute)
 CMessagePort::~CMessagePort()
 {
     __ENTER_FUNCTION
-    Destory();
+    Destroy();
     __LEAVE_FUNCTION
 }
 
-void CMessagePort::Destory()
+void CMessagePort::Destroy()
 {
     __ENTER_FUNCTION
     CNetworkMessage* pMsg;

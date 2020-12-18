@@ -34,7 +34,7 @@ void CServiceCommon::DestoryServiceCommon()
 
     if(m_pEventManager)
     {
-        m_pEventManager->Destory();
+        m_pEventManager->Destroy();
         m_pEventManager.reset();
     }
 

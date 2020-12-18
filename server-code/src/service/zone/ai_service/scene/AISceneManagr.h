@@ -19,7 +19,7 @@ public:
 public:
     ~CAISceneManager();
 
-    void Destory();
+    void Destroy();
 
     CAIScene* CreateScene(uint16_t idMap);
 

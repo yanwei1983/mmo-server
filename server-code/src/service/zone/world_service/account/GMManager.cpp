@@ -37,14 +37,14 @@ bool CGMManager::Init(CMysqlConnection* pGlobalDB)
     return false;
 }
 
-void CGMManager::Destory()
+void CGMManager::Destroy()
 {
     m_GMList.clear();
 }
 
 void CGMManager::Reload()
 {
-    Destory();
+    Destroy();
     Init();
 }
 

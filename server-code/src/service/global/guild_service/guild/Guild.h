@@ -84,7 +84,7 @@ public:
     bool SetMemberRank(OBJID idOperator, OBJID idMember, uint32_t nRank);
     void SetMemberScore(OBJID idMember, uint32_t nScore);
     void Dismiss(OBJID idOperator);
-    void OnDestory();
+    void OnDestroy();
 
 public:
     bool                    IsLeader(OBJID idActor) const;

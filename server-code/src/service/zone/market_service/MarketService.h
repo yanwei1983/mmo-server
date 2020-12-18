@@ -13,7 +13,7 @@ class CMarketService : public IService, public CServiceCommon
     CMarketService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CMarketService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;

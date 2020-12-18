@@ -14,8 +14,9 @@ public:
     virtual ~CNetEventHandler() {}
 
 public:
-    virtual size_t GetPacketSizeMax() const { return _MAX_MSGSIZE; }
-    virtual size_t GetLogWriteHighWateMark() const { return GetPacketSizeMax() * 1024; }
+    virtual size_t GetSendPacketSizeMax() const { return _MAX_MSGSIZE; }
+    virtual size_t GetRecvPacketSizeMax() const { return _MAX_MSGSIZE; }
+    virtual size_t GetLogWriteHighWateMark() const { return GetRecvPacketSizeMax() * 1024; }
     // socket new
     virtual void OnBindSocket(const CNetSocketSharedPtr&) {}
     // socket delete

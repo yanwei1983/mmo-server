@@ -18,7 +18,7 @@ void ReleaseGlobalSetting()
 {
     if(g_pGlobalSetting)
     {
-        g_pGlobalSetting->Destory();
+        g_pGlobalSetting->Destroy();
         SAFE_DELETE(g_pGlobalSetting);
     }
 }
@@ -30,7 +30,7 @@ bool CGlobalSetting::Init()
 {
     return true;
 }
-bool CGlobalSetting::Destory()
+bool CGlobalSetting::Destroy()
 {
     return true;
 }

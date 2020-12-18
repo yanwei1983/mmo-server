@@ -12,7 +12,7 @@ CSceneManager::CSceneManager()
 
 CSceneManager::~CSceneManager()
 {
-    Destory();
+    Destroy();
 }
 
 bool CSceneManager::Init(uint32_t idZone)
@@ -32,13 +32,13 @@ bool CSceneManager::Init(uint32_t idZone)
     return false;
 }
 
-void CSceneManager::Destory()
+void CSceneManager::Destroy()
 {
     __ENTER_FUNCTION
     LOGDEBUG("CSceneManager::Destory");
     for(auto& [k, v]: m_mapScene)
     {
-        v->Destory();
+        v->Destroy();
         SAFE_DELETE(v);
     }
     m_mapScene.clear();

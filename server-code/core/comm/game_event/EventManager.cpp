@@ -10,7 +10,7 @@ CEventManager::CEventManager()
 
 CEventManager::~CEventManager()
 {
-    Destory();
+    Destroy();
 }
 
 bool CEventManager::Init(event_base* base, bool bPause /* = true*/)
@@ -63,7 +63,7 @@ bool CEventManager::Init(event_base* base, bool bPause /* = true*/)
     return true;
 }
 
-void CEventManager::Destory()
+void CEventManager::Destroy()
 {
     {
         m_ManagedEntry.clear();

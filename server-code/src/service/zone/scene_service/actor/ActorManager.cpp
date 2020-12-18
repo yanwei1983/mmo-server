@@ -7,7 +7,7 @@ CActorManager::CActorManager() {}
 
 CActorManager::~CActorManager()
 {
-    Destory();
+    Destroy();
 }
 
 bool CActorManager::Init()
@@ -25,7 +25,7 @@ bool CActorManager::Init()
     return false;
 }
 
-void CActorManager::Destory()
+void CActorManager::Destroy()
 {
     __ENTER_FUNCTION
     LOGDEBUG("CActorManager::Destory");

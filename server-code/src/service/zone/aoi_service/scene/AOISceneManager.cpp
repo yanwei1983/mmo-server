@@ -8,7 +8,7 @@ CAOISceneManager::CAOISceneManager() {}
 
 CAOISceneManager::~CAOISceneManager()
 {
-    Destory();
+    Destroy();
 }
 
 bool CAOISceneManager::Init(uint32_t idZone)
@@ -16,7 +16,7 @@ bool CAOISceneManager::Init(uint32_t idZone)
     return true;
 }
 
-void CAOISceneManager::Destory()
+void CAOISceneManager::Destroy()
 {
     __ENTER_FUNCTION
     for(auto& [k, v]: m_mapScene)

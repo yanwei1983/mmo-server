@@ -46,7 +46,7 @@ void CTeamInfo::OnDelMember(OBJID idMember)
     __LEAVE_FUNCTION
 }
 
-void CTeamInfo::OnDestory()
+void CTeamInfo::OnDestroy()
 {
     __ENTER_FUNCTION
     for(OBJID idActor: m_setMemberID)
@@ -119,7 +119,7 @@ void CTeamInfoManager::OnDestoryTeam(uint64_t idTeam)
     auto pTeamInfo = it->second;
     if(pTeamInfo)
     {
-        pTeamInfo->OnDestory();
+        pTeamInfo->OnDestroy();
     }
     m_setTeam.erase(it);
     __LEAVE_FUNCTION

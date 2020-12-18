@@ -8,7 +8,7 @@ CLoadingThread::CLoadingThread() {}
 
 CLoadingThread::~CLoadingThread()
 {
-    Destory();
+    Destroy();
 }
 
 bool CLoadingThread::Init(CSceneService* pZoneRef)
@@ -22,7 +22,7 @@ bool CLoadingThread::Init(CSceneService* pZoneRef)
     return true;
 }
 
-void CLoadingThread::Destory()
+void CLoadingThread::Destroy()
 {
     __ENTER_FUNCTION
     LOGDEBUG("CLoadingThread::Destory");

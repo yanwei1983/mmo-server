@@ -15,7 +15,7 @@ class CGuildService : public IService, public CServiceCommon
     CGuildService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CGuildService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;

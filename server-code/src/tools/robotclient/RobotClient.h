@@ -20,13 +20,13 @@ public:
     static void initInLua(struct lua_State* L);
 
 public:
-    virtual void OnConnected(const CNetSocketSharedPtr& pSocket);
-    virtual void OnConnectFailed(const CNetSocketSharedPtr&);
-    virtual void OnDisconnected(const CNetSocketSharedPtr&);
-    virtual void OnAccepted(const CNetSocketSharedPtr&);
-    virtual void OnRecvData(const CNetSocketSharedPtr&, byte* pBuffer, size_t len);
-    virtual void OnProcessMessage(CNetworkMessage*);
-    virtual void OnRecvTimeout(const CNetSocketSharedPtr&);
+    virtual size_t GetRecvPacketSizeMax() const override { return _MAX_MSGSIZE * 10; }
+    virtual void OnConnected(const CNetSocketSharedPtr& pSocket) override;
+    virtual void OnConnectFailed(const CNetSocketSharedPtr&) override;
+    virtual void OnDisconnected(const CNetSocketSharedPtr&) override;
+    virtual void OnAccepted(const CNetSocketSharedPtr&) override;
+    virtual void OnRecvData(const CNetSocketSharedPtr&, byte* pBuffer, size_t len) override;
+    virtual void OnRecvTimeout(const CNetSocketSharedPtr&) override;
 
     void AddEventCallBack(uint32_t nWaitMs, const std::string& func_name, bool bPersist);
     bool IsConnectServer();

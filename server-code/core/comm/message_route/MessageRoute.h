@@ -34,7 +34,7 @@ public:
 
     WorldID_t GetWorldID() const { return m_nWorldID; }
     void      SetWorldID(WorldID_t val) { m_nWorldID = val; }
-    void      Destory();
+    void      Destroy();
 
 public:
     //从配置文件读取数据库地址,并重读配置

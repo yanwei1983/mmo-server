@@ -20,7 +20,7 @@ public:
     ~CGuildManager();
 
     bool Init();
-    void Destory();
+    void Destroy();
     bool CreateGuild(uint64_t idGuild, const std::string& strGuildName, OBJID idLeader, const std::string& strLeaderName);
 
     CGuild*  QueryGuild(uint64_t idGuild) const;

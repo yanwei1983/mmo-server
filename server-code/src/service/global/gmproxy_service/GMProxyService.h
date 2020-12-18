@@ -14,7 +14,7 @@ class CGMProxyService : public IService, public CServiceCommon
     CGMProxyService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CGMProxyService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;

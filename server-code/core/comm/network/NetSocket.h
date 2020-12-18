@@ -70,7 +70,7 @@ public:
     NET_SOCKET_STATUS GetStatus() const { return m_Status; }
     void              SetStatus(NET_SOCKET_STATUS val) { m_Status = val; }
 
-    void SetAddrAndPort(const char* addr, int32_t port);
+    void SetAddrAndPort(const std::string& addr, int32_t port);
 
     SOCKET      GetSocket() const { return m_socket; }
     void        SetSocket(SOCKET val) { m_socket = val; }
@@ -87,7 +87,8 @@ public:
     size_t  GetLogWriteHighWateMark() const { return m_nLogWriteHighWateMark; }
     void    SetLogWriteHighWateMark(size_t val) { m_nLogWriteHighWateMark = val; }
     size_t  GetWaitWriteSize();
-    size_t  GetPacketSizeMax() const { return m_nPacketSizeMax; }
+    size_t  GetSendPacketSizeMax() const { return m_nSendPacketSizeMax; }
+    size_t  GetRecvPacketSizeMax() const { return m_nRecvPacketSizeMax; }
     void    _SetEventHandler(const CNetEventHandlerSharedPtr& v) { m_pEventHandler = v; }
     void    DetachEventHandler();
     void    set_sock_nodely();
@@ -132,7 +133,8 @@ protected:
 
     std::unique_ptr<CDecryptor> m_pDecryptor;
     std::unique_ptr<CEncryptor> m_pEncryptor;
-    size_t                      m_nPacketSizeMax;
+    size_t                      m_nSendPacketSizeMax;
+    size_t                      m_nRecvPacketSizeMax;
     size_t                      m_nLogWriteHighWateMark; // default log when output>=4M
     std::unique_ptr<byte[]>     m_ReadBuff;
     unsigned short              m_nLastProcessMsgCMD = 0;

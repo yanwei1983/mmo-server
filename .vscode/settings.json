@@ -79,7 +79,8 @@
         "future": "cpp",
         "iomanip": "cpp",
         "cfenv": "cpp",
-        "content": "cpp"
+        "content": "cpp",
+        "fft": "cpp"
     },
     
     "cmake.sourceDirectory": "${workspaceFolder}/server-code/",

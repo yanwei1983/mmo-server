@@ -15,6 +15,7 @@
 #include "NetMSGProcess.h"
 #include "NetSocket.h"
 #include "NetworkMessage.h"
+#include "RemoteIMGuiServer.h"
 #include "server_msg/server_side.pb.h"
 
 static thread_local CAOIService* tls_pService;
@@ -43,11 +44,11 @@ CAOIService::~CAOIService() {}
 void CAOIService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CAOIService::Destory()
+void CAOIService::Destroy()
 {
     __ENTER_FUNCTION
 
@@ -59,7 +60,7 @@ void CAOIService::Destory()
     StopLogicThread();
     if(m_pAOISceneManager)
     {
-        m_pAOISceneManager->Destory();
+        m_pAOISceneManager->Destroy();
         m_pAOISceneManager.reset();
     }
     if(m_pAOIActorManager)
@@ -82,6 +83,13 @@ bool CAOIService::Init(const ServerPort& nServerPort)
         tls_pService = nullptr;
     };
 
+    const ServerAddrInfo* pAddrInfo = GetMessageRoute()->QueryServiceInfo(GetServerPort());
+    if(pAddrInfo == nullptr)
+    {
+        LOGFATAL("CSocketService::Create QueryServerInfo {} fail", GetServerPort().GetServiceID());
+        return false;
+    }
+
     CServiceCommon::Init(nServerPort, true);
     auto oldNdc = BaseCode::SetNdc(GetServiceName());
     scope_exit += [oldNdc]() {
@@ -95,6 +103,10 @@ bool CAOIService::Init(const ServerPort& nServerPort)
     CHECKF(m_pAOISceneManager.get());
     m_pAOIActorManager.reset(CAOIActorManager::CreateNew());
     CHECKF(m_pAOIActorManager.get());
+
+
+    m_pRemoteIMGui.reset(CRemoteIMGuiServer::CreateNew(pAddrInfo->bind_addr, pAddrInfo->debug_port));
+    CHECKF(m_pRemoteIMGui.get())
 
     RegisterAllMsgProcess<CAOIService>(GetNetMsgProcess());
 
@@ -117,6 +129,7 @@ bool CAOIService::Init(const ServerPort& nServerPort)
 void CAOIService::OnLogicThreadProc()
 {
     __ENTER_FUNCTION
+    m_pRemoteIMGui->OnTimer();
     CServiceCommon::OnLogicThreadProc();
 
     AOISceneManager()->OnTimer();

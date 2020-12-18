@@ -75,6 +75,7 @@ void RobotClient::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, 
             if(msg.ParseFromArray(pBuffer + sizeof(MSG_HEAD), len - sizeof(MSG_HEAD)) == false)
             {
                 LOGERROR("ParseFromArray Fail:{}", CMD_SC_KEY);
+                return;
             }
 
             pSocket->InitEncryptor(msg.key());
@@ -102,8 +103,6 @@ void RobotClient::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, 
         break;
     }
 }
-
-void RobotClient::OnProcessMessage(CNetworkMessage*) {}
 
 void RobotClient::OnRecvTimeout(const CNetSocketSharedPtr&) {}
 

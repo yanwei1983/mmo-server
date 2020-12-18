@@ -30,11 +30,11 @@ CMarketService::~CMarketService() {}
 void CMarketService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CMarketService::Destory()
+void CMarketService::Destroy()
 {
     tls_pService = this;
     scope_guards scope_exit;

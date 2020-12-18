@@ -22,7 +22,7 @@ public:
     CreateNewImpl(CEventManager);
     ~CEventManager();
 
-    void Destory();
+    void Destroy();
 
     void OnTimer();
     void Pause(bool bPause) { m_bPause = bPause; }

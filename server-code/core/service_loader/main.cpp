@@ -101,7 +101,7 @@ void destory_all()
 {
     if(g_pLoader)
     {
-        g_pLoader->Destory();
+        g_pLoader->Destroy();
         plock->unlock();
         plock.reset();
         BaseCode::StopLog();

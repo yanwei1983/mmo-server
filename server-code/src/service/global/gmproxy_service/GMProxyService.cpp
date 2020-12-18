@@ -173,11 +173,11 @@ CGMProxyService::~CGMProxyService() {}
 void CGMProxyService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CGMProxyService::Destory()
+void CGMProxyService::Destroy()
 {
     __ENTER_FUNCTION
     tls_pService = this;

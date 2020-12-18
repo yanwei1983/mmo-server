@@ -24,7 +24,7 @@ export_lua class CSceneService : public IService, public CServiceCommon
     CSceneService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CSceneService();
-    void Destory();
+    void Destroy();
 
 public:
     void Release() override;

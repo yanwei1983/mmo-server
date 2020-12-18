@@ -42,9 +42,9 @@ public:
 
 public:
     bool            Init(CScene* pScene, const SceneIdx& idxScene, uint64_t idPhase, const Cfg_Phase* pPhaseData);
-    void            Destory();
-    export_lua bool NeedDestory() const;
-    export_lua bool CanDestory();
+    void            Destroy();
+    export_lua bool NeedDestroy() const;
+    export_lua bool CanDestroy();
 
     export_lua void KickAllPlayer(const char* pszReason = "");
     export_lua void _KickPlayer(const char* pszReason, CPlayer* pPlayer);

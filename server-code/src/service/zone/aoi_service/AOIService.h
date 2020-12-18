@@ -11,13 +11,14 @@
 class CAOIActorManager;
 class CAOISceneManager;
 class CMapManager;
+class CRemoteIMGuiServer;
 
 class CAOIService : public IService, public CServiceCommon
 {
     CAOIService();
     bool Init(const ServerPort& nServerPort);
     virtual ~CAOIService();
-    void Destory();
+    void Destroy();
 
 public:
     void             Release() override;
@@ -40,13 +41,14 @@ public:
     CAOISceneManager* GetAOISceneManager() const { return m_pAOISceneManager.get(); }
     CAOIActorManager* GetAOIActorManager() const { return m_pAOIActorManager.get(); }
     CMapManager*      GetMapManager() const { return m_pMapManager.get(); }
-
+    CRemoteIMGuiServer* GetRemoteIMGui() const { return m_pRemoteIMGui.get(); }
 private:
     CMyTimer m_tLastDisplayTime;
 
     std::unique_ptr<CAOISceneManager> m_pAOISceneManager;
     std::unique_ptr<CAOIActorManager> m_pAOIActorManager;
     std::unique_ptr<CMapManager>      m_pMapManager;
+    std::unique_ptr<CRemoteIMGuiServer> m_pRemoteIMGui;
 
 public:
     //配置文件
@@ -74,6 +76,10 @@ inline auto NetMsgProcess()
 inline auto MapManager()
 {
     return AOIService()->GetMapManager();
+}
+inline auto RemoteIMGui()
+{
+    return AOIService()->GetRemoteIMGui();
 }
 
 #endif /* AOISERVICE_H */

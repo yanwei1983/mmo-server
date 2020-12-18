@@ -48,14 +48,14 @@ public:
 
     void Destroy();
     //监听
-    evconnlistener* Listen(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler);
+    evconnlistener* Listen(const std::string& addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler);
     bool            EnableListener(evconnlistener* listener, bool bEnable = false);
     // http监听
-    bool ListenHttpPort(const char* addr, int32_t port, std::function<void(struct evhttp_request* req)>&& func);
+    bool ListenHttpPort(const std::string& addr, int32_t port, std::function<void(struct evhttp_request* req)>&& func);
     //阻塞连接到一个目标地址
-    CServerSocketWeakPtr ConnectTo(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect = false);
+    CServerSocketWeakPtr ConnectTo(const std::string& addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect = false);
     //异步连接到一个目标地址
-    CServerSocketWeakPtr AsyncConnectTo(const char* addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect = false);
+    CServerSocketWeakPtr AsyncConnectTo(const std::string& addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler, bool bAutoReconnect = false);
     bool                 _AsyncReconnect(const CServerSocketSharedPtr& pSocket);
 
     void BreakLoop();

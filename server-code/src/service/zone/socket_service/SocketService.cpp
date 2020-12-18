@@ -70,6 +70,7 @@ public:
         : m_pService(pService)
     {
     }
+    virtual size_t GetSendPacketSizeMax() const override { return _MAX_MSGSIZE * 1024; }//4M_1Packet
     virtual void OnDisconnected(const CNetSocketSharedPtr& pSocket) override { m_pService->OnDisconnected(pSocket); }
     virtual void OnAccepted(const CNetSocketSharedPtr& pSocket) override { m_pService->OnAccepted(pSocket); }
     virtual void OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len) override { m_pService->OnRecvData(pSocket, pBuffer, len); }
@@ -88,11 +89,11 @@ CSocketService::~CSocketService() {}
 void CSocketService::Release()
 {
 
-    Destory();
+    Destroy();
     delete this;
 }
 
-void CSocketService::Destory()
+void CSocketService::Destroy()
 {
     tls_pService = this;
     scope_guards scope_exit;

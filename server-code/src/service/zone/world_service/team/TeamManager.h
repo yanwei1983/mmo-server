@@ -19,7 +19,7 @@ public:
     ~CTeamManager();
 
     bool   Init();
-    void   Destory();
+    void   Destroy();
     CTeam* CreateTeam(uint64_t idTeam, OBJID idLeader);
     CTeam* QueryTeam(uint64_t idTeam);
     bool   DestoryTeam(uint64_t idTeam);
