@@ -25,7 +25,7 @@ jobs:
       with:
         path: server-depends
         key: server-depends--${{ steps.get-depends-key.outputs.ver }}
-        restore-keys: server-depends--
+        restore-keys: server-depends--${{ steps.get-depends-key.outputs.ver }}
 
     - name: build depends
       if: steps.cache-depends.outputs.cache-hit != 'true'
@@ -35,7 +35,7 @@ jobs:
       id: ccache_cache_timestamp
       shell: cmake -P {0}
       run: |
-        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+        string(TIMESTAMP current_date "%Y-%m-%d" UTC)
         message("::set-output name=timestamp::${current_date}")
     - name: ccache cache files
       uses: actions/cache@v2
