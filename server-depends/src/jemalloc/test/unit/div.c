@@ -14,7 +14,7 @@ TEST_BEGIN(test_div_exhaustive) {
 		    dividend += divisor) {
 			size_t quotient = div_compute(
 			    &div_info, dividend);
-			expect_zu_eq(dividend, quotient * divisor,
+			assert_zu_eq(dividend, quotient * divisor,
 			    "With divisor = %zu, dividend = %zu, "
 			    "got quotient %zu", divisor, dividend, quotient);
 		}

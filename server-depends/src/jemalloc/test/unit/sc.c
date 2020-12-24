@@ -9,7 +9,7 @@ TEST_BEGIN(test_update_slab_size) {
 	    + (ZU(tiny->ndelta) << tiny->lg_delta);
 	size_t pgs_too_big = (tiny_size * BITMAP_MAXBITS + PAGE - 1) / PAGE + 1;
 	sc_data_update_slab_size(&data, tiny_size, tiny_size, (int)pgs_too_big);
-	expect_zu_lt((size_t)tiny->pgs, pgs_too_big, "Allowed excessive pages");
+	assert_zu_lt((size_t)tiny->pgs, pgs_too_big, "Allowed excessive pages");
 
 	sc_data_update_slab_size(&data, 1, 10 * PAGE, 1);
 	for (int i = 0; i < data.nbins; i++) {
@@ -17,9 +17,9 @@ TEST_BEGIN(test_update_slab_size) {
 		size_t reg_size = (ZU(1) << sc->lg_base)
 		    + (ZU(sc->ndelta) << sc->lg_delta);
 		if (reg_size <= PAGE) {
-			expect_d_eq(sc->pgs, 1, "Ignored valid page size hint");
+			assert_d_eq(sc->pgs, 1, "Ignored valid page size hint");
 		} else {
-			expect_d_gt(sc->pgs, 1,
+			assert_d_gt(sc->pgs, 1,
 			    "Allowed invalid page size hint");
 		}
 	}

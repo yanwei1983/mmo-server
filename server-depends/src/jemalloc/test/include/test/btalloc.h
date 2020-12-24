@@ -25,6 +25,6 @@ btalloc_##n(size_t size, unsigned bits) {				\
 		}							\
 	}								\
 	/* Intentionally sabotage tail call optimization. */		\
-	expect_ptr_not_null(p, "Unexpected mallocx() failure");		\
+	assert_ptr_not_null(p, "Unexpected mallocx() failure");		\
 	return p;							\
 }

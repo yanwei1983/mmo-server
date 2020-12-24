@@ -53,6 +53,7 @@
 /******************************************************************************/
 /* Function prototypes for non-inline static functions. */
 
+static void wrtmessage(void *cbopaque, const char *s);
 #define U2S_BUFSIZE ((1U << (LG_SIZEOF_INTMAX_T + 3)) + 1)
 static char *u2s(uintmax_t x, unsigned base, bool uppercase, char *s,
     size_t *slen_p);
@@ -67,7 +68,7 @@ static char *x2s(uintmax_t x, bool alt_form, bool uppercase, char *s,
 /******************************************************************************/
 
 /* malloc_message() setup. */
-void
+static void
 wrtmessage(void *cbopaque, const char *s) {
 	malloc_write_fd(STDERR_FILENO, s, strlen(s));
 }
@@ -134,10 +135,10 @@ malloc_strtoumax(const char *restrict nptr, char **restrict endptr, int base) {
 			break;
 		case '-':
 			neg = true;
-			JEMALLOC_FALLTHROUGH;
+			/* Fall through. */
 		case '+':
 			p++;
-			JEMALLOC_FALLTHROUGH;
+			/* Fall through. */
 		default:
 			goto label_prefix;
 		}
@@ -288,7 +289,7 @@ d2s(intmax_t x, char sign, char *s, size_t *slen_p) {
 		if (!neg) {
 			break;
 		}
-		JEMALLOC_FALLTHROUGH;
+		/* Fall through. */
 	case ' ':
 	case '+':
 		s--;

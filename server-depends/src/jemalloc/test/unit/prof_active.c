@@ -6,9 +6,9 @@ mallctl_bool_get(const char *name, bool expected, const char *func, int line) {
 	size_t sz;
 
 	sz = sizeof(old);
-	expect_d_eq(mallctl(name, (void *)&old, &sz, NULL, 0), 0,
+	assert_d_eq(mallctl(name, (void *)&old, &sz, NULL, 0), 0,
 	    "%s():%d: Unexpected mallctl failure reading %s", func, line, name);
-	expect_b_eq(old, expected, "%s():%d: Unexpected %s value", func, line,
+	assert_b_eq(old, expected, "%s():%d: Unexpected %s value", func, line,
 	    name);
 }
 
@@ -19,11 +19,11 @@ mallctl_bool_set(const char *name, bool old_expected, bool val_new,
 	size_t sz;
 
 	sz = sizeof(old);
-	expect_d_eq(mallctl(name, (void *)&old, &sz, (void *)&val_new,
+	assert_d_eq(mallctl(name, (void *)&old, &sz, (void *)&val_new,
 	    sizeof(val_new)), 0,
 	    "%s():%d: Unexpected mallctl failure reading/writing %s", func,
 	    line, name);
-	expect_b_eq(old, old_expected, "%s():%d: Unexpected %s value", func,
+	assert_b_eq(old, old_expected, "%s():%d: Unexpected %s value", func,
 	    line, name);
 }
 
@@ -67,11 +67,11 @@ prof_sampling_probe_impl(bool expect_sample, const char *func, int line) {
 	void *p;
 	size_t expected_backtraces = expect_sample ? 1 : 0;
 
-	expect_zu_eq(prof_bt_count(), 0, "%s():%d: Expected 0 backtraces", func,
+	assert_zu_eq(prof_bt_count(), 0, "%s():%d: Expected 0 backtraces", func,
 	    line);
 	p = mallocx(1, 0);
-	expect_ptr_not_null(p, "Unexpected mallocx() failure");
-	expect_zu_eq(prof_bt_count(), expected_backtraces,
+	assert_ptr_not_null(p, "Unexpected mallocx() failure");
+	assert_zu_eq(prof_bt_count(), expected_backtraces,
 	    "%s():%d: Unexpected backtrace count", func, line);
 	dallocx(p, 0);
 }

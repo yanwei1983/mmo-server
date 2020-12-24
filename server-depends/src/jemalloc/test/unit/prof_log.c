@@ -1,19 +1,18 @@
 #include "test/jemalloc_test.h"
-#include "jemalloc/internal/prof_log.h"
 
 #define N_PARAM 100
 #define N_THREADS 10
 
-static void expect_rep() {
-	expect_b_eq(prof_log_rep_check(), false, "Rep check failed");
+static void assert_rep() {
+	assert_b_eq(prof_log_rep_check(), false, "Rep check failed");
 }
 
-static void expect_log_empty() {
-	expect_zu_eq(prof_log_bt_count(), 0,
+static void assert_log_empty() {
+	assert_zu_eq(prof_log_bt_count(), 0,
 	    "The log has backtraces; it isn't empty");
-	expect_zu_eq(prof_log_thr_count(), 0,
+	assert_zu_eq(prof_log_thr_count(), 0,
 	    "The log has threads; it isn't empty");
-	expect_zu_eq(prof_log_alloc_count(), 0,
+	assert_zu_eq(prof_log_alloc_count(), 0,
 	    "The log has allocations; it isn't empty");
 }
 
@@ -35,22 +34,22 @@ TEST_BEGIN(test_prof_log_many_logs) {
 	test_skip_if(!config_prof);
 
 	for (i = 0; i < N_PARAM; i++) {
-		expect_b_eq(prof_log_is_logging(), false,
+		assert_b_eq(prof_log_is_logging(), false,
 		    "Logging shouldn't have started yet");
-		expect_d_eq(mallctl("prof.log_start", NULL, NULL, NULL, 0), 0,
+		assert_d_eq(mallctl("prof.log_start", NULL, NULL, NULL, 0), 0,
 		    "Unexpected mallctl failure when starting logging");
-		expect_b_eq(prof_log_is_logging(), true,
+		assert_b_eq(prof_log_is_logging(), true,
 		    "Logging should be started by now");
-		expect_log_empty();
-		expect_rep();
+		assert_log_empty();
+		assert_rep();
 		f();
-		expect_zu_eq(prof_log_thr_count(), 1, "Wrong thread count");
-		expect_rep();
-		expect_b_eq(prof_log_is_logging(), true,
+		assert_zu_eq(prof_log_thr_count(), 1, "Wrong thread count");
+		assert_rep();
+		assert_b_eq(prof_log_is_logging(), true,
 		    "Logging should still be on");
-		expect_d_eq(mallctl("prof.log_stop", NULL, NULL, NULL, 0), 0,
+		assert_d_eq(mallctl("prof.log_stop", NULL, NULL, NULL, 0), 0,
 		    "Unexpected mallctl failure when stopping logging");
-		expect_b_eq(prof_log_is_logging(), false,
+		assert_b_eq(prof_log_is_logging(), false,
 		    "Logging should have turned off");
 	}
 }
@@ -62,7 +61,7 @@ static void *f_thread(void *unused) {
 	int i;
 	for (i = 0; i < N_PARAM; i++) {
 		void *p = malloc(100);
-		memset(p, 100, 1);
+		memset(p, 100, sizeof(char));
 		free(p);
 	}
 
@@ -74,7 +73,7 @@ TEST_BEGIN(test_prof_log_many_threads) {
 	test_skip_if(!config_prof);
 
 	int i;
-	expect_d_eq(mallctl("prof.log_start", NULL, NULL, NULL, 0), 0,
+	assert_d_eq(mallctl("prof.log_start", NULL, NULL, NULL, 0), 0,
 	    "Unexpected mallctl failure when starting logging");
 	for (i = 0; i < N_THREADS; i++) {
 		thd_create(&thr_buf[i], &f_thread, NULL);
@@ -83,10 +82,10 @@ TEST_BEGIN(test_prof_log_many_threads) {
 	for (i = 0; i < N_THREADS; i++) {
 		thd_join(thr_buf[i], NULL);
 	}
-	expect_zu_eq(prof_log_thr_count(), N_THREADS,
+	assert_zu_eq(prof_log_thr_count(), N_THREADS,
 	    "Wrong number of thread entries");
-	expect_rep();
-	expect_d_eq(mallctl("prof.log_stop", NULL, NULL, NULL, 0), 0,
+	assert_rep();
+	assert_d_eq(mallctl("prof.log_stop", NULL, NULL, NULL, 0), 0,
 	    "Unexpected mallctl failure when stopping logging");
 }
 TEST_END
@@ -111,19 +110,19 @@ TEST_BEGIN(test_prof_log_many_traces) {
 
 	test_skip_if(!config_prof);
 
-	expect_d_eq(mallctl("prof.log_start", NULL, NULL, NULL, 0), 0,
+	assert_d_eq(mallctl("prof.log_start", NULL, NULL, NULL, 0), 0,
 	    "Unexpected mallctl failure when starting logging");
 	int i;
-	expect_rep();
-	expect_log_empty();
+	assert_rep();
+	assert_log_empty();
 	for (i = 0; i < N_PARAM; i++) {
-		expect_rep();
+		assert_rep();
 		f1();
-		expect_rep();
+		assert_rep();
 		f2();
-		expect_rep();
+		assert_rep();
 		f3();
-		expect_rep();
+		assert_rep();
 	}
 	/*
 	 * There should be 8 total backtraces: two for malloc/free in f1(), two
@@ -132,9 +131,9 @@ TEST_BEGIN(test_prof_log_many_traces) {
 	 * optimizations such as loop unrolling might generate more call sites.
 	 * So >= 8 traces are expected.
 	 */
-	expect_zu_ge(prof_log_bt_count(), 8,
+	assert_zu_ge(prof_log_bt_count(), 8,
 	    "Expect at least 8 backtraces given sample workload");
-	expect_d_eq(mallctl("prof.log_stop", NULL, NULL, NULL, 0), 0,
+	assert_d_eq(mallctl("prof.log_stop", NULL, NULL, NULL, 0), 0,
 	    "Unexpected mallctl failure when stopping logging");
 }
 TEST_END

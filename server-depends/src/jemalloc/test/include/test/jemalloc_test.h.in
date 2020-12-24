@@ -124,7 +124,6 @@ static const bool config_debug =
 #include "test/math.h"
 #include "test/mtx.h"
 #include "test/mq.h"
-#include "test/sleep.h"
 #include "test/test.h"
 #include "test/timer.h"
 #include "test/thd.h"
@@ -139,7 +138,7 @@ static const bool config_debug =
 #undef assert
 #undef not_reached
 #undef not_implemented
-#undef expect_not_implemented
+#undef assert_not_implemented
 
 #define assert(e) do {							\
 	if (!(e)) {							\
@@ -163,7 +162,7 @@ static const bool config_debug =
 	abort();							\
 } while (0)
 
-#define expect_not_implemented(e) do {					\
+#define assert_not_implemented(e) do {					\
 	if (!(e)) {							\
 		not_implemented();					\
 	}								\

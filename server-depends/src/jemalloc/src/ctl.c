@@ -6,7 +6,6 @@
 #include "jemalloc/internal/ctl.h"
 #include "jemalloc/internal/extent_dss.h"
 #include "jemalloc/internal/extent_mmap.h"
-#include "jemalloc/internal/inspect.h"
 #include "jemalloc/internal/mutex.h"
 #include "jemalloc/internal/nstime.h"
 #include "jemalloc/internal/sc.h"
@@ -68,7 +67,6 @@ CTL_PROTO(thread_allocated)
 CTL_PROTO(thread_allocatedp)
 CTL_PROTO(thread_deallocated)
 CTL_PROTO(thread_deallocatedp)
-CTL_PROTO(thread_idle)
 CTL_PROTO(config_cache_oblivious)
 CTL_PROTO(config_debug)
 CTL_PROTO(config_fill)
@@ -96,8 +94,6 @@ CTL_PROTO(opt_dirty_decay_ms)
 CTL_PROTO(opt_muzzy_decay_ms)
 CTL_PROTO(opt_stats_print)
 CTL_PROTO(opt_stats_print_opts)
-CTL_PROTO(opt_stats_interval)
-CTL_PROTO(opt_stats_interval_opts)
 CTL_PROTO(opt_junk)
 CTL_PROTO(opt_zero)
 CTL_PROTO(opt_utrace)
@@ -116,9 +112,6 @@ CTL_PROTO(opt_prof_gdump)
 CTL_PROTO(opt_prof_final)
 CTL_PROTO(opt_prof_leak)
 CTL_PROTO(opt_prof_accum)
-CTL_PROTO(opt_prof_recent_alloc_max)
-CTL_PROTO(opt_prof_experimental_use_sys_thread_name)
-CTL_PROTO(opt_zero_realloc)
 CTL_PROTO(tcache_create)
 CTL_PROTO(tcache_flush)
 CTL_PROTO(tcache_destroy)
@@ -155,7 +148,6 @@ CTL_PROTO(prof_thread_active_init)
 CTL_PROTO(prof_active)
 CTL_PROTO(prof_dump)
 CTL_PROTO(prof_gdump)
-CTL_PROTO(prof_dump_prefix)
 CTL_PROTO(prof_reset)
 CTL_PROTO(prof_interval)
 CTL_PROTO(lg_prof_sample)
@@ -230,15 +222,12 @@ CTL_PROTO(stats_metadata_thp)
 CTL_PROTO(stats_resident)
 CTL_PROTO(stats_mapped)
 CTL_PROTO(stats_retained)
-CTL_PROTO(stats_zero_reallocs)
 CTL_PROTO(experimental_hooks_install)
 CTL_PROTO(experimental_hooks_remove)
 CTL_PROTO(experimental_utilization_query)
 CTL_PROTO(experimental_utilization_batch_query)
 CTL_PROTO(experimental_arenas_i_pactivep)
 INDEX_PROTO(experimental_arenas_i)
-CTL_PROTO(experimental_prof_recent_alloc_max)
-CTL_PROTO(experimental_prof_recent_alloc_dump)
 
 #define MUTEX_STATS_CTL_PROTO_GEN(n)					\
 CTL_PROTO(stats_##n##_num_ops)						\
@@ -298,8 +287,7 @@ static const ctl_named_node_t	thread_node[] = {
 	{NAME("deallocated"),	CTL(thread_deallocated)},
 	{NAME("deallocatedp"),	CTL(thread_deallocatedp)},
 	{NAME("tcache"),	CHILD(named, thread_tcache)},
-	{NAME("prof"),		CHILD(named, thread_prof)},
-	{NAME("idle"),		CTL(thread_idle)}
+	{NAME("prof"),		CHILD(named, thread_prof)}
 };
 
 static const ctl_named_node_t	config_node[] = {
@@ -333,8 +321,6 @@ static const ctl_named_node_t opt_node[] = {
 	{NAME("muzzy_decay_ms"), CTL(opt_muzzy_decay_ms)},
 	{NAME("stats_print"),	CTL(opt_stats_print)},
 	{NAME("stats_print_opts"),	CTL(opt_stats_print_opts)},
-	{NAME("stats_interval"),	CTL(opt_stats_interval)},
-	{NAME("stats_interval_opts"),	CTL(opt_stats_interval_opts)},
 	{NAME("junk"),		CTL(opt_junk)},
 	{NAME("zero"),		CTL(opt_zero)},
 	{NAME("utrace"),	CTL(opt_utrace)},
@@ -352,11 +338,7 @@ static const ctl_named_node_t opt_node[] = {
 	{NAME("prof_gdump"),	CTL(opt_prof_gdump)},
 	{NAME("prof_final"),	CTL(opt_prof_final)},
 	{NAME("prof_leak"),	CTL(opt_prof_leak)},
-	{NAME("prof_accum"),	CTL(opt_prof_accum)},
-	{NAME("prof_recent_alloc_max"), CTL(opt_prof_recent_alloc_max)},
-	{NAME("prof_experimental_use_sys_thread_name"),
-	    CTL(opt_prof_experimental_use_sys_thread_name)},
-	{NAME("zero_realloc"),	CTL(opt_zero_realloc)}
+	{NAME("prof_accum"),	CTL(opt_prof_accum)}
 };
 
 static const ctl_named_node_t	tcache_node[] = {
@@ -431,7 +413,6 @@ static const ctl_named_node_t	prof_node[] = {
 	{NAME("active"),	CTL(prof_active)},
 	{NAME("dump"),		CTL(prof_dump)},
 	{NAME("gdump"),		CTL(prof_gdump)},
-	{NAME("dump_prefix"),	CTL(prof_dump_prefix)},
 	{NAME("reset"),		CTL(prof_reset)},
 	{NAME("interval"),	CTL(prof_interval)},
 	{NAME("lg_sample"),	CTL(lg_prof_sample)},
@@ -608,8 +589,7 @@ static const ctl_named_node_t stats_node[] = {
 	{NAME("background_thread"),
 	 CHILD(named, stats_background_thread)},
 	{NAME("mutexes"),	CHILD(named, stats_mutexes)},
-	{NAME("arenas"),	CHILD(indexed, stats_arenas)},
-	{NAME("zero_reallocs"),	CTL(stats_zero_reallocs)},
+	{NAME("arenas"),	CHILD(indexed, stats_arenas)}
 };
 
 static const ctl_named_node_t experimental_hooks_node[] = {
@@ -633,16 +613,10 @@ static const ctl_indexed_node_t experimental_arenas_node[] = {
 	{INDEX(experimental_arenas_i)}
 };
 
-static const ctl_named_node_t experimental_prof_recent_node[] = {
-	{NAME("alloc_max"),	CTL(experimental_prof_recent_alloc_max)},
-	{NAME("alloc_dump"),	CTL(experimental_prof_recent_alloc_dump)},
-};
-
 static const ctl_named_node_t experimental_node[] = {
 	{NAME("hooks"),		CHILD(named, experimental_hooks)},
 	{NAME("utilization"),	CHILD(named, experimental_utilization)},
-	{NAME("arenas"),	CHILD(indexed, experimental_arenas)},
-	{NAME("prof_recent"),	CHILD(named, experimental_prof_recent)}
+	{NAME("arenas"),	CHILD(indexed, experimental_arenas)}
 };
 
 static const ctl_named_node_t	root_node[] = {
@@ -809,7 +783,7 @@ ctl_arena_clear(ctl_arena_t *ctl_arena) {
 		ctl_arena->astats->nfills_small = 0;
 		ctl_arena->astats->nflushes_small = 0;
 		memset(ctl_arena->astats->bstats, 0, SC_NBINS *
-		    sizeof(bin_stats_data_t));
+		    sizeof(bin_stats_t));
 		memset(ctl_arena->astats->lstats, 0, (SC_NSIZES - SC_NBINS) *
 		    sizeof(arena_stats_large_t));
 		memset(ctl_arena->astats->estats, 0, SC_NPSIZES *
@@ -830,15 +804,19 @@ ctl_arena_stats_amerge(tsdn_t *tsdn, ctl_arena_t *ctl_arena, arena_t *arena) {
 		    ctl_arena->astats->lstats, ctl_arena->astats->estats);
 
 		for (i = 0; i < SC_NBINS; i++) {
-			bin_stats_t *bstats =
-			    &ctl_arena->astats->bstats[i].stats_data;
-			ctl_arena->astats->allocated_small += bstats->curregs *
+			ctl_arena->astats->allocated_small +=
+			    ctl_arena->astats->bstats[i].curregs *
 			    sz_index2size(i);
-			ctl_arena->astats->nmalloc_small += bstats->nmalloc;
-			ctl_arena->astats->ndalloc_small += bstats->ndalloc;
-			ctl_arena->astats->nrequests_small += bstats->nrequests;
-			ctl_arena->astats->nfills_small += bstats->nfills;
-			ctl_arena->astats->nflushes_small += bstats->nflushes;
+			ctl_arena->astats->nmalloc_small +=
+			    ctl_arena->astats->bstats[i].nmalloc;
+			ctl_arena->astats->ndalloc_small +=
+			    ctl_arena->astats->bstats[i].ndalloc;
+			ctl_arena->astats->nrequests_small +=
+			    ctl_arena->astats->bstats[i].nrequests;
+			ctl_arena->astats->nfills_small +=
+			    ctl_arena->astats->bstats[i].nfills;
+			ctl_arena->astats->nflushes_small +=
+			    ctl_arena->astats->bstats[i].nflushes;
 		}
 	} else {
 		arena_basic_stats_merge(tsdn, arena, &ctl_arena->nthreads,
@@ -874,8 +852,8 @@ ctl_arena_stats_sdmerge(ctl_arena_t *ctl_sdarena, ctl_arena_t *ctl_arena,
 			    &astats->astats.mapped);
 			accum_atomic_zu(&sdstats->astats.retained,
 			    &astats->astats.retained);
-			accum_atomic_zu(&sdstats->astats.edata_avail,
-			    &astats->astats.edata_avail);
+			accum_atomic_zu(&sdstats->astats.extent_avail,
+			    &astats->astats.extent_avail);
 		}
 
 		ctl_accum_arena_stats_u64(&sdstats->astats.decay_dirty.npurge,
@@ -937,8 +915,6 @@ MUTEX_PROF_ARENA_MUTEXES
 		    &astats->astats.ndalloc_large);
 		ctl_accum_arena_stats_u64(&sdstats->astats.nrequests_large,
 		    &astats->astats.nrequests_large);
-		ctl_accum_arena_stats_u64(&sdstats->astats.nflushes_large,
-		    &astats->astats.nflushes_large);
 		accum_atomic_zu(&sdstats->astats.abandoned_vm,
 		    &astats->astats.abandoned_vm);
 
@@ -951,26 +927,29 @@ MUTEX_PROF_ARENA_MUTEXES
 
 		/* Merge bin stats. */
 		for (i = 0; i < SC_NBINS; i++) {
-			bin_stats_t *bstats = &astats->bstats[i].stats_data;
-			bin_stats_t *merged = &sdstats->bstats[i].stats_data;
-			merged->nmalloc += bstats->nmalloc;
-			merged->ndalloc += bstats->ndalloc;
-			merged->nrequests += bstats->nrequests;
+			sdstats->bstats[i].nmalloc += astats->bstats[i].nmalloc;
+			sdstats->bstats[i].ndalloc += astats->bstats[i].ndalloc;
+			sdstats->bstats[i].nrequests +=
+			    astats->bstats[i].nrequests;
 			if (!destroyed) {
-				merged->curregs += bstats->curregs;
+				sdstats->bstats[i].curregs +=
+				    astats->bstats[i].curregs;
 			} else {
-				assert(bstats->curregs == 0);
+				assert(astats->bstats[i].curregs == 0);
 			}
-			merged->nfills += bstats->nfills;
-			merged->nflushes += bstats->nflushes;
-			merged->nslabs += bstats->nslabs;
-			merged->reslabs += bstats->reslabs;
+			sdstats->bstats[i].nfills += astats->bstats[i].nfills;
+			sdstats->bstats[i].nflushes +=
+			    astats->bstats[i].nflushes;
+			sdstats->bstats[i].nslabs += astats->bstats[i].nslabs;
+			sdstats->bstats[i].reslabs += astats->bstats[i].reslabs;
 			if (!destroyed) {
-				merged->curslabs += bstats->curslabs;
-				merged->nonfull_slabs += bstats->nonfull_slabs;
+				sdstats->bstats[i].curslabs +=
+				    astats->bstats[i].curslabs;
+				sdstats->bstats[i].nonfull_slabs +=
+				    astats->bstats[i].nonfull_slabs;
 			} else {
-				assert(bstats->curslabs == 0);
-				assert(bstats->nonfull_slabs == 0);
+				assert(astats->bstats[i].curslabs == 0);
+				assert(astats->bstats[i].nonfull_slabs == 0);
 			}
 			malloc_mutex_prof_merge(&sdstats->bstats[i].mutex_data,
 			    &astats->bstats[i].mutex_data);
@@ -1057,11 +1036,8 @@ ctl_background_thread_stats_read(tsdn_t *tsdn) {
 	if (!have_background_thread ||
 	    background_thread_stats_read(tsdn, stats)) {
 		memset(stats, 0, sizeof(background_thread_stats_t));
-		nstime_init_zero(&stats->run_interval);
+		nstime_init(&stats->run_interval, 0);
 	}
-	malloc_mutex_prof_copy(
-	    &ctl_stats->mutex_prof_data[global_prof_mutex_max_per_bg_thd],
-	    &stats->max_counter_per_bg_thd);
 }
 
 static void
@@ -1117,12 +1093,8 @@ ctl_refresh(tsdn_t *tsdn) {
     malloc_mutex_unlock(tsdn, &mtx);
 
 		if (config_prof && opt_prof) {
-			READ_GLOBAL_MUTEX_PROF_DATA(
-			    global_prof_mutex_prof, bt2gctx_mtx);
-			READ_GLOBAL_MUTEX_PROF_DATA(
-			    global_prof_mutex_prof_thds_data, tdatas_mtx);
-			READ_GLOBAL_MUTEX_PROF_DATA(
-			    global_prof_mutex_prof_dump, prof_dump_mtx);
+			READ_GLOBAL_MUTEX_PROF_DATA(global_prof_mutex_prof,
+			    bt2gctx_mtx);
 		}
 		if (have_background_thread) {
 			READ_GLOBAL_MUTEX_PROF_DATA(
@@ -1438,11 +1410,6 @@ ctl_postfork_child(tsdn_t *tsdn) {
 	malloc_mutex_postfork_child(tsdn, &ctl_mtx);
 }
 
-void
-ctl_mtx_assert_held(tsdn_t *tsdn) {
-	malloc_mutex_assert_owner(tsdn, &ctl_mtx);
-}
-
 /******************************************************************************/
 /* *_ctl() functions. */
 
@@ -1460,19 +1427,9 @@ ctl_mtx_assert_held(tsdn_t *tsdn) {
 	}								\
 } while (0)
 
-/* Can read or write, but not both. */
 #define READ_XOR_WRITE()	do {					\
 	if ((oldp != NULL && oldlenp != NULL) && (newp != NULL ||	\
 	    newlen != 0)) {						\
-		ret = EPERM;						\
-		goto label_return;					\
-	}								\
-} while (0)
-
-/* Can neither read nor write. */
-#define NEITHER_READ_NOR_WRITE()	do {				\
-	if (oldp != NULL || oldlenp != NULL || newp != NULL ||		\
-	    newlen != 0) {						\
 		ret = EPERM;						\
 		goto label_return;					\
 	}								\
@@ -1499,14 +1456,6 @@ ctl_mtx_assert_held(tsdn_t *tsdn) {
 		}							\
 		(v) = *(t *)newp;					\
 	}								\
-} while (0)
-
-#define ASSURED_WRITE(v, t)	do {					\
-	if (newp == NULL || newlen != sizeof(t)) {			\
-		ret = EINVAL;						\
-		goto label_return;					\
-	}								\
-	(v) = *(t *)newp;						\
 } while (0)
 
 #define MIB_UNSIGNED(v, i) do {						\
@@ -1617,6 +1566,25 @@ n##_ctl(tsd_t *tsd, const size_t *mib, size_t miblen, \
 									\
 	READONLY();							\
 	oldval = (v);							\
+	READ(oldval, t);						\
+									\
+	ret = 0;							\
+label_return:								\
+	return ret;							\
+}
+
+#define CTL_TSD_RO_NL_CGEN(c, n, m, t)					\
+static int								\
+n##_ctl(tsd_t *tsd, const size_t *mib, size_t miblen, void *oldp,	\
+    size_t *oldlenp, void *newp, size_t newlen) {			\
+	int ret;							\
+	t oldval;							\
+									\
+	if (!(c)) {							\
+		return ENOENT;						\
+	}								\
+	READONLY();							\
+	oldval = (m(tsd));						\
 	READ(oldval, t);						\
 									\
 	ret = 0;							\
@@ -1808,8 +1776,6 @@ CTL_RO_NL_GEN(opt_dirty_decay_ms, opt_dirty_decay_ms, ssize_t)
 CTL_RO_NL_GEN(opt_muzzy_decay_ms, opt_muzzy_decay_ms, ssize_t)
 CTL_RO_NL_GEN(opt_stats_print, opt_stats_print, bool)
 CTL_RO_NL_GEN(opt_stats_print_opts, opt_stats_print_opts, const char *)
-CTL_RO_NL_GEN(opt_stats_interval, opt_stats_interval, int64_t)
-CTL_RO_NL_GEN(opt_stats_interval_opts, opt_stats_interval_opts, const char *)
 CTL_RO_NL_CGEN(config_fill, opt_junk, opt_junk, const char *)
 CTL_RO_NL_CGEN(config_fill, opt_zero, opt_zero, bool)
 CTL_RO_NL_CGEN(config_utrace, opt_utrace, opt_utrace, bool)
@@ -1830,12 +1796,6 @@ CTL_RO_NL_CGEN(config_prof, opt_lg_prof_interval, opt_lg_prof_interval, ssize_t)
 CTL_RO_NL_CGEN(config_prof, opt_prof_gdump, opt_prof_gdump, bool)
 CTL_RO_NL_CGEN(config_prof, opt_prof_final, opt_prof_final, bool)
 CTL_RO_NL_CGEN(config_prof, opt_prof_leak, opt_prof_leak, bool)
-CTL_RO_NL_CGEN(config_prof, opt_prof_recent_alloc_max,
-    opt_prof_recent_alloc_max, ssize_t)
-CTL_RO_NL_CGEN(config_prof, opt_prof_experimental_use_sys_thread_name,
-    opt_prof_experimental_use_sys_thread_name, bool)
-CTL_RO_NL_GEN(opt_zero_realloc,
-    zero_realloc_mode_names[opt_zero_realloc_action], const char *)
 
 /******************************************************************************/
 
@@ -1895,10 +1855,14 @@ label_return:
 	return ret;
 }
 
-CTL_RO_NL_GEN(thread_allocated, tsd_thread_allocated_get(tsd), uint64_t)
-CTL_RO_NL_GEN(thread_allocatedp, tsd_thread_allocatedp_get(tsd), uint64_t *)
-CTL_RO_NL_GEN(thread_deallocated, tsd_thread_deallocated_get(tsd), uint64_t)
-CTL_RO_NL_GEN(thread_deallocatedp, tsd_thread_deallocatedp_get(tsd), uint64_t *)
+CTL_TSD_RO_NL_CGEN(config_stats, thread_allocated, tsd_thread_allocated_get,
+    uint64_t)
+CTL_TSD_RO_NL_CGEN(config_stats, thread_allocatedp, tsd_thread_allocatedp_get,
+    uint64_t *)
+CTL_TSD_RO_NL_CGEN(config_stats, thread_deallocated, tsd_thread_deallocated_get,
+    uint64_t)
+CTL_TSD_RO_NL_CGEN(config_stats, thread_deallocatedp,
+    tsd_thread_deallocatedp_get, uint64_t *)
 
 static int
 thread_tcache_enabled_ctl(tsd_t *tsd, const size_t *mib,
@@ -1933,7 +1897,8 @@ thread_tcache_flush_ctl(tsd_t *tsd, const size_t *mib,
 		goto label_return;
 	}
 
-	NEITHER_READ_NOR_WRITE();
+	READONLY();
+	WRITEONLY();
 
 	tcache_flush(tsd);
 
@@ -2003,39 +1968,6 @@ label_return:
 	return ret;
 }
 
-static int
-thread_idle_ctl(tsd_t *tsd, const size_t *mib,
-    size_t miblen, void *oldp, size_t *oldlenp, void *newp,
-    size_t newlen) {
-	int ret;
-
-	NEITHER_READ_NOR_WRITE();
-
-	if (tcache_available(tsd)) {
-		tcache_flush(tsd);
-	}
-	/*
-	 * This heuristic is perhaps not the most well-considered.  But it
-	 * matches the only idling policy we have experience with in the status
-	 * quo.  Over time we should investigate more principled approaches.
-	 */
-	if (opt_narenas > ncpus * 2) {
-		arena_t *arena = arena_choose(tsd, NULL);
-		if (arena != NULL) {
-			arena_decay(tsd_tsdn(tsd), arena, false, true);
-		}
-		/*
-		 * The missing arena case is not actually an error; a thread
-		 * might be idle before it associates itself to one.  This is
-		 * unusual, but not wrong.
-		 */
-	}
-
-	ret = 0;
-label_return:
-	return ret;
-}
-
 /******************************************************************************/
 
 static int
@@ -2045,7 +1977,7 @@ tcache_create_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
 	unsigned tcache_ind;
 
 	READONLY();
-	if (tcaches_create(tsd, b0get(), &tcache_ind)) {
+	if (tcaches_create(tsd, &tcache_ind)) {
 		ret = EFAULT;
 		goto label_return;
 	}
@@ -2063,7 +1995,12 @@ tcache_flush_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
 	unsigned tcache_ind;
 
 	WRITEONLY();
-	ASSURED_WRITE(tcache_ind, unsigned);
+	tcache_ind = UINT_MAX;
+	WRITE(tcache_ind, unsigned);
+	if (tcache_ind == UINT_MAX) {
+		ret = EFAULT;
+		goto label_return;
+	}
 	tcaches_flush(tsd, tcache_ind);
 
 	ret = 0;
@@ -2078,7 +2015,12 @@ tcache_destroy_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
 	unsigned tcache_ind;
 
 	WRITEONLY();
-	ASSURED_WRITE(tcache_ind, unsigned);
+	tcache_ind = UINT_MAX;
+	WRITE(tcache_ind, unsigned);
+	if (tcache_ind == UINT_MAX) {
+		ret = EFAULT;
+		goto label_return;
+	}
 	tcaches_destroy(tsd, tcache_ind);
 
 	ret = 0;
@@ -2163,7 +2105,8 @@ arena_i_decay_ctl(tsd_t *tsd, const size_t *mib, size_t miblen, void *oldp,
 	int ret;
 	unsigned arena_ind;
 
-	NEITHER_READ_NOR_WRITE();
+	READONLY();
+	WRITEONLY();
 	MIB_UNSIGNED(arena_ind, 1);
 	arena_i_decay(tsd_tsdn(tsd), arena_ind, false);
 
@@ -2178,7 +2121,8 @@ arena_i_purge_ctl(tsd_t *tsd, const size_t *mib, size_t miblen, void *oldp,
 	int ret;
 	unsigned arena_ind;
 
-	NEITHER_READ_NOR_WRITE();
+	READONLY();
+	WRITEONLY();
 	MIB_UNSIGNED(arena_ind, 1);
 	arena_i_decay(tsd_tsdn(tsd), arena_ind, true);
 
@@ -2193,7 +2137,8 @@ arena_i_reset_destroy_helper(tsd_t *tsd, const size_t *mib, size_t miblen,
     arena_t **arena) {
 	int ret;
 
-	NEITHER_READ_NOR_WRITE();
+	READONLY();
+	WRITEONLY();
 	MIB_UNSIGNED(*arena_ind, 1);
 
 	*arena = arena_get(tsd_tsdn(tsd), *arena_ind, false);
@@ -2440,7 +2385,7 @@ arena_i_extent_hooks_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
 				goto label_return;
 			}
 			old_extent_hooks =
-			    (extent_hooks_t *)&ehooks_default_extent_hooks;
+			    (extent_hooks_t *)&extent_hooks_default;
 			READ(old_extent_hooks, extent_hooks_t *);
 			if (newp != NULL) {
 				/* Initialize a new arena as a side effect. */
@@ -2459,13 +2404,11 @@ arena_i_extent_hooks_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
 				extent_hooks_t *new_extent_hooks
 				    JEMALLOC_CC_SILENCE_INIT(NULL);
 				WRITE(new_extent_hooks, extent_hooks_t *);
-				old_extent_hooks = arena_set_extent_hooks(tsd,
-				    arena, new_extent_hooks);
+				old_extent_hooks = extent_hooks_set(tsd, arena,
+				    new_extent_hooks);
 				READ(old_extent_hooks, extent_hooks_t *);
 			} else {
-				old_extent_hooks =
-				    ehooks_get_extent_hooks_ptr(
-					arena_get_ehooks(arena));
+				old_extent_hooks = extent_hooks_get(arena);
 				READ(old_extent_hooks, extent_hooks_t *);
 			}
 		}
@@ -2644,7 +2587,7 @@ arenas_create_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
 
 	malloc_mutex_lock(tsd_tsdn(tsd), &ctl_mtx);
 
-	extent_hooks = (extent_hooks_t *)&ehooks_default_extent_hooks;
+	extent_hooks = (extent_hooks_t *)&extent_hooks_default;
 	WRITE(extent_hooks, extent_hooks_t *);
 	if ((arena_ind = ctl_arena_init(tsd, extent_hooks)) == UINT_MAX) {
 		ret = EAGAIN;
@@ -2665,18 +2608,18 @@ arenas_lookup_ctl(tsd_t *tsd, const size_t *mib,
 	int ret;
 	unsigned arena_ind;
 	void *ptr;
-	edata_t *edata;
+	extent_t *extent;
 	arena_t *arena;
 
 	ptr = NULL;
 	ret = EINVAL;
 	malloc_mutex_lock(tsd_tsdn(tsd), &ctl_mtx);
 	WRITE(ptr, void *);
-	edata = emap_edata_lookup(tsd_tsdn(tsd), &emap_global, ptr);
-	if (edata == NULL)
+	extent = iealloc(tsd_tsdn(tsd), ptr);
+	if (extent == NULL)
 		goto label_return;
 
-	arena = arena_get_from_edata(edata);
+	arena = extent_arena_get(extent);
 	if (arena == NULL)
 		goto label_return;
 
@@ -2726,8 +2669,7 @@ prof_active_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
 	bool oldval;
 
 	if (!config_prof) {
-		ret = ENOENT;
-		goto label_return;
+		return ENOENT;
 	}
 
 	if (newp != NULL) {
@@ -2735,12 +2677,7 @@ prof_active_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
 			ret = EINVAL;
 			goto label_return;
 		}
-		bool val = *(bool *)newp;
-		if (!opt_prof && val) {
-			ret = ENOENT;
-			goto label_return;
-		}
-		oldval = prof_active_set(tsd_tsdn(tsd), val);
+		oldval = prof_active_set(tsd_tsdn(tsd), *(bool *)newp);
 	} else {
 		oldval = prof_active_get(tsd_tsdn(tsd));
 	}
@@ -2797,26 +2734,6 @@ prof_gdump_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
 
 	ret = 0;
 label_return:
-	return ret;
-}
-
-static int
-prof_dump_prefix_ctl(tsd_t *tsd, const size_t *mib, size_t miblen,
-    void *oldp, size_t *oldlenp, void *newp, size_t newlen) {
-	int ret;
-	const char *prefix = NULL;
-
-	if (!config_prof) {
-		return ENOENT;
-	}
-
-	malloc_mutex_lock(tsd_tsdn(tsd), &ctl_mtx);
-	WRITEONLY();
-	WRITE(prefix, const char *);
-
-	ret = prof_dump_prefix_set(tsd_tsdn(tsd), prefix) ? EFAULT : 0;
-label_return:
-	malloc_mutex_unlock(tsd_tsdn(tsd), &ctl_mtx);
 	return ret;
 }
 
@@ -2901,9 +2818,6 @@ CTL_RO_CGEN(config_stats, stats_background_thread_num_runs,
 CTL_RO_CGEN(config_stats, stats_background_thread_run_interval,
     nstime_ns(&ctl_stats->background_thread.run_interval), uint64_t)
 
-CTL_RO_CGEN(config_stats, stats_zero_reallocs,
-    atomic_load_zu(&zero_realloc_count, ATOMIC_RELAXED), size_t)
-
 CTL_RO_GEN(stats_arenas_i_dss, arenas_i(mib[2])->dss, const char *)
 CTL_RO_GEN(stats_arenas_i_dirty_decay_ms, arenas_i(mib[2])->dirty_decay_ms,
     ssize_t)
@@ -2922,7 +2836,7 @@ CTL_RO_CGEN(config_stats, stats_arenas_i_retained,
     atomic_load_zu(&arenas_i(mib[2])->astats->astats.retained, ATOMIC_RELAXED),
     size_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_extent_avail,
-    atomic_load_zu(&arenas_i(mib[2])->astats->astats.edata_avail,
+    atomic_load_zu(&arenas_i(mib[2])->astats->astats.extent_avail,
         ATOMIC_RELAXED),
     size_t)
 
@@ -3058,8 +2972,6 @@ stats_mutexes_reset_ctl(tsd_t *tsd, const size_t *mib,
 	}
 	if (config_prof && opt_prof) {
 		MUTEX_PROF_RESET(bt2gctx_mtx);
-		MUTEX_PROF_RESET(tdatas_mtx);
-		MUTEX_PROF_RESET(prof_dump_mtx);
 	}
 
 
@@ -3072,10 +2984,10 @@ stats_mutexes_reset_ctl(tsd_t *tsd, const size_t *mib,
 			continue;
 		}
 		MUTEX_PROF_RESET(arena->large_mtx);
-		MUTEX_PROF_RESET(arena->edata_cache.mtx);
-		MUTEX_PROF_RESET(arena->ecache_dirty.mtx);
-		MUTEX_PROF_RESET(arena->ecache_muzzy.mtx);
-		MUTEX_PROF_RESET(arena->ecache_retained.mtx);
+		MUTEX_PROF_RESET(arena->extent_avail_mtx);
+		MUTEX_PROF_RESET(arena->extents_dirty.mtx);
+		MUTEX_PROF_RESET(arena->extents_muzzy.mtx);
+		MUTEX_PROF_RESET(arena->extents_retained.mtx);
 		MUTEX_PROF_RESET(arena->decay_dirty.mtx);
 		MUTEX_PROF_RESET(arena->decay_muzzy.mtx);
 		MUTEX_PROF_RESET(arena->tcache_ql_mtx);
@@ -3093,25 +3005,25 @@ stats_mutexes_reset_ctl(tsd_t *tsd, const size_t *mib,
 }
 
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_nmalloc,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.nmalloc, uint64_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].nmalloc, uint64_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_ndalloc,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.ndalloc, uint64_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].ndalloc, uint64_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_nrequests,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.nrequests, uint64_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].nrequests, uint64_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_curregs,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.curregs, size_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].curregs, size_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_nfills,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.nfills, uint64_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].nfills, uint64_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_nflushes,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.nflushes, uint64_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].nflushes, uint64_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_nslabs,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.nslabs, uint64_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].nslabs, uint64_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_nreslabs,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.reslabs, uint64_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].reslabs, uint64_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_curslabs,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.curslabs, size_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].curslabs, size_t)
 CTL_RO_CGEN(config_stats, stats_arenas_i_bins_j_nonfull_slabs,
-    arenas_i(mib[2])->astats->bstats[mib[4]].stats_data.nonfull_slabs, size_t)
+    arenas_i(mib[2])->astats->bstats[mib[4]].nonfull_slabs, size_t)
 
 static const ctl_named_node_t *
 stats_arenas_i_bins_j_index(tsdn_t *tsdn, const size_t *mib,
@@ -3266,8 +3178,7 @@ label_return:
  * otherwise their values are undefined.
  *
  * This API is mainly intended for small class allocations, where extents are
- * used as slab.  Note that if the bin the extent belongs to is completely
- * full, "(a)" will be NULL.
+ * used as slab.
  *
  * In case of large class allocations, "(a)" will be NULL, and "(e)" and "(f)"
  * will be zero (if stats are enabled; otherwise undefined).  The other three
@@ -3321,11 +3232,11 @@ experimental_utilization_query_ctl(tsd_t *tsd, const size_t *mib,
     size_t miblen, void *oldp, size_t *oldlenp, void *newp, size_t newlen) {
 	int ret;
 
-	assert(sizeof(inspect_extent_util_stats_verbose_t)
+	assert(sizeof(extent_util_stats_verbose_t)
 	    == sizeof(void *) + sizeof(size_t) * 5);
 
 	if (oldp == NULL || oldlenp == NULL
-	    || *oldlenp != sizeof(inspect_extent_util_stats_verbose_t)
+	    || *oldlenp != sizeof(extent_util_stats_verbose_t)
 	    || newp == NULL) {
 		ret = EINVAL;
 		goto label_return;
@@ -3333,9 +3244,9 @@ experimental_utilization_query_ctl(tsd_t *tsd, const size_t *mib,
 
 	void *ptr = NULL;
 	WRITE(ptr, void *);
-	inspect_extent_util_stats_verbose_t *util_stats
-	    = (inspect_extent_util_stats_verbose_t *)oldp;
-	inspect_extent_util_stats_verbose_get(tsd_tsdn(tsd), ptr,
+	extent_util_stats_verbose_t *util_stats
+	    = (extent_util_stats_verbose_t *)oldp;
+	extent_util_stats_verbose_get(tsd_tsdn(tsd), ptr,
 	    &util_stats->nfree, &util_stats->nregs, &util_stats->size,
 	    &util_stats->bin_nfree, &util_stats->bin_nregs,
 	    &util_stats->slabcur_addr);
@@ -3446,22 +3357,21 @@ experimental_utilization_batch_query_ctl(tsd_t *tsd, const size_t *mib,
     size_t miblen, void *oldp, size_t *oldlenp, void *newp, size_t newlen) {
 	int ret;
 
-	assert(sizeof(inspect_extent_util_stats_t) == sizeof(size_t) * 3);
+	assert(sizeof(extent_util_stats_t) == sizeof(size_t) * 3);
 
 	const size_t len = newlen / sizeof(const void *);
 	if (oldp == NULL || oldlenp == NULL || newp == NULL || newlen == 0
 	    || newlen != len * sizeof(const void *)
-	    || *oldlenp != len * sizeof(inspect_extent_util_stats_t)) {
+	    || *oldlenp != len * sizeof(extent_util_stats_t)) {
 		ret = EINVAL;
 		goto label_return;
 	}
 
 	void **ptrs = (void **)newp;
-	inspect_extent_util_stats_t *util_stats =
-	    (inspect_extent_util_stats_t *)oldp;
+	extent_util_stats_t *util_stats = (extent_util_stats_t *)oldp;
 	size_t i;
 	for (i = 0; i < len; ++i) {
-		inspect_extent_util_stats_get(tsd_tsdn(tsd), ptrs[i],
+		extent_util_stats_get(tsd_tsdn(tsd), ptrs[i],
 		    &util_stats[i].nfree, &util_stats[i].nregs,
 		    &util_stats[i].size);
 	}
@@ -3521,69 +3431,5 @@ experimental_arenas_i_pactivep_ctl(tsd_t *tsd, const size_t *mib,
 	}
 label_return:
 	malloc_mutex_unlock(tsd_tsdn(tsd), &ctl_mtx);
-	return ret;
-}
-
-static int
-experimental_prof_recent_alloc_max_ctl(tsd_t *tsd, const size_t *mib,
-    size_t miblen, void *oldp, size_t *oldlenp, void *newp, size_t newlen) {
-	int ret;
-
-	if (!(config_prof && opt_prof)) {
-		ret = ENOENT;
-		goto label_return;
-	}
-
-	ssize_t old_max;
-	if (newp != NULL) {
-		if (newlen != sizeof(ssize_t)) {
-			ret = EINVAL;
-			goto label_return;
-		}
-		ssize_t max = *(ssize_t *)newp;
-		if (max < -1) {
-			ret = EINVAL;
-			goto label_return;
-		}
-		old_max = prof_recent_alloc_max_ctl_write(tsd, max);
-	} else {
-		old_max = prof_recent_alloc_max_ctl_read();
-	}
-	READ(old_max, ssize_t);
-
-	ret = 0;
-
-label_return:
-	return ret;
-}
-
-typedef struct write_cb_packet_s write_cb_packet_t;
-struct write_cb_packet_s {
-	void (*write_cb)(void *, const char *);
-	void *cbopaque;
-};
-
-static int
-experimental_prof_recent_alloc_dump_ctl(tsd_t *tsd, const size_t *mib,
-    size_t miblen, void *oldp, size_t *oldlenp, void *newp, size_t newlen) {
-	int ret;
-
-	if (!(config_prof && opt_prof)) {
-		ret = ENOENT;
-		goto label_return;
-	}
-
-	assert(sizeof(write_cb_packet_t) == sizeof(void *) * 2);
-
-	WRITEONLY();
-	write_cb_packet_t write_cb_packet;
-	ASSURED_WRITE(write_cb_packet, write_cb_packet_t);
-
-	prof_recent_alloc_dump(tsd, write_cb_packet.write_cb,
-	    write_cb_packet.cbopaque);
-
-	ret = 0;
-
-label_return:
 	return ret;
 }

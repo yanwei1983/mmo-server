@@ -9,7 +9,7 @@
  */
 static void
 purge(void) {
-	expect_d_eq(mallctl("arena.0.purge", NULL, NULL, NULL, 0), 0,
+	assert_d_eq(mallctl("arena.0.purge", NULL, NULL, NULL, 0), 0,
 	    "Unexpected mallctl error");
 }
 
@@ -18,14 +18,14 @@ TEST_BEGIN(test_alignment_errors) {
 	void *p;
 
 	for (alignment = 0; alignment < sizeof(void *); alignment++) {
-		expect_d_eq(posix_memalign(&p, alignment, 1), EINVAL,
+		assert_d_eq(posix_memalign(&p, alignment, 1), EINVAL,
 		    "Expected error for invalid alignment %zu",
 		    alignment);
 	}
 
 	for (alignment = sizeof(size_t); alignment < MAXALIGN;
 	    alignment <<= 1) {
-		expect_d_ne(posix_memalign(&p, alignment + 1, 1), 0,
+		assert_d_ne(posix_memalign(&p, alignment + 1, 1), 0,
 		    "Expected error for invalid alignment %zu",
 		    alignment + 1);
 	}
@@ -43,7 +43,7 @@ TEST_BEGIN(test_oom_errors) {
 	alignment = 0x80000000LU;
 	size      = 0x80000000LU;
 #endif
-	expect_d_ne(posix_memalign(&p, alignment, size), 0,
+	assert_d_ne(posix_memalign(&p, alignment, size), 0,
 	    "Expected error for posix_memalign(&p, %zu, %zu)",
 	    alignment, size);
 
@@ -54,7 +54,7 @@ TEST_BEGIN(test_oom_errors) {
 	alignment = 0x40000000LU;
 	size      = 0xc0000001LU;
 #endif
-	expect_d_ne(posix_memalign(&p, alignment, size), 0,
+	assert_d_ne(posix_memalign(&p, alignment, size), 0,
 	    "Expected error for posix_memalign(&p, %zu, %zu)",
 	    alignment, size);
 
@@ -64,7 +64,7 @@ TEST_BEGIN(test_oom_errors) {
 #else
 	size = 0xfffffff0LU;
 #endif
-	expect_d_ne(posix_memalign(&p, alignment, size), 0,
+	assert_d_ne(posix_memalign(&p, alignment, size), 0,
 	    "Expected error for posix_memalign(&p, %zu, %zu)",
 	    alignment, size);
 }

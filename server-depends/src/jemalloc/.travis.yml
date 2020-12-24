@@ -26,8 +26,6 @@ matrix:
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-opt-safety-checks" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-lg-page=16" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-malloc-conf=dss:primary" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
@@ -48,8 +46,6 @@ matrix:
     - os: osx
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-opt-safety-checks" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: osx
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-lg-page=16" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: osx
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=clang CXX=clang++ COMPILER_FLAGS="-m32" CONFIGURE_FLAGS="" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
@@ -64,8 +60,6 @@ matrix:
       env: CC=clang CXX=clang++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-libdl" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=clang CXX=clang++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-opt-safety-checks" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
-      env: CC=clang CXX=clang++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-lg-page=16" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=clang CXX=clang++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
@@ -90,9 +84,6 @@ matrix:
       env: CC=gcc CXX=g++ COMPILER_FLAGS="-m32" CONFIGURE_FLAGS="--enable-opt-safety-checks" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
       addons: *gcc_multilib
     - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="-m32" CONFIGURE_FLAGS="--with-lg-page=16" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-      addons: *gcc_multilib
-    - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="-m32" CONFIGURE_FLAGS="--with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
       addons: *gcc_multilib
     - os: linux
@@ -113,8 +104,6 @@ matrix:
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-debug --enable-opt-safety-checks" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-debug --with-lg-page=16" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-debug --with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-debug --with-malloc-conf=dss:primary" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
@@ -129,8 +118,6 @@ matrix:
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-prof --enable-opt-safety-checks" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-prof --with-lg-page=16" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-prof --with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-prof --with-malloc-conf=dss:primary" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
@@ -143,8 +130,6 @@ matrix:
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-stats --enable-opt-safety-checks" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-stats --with-lg-page=16" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-stats --with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-stats --with-malloc-conf=dss:primary" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
@@ -155,8 +140,6 @@ matrix:
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-libdl --enable-opt-safety-checks" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-libdl --with-lg-page=16" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-libdl --with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-libdl --with-malloc-conf=dss:primary" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
@@ -165,8 +148,6 @@ matrix:
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--disable-libdl --with-malloc-conf=background_thread:true" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-opt-safety-checks --with-lg-page=16" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-opt-safety-checks --with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-opt-safety-checks --with-malloc-conf=dss:primary" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
@@ -174,14 +155,6 @@ matrix:
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-opt-safety-checks --with-malloc-conf=percpu_arena:percpu" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--enable-opt-safety-checks --with-malloc-conf=background_thread:true" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-lg-page=16 --with-malloc-conf=tcache:false" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-lg-page=16 --with-malloc-conf=dss:primary" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-lg-page=16 --with-malloc-conf=percpu_arena:percpu" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
-    - os: linux
-      env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-lg-page=16 --with-malloc-conf=background_thread:true" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux
       env: CC=gcc CXX=g++ COMPILER_FLAGS="" CONFIGURE_FLAGS="--with-malloc-conf=tcache:false,dss:primary" EXTRA_CFLAGS="-Werror -Wno-array-bounds"
     - os: linux

@@ -18,8 +18,8 @@
         assert_d_eq(mallctl("experimental.utilization." node,		\
 	    out, &out_sz, in, in_sz), 0,				\
 	    "Should return 0 on correct arguments");			\
-        expect_zu_eq(out_sz, out_sz_ref, "incorrect output size");	\
-	expect_d_ne(memcmp(out, out_ref, out_sz_ref), 0,		\
+        assert_zu_eq(out_sz, out_sz_ref, "incorrect output size");	\
+	assert_d_ne(memcmp(out, out_ref, out_sz_ref), 0,		\
 	    "Output content should be changed");			\
 } while (0)
 
@@ -83,67 +83,62 @@ TEST_BEGIN(test_query) {
 
 		/* Examine output for valid call */
 		TEST_UTIL_VALID("query");
-		expect_zu_le(sz, SIZE_READ(out),
+		assert_zu_le(sz, SIZE_READ(out),
 		    "Extent size should be at least allocation size");
-		expect_zu_eq(SIZE_READ(out) & (PAGE - 1), 0,
+		assert_zu_eq(SIZE_READ(out) & (PAGE - 1), 0,
 		    "Extent size should be a multiple of page size");
-
-		/*
-		 * We don't do much bin checking if prof is on, since profiling
-		 * can produce extents that are for small size classes but not
-		 * slabs, which interferes with things like region counts.
-		 */
-		if (!opt_prof && sz <= SC_SMALL_MAXCLASS) {
-			expect_zu_le(NFREE_READ(out), NREGS_READ(out),
+		if (sz <= SC_SMALL_MAXCLASS) {
+			assert_zu_le(NFREE_READ(out), NREGS_READ(out),
 			    "Extent free count exceeded region count");
-			expect_zu_le(NREGS_READ(out), SIZE_READ(out),
+			assert_zu_le(NREGS_READ(out), SIZE_READ(out),
 			    "Extent region count exceeded size");
-			expect_zu_ne(NREGS_READ(out), 0,
+			assert_zu_ne(NREGS_READ(out), 0,
 			    "Extent region count must be positive");
-			expect_true(NFREE_READ(out) == 0 || (SLABCUR_READ(out)
-			    != NULL && SLABCUR_READ(out) <= p),
+			assert_ptr_not_null(SLABCUR_READ(out),
+			    "Current slab is null");
+			assert_true(NFREE_READ(out) == 0
+			    || SLABCUR_READ(out) <= p,
 			    "Allocation should follow first fit principle");
-
 			if (config_stats) {
-				expect_zu_le(BIN_NFREE_READ(out),
+				assert_zu_le(BIN_NFREE_READ(out),
 				    BIN_NREGS_READ(out),
 				    "Bin free count exceeded region count");
-				expect_zu_ne(BIN_NREGS_READ(out), 0,
+				assert_zu_ne(BIN_NREGS_READ(out), 0,
 				    "Bin region count must be positive");
-				expect_zu_le(NFREE_READ(out),
+				assert_zu_le(NFREE_READ(out),
 				    BIN_NFREE_READ(out),
 				    "Extent free count exceeded bin free count");
-				expect_zu_le(NREGS_READ(out),
+				assert_zu_le(NREGS_READ(out),
 				    BIN_NREGS_READ(out),
 				    "Extent region count exceeded "
 				    "bin region count");
-				expect_zu_eq(BIN_NREGS_READ(out)
+				assert_zu_eq(BIN_NREGS_READ(out)
 				    % NREGS_READ(out), 0,
 				    "Bin region count isn't a multiple of "
 				    "extent region count");
-				expect_zu_le(
+				assert_zu_le(
 				    BIN_NFREE_READ(out) - NFREE_READ(out),
 				    BIN_NREGS_READ(out) - NREGS_READ(out),
 				    "Free count in other extents in the bin "
 				    "exceeded region count in other extents "
 				    "in the bin");
-				expect_zu_le(NREGS_READ(out) - NFREE_READ(out),
+				assert_zu_le(NREGS_READ(out) - NFREE_READ(out),
 				    BIN_NREGS_READ(out) - BIN_NFREE_READ(out),
 				    "Extent utilized count exceeded "
 				    "bin utilized count");
 			}
-		} else if (sz > SC_SMALL_MAXCLASS) {
-			expect_zu_eq(NFREE_READ(out), 0,
+		} else {
+			assert_zu_eq(NFREE_READ(out), 0,
 			    "Extent free count should be zero");
-			expect_zu_eq(NREGS_READ(out), 1,
+			assert_zu_eq(NREGS_READ(out), 1,
 			    "Extent region count should be one");
-			expect_ptr_null(SLABCUR_READ(out),
+			assert_ptr_null(SLABCUR_READ(out),
 			    "Current slab must be null for large size classes");
 			if (config_stats) {
-				expect_zu_eq(BIN_NFREE_READ(out), 0,
+				assert_zu_eq(BIN_NFREE_READ(out), 0,
 				    "Bin free count must be zero for "
 				    "large sizes");
-				expect_zu_eq(BIN_NREGS_READ(out), 0,
+				assert_zu_eq(BIN_NREGS_READ(out), 0,
 				    "Bin region count must be zero for "
 				    "large sizes");
 			}
@@ -217,25 +212,21 @@ TEST_BEGIN(test_batch) {
 		out_sz_ref = out_sz /= 2;
 		in_sz /= 2;
 		TEST_UTIL_BATCH_VALID;
-		expect_zu_le(sz, SIZE_READ(out, 0),
+		assert_zu_le(sz, SIZE_READ(out, 0),
 		    "Extent size should be at least allocation size");
-		expect_zu_eq(SIZE_READ(out, 0) & (PAGE - 1), 0,
+		assert_zu_eq(SIZE_READ(out, 0) & (PAGE - 1), 0,
 		    "Extent size should be a multiple of page size");
-		/*
-		 * See the corresponding comment in test_query; profiling breaks
-		 * our slab count expectations.
-		 */
-		if (sz <= SC_SMALL_MAXCLASS && !opt_prof) {
-			expect_zu_le(NFREE_READ(out, 0), NREGS_READ(out, 0),
+		if (sz <= SC_SMALL_MAXCLASS) {
+			assert_zu_le(NFREE_READ(out, 0), NREGS_READ(out, 0),
 			    "Extent free count exceeded region count");
-			expect_zu_le(NREGS_READ(out, 0), SIZE_READ(out, 0),
+			assert_zu_le(NREGS_READ(out, 0), SIZE_READ(out, 0),
 			    "Extent region count exceeded size");
-			expect_zu_ne(NREGS_READ(out, 0), 0,
+			assert_zu_ne(NREGS_READ(out, 0), 0,
 			    "Extent region count must be positive");
-		} else if (sz > SC_SMALL_MAXCLASS) {
-			expect_zu_eq(NFREE_READ(out, 0), 0,
+		} else {
+			assert_zu_eq(NFREE_READ(out, 0), 0,
 			    "Extent free count should be zero");
-			expect_zu_eq(NREGS_READ(out, 0), 1,
+			assert_zu_eq(NREGS_READ(out, 0), 1,
 			    "Extent region count should be one");
 		}
 		TEST_EQUAL_REF(1,
@@ -247,15 +238,15 @@ TEST_BEGIN(test_batch) {
 		TEST_UTIL_BATCH_VALID;
 		TEST_EQUAL_REF(0, "Statistics should be stable across calls");
 		if (sz <= SC_SMALL_MAXCLASS) {
-			expect_zu_le(NFREE_READ(out, 1), NREGS_READ(out, 1),
+			assert_zu_le(NFREE_READ(out, 1), NREGS_READ(out, 1),
 			    "Extent free count exceeded region count");
 		} else {
-			expect_zu_eq(NFREE_READ(out, 0), 0,
+			assert_zu_eq(NFREE_READ(out, 0), 0,
 			    "Extent free count should be zero");
 		}
-		expect_zu_eq(NREGS_READ(out, 0), NREGS_READ(out, 1),
+		assert_zu_eq(NREGS_READ(out, 0), NREGS_READ(out, 1),
 		    "Extent region count should be same for same region size");
-		expect_zu_eq(SIZE_READ(out, 0), SIZE_READ(out, 1),
+		assert_zu_eq(SIZE_READ(out, 0), SIZE_READ(out, 1),
 		    "Extent size should be same for same region size");
 
 #undef SIZE_READ
@@ -272,7 +263,7 @@ TEST_END
 
 int
 main(void) {
-	assert_zu_lt(SC_SMALL_MAXCLASS + 100000, TEST_MAX_SIZE,
+	assert_zu_lt(SC_SMALL_MAXCLASS, TEST_MAX_SIZE,
 	    "Test case cannot cover large classes");
 	return test(test_query, test_batch);
 }

@@ -168,9 +168,3 @@ nstime_update_impl(nstime_t *time) {
 	return false;
 }
 nstime_update_t *JET_MUTABLE nstime_update = nstime_update_impl;
-
-bool
-nstime_init_update(nstime_t *time) {
-	nstime_init_zero(time);
-	return nstime_update(time);
-}

@@ -131,7 +131,7 @@ hash_variant_verify_key(hash_variant_t variant, uint8_t *key) {
 	default: not_reached();
 	}
 
-	expect_u32_eq(computed, expected,
+	assert_u32_eq(computed, expected,
 	    "Hash mismatch for %s(): expected %#x but got %#x",
 	    hash_variant_string(variant), expected, computed);
 }
