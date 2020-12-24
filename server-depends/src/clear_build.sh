@@ -10,10 +10,7 @@ cd lua
 make clean
 cd ..
 
-cd libevent
-make clean
-cd ..
-
+rm libevent/cmake_build/* -rf
 rm protobuf/build/* -rf
 rm cpp_redis/build/* -rf
 rm gflags/build/* -rf
@@ -28,4 +25,5 @@ rm fmt/build/* -rf
 rm recastnavigation/build/* -rf
 rm box2d/build/* -rf
 rm cryptopp/cmake_build/* -rf
+rm lz4/build/cmake/build/* -rf
 

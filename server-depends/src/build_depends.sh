@@ -107,12 +107,13 @@ cd ../..
 libevent()
 {
 cd libevent
-sudo autoreconf -ivf 
-sudo chmod +x ./configure
-CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} LD_FLAG=${LINK_FLAGS} ./configure
-make -j4
-cp .libs/*.so* ../../lib/ -rp
-cd ..
+mkdir -p cmake_build
+cd cmake_build
+CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DEVENT__DISABLE_BENCHMARK=ON -DEVENT__DISABLE_TESTS=ON -DEVENT__DISABLE_REGRESS=ON -DEVENT__DISABLE_SAMPLES=ON
+cmake --build . -j4
+cp include .. -rp
+cp lib/*.so* ../../../lib/ -rp
+cd ../..
 }
 
 tinyxml2()
@@ -220,11 +221,13 @@ cd ../..
 
 lz4()
 {
-cd lz4/build/cmake
-CC=${CC_COMILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake . -DLZ4_BUILD_CLI=OFF -DLZ4_BUILD_LEGACY_LZ4C=OFF -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cd lz4/build/cmake/
+mkdir -p build
+cd build
+CC=${CC_COMILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DLZ4_BUILD_CLI=OFF -DLZ4_BUILD_LEGACY_LZ4C=OFF -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build . -j4
-cp liblz4.a ../../../../lib/ -rp
-cd ../../..
+cp liblz4.a ../../../../../lib/ -rp
+cd ../../../..
 }
 
 $1;
