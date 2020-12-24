@@ -10,20 +10,10 @@
 #include "MessageRoute.h"
 #include "ObjectHeap.h"
 #include "Thread.h"
-#include "event2/event.h"
-#include "event2/thread.h"
 //#include <brpc/global.h>
-void log_cb(int32_t severity, const char* msg)
-{
-    LOGNETERROR("libevent：{}", msg);
-}
 
 ServiceLoader::ServiceLoader()
 {
-    event_enable_debug_mode();
-    evthread_use_pthreads();
-    event_set_log_callback(log_cb);
-
     CreateMessageRoute();
 }
 

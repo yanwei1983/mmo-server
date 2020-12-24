@@ -13,9 +13,34 @@
 #include "event2/thread.h"
 #include "event2/util.h"
 
-CNetworkService::CNetworkService()
-    : m_pBase(event_base_new())
+void log_cb(int32_t severity, const char* msg)
 {
+    LOGNETERROR("libevent：{}", msg);
+}
+
+
+void InitGlobal()
+{
+    
+#ifdef WIN32
+    WSADATA WSAData;
+	WSAStartup(0x101, &WSAData);
+#endif
+    event_set_log_callback(log_cb);
+    event_enable_debug_mode();
+#ifdef WIN32
+    evthread_use_windows_threads();
+#else
+    evthread_use_pthreads();
+#endif
+    
+}
+std::once_flag g_init_network_global;
+
+CNetworkService::CNetworkService()
+{
+    std::call_once(g_init_network_global, &InitGlobal);
+   
     m_SocketIdxPool.resize(MAX_SOCKET_IDX, 0);
     for(size_t i = 0; i < m_SocketIdxPool.size(); i++)
     {
@@ -93,6 +118,42 @@ void CNetworkService::Destroy()
     __LEAVE_FUNCTION
 }
 
+static void clock_socket_cb(evutil_socket_t, short, void* ctx) 
+{
+    CNetworkService* pThis = (CNetworkService*)ctx;
+    pThis->_ProceseClosingSocket();
+}
+
+
+static void _IOThreadTimeOut(evutil_socket_t, short, void* ctx)
+{
+    __ENTER_FUNCTION
+    CNetworkService* pThis = (CNetworkService*)ctx;
+    pThis->OnIOThreadTimeOut();
+    __LEAVE_FUNCTION
+}
+
+bool CNetworkService::Init(std::function<void()>&& time_out_func, uint32_t time_out_ms)
+{
+    __ENTER_FUNCTION
+    CHECKF(m_pBase == nullptr);
+
+    m_pBase = event_base_new();
+    m_IOThreadTimeOutFunc = std::move(time_out_func);
+    m_pIOTimeOutEvent     = event_new(m_pBase, -1, EV_PERSIST, &_IOThreadTimeOut, this);
+    m_pCloseSocketEvent   = event_new(m_pBase, -1, 0, &clock_socket_cb, this);
+    struct timeval tv
+    {
+        time_out_ms / 1000, time_out_ms % 1000
+    };
+    event_add(m_pIOTimeOutEvent, &tv);
+
+    return true;
+
+    __LEAVE_FUNCTION
+    return false;
+}
+
 bool CNetworkService::EnableListener(evconnlistener* listener, bool bEnable)
 {
     __ENTER_FUNCTION
@@ -119,6 +180,20 @@ bool CNetworkService::EnableListener(evconnlistener* listener, bool bEnable)
     return false;
 }
 
+void CNetworkService::OnReciveHttp(struct evhttp_request* req)
+{
+    m_funcOnReciveHttp(req);
+}
+
+static void http_process_cb(struct evhttp_request* req, void* arg)
+{
+    __ENTER_FUNCTION
+    CNetworkService* pThis = (CNetworkService*)arg;
+    pThis->OnReciveHttp(req);
+    __LEAVE_FUNCTION
+}
+
+
 bool CNetworkService::ListenHttpPort(const std::string& addr, int32_t port, std::function<void(struct evhttp_request* req)>&& func)
 {
     __ENTER_FUNCTION
@@ -142,11 +217,26 @@ bool CNetworkService::ListenHttpPort(const std::string& addr, int32_t port, std:
     return false;
 }
 
-void CNetworkService::http_process_cb(struct evhttp_request* req, void* arg)
+
+static void accept_conn_cb(evconnlistener* listener, evutil_socket_t fd, sockaddr* addr, int32_t socklen, void* arg)
 {
     __ENTER_FUNCTION
-    CNetworkService* pThis = (CNetworkService*)arg;
-    pThis->m_funcOnReciveHttp(req);
+
+    static_cast<CNetworkService*>(arg)->OnAccept(fd, addr, socklen, listener);
+
+    __LEAVE_FUNCTION
+}
+
+
+static void accept_error_cb(struct evconnlistener* listener, void* arg)
+{
+    __ENTER_FUNCTION
+    // struct event_base* base   = evconnlistener_get_base(listener);
+    int32_t     err    = EVUTIL_SOCKET_ERROR();
+    const char* errstr = evutil_socket_error_to_string(err);
+
+    // log error
+    LOGNETERROR("CNetworkService::accept_error_cb {}", errstr);
     __LEAVE_FUNCTION
 }
 
@@ -169,7 +259,7 @@ evconnlistener* CNetworkService::Listen(const std::string& addr, int32_t port, c
     std::unique_ptr<addrinfo, decltype(evutil_freeaddrinfo)*> answer_ptr(answer, evutil_freeaddrinfo);
 
     evconnlistener* pListener = evconnlistener_new_bind(m_pBase,
-                                                        accept_conn_cb,
+                                                        &accept_conn_cb,
                                                         this,
                                                         LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE | LEV_OPT_THREADSAFE,
                                                         -1,
@@ -180,7 +270,7 @@ evconnlistener* CNetworkService::Listen(const std::string& addr, int32_t port, c
         LOGNETERROR("CNetworkService::Listen:{}:{} evconnlistener_new_bind fail:{}", addr, port, strerror(errno));
         return nullptr;
     }
-    evconnlistener_set_error_cb(pListener, accept_error_cb);
+    evconnlistener_set_error_cb(pListener, &accept_error_cb);
     {
         std::lock_guard<std::mutex> lock(m_mutexListener);
         m_setListener.emplace(pListener, pEventHandler);
@@ -210,7 +300,7 @@ CServerSocketWeakPtr CNetworkService::ConnectTo(const std::string& addr, int32_t
     }
     std::unique_ptr<addrinfo, decltype(evutil_freeaddrinfo)*> answer_ptr(answer, evutil_freeaddrinfo);
 
-    int32_t fd = socket(answer_ptr->ai_family, answer_ptr->ai_socktype, answer_ptr->ai_protocol);
+    auto fd = socket(answer_ptr->ai_family, answer_ptr->ai_socktype, answer_ptr->ai_protocol);
     if(fd < 0)
     {
         LOGNETERROR("CNetworkService::ConnectTo:{}:{} socket fail", addr, port);
@@ -343,14 +433,6 @@ void CNetworkService::BreakLoop()
     __LEAVE_FUNCTION
 }
 
-static void _IOThreadTimeOut(int32_t, short, void* ctx)
-{
-    __ENTER_FUNCTION
-    CNetworkService* pThis = (CNetworkService*)ctx;
-    pThis->OnIOThreadTimeOut();
-    __LEAVE_FUNCTION
-}
-
 void CNetworkService::OnIOThreadTimeOut()
 {
     __ENTER_FUNCTION
@@ -362,7 +444,9 @@ void CNetworkService::OnIOThreadTimeOut()
 static void IOThreadProc(event_base* pBase, const std::string& _thread_name, const ServiceID& idService)
 {
     __ENTER_FUNCTION
+    #ifdef __linux__
     pthread_setname_np(pthread_self(), _thread_name.c_str());
+    #endif
     BaseCode::SetNdc(_thread_name);
     LOGDEBUG("ThreadCreate:{} ThreadID:{}", _thread_name, get_cur_thread_id());
     int32_t result = 0;
@@ -384,32 +468,13 @@ static void IOThreadProc(event_base* pBase, const std::string& _thread_name, con
     __LEAVE_FUNCTION
 }
 
-void CNetworkService::StartIOThread(const std::string&      thread_name,
-                                    std::function<void()>&& time_out_func,
-                                    uint32_t                time_out_ms,
-                                    const ServiceID&        idService)
+void CNetworkService::StartIOThread(const std::string& thread_name, const ServiceID& idService)
 {
     __ENTER_FUNCTION
     if(m_pIOThread)
     {
         return;
     }
-    m_IOThreadTimeOutFunc = std::move(time_out_func);
-    m_pIOTimeOutEvent     = event_new(m_pBase, -1, EV_PERSIST, _IOThreadTimeOut, this);
-    m_pCloseSocketEvent   = event_new(
-        m_pBase,
-        -1,
-        0,
-        [](int32_t, short, void* ctx) {
-            CNetworkService* pThis = (CNetworkService*)ctx;
-            pThis->_ProceseClosingSocket();
-        },
-        this);
-    struct timeval tv
-    {
-        time_out_ms / 1000, time_out_ms % 1000
-    };
-    event_add(m_pIOTimeOutEvent, &tv);
     m_pIOThread = std::make_unique<std::thread>(&IOThreadProc, m_pBase, thread_name, idService);
 
     __LEAVE_FUNCTION
@@ -447,28 +512,9 @@ CClientSocketSharedPtr CNetworkService::CreateClientSocket(const CNetEventHandle
     return pSocket;
 }
 
-void CNetworkService::accept_conn_cb(evconnlistener* listener, int32_t fd, sockaddr* addr, int32_t socklen, void* arg)
-{
-    __ENTER_FUNCTION
 
-    static_cast<CNetworkService*>(arg)->OnAccept(fd, addr, socklen, listener);
 
-    __LEAVE_FUNCTION
-}
-
-void CNetworkService::accept_error_cb(struct evconnlistener* listener, void* arg)
-{
-    __ENTER_FUNCTION
-    // struct event_base* base   = evconnlistener_get_base(listener);
-    int32_t     err    = EVUTIL_SOCKET_ERROR();
-    const char* errstr = evutil_socket_error_to_string(err);
-
-    // log error
-    LOGNETERROR("CNetworkService::accept_error_cb {}", errstr);
-    __LEAVE_FUNCTION
-}
-
-void CNetworkService::OnAccept(int32_t fd, sockaddr* addr, int32_t, evconnlistener* listener)
+void CNetworkService::OnAccept(evutil_socket_t fd, sockaddr* addr, int32_t, evconnlistener* listener)
 {
     __ENTER_FUNCTION
     char           szHost[512] = {};

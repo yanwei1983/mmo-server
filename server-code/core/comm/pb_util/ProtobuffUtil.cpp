@@ -58,7 +58,7 @@ namespace pb_util
     {
         bool rv = false;
 
-        std::ifstream ifs(filename.data());
+        std::ifstream ifs(filename.data(), std::ios::in | std::ios::binary);
         if(ifs.is_open())
         {
             rv = pbm.ParseFromIstream(&ifs);

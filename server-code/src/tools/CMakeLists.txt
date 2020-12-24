@@ -1,5 +1,9 @@
 MESSAGE(STATUS "cmake: tools-")
 
+
+IF (NOT WIN32)
 ADD_SUBDIRECTORY(robotclient )
 ADD_SUBDIRECTORY(merge-server EXCLUDE_FROM_ALL)
 ADD_SUBDIRECTORY(db_check )
+ENDIF()
+

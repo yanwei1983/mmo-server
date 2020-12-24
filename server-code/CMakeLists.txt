@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 3.2)
 MESSAGE(STATUS "cmake: project root")
 
+IF(NOT WIN32)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+ELSE()
+set(CMAKE_CXX_STANDARD 20)
+ENDIF()
 
 option(TIDY "ON for use clang-tidy(cmake version 3.6+) or OFF" OFF)
 option(USE_LUADEBUGER "ON for use lua_debuger or OFF" OFF)
@@ -16,17 +20,19 @@ option(USE_STATIC_LINK_STD "ON for use static link gcc or OFF" OFF)
 
 set_directory_properties(PROPERTIES COTIRE_ADD_UNITY_BUILD FALSE)
 
-
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+cmake_policy(SET CMP0091 NEW)
 
 
 PROJECT(Framework C CXX)
 
-
 set (CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/core/CMake")
+IF(NOT WIN32)
+
 include(cotire)
 set_directory_properties(PROPERTIES
     COTIRE_PREFIX_HEADER_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/depends" "${PROJECT_SOURCE_DIR}/core/comm" "${PROJECT_SOURCE_DIR}/src/game_comm")
-
 
 SET(CMAKE_CXX_ERROR_FLAGS 
 "-fexceptions \
@@ -40,8 +46,8 @@ SET(CMAKE_CXX_ERROR_FLAGS
  -Wno-unused-private-field \
  -Wno-nonportable-include-path \
  -Wno-undefined-var-template")
-
 add_compile_options("-D__FILENAME__='\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"'")
+
 
 SET(CMAKE_C_FLAGS_DEBUG "$ENV{CFLAGS} -g -pipe -D__DEBUG -DDEBUG -pthread")
 SET(CMAKE_C_FLAGS_RELEASE "$ENV{CFLAGS} -g -pipe -O2 -DNDEBUG -pthread")
@@ -50,11 +56,29 @@ SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -std=c++17 -g -pipe -O2 -DNDEBUG ${C
 
 add_compile_options("-fPIC")
 
+ELSE()
+
+function (cotire)
+endfunction()
+
+add_compile_options("-D__FILENAME__=__FILE__")
+add_compile_options("/utf-8")
+add_compile_options("/std:c++latest")
+add_compile_options("-DWIN32_LEAN_AND_MEAN")
+
+SET(USE_JEMALLOC 0)
+
+ENDIF()
+
+
+
 
 #add_compile_options(-Wl,--unresolved-symbols=ignore-in-shared-libs)
 IF(NOT CMAKE_CXX_COMPILER MATCHES "clang")
 #gcc/vs
+IF(NOT MSVC)
 add_compile_options("-rdynamic")
+ENDIF()
 
 ELSE()
 #clang
@@ -82,9 +106,14 @@ ENDIF()
 
 IF(USE_LIBCXX)
 add_compile_options("-stdlib=libc++")
-SET(LIB_FS "c++fs")
+IF(USE_LIBFS)
+  SET(LIB_FS "c++fs")
+ENDIF()
 ELSE()
-SET(LIB_FS "stdc++fs")
+IF(USE_LIBFS)
+  SET(LIB_FS "stdc++fs")
+ENDIF()
+
 ENDIF()
 
 macro(try_enable_malloc)
@@ -124,6 +153,11 @@ message("jemalloc:${JEMALLOC_LIB_NAME}")
 ELSE()
 ENDIF()
 
+IF(WIN32)
+ELSE()
+SET(LIB_PTHREAD "pthread")
+ENDIF()
+
 #-----------------------------------------------------------------------------
 # Enable ccache if not already enabled by symlink masquerading and if no other
 # CMake compiler launchers are already defined
@@ -144,7 +178,11 @@ include(FindThreads)
 set(PROTOBUF_USE_STATIC_LIBS ON)
 set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${PROJECT_SOURCE_DIR}/depends/src/protobuf/src)
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${PROJECT_SOURCE_DIR}/depends/lib)
+IF(WIN32)
+SET(PROTOBUF_PROTOC_EXECUTABLE ${PROJECT_SOURCE_DIR}/depends/bin/protoc.exe) 
+ELSE()
 SET(PROTOBUF_PROTOC_EXECUTABLE ${PROJECT_SOURCE_DIR}/depends/bin/protoc) 
+ENDIF()
 include(FindProtobuf)
 include(protobuf_gen)
 
@@ -154,7 +192,6 @@ set(CMAKE_CXX_CLANG_TIDY ${MY_CLANG_TIDY_STR})
 message("tidy:${MY_CLANG_TIDY_STR}")
 ELSE()
 ENDIF()
-
 
 
 message(STATUS "CMAKE_CXX_COMPILER:" ${CMAKE_CXX_COMPILER})
@@ -192,6 +229,7 @@ include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/depends/src/recastnavigation/De
 #include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/depends/src/recastnavigation/DetourCrowd/Inlcude)
 #include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/depends/src/recastnavigation/DetourTileCache/Inlcude)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/depends/src/spy/include)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/depends/src/lz4/lib)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/depends/src/)
 
 
@@ -209,7 +247,8 @@ include_directories(${PROJECT_SOURCE_DIR}/core/comm/mydb/)
 include_directories(${PROJECT_SOURCE_DIR}/core/service/comm/)
 include_directories(${PROJECT_SOURCE_DIR}/core/service/service_comm/)
 include_directories(${PROJECT_SOURCE_DIR}/core/service/rpcservice_comm/)
-
+include_directories(${PROJECT_SOURCE_DIR}/core/comm/remote_imgui/imgui_comm/)
+include_directories(${PROJECT_SOURCE_DIR}/core/comm/remote_imgui/imgui_server/)
 
 
 macro(source_group_by_dir source_files)

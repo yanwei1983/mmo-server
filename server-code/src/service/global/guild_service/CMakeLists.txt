@@ -26,9 +26,7 @@ TARGET_LINK_LIBRARIES(guild_service
  libmyproto.so 
  libmydbtable.so 
  libservice_comm.so  
- pthread
- rt
- dl
+ ${LIB_PTHREAD}
   ${JEMALLOC_LIB_NAME}
 )
 cotire(guild_service)

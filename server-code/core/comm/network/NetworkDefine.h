@@ -10,6 +10,8 @@
 #include "Misc.h"
 #include "export_lua.h"
 
+#include "event2/util.h"
+
 const size_t _MAX_MSGSIZE                  = 1024 * 4;
 const size_t _DEFAULT_LOGWRITEHIGHWATEMARK = 1024; // packet*1024
 using WorldID_t                            = uint16_t;
@@ -307,12 +309,27 @@ enum MSGTYPE_INTERNAL
 #pragma pack(push) //保存对齐状态
 #pragma pack(1)    // 1 bytes对齐
 
+struct MSG_FLAG
+{
+    uint16_t  is_ciper : 1;
+    uint16_t  is_zip   : 1;
+    uint16_t  reserved : 14;
+};
+
 struct MSG_HEAD
 {
     uint32_t msg_size = 0;
     uint16_t msg_cmd  = 0;
-    uint8_t  is_ciper = 0;
-    uint8_t  reserved = 0;
+    union
+    {
+        MSG_FLAG msg_flag;
+        uint16_t msg_flag_data = 0;
+    };  
+};
+
+struct MSG_HEAD_ZIP : public MSG_HEAD
+{
+    uint32_t plain_size = 0;
 };
 
 struct MSG_PING : public MSG_HEAD

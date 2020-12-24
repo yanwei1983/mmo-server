@@ -12,8 +12,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${BINARIES_CORE})
 # 指定额外的链接库
 TARGET_LINK_LIBRARIES(sql2cpp
  libfmt.a
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 
 

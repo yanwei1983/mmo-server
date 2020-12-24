@@ -8,9 +8,9 @@
 export_lua class Vector3
 {
 public:
-    export_lua float x;
-    export_lua float y;
-    export_lua float z;
+    export_lua float x = 0.0f;
+    export_lua float y = 0.0f;
+    export_lua float z = 0.0f;
 
 public:
     export_lua inline Vector3() {}

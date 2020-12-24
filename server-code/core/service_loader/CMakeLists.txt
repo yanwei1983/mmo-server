@@ -15,19 +15,14 @@ SET(EXECUTABLE_OUTPUT_PATH ${BINARIES_CORE})
 ADD_DEPENDENCIES(service_loader basecode message_route)
 # 指定额外的链接库
 TARGET_LINK_LIBRARIES(service_loader
- libevent.so
- libevent_core.so
- libevent_pthreads.so
- libevent_extra.so
  libmessage_route.so
  libbasecode.so
  protobuf
- pthread
  ssl
  crypto
- rt
- dl
+ ${LIB_PTHREAD}
  z
+ dl
  ${JEMALLOC_LIB_NAME}
 
 )

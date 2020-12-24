@@ -17,6 +17,8 @@
 //当前包含的系统头文件引用
 /////////////////////////////////////////////////////////////////////////////////
 
+#include <stddef.h>   
+#include <stdint.h>  
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -25,6 +27,7 @@
 #include <exception>
 #include <string>
 
+#ifdef __linux__
 #include <execinfo.h>
 #include <pthread.h>
 #include <semaphore.h>
@@ -34,6 +37,21 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+using HMODULE = void*;
+using HANDLE  = void*;
+
+
+#ifndef SOCKET
+using SOCKET = uint32_t;
+#endif
+
+constexpr uint32_t INFINITE = 0xFFFFFFFF; // Infinite timeout
+
+constexpr SOCKET INVALID_SOCKET = static_cast<SOCKET>(-1);
+constexpr SOCKET SOCKET_ERROR   = static_cast<SOCKET>(-1);
+
+#endif
+
 using float32_t = float;
 using float64_t = double;
 
@@ -42,12 +60,7 @@ using BYTE = uint8_t;
 
 using OBJID = uint64_t;
 
-using HMODULE = void*;
-using HANDLE  = void*;
 
-#ifndef SOCKET
-using SOCKET = uint32_t;
-#endif
 
 ///////////////////////////////////////////////////////////////////////
 const OBJID ID_NONE = static_cast<OBJID>(0);
@@ -55,10 +68,9 @@ const OBJID ID_NONE = static_cast<OBJID>(0);
 ///////////////////////////////////////////////////////////////////////
 #define TRUE  1
 #define FALSE 0
-constexpr uint32_t INFINITE = 0xFFFFFFFF; // Infinite timeout
 
-constexpr SOCKET INVALID_SOCKET = static_cast<SOCKET>(-1);
-constexpr SOCKET SOCKET_ERROR   = static_cast<SOCKET>(-1);
+
+
 
 #define LINEEND "\n"
 

@@ -586,8 +586,8 @@ float Matrix3::MaxCubicRoot(float afCoeff[3])
     // This yields the assertions c[0] < 0 and c[2]*c[2] >= 3*c[1].
 
     // quick out for uniform scale (triple root)
-    const float fOneThird = 1.0 / 3.0;
-    const float fEpsilon  = 1e-06;
+    const float fOneThird = 1.0f / 3.0f;
+    const float fEpsilon  = 1e-06f;
     float       fDiscr    = afCoeff[2] * afCoeff[2] - 3.0f * afCoeff[1];
     if(fDiscr <= fEpsilon)
         return -fOneThird * afCoeff[2];

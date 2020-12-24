@@ -1,0 +1,125 @@
+syntax = "proto3";
+package imgui;
+
+enum MsgType
+{
+    CS_NONE    = 0;
+    SC_FRAME   = 1001; //发送帧数据
+    SC_TEXTURE = 1002; //发送贴图
+    CS_IO      = 1003; //发送操作
+    CS_FRAME_START      = 1004;
+    CS_FRAME_STOP       = 1005;
+    SC_FRAME_DIFF       = 1006; //发送帧数据, 数据全量存为xor数据，方便快速压缩
+}
+
+message FrameStart
+{
+}
+
+message FrameStop
+{
+}
+
+enum TexturFormat
+{
+    Alpha = 0;
+    RGB = 1;
+    RGBA = 2;
+}
+
+enum TextureType
+{
+    UNSIGNED_BYTE = 0;
+    UNSIGNED_SHORT = 1;
+    UNSIGNED_INT = 2;
+    FLOAT = 3;
+}   
+
+message Vec2
+{
+    float x = 1;
+    float y = 2;
+}
+
+message Vec4
+{
+    float x = 1;
+    float y = 2;
+    float z = 3;
+    float w = 4;
+}
+
+message DrawCmd
+{
+    Vec4   ClipRect  = 1;
+    uint64 TextureId = 2;
+    uint32 VtxOffset = 3;
+    uint32 IdxOffset = 4;
+    uint32 ElemCount = 5;
+}
+
+message DrawVert
+{
+    Vec2   pos = 1;
+    Vec2   uv  = 2;
+    uint32 col = 3;
+}
+
+message DrawList
+{
+    repeated DrawCmd    CmdBuffer = 1; 
+    repeated uint32     IdxBuffer = 2; 
+    repeated DrawVert   VtxBuffer = 3; 
+    uint32              Flags     = 4; 
+}
+
+message FrameDataInfo
+{
+    bool              Valid            = 1;
+    int32             TotalIdxCount    = 4;
+    int32             TotalVtxCount    = 5;
+    Vec2              DisplayPos       = 6;
+    Vec2              DisplaySize      = 7;
+    Vec2              FramebufferScale = 8;
+}
+
+message FrameData
+{
+    FrameDataInfo info = 1;
+    repeated DrawList CmdLists         = 2;
+}
+
+message FrameDataPack
+{
+    repeated FrameData framebuffer = 1;
+}
+
+message IOData
+{
+    Vec2            MousePos  = 1;
+    repeated uint32 MouseDown = 2;
+    Vec2            DisplaySize= 3;
+    float           MouseWheelH = 4;
+    float           MouseWheel = 5;
+    bool            KeyCtrl = 6;
+    bool            KeyShift = 7;
+    bool            KeyAlt = 8;
+    bool            KeySuper = 9;
+
+    repeated uint32 KeysDown =10;
+    repeated uint32 KeyMap  =11;
+
+    uint32 InputQueueSurrogate = 12;
+    repeated uint32 InputQueueCharacters=13;
+}
+
+message TextureData
+{
+    uint32 tex_id = 1;
+    int32  width  = 2;
+    int32  height = 3;
+    int32  format = 4;
+    int32  type = 5;
+    bytes  pixels = 6;
+    
+}

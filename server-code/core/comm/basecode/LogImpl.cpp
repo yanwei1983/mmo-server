@@ -3,6 +3,8 @@
 #include "FileUtil.h"
 #include "Thread.h"
 #include "TimeUtil.h"
+#include <fmt/format.h>
+#include <fmt/chrono.h>
 
 OBJECTHEAP_IMPLEMENTATION(LogData, s_heap);
 
@@ -16,13 +18,6 @@ constexpr const char* LOG_STRING[] = {
     "FATAL",
 };
 
-const static char LOG_COLOR[LOG_LEVEL_FATAL + 1][50] = {"\e[0m",
-                                                        "\e[0m",
-                                                        "\e[34m\e[1m", // hight blue
-                                                        "\e[33m",      // yellow
-                                                        "\e[31m",      // red
-                                                        "\e[32m",      // green
-                                                        "\e[35m"};
 CLogManager*      CLogManager::getInstance()
 {
     static CLogManager m;
@@ -329,13 +324,18 @@ void CLogManager::writeLog(const LogDataPtr& pLog)
 LogDataPtr CLogManager::makeLogData(LoggerID id, int32_t level, uint64_t detail, const char* file, int32_t line)
 {
     __ENTER_FUNCTION
-    struct timeval tm;
-    gettimeofday(&tm, NULL);
+    auto now = std::chrono::high_resolution_clock::now();
+
+    auto sec = std::chrono::time_point_cast<std::chrono::seconds>(now);
+    auto ms  = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+    //std::chrono::duration<float> ms_float = ms - sec;
+    auto ms_diff = ms - sec;
+    
     NDC* pNdc = BaseCode::getNdc();
-    return LogDataPtr(new LogData{.id      = id,
+    return LogDataPtr(new LogData {.id      = id,
                                   .level   = level,
-                                  .time    = tm.tv_sec,
-                                  .precise = static_cast<uint32_t>(tm.tv_usec / 1000),
+                                  .time    = sec.time_since_epoch().count(),
+                                  .precise = static_cast<uint32_t>(ms_diff.count()),
                                   .file    = file,
                                   .line    = line,
                                   .detail  = detail,

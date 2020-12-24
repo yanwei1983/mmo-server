@@ -5,6 +5,7 @@
 
 #include "MathDef.h"
 #include "export_lua.h"
+#include "RandomGet.h"
 export_lua class Vector2
 {
 public:

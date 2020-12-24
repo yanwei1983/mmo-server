@@ -1,39 +1,38 @@
 #include "TimeUtil.h"
 
+#include <iomanip>
+#include <locale>
+#include <time.h>
+#include <sstream>
 #include "BaseCode.h"
 
-time_t timeGetTime()
+#ifdef WIN32
+#include <windows.h>
+#define localtime_r(timep, result) localtime_s(result, timep)
+void usleep(unsigned long usec)
 {
-    // 	timeval cTime;
-    // 	gettimeofday(&cTime,NULL);
-    // 	return (1000*(time_t)cTime.tv_sec + cTime.tv_usec/1000);
+    HANDLE        timer;
+    LARGE_INTEGER interval;
+    interval.QuadPart = -int64_t(10 * usec);
 
-    /*
-    struct timespec {
-    time_t   tv_sec;        // seconds
-    long     tv_nsec;       // nanoseconds
-    };
+    timer = CreateWaitableTimer(NULL, TRUE, NULL);
+    SetWaitableTimer(timer, &interval, 0, NULL, NULL, 0);
+    WaitForSingleObject(timer, INFINITE);
+    CloseHandle(timer);
+}
+#endif
 
-    int32_t clock_gettime(clockid_t clk_id, struct timespec *tp);
-    clk_id:
-    CLOCK_REALTIME				系统实时时间
-    CLOCK_MONOTONIC				从系统启动到这一刻所经过的时间，不受系统时间被用户改变的影响
-    CLOCK_PROCESS_CPUTIME_ID	本进程到当前所花费的系统CPU时间
-    CLOCK_THREAD_CPUTIME_ID		本线程到当前所花费的系统CPU时间
-    */
-    timespec _ts;
-    if(clock_gettime(CLOCK_MONOTONIC, &_ts) != 0)
-    {
-        // error
-        return 0;
-    }
-    time_t _tick = (time_t)_ts.tv_sec * 1000 + _ts.tv_nsec / 1000000;
-    return _tick;
+time_t timeGetSteady()
+{
+    auto now = std::chrono::steady_clock::now();
+    auto ms  = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+
+    return ms.time_since_epoch().count();
 }
 
 time_t _TimeGetMonotonic()
 {
-    return timeGetTime();
+    return timeGetSteady();
 }
 
 time_t _TimeGetSecond()
@@ -57,13 +56,9 @@ time_t _TimeGetSecondFrom2K2K()
 
 time_t _TimeGetMillisecond()
 {
-    timespec _ts;
-    if(clock_gettime(CLOCK_REALTIME, &_ts) != 0)
-    {
-        return 0;
-    }
-    time_t _tick = (time_t)_ts.tv_sec * 1000 + _ts.tv_nsec / 1000000;
-    return _tick;
+    auto now = std::chrono::high_resolution_clock::now();
+    auto ms  = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+    return ms.time_since_epoch().count();
 }
 
 time_t _TimeGetSecondLocal()
@@ -339,13 +334,21 @@ time_t NextMonthBeginTimeStamp(time_t time1, int32_t nMonths)
 
 time_t GetTimeFromString(const std::string& time_str)
 {
+#ifdef WIN32
+    std::tm            _tm = {};
+    std::istringstream ss(time_str);
+
+    ss >> std::get_time(&_tm, "%Y-%b-%d %H:%M:%S");
+    time_t t = mktime(&_tm);
+    return t;
+#else
     struct tm _tm;
     memset(&_tm, 0, sizeof(_tm));
     strptime(time_str.c_str(), "%Y-%m-%d %H:%M:%S", &_tm);
 
     time_t t = mktime(&_tm);
-    // t = local2gmt(t);
     return t;
+#endif
 }
 
 time_t GetNextDayBeginTime()

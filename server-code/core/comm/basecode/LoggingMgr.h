@@ -64,6 +64,9 @@ namespace BaseCode
     extern int32_t s_actordetail_logger;
     extern int32_t s_skilldetail_logger;
 } // namespace BaseCode
+#ifndef __FILE_NAME__
+#define __FILE_NAME__  __FILE__
+#endif
 
 #define LOGTRACE(...)  ZLOGFMT_TRACE(BaseCode::s_debug_logger, ##__VA_ARGS__)
 #define LOGDEBUG(...)  ZLOGFMT_DEBUG(BaseCode::s_debug_logger, ##__VA_ARGS__)

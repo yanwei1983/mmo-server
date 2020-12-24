@@ -220,7 +220,7 @@ public:
         return false;
     }
 
-    static constexpr float EPSILON = 1e-06;
+    static constexpr float EPSILON = 1e-06f;
     static inline Matrix3  ZERO() { return {0, 0, 0, 0, 0, 0, 0, 0, 0}; }
     static inline Matrix3  IDENTITY() { return {1, 0, 0, 0, 1, 0, 0, 0, 1}; }
 

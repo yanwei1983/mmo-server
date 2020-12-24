@@ -61,9 +61,7 @@ TARGET_LINK_LIBRARIES(scene_service
  libservice_comm.so 
  libgamemap.so 
  libscript.so
- pthread
- rt
- dl
+ ${LIB_PTHREAD}
  ${JEMALLOC_LIB_NAME}
 )
 

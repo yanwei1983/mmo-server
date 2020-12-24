@@ -21,3 +21,4 @@ bash build_depends.sh recastnavigation;
 bash build_depends.sh box2d;
 bash build_depends.sh spy;
 bash build_depends.sh cryptopp;
+bash build_depends.sh lz4;

@@ -25,9 +25,7 @@ TARGET_LINK_LIBRARIES(service_comm
  PUBLIC libmessage_route.so
  PUBLIC libgame_event.so
  PUBLIC crypto_comm
- pthread
- rt
- dl
+ PUBLIC ${LIB_PTHREAD}
  ${JEMALLOC_LIB_NAME}
 )
 cotire(service_comm)

@@ -123,19 +123,33 @@ void BaseCode::InitLog(const std::string& path)
 
     BaseCode::s_network_logger = CLogManager::getPtr()->createLogger({.name = "network", .path = path, .level = getLogDefaultLev("network")});
     BaseCode::s_db_logger      = CLogManager::getPtr()->createLogger({.name = "db", .path = path, .level = getLogDefaultLev("db")});
-    BaseCode::s_stack_logger =
-        CLogManager::getPtr()->createLogger({.name = "stack", .path = path, .fileLine = false, .level = getLogDefaultLev("stack")});
-    BaseCode::s_lua_logger = CLogManager::getPtr()->createLogger({.name = "lua", .path = path, .fileLine = false, .level = getLogDefaultLev("lua")});
+    BaseCode::s_stack_logger = CLogManager::getPtr()->createLogger({
+        .name  = "stack",
+        .path  = path,
+        .level = getLogDefaultLev("stack"),
+        .fileLine = false,
+    });
+    BaseCode::s_lua_logger     = CLogManager::getPtr()->createLogger({
+        .name  = "lua",
+        .path  = path,
+        .level = getLogDefaultLev("lua"),
+        .fileLine = false
+    });
     BaseCode::s_ai_logger  = CLogManager::getPtr()->createLogger({.name = "ai", .path = path, .level = getLogDefaultLev("ai")});
     BaseCode::s_login_logger = CLogManager::getPtr()->createLogger({.name = "login", .path = path, .level = getLogDefaultLev("login")});
-    BaseCode::s_gm_logger    = CLogManager::getPtr()->createLogger({.name = "gm", .path = path, .fileLine = false, .level = getLogDefaultLev("gm")});
+    BaseCode::s_gm_logger      = CLogManager::getPtr()->createLogger({
+        .name  = "gm",
+        .path  = path,
+        .level = getLogDefaultLev("gm"),
+        .fileLine = false
+    });
 
     BaseCode::s_aidetail_logger = CLogManager::getPtr()->createLogger(
-        {.name = "aidetail", .path = path + "/aidetail", .fileLine = false, .detail_file = true, .level = getLogDefaultLev("aidetail")});
+        {.name = "aidetail", .path = path + "/aidetail", .level = getLogDefaultLev("aidetail"), .fileLine = false, .detail_file = true});
     BaseCode::s_actordetail_logger = CLogManager::getPtr()->createLogger(
-        {.name = "actordetail", .path = path + "/actordetail", .fileLine = false, .detail_file = true, .level = getLogDefaultLev("actordetail")});
+        {.name = "actordetail", .path = path + "/actordetail", .level = getLogDefaultLev("actordetail"), .fileLine = false, .detail_file = true});
     BaseCode::s_skilldetail_logger = CLogManager::getPtr()->createLogger(
-        {.name = "skilldetail", .path = path + "/skilldetail", .fileLine = false, .detail_file = true, .level = getLogDefaultLev("skilldetail")});
+        {.name = "skilldetail", .path = path + "/skilldetail", .level = getLogDefaultLev("skilldetail"), .fileLine = false, .detail_file = true});
 
     if(path.empty() == false)
     {

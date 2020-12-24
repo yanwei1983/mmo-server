@@ -29,9 +29,7 @@ TARGET_LINK_LIBRARIES(world_service
  libmydbtable.so 
  libservice_comm.so
  libgamemap.so
- pthread
- rt
- dl
+ ${LIB_PTHREAD}
  ${JEMALLOC_LIB_NAME}
 )
 

@@ -19,9 +19,7 @@ ADD_DEPENDENCIES(rpcservice_comm basecode)
 TARGET_LINK_LIBRARIES(rpcservice_comm
  libbasecode.so
  libbrpc.so
- pthread
- rt
- dl
+ ${LIB_PTHREAD}
  ${JEMALLOC_LIB_NAME}
 )
 

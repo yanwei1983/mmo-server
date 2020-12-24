@@ -21,11 +21,11 @@ public:
     void   SetReconnectTimes(size_t val) { m_nReconnectTimes = val; }
 
     virtual void _OnError(const std::string& what) override;
-    static void  _OnReconnect(int32_t fd, short what, void* ctx);
+    static void  _OnReconnect(evutil_socket_t fd, short what, void* ctx);
     static void  _OnSocketConnectorEvent(bufferevent*, short what, void* ctx);
 
     virtual void OnRecvTimeout(bool& bReconnect) override;
-    virtual void OnRecvData(byte* pBuffer, size_t len) override;
+    virtual void OnRecvData(CNetworkMessage&& recv_msg) override;
 
     void OnStartConnect();
     void OnConnected();

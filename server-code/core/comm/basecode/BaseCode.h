@@ -4,21 +4,33 @@
 #include <chrono>
 #include <cstdio>
 #include <cstring>
-#include <deque>
+#include <stdint.h>       // for uint32_t, int32_t
+#include <stddef.h>  
+
 #include <exception>
-#include <functional>
+#include <string>
+#include <string_view>
+
+#include <vector>
+#include <deque>
 #include <map>
 #include <set>
-#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <utility>
-#include <vector>
 
+#include <utility>
+#include <memory>         // for unique_ptr, shared_ptr
+
+
+#ifdef __linux__
 #include <dirent.h>
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#else
+#include <windows.h>
+#endif
+
 
 #include "BaseType.h"
 #include "CheckUtil.h"

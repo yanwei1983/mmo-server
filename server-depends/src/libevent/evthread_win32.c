@@ -29,7 +29,7 @@
 #ifdef _WIN32
 #ifndef _WIN32_WINNT
 /* Minimum required for InitializeCriticalSectionAndSpinCount */
-#define _WIN32_WINNT 0x0403
+#define _WIN32_WINNT 0x0500
 #endif
 #include <winsock2.h>
 #define WIN32_LEAN_AND_MEAN

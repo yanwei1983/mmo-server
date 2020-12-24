@@ -16,7 +16,6 @@ ADD_DEPENDENCIES(cryptopp_test crypto_comm_static)
 TARGET_LINK_LIBRARIES(cryptopp_test
  crypto_comm_static
  ${JEMALLOC_LIB_NAME}
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 

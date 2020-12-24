@@ -13,8 +13,7 @@ ADD_DEPENDENCIES(pbbin2json pb_util)
 TARGET_LINK_LIBRARIES(pbbin2json
  protobuf
  pb_util
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 
 

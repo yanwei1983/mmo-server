@@ -58,9 +58,7 @@ TARGET_LINK_LIBRARIES(ai_service
  libservice_comm.so 
  libgamemap.so 
  libscript.so
- pthread
- rt
- dl
+ ${LIB_PTHREAD}
  ${JEMALLOC_LIB_NAME}
 )
 cotire(ai_service)

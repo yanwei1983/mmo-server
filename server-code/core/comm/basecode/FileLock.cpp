@@ -4,13 +4,16 @@
 #include <cstdio>
 #include <cstring>
 
+#include "LoggingMgr.h"
+#ifdef __linux__
 #include <fcntl.h>
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "LoggingMgr.h"
+
+
 
 file_lock::file_lock(const std::string& programname)
 {
@@ -94,3 +97,28 @@ void file_lock::unlock()
     }
     lockf(m_fd, F_ULOCK, 0);
 }
+#else
+
+
+
+file_lock::file_lock(const std::string& programname)
+{
+}
+
+file_lock::~file_lock() {}
+
+bool file_lock::kill(int32_t sig)
+{
+    return true;
+}
+
+bool file_lock::lock()
+{
+    return false;
+}
+
+void file_lock::unlock()
+{
+}
+
+#endif

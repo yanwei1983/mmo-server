@@ -23,7 +23,7 @@ TARGET_LINK_LIBRARIES(db_check
  crypto
  z
  ${JEMALLOC_LIB_NAME}
- dl
- pthread)
+ ${LIB_PTHREAD}
+)
 
 cotire(db_check)

@@ -5,7 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Attach",
+            "name": "(gdb) remote_imgui_server_test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/server-code/bin/tools_bin/remote_imgui_server_test",
+            "args": ["--addr=0.0.0.0","--port=12345"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/server-code/bin/",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "(gdb) Attach service_loader",
             "type": "cppdbg",
             "request": "attach",
             "program": "${workspaceFolder}/server-code/bin/service_loader",
@@ -20,7 +39,7 @@
             ]
         },
         {
-            "name": "(gdb) Launch",
+            "name": "(gdb) service_loader",
             "type": "cppdbg",
             "request": "launch",
             "program": "service_loader",
@@ -37,6 +56,18 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "remote_imgui_client.exe",           
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/server-code/bin/remote_imgui_client.exe",
+            "args": ["--addr=192.168.211.61","--port=12345"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/server-code/bin/",
+            "environment": [],
+            "externalConsole": false
         }
+       
     ]
 }

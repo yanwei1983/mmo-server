@@ -14,10 +14,25 @@ ADD_LIBRARY(network SHARED ${SRCS})
 
 #指定库输出路径
 SET(LIBRARY_OUTPUT_PATH ${LIBRARIES_CORE})
-ADD_DEPENDENCIES(network basecode myproto crypto_comm)
+ADD_DEPENDENCIES(network basecode crypto_comm)
+
 # 指定额外的链接库
+IF(WIN32)
 TARGET_LINK_LIBRARIES(network
  PRIVATE crypto_comm
+ PRIVATE liblz4_static
+ PRIVATE event
+ PRIVATE event_core
+ PRIVATE event_extra
+ PRIVATE ws2_32.lib
+ PUBLIC basecode
+ PUBLIC protobuf::libprotobuf
+ PRIVATE ${JEMALLOC_LIB_NAME}
+)
+ELSE()
+TARGET_LINK_LIBRARIES(network
+ PRIVATE crypto_comm
+ PRIVATE lz4
  PRIVATE libevent.so
  PRIVATE libevent_core.so
  PRIVATE libevent_pthreads.so
@@ -26,5 +41,7 @@ TARGET_LINK_LIBRARIES(network
  PUBLIC protobuf
  PRIVATE ${JEMALLOC_LIB_NAME}
 )
+ENDIF()
+
 cotire(network)
 

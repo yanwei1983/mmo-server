@@ -86,6 +86,7 @@ bool CObjectHeap::IsValidPt(void* p)
 #endif
 }
 
+#ifdef __linux__
 void* CObjectHeap::AlignAlloc(std::size_t size, std::align_val_t align)
 {
 #ifdef USE_JEMALLOC
@@ -110,6 +111,12 @@ void* CObjectHeap::AlignAlloc(std::size_t size, std::align_val_t align)
 
     return result;
 }
+#else
+void* CObjectHeap::AlignAlloc(std::size_t size, std::align_val_t align) 
+{
+    return Alloc(size);
+}
+#endif
 
 void* CObjectHeap::Alloc(size_t size)
 {

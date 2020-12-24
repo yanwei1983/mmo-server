@@ -16,10 +16,9 @@ SET(LIBRARY_OUTPUT_PATH ${LIBRARIES_CORE})
 
 # 指定额外的链接库
 TARGET_LINK_LIBRARIES(pb_util
-	libfmt.a
-	protobuf
-	dl
-	pthread
+	fmt
+	protobuf::libprotobuf
+	${LIB_PTHREAD}
 ) 
  
 cotire(pb_util)

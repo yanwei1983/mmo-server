@@ -21,9 +21,7 @@ TARGET_LINK_LIBRARIES(socket_service
  libbasecode.so 
  libservice_comm.so
  libnetwork.so 
- pthread
- rt
- dl
+ ${LIB_PTHREAD}
  ${JEMALLOC_LIB_NAME}
 )
 cotire(socket_service)

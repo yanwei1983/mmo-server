@@ -27,9 +27,7 @@ TARGET_LINK_LIBRARIES(aoi_service
  libmyproto.so 
  libservice_comm.so 
  libgamemap.so 
- pthread
- rt
- dl
+ ${LIB_PTHREAD}
  ${JEMALLOC_LIB_NAME}
 )
 cotire(aoi_service)

@@ -5,6 +5,7 @@
 //#include "proto/options.pb.h"
 #include "Decryptor.h"
 #include "Encryptor.h"
+#include "lz4.h"
 
 OBJECTHEAP_IMPLEMENTATION(CNetworkMessage, s_Heap);
 
@@ -60,15 +61,16 @@ CNetworkMessage::CNetworkMessage(uint16_t msg_cmd, const proto_msg_t& msg, const
     , m_pBuf(nullptr)
     , m_nBufSize(0)
 {
-    int32_t nDataSize = msg.ByteSizeLong();
+    auto nDataSize = msg.ByteSizeLong();
     AllocBuffer(nDataSize + sizeof(MSG_HEAD));
     msg.SerializeToArray(GetMsgBody(), nDataSize);
 
     MSG_HEAD* pHead = GetMsgHead();
     pHead->msg_size = nDataSize + sizeof(MSG_HEAD);
     pHead->msg_cmd  = msg_cmd;
-    pHead->is_ciper = FALSE;
-    pHead->reserved = 0;
+    pHead->msg_flag.is_ciper = FALSE;
+    pHead->msg_flag.is_zip = FALSE;
+    pHead->msg_flag.reserved = 0;
     // pHead->msg_cmd =  = msg.GetDescriptor()->options().GetExtension(NetMSG::msgid);
 
     // static auto desp = google::protobuf::DescriptorPool::generated_pool()->FindEnumTypeByName(std::string("MSGID"));
@@ -87,8 +89,9 @@ CNetworkMessage::CNetworkMessage(uint16_t msg_cmd, byte* body, size_t body_len, 
     MSG_HEAD* pHead = GetMsgHead();
     pHead->msg_size = body_len + sizeof(MSG_HEAD);
     pHead->msg_cmd  = msg_cmd;
-    pHead->is_ciper = FALSE;
-    pHead->reserved = 0;
+    pHead->msg_flag.is_ciper = FALSE;
+    pHead->msg_flag.is_zip = FALSE;
+    pHead->msg_flag.reserved = 0;
 }
 
 void CNetworkMessage::CopyRawMessage(const CNetworkMessage& rht)
@@ -230,26 +233,92 @@ bool CNetworkMessage::NeedDuplicateWhenEncryptor() const
 
 void CNetworkMessage::Encryptor(CEncryptor* pEnc)
 {
-    if(pEnc && GetMsgHead()->is_ciper == FALSE)
-    {
-        constexpr size_t sizeof_HEAD = sizeof(MSG_HEAD);
-        size_t           buff_len    = GetBodySize();
-        byte*            plain_buff  = GetMsgBody();
-        size_t           cipher_len  = pEnc->Encryptor(plain_buff, buff_len, plain_buff, buff_len);
-        GetMsgHead()->msg_size       = cipher_len + sizeof_HEAD;
-        GetMsgHead()->is_ciper       = TRUE;
-    }
+    if(GetMsgHead()->msg_flag.is_ciper == TRUE)
+        return;
+
+    CHECK(pEnc);
+
+    constexpr size_t sizeof_HEAD = sizeof(MSG_HEAD);
+    size_t           buff_len    = GetBodySize();
+    byte*            plain_buff  = GetMsgBody();
+    size_t           cipher_len  = pEnc->Encryptor(plain_buff, buff_len, plain_buff, buff_len);
+    GetMsgHead()->msg_size          = cipher_len + sizeof_HEAD;
+    GetMsgHead()->msg_flag.is_ciper = TRUE;
+    
 }
 
 void CNetworkMessage::Decryptor(CDecryptor* pDec)
 {
-    if(pDec && GetMsgHead()->is_ciper == TRUE)
+    if(GetMsgHead()->msg_flag.is_ciper == FALSE)
+        return;
+
+    CHECK(pDec);      
+
+    constexpr size_t sizeof_HEAD = sizeof(MSG_HEAD);
+    size_t           buff_len    = GetBodySize();
+    byte*            cipher_buff = GetMsgBody();
+    size_t           plain_len   = pDec->Decryptor(cipher_buff, buff_len, cipher_buff, buff_len);
+    GetMsgHead()->msg_size       = plain_len + sizeof_HEAD;
+    GetMsgHead()->msg_flag.is_ciper       = FALSE;
+    
+}
+
+void CNetworkMessage::Compress()
+{   
+    if(GetMsgHead()->msg_flag.is_zip == TRUE)
+        return;
+    constexpr size_t MIN_ZIP_SIZE = 1024;
+    if(GetBodySize() < MIN_ZIP_SIZE)
+        return;
+
+    
+    size_t           buff_len    = GetBodySize();
+    byte*            plain_buff  = GetMsgBody();
+    
+    size_t dst_capacity = LZ4_compressBound(buff_len);
+    auto dest_buffer = std::shared_ptr<byte>(new byte[dst_capacity+sizeof(MSG_HEAD_ZIP)], [](byte* p) { delete[] p; });
+    
+    //copy old head to new head
+    memcpy(dest_buffer.get(), GetMsgHead(), sizeof(MSG_HEAD));
+    //compress
+    size_t cipher_len  = LZ4_compress_default((const char*)plain_buff, (char*)dest_buffer.get() + sizeof(MSG_HEAD_ZIP), buff_len, dst_capacity);
+    MSG_HEAD_ZIP* pNewHead = (MSG_HEAD_ZIP*)dest_buffer.get();
+    pNewHead->msg_flag.is_zip = TRUE;
+    pNewHead->plain_size = buff_len;
+    pNewHead->msg_size = cipher_len + sizeof(MSG_HEAD_ZIP);
+    //move buffer
+    m_pBuffer = dest_buffer;   
+    m_nBufSize = pNewHead->msg_size;
+    m_pBuf = nullptr;
+    
+}
+
+void CNetworkMessage::Decompress()
+{
+    if(GetMsgHead()->msg_flag.is_zip == FALSE)
+        return;
+    
+    MSG_HEAD_ZIP* pHead = (MSG_HEAD_ZIP*)GetBuf();
+    size_t cipher_len  = GetSize() - sizeof(MSG_HEAD_ZIP);       
+    byte*  cipher_buff = GetBuf() + sizeof(MSG_HEAD_ZIP);
+    auto plain_size = pHead->plain_size;  
+    auto dest_buffer = std::shared_ptr<byte>(new byte[plain_size + sizeof(MSG_HEAD)], [](byte* p) { delete[] p; });
+
+    //copy old head to new head
+    memcpy(dest_buffer.get(), GetMsgHead(), sizeof(MSG_HEAD));
+    //decompress
+    size_t plain_len = LZ4_decompress_safe((const char*)cipher_buff, (char*)dest_buffer.get() + sizeof(MSG_HEAD), cipher_len, plain_size);
+    if(plain_len != plain_size)
     {
-        constexpr size_t sizeof_HEAD = sizeof(MSG_HEAD);
-        size_t           buff_len    = GetBodySize();
-        byte*            cipher_buff = GetMsgBody();
-        size_t           plain_len   = pDec->Decryptor(cipher_buff, buff_len, cipher_buff, buff_len);
-        GetMsgHead()->msg_size       = plain_len + sizeof_HEAD;
-        GetMsgHead()->is_ciper       = FALSE;
+        LOGERROR("msg decompress error plain:{} newplain:{} cmd:{} from:{} to:{}", plain_size, plain_len, GetCmd(), GetFrom(), GetTo());
     }
+    MSG_HEAD* pNewHead = (MSG_HEAD*)dest_buffer.get();
+    pNewHead->msg_size = plain_len + sizeof(MSG_HEAD);
+    pNewHead->msg_flag.is_zip  = FALSE;
+    //move buffer
+    m_pBuffer = dest_buffer;   
+    m_nBufSize = pNewHead->msg_size;
+    m_pBuf = nullptr;
+
+    
 }

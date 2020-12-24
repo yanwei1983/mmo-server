@@ -14,8 +14,7 @@ TARGET_LINK_LIBRARIES(pbbin2txt
  protobuf
  pb_util
  libdata_pack_static.a
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 
 

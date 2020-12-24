@@ -25,9 +25,7 @@ TARGET_LINK_LIBRARIES(market_service
  libmyproto.so 
  libmydbtable.so 
  libservice_comm.so  
- pthread
- rt
- dl
+ ${LIB_PTHREAD}
   ${JEMALLOC_LIB_NAME}
 )
 cotire(market_service)

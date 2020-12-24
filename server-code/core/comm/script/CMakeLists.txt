@@ -55,7 +55,7 @@ COMMENT "gen basecode for basecode2lua.cpp"
 set_property (SOURCE ${CMAKE_CURRENT_BINARY_DIR}/basecode2lua.cpp PROPERTY COTIRE_EXCLUDED  "TRUE")
 
 #指定库输出路径
-SET(LIBRARY_OUTPUT_PATH ${LIBRARIES})
+SET(LIBRARY_OUTPUT_PATH ${LIBRARIES_CORE})
 # 生成库文件
 ADD_LIBRARY(script SHARED ${SRCS})
 add_dependencies(script basecode)
@@ -64,6 +64,7 @@ add_dependencies(script basecode)
 TARGET_LINK_LIBRARIES(script
   liblua.a
   libbasecode.so
+  dl
   ${JEMALLOC_LIB_NAME}
 )
 

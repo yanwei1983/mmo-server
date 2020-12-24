@@ -14,13 +14,13 @@ bool GameMath::Intersection2D::pointInTri2D(const Vector2& p, const Vector2& a, 
     // Note we don't care about normalisation here since sign is all we need
     // It means we don't have to worry about magnitude of cross products either
     dot[0]     = v1.crossProduct(v2);
-    zeroDot[0] = Math::FloatEqual(dot[0], 0.0f, 1e-3);
+    zeroDot[0] = Math::FloatEqual(dot[0], 0.0f, 1e-3f);
 
     v1 = c - b;
     v2 = p - b;
 
     dot[1]     = v1.crossProduct(v2);
-    zeroDot[1] = Math::FloatEqual(dot[1], 0.0f, 1e-3);
+    zeroDot[1] = Math::FloatEqual(dot[1], 0.0f, 1e-3f);
 
     // Compare signs (ignore colinear / coincident points)
     if(!zeroDot[0] && !zeroDot[1] && Math::Sign(dot[0]) != Math::Sign(dot[1]))
@@ -32,7 +32,7 @@ bool GameMath::Intersection2D::pointInTri2D(const Vector2& p, const Vector2& a, 
     v2 = p - c;
 
     dot[2]     = v1.crossProduct(v2);
-    zeroDot[2] = Math::FloatEqual(dot[2], 0.0f, 1e-3);
+    zeroDot[2] = Math::FloatEqual(dot[2], 0.0f, 1e-3f);
     // Compare signs (ignore colinear / coincident points)
     if((!zeroDot[0] && !zeroDot[2] && Math::Sign(dot[0]) != Math::Sign(dot[2])) ||
        (!zeroDot[1] && !zeroDot[2] && Math::Sign(dot[1]) != Math::Sign(dot[2])))
@@ -57,13 +57,13 @@ bool GameMath::Intersection::pointInTri3D(const Vector3& p, const Vector3& a, co
     // Note we don't care about normalisation here since sign is all we need
     // It means we don't have to worry about magnitude of cross products either
     dot[0]     = v1.crossProduct(v2).dotProduct(normal);
-    zeroDot[0] = Math::FloatEqual(dot[0], 0.0f, 1e-3);
+    zeroDot[0] = Math::FloatEqual(dot[0], 0.0f, 1e-3f);
 
     v1 = c - b;
     v2 = p - b;
 
     dot[1]     = v1.crossProduct(v2).dotProduct(normal);
-    zeroDot[1] = Math::FloatEqual(dot[1], 0.0f, 1e-3);
+    zeroDot[1] = Math::FloatEqual(dot[1], 0.0f, 1e-3f);
 
     // Compare signs (ignore colinear / coincident points)
     if(!zeroDot[0] && !zeroDot[1] && Math::Sign(dot[0]) != Math::Sign(dot[1]))

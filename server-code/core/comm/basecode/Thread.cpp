@@ -4,7 +4,8 @@
 #define SUSPEND_SIG SIGUSR1
 
 static thread_local int32_t suspended = 0; // per-thread flag
-
+#ifdef WIN32
+#else
 void resume_handler(int32_t sig, siginfo_t* pInfo, void* pVoid)
 {
     suspended = 0;
@@ -24,6 +25,7 @@ void suspend_handler(int32_t sig, siginfo_t* pInfo, void* pVoid)
         sigsuspend(&wait_mask);
     } while(suspended);
 }
+#endif
 
 CNormalThread::CNormalThread(int32_t                      nWorkIntervalMS,
                              const std::string&           thread_name /*= std::string()*/,
@@ -62,12 +64,20 @@ void CNormalThread::Join()
 
 void CNormalThread::Suspend()
 {
+#ifdef WIN32
+    SuspendThread(m_tid);
+#else
     pthread_kill(m_tid, SUSPEND_SIG);
+#endif
 }
 
 void CNormalThread::Resume()
 {
+#ifdef WIN32
+    ResumeThread(m_tid);
+#else
     pthread_kill(m_tid, RESUME_SIG);
+#endif
 }
 
 bool CNormalThread::IsReady() const
@@ -78,14 +88,21 @@ bool CNormalThread::IsReady() const
 void CNormalThread::ThreadFunc()
 {
     __ENTER_FUNCTION
+#ifdef WIN32
+    SetTid(GetCurrentThread());
+#else
     SetTid(pthread_self());
 
     if(m_ThreadName.empty() == false)
     {
         pthread_setname_np(pthread_self(), m_ThreadName.c_str());
     }
+#endif
     BaseCode::SetNdc(m_ThreadName);
 
+
+#ifdef WIN32
+#else
     //允许线程处理SUSPEND_SIG和RESUME_SIG
     sigset_t unblock_mask;
     sigemptyset(&unblock_mask);
@@ -101,6 +118,7 @@ void CNormalThread::ThreadFunc()
 
     sa.sa_sigaction = &suspend_handler;
     sigaction(SUSPEND_SIG, &sa, NULL);
+#endif
 
     LOGDEBUG("ThreadCreate:{} ThreadID:{}", m_ThreadName, get_cur_thread_id());
     if(m_funcThreadCreate)
@@ -124,7 +142,7 @@ void CNormalThread::ThreadFunc()
             std::chrono::milliseconds waitTime = std::chrono::milliseconds(m_nWorkIntervalMS) - costTime;
             if(waitTime.count() > 0)
             {
-                usleep(waitTime.count() * 1000);
+                msleep(waitTime.count() * 1000);
             }
             else
             {
@@ -170,10 +188,13 @@ void CWorkerThread::Start()
 void CWorkerThread::ThreadFunc()
 {
     __ENTER_FUNCTION
+
+#ifdef __linux__
     if(m_ThreadName.empty() == false)
     {
         pthread_setname_np(pthread_self(), m_ThreadName.c_str());
     }
+#endif
 
     BaseCode::SetNdc(m_ThreadName);
     LOGDEBUG("ThreadCreate:{} ThreadID:{}", m_ThreadName, get_cur_thread_id());

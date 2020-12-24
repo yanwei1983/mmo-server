@@ -28,9 +28,9 @@ public:
 
     export_lua void CopyRawMessage(const CNetworkMessage& rht);
 
-    export_lua uint16_t GetSize() const { return GetMsgHead()->msg_size; }
+    export_lua uint32_t GetSize() const { return GetMsgHead()->msg_size; }
     export_lua uint16_t GetCmd() const { return GetMsgHead()->msg_cmd; }
-    export_lua uint16_t GetBodySize() const { return GetSize() - sizeof(MSG_HEAD); }
+    export_lua uint32_t GetBodySize() const { return GetSize() - sizeof(MSG_HEAD); }
     export_lua byte* GetBuf() const;
     export_lua MSG_HEAD* GetMsgHead() { return (MSG_HEAD*)GetBuf(); }
     export_lua const MSG_HEAD* GetMsgHead() const { return (const MSG_HEAD*)GetBuf(); }
@@ -39,6 +39,8 @@ public:
 
     void Decryptor(class CDecryptor* pDec);
     void Encryptor(class CEncryptor* pEnc);
+    void Compress();
+    void Decompress();
 
     export_lua const VirtualSocket& GetFrom() const { return m_nFrom; }
     export_lua void                 SetFrom(const VirtualSocket& val) { m_nFrom = val; }

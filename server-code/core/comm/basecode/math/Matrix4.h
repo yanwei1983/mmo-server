@@ -47,7 +47,7 @@ class TransformBase
 {
 protected:
     /// The matrix entries, indexed by [row][col].
-    float m[rows][4];
+    float m[rows][4] = {};
     // do not reduce storage for affine for compatibility with SSE, shader mat4 types
 public:
     /// Do <b>NOT</b> initialize for efficiency.

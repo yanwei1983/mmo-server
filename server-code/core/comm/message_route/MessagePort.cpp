@@ -168,13 +168,13 @@ void CMessagePort::DetachRemoteSocket()
     __LEAVE_FUNCTION
 }
 
-void CMessagePort::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len)
+void CMessagePort::OnRecvData(const CNetSocketSharedPtr& pSocket, CNetworkMessage&& recv_msg)
 {
     __ENTER_FUNCTION
-    MSG_HEAD*   pHead = (MSG_HEAD*)pBuffer;
+    MSG_HEAD*   pHead = recv_msg.GetMsgHead();
     InternalMsg internal_msg;
-    byte*       pData    = pBuffer + sizeof(MSG_HEAD);
-    size_t      data_len = len - sizeof(MSG_HEAD);
+    byte*       pData    = recv_msg.GetMsgBody();
+    size_t      data_len = recv_msg.GetBodySize();
     if(internal_msg.ParseFromArray(pData, static_cast<int>(data_len)) == false)
     {
         LOGNETERROR("MessagePort:{} Recv a unknow cmd:{} size:{}", GetServerPort().GetServiceID(), pHead->msg_cmd, pHead->msg_size);

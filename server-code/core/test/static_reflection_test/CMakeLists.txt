@@ -16,7 +16,6 @@ SET(EXECUTABLE_OUTPUT_PATH ${BINARIES_CORE})
 TARGET_LINK_LIBRARIES(static_reflection_test
  tinyxml2
  ${JEMALLOC_LIB_NAME}
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 

@@ -19,6 +19,13 @@
 
 OBJECTHEAP_IMPLEMENTATION(CNetSocket, s_Heap);
 
+static void OnSendAllMsg(evutil_socket_t, short, void* ctx)
+{
+    CNetSocket* pThis = (CNetSocket*)ctx;
+    pThis->_SendAllMsg();
+}
+
+
 CNetSocket::CNetSocket(CNetworkService* pService, const CNetEventHandlerSharedPtr& pEventHandler)
     : m_pService(pService)
     , m_pEventHandler(pEventHandler)
@@ -36,11 +43,7 @@ CNetSocket::CNetSocket(CNetworkService* pService, const CNetEventHandlerSharedPt
     , m_ReadBuff{std::make_unique<byte[]>(m_nRecvPacketSizeMax)}
 {
     m_pEventSendMsg = evuser_new(
-        pService->GetEVBase(),
-        [](int, short, void* ctx) {
-            CNetSocket* pThis = (CNetSocket*)ctx;
-            pThis->_SendAllMsg();
-        },
+        pService->GetEVBase(), &OnSendAllMsg,
         this);
 }
 
@@ -101,6 +104,7 @@ bool CNetSocket::SendNetworkMessage(CNetworkMessage&& msg)
 {
     __ENTER_FUNCTION
     CHECKF(msg.GetSize() < GetSendPacketSizeMax());
+    msg.Compress();
     SendMsgData* pData = new SendMsgData{std::move(msg)};
     m_SendMsgQueue.push(pData);
     PostSend();
@@ -115,6 +119,7 @@ bool CNetSocket::SendNetworkMessage(const CNetworkMessage& msg, bool bNeedDuplic
     CHECKF_FMT(msg.GetSize() < GetSendPacketSizeMax(), "msg_size:{} packsizemax:{}", msg.GetSize(), GetSendPacketSizeMax());
     CNetworkMessage send_msg;
     send_msg.CopyRawMessage(msg);
+    send_msg.Compress();
     if(m_pEncryptor && bNeedDuplicate)
     {
         send_msg.DuplicateBuffer();
@@ -261,22 +266,25 @@ void CNetSocket::_OnReceive(bufferevent* b)
         evbuffer_remove(input, pReadBuf, pHeader->msg_size);
         pHeader = (MSG_HEAD*)pReadBuf;
 
-        if(m_pDecryptor && pHeader->msg_size != sizeof(MSG_HEAD))
+        CNetworkMessage recv_msg(pReadBuf, pHeader->msg_size);
+        if(m_pDecryptor)
         {
-            if(pHeader->is_ciper == false)
+            if(pHeader->msg_flag.is_ciper == false)
             {
                 LOGNETERROR("CNetSocket _OnReceive Msg:{} size:{} need decryptor, but msg is not chiper", pHeader->msg_cmd, pHeader->msg_size);
                 _OnError("_OnReceive Decryptor Fail");
                 return;
             }
-            byte*  pBody    = pReadBuf + sizeof(MSG_HEAD);
-            size_t nBodyLen = pHeader->msg_size - sizeof(MSG_HEAD);
-            m_pDecryptor->Decryptor(pBody, nBodyLen, pBody, nBodyLen);
+            recv_msg.Decryptor(m_pDecryptor.get());
         }
+
+        recv_msg.Decompress();
 
         m_nLastProcessMsgCMD = pHeader->msg_cmd;
         m_nLastCMDSize       = pHeader->msg_size;
-        OnRecvData(pReadBuf, pHeader->msg_size);
+
+        
+        OnRecvData(std::move(recv_msg));
     }
     __LEAVE_FUNCTION
 }
@@ -407,12 +415,12 @@ void CNetSocket::OnDisconnected()
     __LEAVE_FUNCTION
 }
 
-void CNetSocket::OnRecvData(byte* pBuffer, size_t len)
+void CNetSocket::OnRecvData(CNetworkMessage&& recv_msg)
 {
     __ENTER_FUNCTION
-    m_pService->AddRecvByteCount(len);
+    m_pService->AddRecvByteCount(recv_msg.GetSize());
 
-    MSG_HEAD* pHeader = (MSG_HEAD*)pBuffer;
+    MSG_HEAD* pHeader = recv_msg.GetMsgHead();
     switch(pHeader->msg_cmd)
     {
         case COMMON_CMD_INTERRUPT:
@@ -444,7 +452,7 @@ void CNetSocket::OnRecvData(byte* pBuffer, size_t len)
     }
 
     if(auto event_handler = m_pEventHandler.lock())
-        event_handler->OnRecvData(shared_from_this(), pBuffer, len);
+        event_handler->OnRecvData(shared_from_this(), std::move(recv_msg));
     __LEAVE_FUNCTION
 }
 
@@ -462,24 +470,25 @@ void CNetSocket::set_sock_nodely()
     bool option_true  = true;
     bool option_false = true;
     setsockopt(m_socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&option_true, sizeof(option_true));
-    setsockopt(m_socket, IPPROTO_TCP, TCP_CORK, (const char*)&option_false, sizeof(option_false));
+    
 
     // turn off SIGPIPE signal
 #ifdef __linux__
-    setsockopt(m_socket, SOL_SOCKET, MSG_NOSIGNAL, (const char*)&option_true, sizeof(option_true));
-#else
-    setsockopt(m_socket, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&option_true, sizeof(option_true));
+    setsockopt(m_socket, IPPROTO_TCP, TCP_CORK, (const char*)&option_false, sizeof(option_false));
+    setsockopt(m_socket, SOL_SOCKET, MSG_NOSIGNAL, (const char*)&option_true, sizeof(option_true));    
 #endif
 
     // set SO_LINGER so socket closes gracefully
     struct linger ling;
     ling.l_onoff  = 1;
     ling.l_linger = 0;
-    setsockopt(m_socket, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling));
+    setsockopt(m_socket, SOL_SOCKET, SO_LINGER, (const char*)&ling, sizeof(ling));
 }
 
 void CNetSocket::set_sock_quickack()
 {
     bool option_true = true;
+#ifdef __linux__
     setsockopt(m_socket, IPPROTO_TCP, TCP_QUICKACK, (const char*)&option_true, sizeof(option_true));
+#endif
 }

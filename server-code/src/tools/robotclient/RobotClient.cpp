@@ -56,9 +56,9 @@ void RobotClient::OnDisconnected(const CNetSocketSharedPtr&)
 
 void RobotClient::OnAccepted(const CNetSocketSharedPtr&) {}
 
-void RobotClient::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len)
+void RobotClient::OnRecvData(const CNetSocketSharedPtr& pSocket,  CNetworkMessage&& recv_msg)
 {
-    MSG_HEAD* pHeader = (MSG_HEAD*)pBuffer;
+    MSG_HEAD* pHeader = recv_msg.GetMsgHead();
     switch(pHeader->msg_cmd)
     {
         case CMD_INTERRUPT:
@@ -72,7 +72,7 @@ void RobotClient::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, 
         case CMD_SC_KEY:
         {
             SC_KEY msg;
-            if(msg.ParseFromArray(pBuffer + sizeof(MSG_HEAD), len - sizeof(MSG_HEAD)) == false)
+            if(msg.ParseFromArray(recv_msg.GetMsgBody(), recv_msg.GetBodySize()) == false)
             {
                 LOGERROR("ParseFromArray Fail:{}", CMD_SC_KEY);
                 return;
@@ -91,7 +91,7 @@ void RobotClient::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, 
             if(func_name.empty() == false)
             {
                 LOGTRACE("process net_msg:{}", pHeader->msg_cmd);
-                m_pManager->ExecScript<void>(func_name.c_str(), this, pBuffer + sizeof(MSG_HEAD), len - sizeof(MSG_HEAD));
+                m_pManager->ExecScript<void>(func_name.c_str(), this, recv_msg.GetMsgBody(), recv_msg.GetBodySize());
                 // m_pManager->GetScriptManager()->FullGC();
             }
             else

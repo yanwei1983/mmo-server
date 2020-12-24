@@ -1,9 +1,18 @@
 
+
 ADD_SUBDIRECTORY(basecode)
-ADD_SUBDIRECTORY(pb_util)
 ADD_SUBDIRECTORY(network)
+ADD_SUBDIRECTORY(crypto_comm)
+ADD_SUBDIRECTORY(remote_imgui)
+ADD_SUBDIRECTORY(pb_util)
+IF (NOT WIN32)
+
 ADD_SUBDIRECTORY(game_event)
 ADD_SUBDIRECTORY(mydb)
 ADD_SUBDIRECTORY(message_route)
-ADD_SUBDIRECTORY(crypto_comm)
+
 ADD_SUBDIRECTORY(script)
+
+ELSE()
+
+ENDIF()

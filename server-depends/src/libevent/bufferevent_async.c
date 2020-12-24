@@ -48,6 +48,7 @@
 #include <winsock2.h>
 #include <winerror.h>
 #include <ws2tcpip.h>
+#include <ws2ipdef.h>
 #endif
 
 #include <sys/queue.h>

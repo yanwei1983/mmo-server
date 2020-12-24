@@ -25,7 +25,7 @@ public:
     virtual void OnConnectFailed(const CNetSocketSharedPtr&) override;
     virtual void OnDisconnected(const CNetSocketSharedPtr&) override;
     virtual void OnAccepted(const CNetSocketSharedPtr&) override;
-    virtual void OnRecvData(const CNetSocketSharedPtr&, byte* pBuffer, size_t len) override;
+    virtual void OnRecvData(const CNetSocketSharedPtr&, CNetworkMessage&& recv_msg) override;
     virtual void OnRecvTimeout(const CNetSocketSharedPtr&) override;
 
     void AddEventCallBack(uint32_t nWaitMs, const std::string& func_name, bool bPersist);

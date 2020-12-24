@@ -59,7 +59,7 @@ public:
     virtual void   OnWaitReconnect(const CNetSocketSharedPtr&) override;
 
     virtual void OnAccepted(const CNetSocketSharedPtr&) override;
-    virtual void OnRecvData(const CNetSocketSharedPtr&, byte* pBuffer, size_t len) override;
+    virtual void OnRecvData(const CNetSocketSharedPtr&, CNetworkMessage&& recv_msg) override;
     virtual void OnRecvTimeout(const CNetSocketSharedPtr&) override;
     virtual void OnClosing(const CNetSocketSharedPtr&) override;
 

@@ -78,7 +78,7 @@ public:
 public:
     void OnDisconnected(const CNetSocketSharedPtr& pSocket);
     void OnAccepted(const CNetSocketSharedPtr& pSocket);
-    void OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len);
+    void OnRecvData(const CNetSocketSharedPtr& pSocket, CNetworkMessage&& recv_msg);
 
     void         OnAuthSucc(CGameClient* pClient);
     void         OnProcessMessage(CNetworkMessage*) override;

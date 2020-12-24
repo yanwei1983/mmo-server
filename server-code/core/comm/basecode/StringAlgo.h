@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-
+#include <functional>
 #include "export_lua.h"
 //跳过utf8_bom头
 export_lua void skip_utf8_bom(FILE* fp);
@@ -108,7 +108,7 @@ OI remove_sub_sequence(OI first1, OI last1, II first2, II last2)
 {
     OI            r1 = std::search(first1, last1, first2, last2);
     OI            w = r1, r2 = r1;
-    const int32_t nDiff = std::distance(first2, last2);
+    const auto nDiff = std::distance(first2, last2);
     while(r2 != last1)
     {
         std::advance(r1, nDiff);                    // ignore [first2, last2)

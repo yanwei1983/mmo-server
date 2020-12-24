@@ -27,7 +27,7 @@
  */
 #ifndef MINHEAP_INTERNAL_H_INCLUDED_
 #define MINHEAP_INTERNAL_H_INCLUDED_
-
+#include "stdint.h"
 #include "event2/event-config.h"
 #include "evconfig-private.h"
 #include "event2/event.h"

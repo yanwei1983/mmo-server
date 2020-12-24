@@ -5,13 +5,14 @@
 #include <vector>
 
 #include <assert.h>
+#include <fmt/format.h>
+#include "RandomGet.h"
 
 #include "AxisAlignedBox.h"
 #include "MathDef.h"
 #include "Matrix3.h"
 #include "Matrix4.h"
 #include "Quaternion.h"
-#include "RandomGet.h"
 #include "Ray.h"
 #include "Vector2.h"
 #include "Vector3.h"
@@ -274,10 +275,10 @@ export_lua namespace GameMath
         if(x0 == x1 && y0 == y1)
             return;
 
-        setPos.push_back(CPos2D(x0, y0)); // 先把初始点加入
+        setPos.push_back(CPos2D(static_cast<float>(x0), static_cast<float>(y0))); // 先把初始点加入
 
         DDALineForeach(x0, y0, x1, y1, [&setPos](int32_t x, int32_t y) -> bool {
-            setPos.push_back(CPos2D(x, y));
+            setPos.push_back(CPos2D(static_cast<float>(x), static_cast<float>(y)));
             return true;
         });
     }

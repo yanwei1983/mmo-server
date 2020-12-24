@@ -27,9 +27,7 @@ TARGET_LINK_LIBRARIES(gm_service
   libservice_comm.so
   librpcservice_comm.so
   libbrpc.so
-  pthread
-  rt
-  dl
+  ${LIB_PTHREAD}
  ${JEMALLOC_LIB_NAME}
 )
 

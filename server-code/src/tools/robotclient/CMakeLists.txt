@@ -28,7 +28,6 @@ TARGET_LINK_LIBRARIES(robotclient
  pb_util
  protobuf
  ${JEMALLOC_LIB_NAME}
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 cotire(robotclient)

@@ -3,8 +3,15 @@
 #include <cstring>
 #include <memory>
 
+#ifndef _MSC_VER
 #include <cxxabi.h>
 #include <dlfcn.h>
+#else
+#include <windows.h>
+#include <ProcessThreadsAPI.h>
+#include <libloaderapi.h>
+#endif
+
 #include <fmt/chrono.h>
 
 #include "BaseCode.h"
@@ -13,7 +20,10 @@
 
 std::string demangle(const char* name)
 {
-    // mangled_name
+#ifdef _MSC_VER
+	return std::string(name);
+#else
+	// mangled_name
     //   A NULL-terminated character string containing the name to
     //   be demangled.
     // output_buffer:
@@ -41,6 +51,7 @@ std::string demangle(const char* name)
         return s;
     }
     return std::string(name);
+#endif
 }
 
 namespace
@@ -58,6 +69,7 @@ namespace
     std::string DemangleSymbol(const char* input_symbol)
     {
         std::string            symbol      = input_symbol;
+#ifdef __linux__
         std::string::size_type search_from = 0;
         while(search_from < symbol.size())
         {
@@ -93,7 +105,7 @@ namespace
                 search_from = mangled_start + 2;
             }
         }
-
+#endif
         return symbol;
     }
 
@@ -159,6 +171,7 @@ namespace
 
 } // namespace
 
+#ifdef __linux__
 #include <bfd.h>
 
 struct line_data
@@ -371,7 +384,18 @@ std::string GetStackTraceString(const CALLFRAME_NODE* pFrame)
     result += "==================end===================================\n";
     return result;
 }
-
+#else
+std::string GetStackTraceString(const CallFrameMap& data)
+{
+    std::string result;
+    return result;
+}
+std::string GetStackTraceString(const CALLFRAME_NODE* pFrame)
+{
+    std::string result;
+    return result;
+}
+#endif
 bool DumpStack(const CALLFRAME_NODE* pFrame)
 {
     LOGSTACK("{}", GetStackTraceString(pFrame));
@@ -401,6 +425,7 @@ bool DumpStackFile(const CallFrameMap& data)
 
 CallFrameMap::CallFrameMap(int32_t skip_calldepth, int32_t max_calldepth)
 {
+#ifdef __linux__
     constexpr int32_t MAX_BACKTRACE_SYMBOLS_NUMBER = 100;
     void*             pCallFramearray[MAX_BACKTRACE_SYMBOLS_NUMBER];
     size_t            nTrace       = backtrace(pCallFramearray, MAX_BACKTRACE_SYMBOLS_NUMBER);
@@ -413,6 +438,7 @@ CallFrameMap::CallFrameMap(int32_t skip_calldepth, int32_t max_calldepth)
         m_Addr.emplace_back(std::make_pair(pCallFramearray[i], std::string(funcnamearry[i])));
     }
     free(funcnamearry);
+#endif
 }
 
 CALLFRAME_NODE::CALLFRAME_NODE(CALLFRAME_NODE* pParent /*= NULL*/, void* p /*= NULL*/)
@@ -464,6 +490,7 @@ void CALLFRAME_NODE::remove(CALLFRAME_NODE* pChild)
 
 CALLFRAME_NODE* CALLFRAME_NODE::MakeCallFrame(int32_t skip_calldepth)
 {
+#ifdef __linux__
     constexpr int32_t MAX_BACKTRACE_SYMBOLS_NUMBER = 100;
     void*             pCallFramearray[MAX_BACKTRACE_SYMBOLS_NUMBER];
     size_t            nTrace = backtrace(pCallFramearray, MAX_BACKTRACE_SYMBOLS_NUMBER);
@@ -473,6 +500,9 @@ CALLFRAME_NODE* CALLFRAME_NODE::MakeCallFrame(int32_t skip_calldepth)
         pFrame = pFrame->append(pCallFramearray[i]);
     }
     return pFrame;
+#else
+    return this;
+#endif
 }
 
 CALLFRAME_NODE::Equal::Equal(void* p)

@@ -21,9 +21,7 @@ TARGET_LINK_LIBRARIES(auth_service
  libbasecode.so 
  libservice_comm.so  
  libcurlpp.so
- pthread
- rt
- dl
+ ${LIB_PTHREAD}
   ${JEMALLOC_LIB_NAME}
 )
 cotire(auth_service)

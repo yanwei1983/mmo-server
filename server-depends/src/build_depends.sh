@@ -35,7 +35,7 @@ cd protobuf/
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake ../cmake -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_BUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make -j4
+cmake --build . -j4
 cp protoc ../../../bin/ -rp
 cp protoc-* ../../../bin/ -rp
 cp *.a ../../../lib/ -rp
@@ -48,7 +48,7 @@ cd cpp_redis
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make -j4
+cmake --build . -j4
 cp lib/libcpp_redis.a ../../../lib/ -rp
 cp lib/libtacopie.a ../../../lib/ -rp
 cd ../..
@@ -60,7 +60,7 @@ cd gflags
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=1 -DBUILD_STATIC_LIBS=1 -DCMAKE_BUILD_RPATH=FALSE -DCMAKE_SKIP_INSTALL_RPATH=FALSE -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE -DCMAKE_INSTALL_RPATH="." -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=FALSE
-make -j4
+cmake --build . -j4
 cp lib/* ../../../lib/ -rp
 cp include .. -rp
 cd ../..
@@ -72,7 +72,7 @@ cd snappy
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_SHARED_LIBS=OFF -DSNAPPY_BUILD_TESTS=OFF -DCMAKE_CXX_FLAGS="-fPIC -g"
-make -j4
+cmake --build . -j4
 cp libsnappy.* ../../../lib/ -rp
 cp snappy-stubs-public.h ..
 cd ../..
@@ -84,9 +84,9 @@ cd leveldb
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_INCLUDE_PATH="../snappy/" -DCMAKE_LIBRARY_PATH="../../lib/" -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLEVELDB_BUILD_TESTS=OFF -DLEVELDB_BUILD_BENCHMARKS=OFF -DLEVELDB_INSTALL=OFF -DCMAKE_BUILD_RPATH=FALSE -DCMAKE_SKIP_INSTALL_RPATH=FALSE -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE -DCMAKE_INSTALL_RPATH="." -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=FALSE -DHAVE_SNAPPY=ON
-make -j4
+cmake --build . -j4
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_INCLUDE_PATH="../snappy/" -DCMAKE_LIBRARY_PATH="../../lib/" -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo -DLEVELDB_BUILD_TESTS=OFF -DLEVELDB_BUILD_BENCHMARKS=OFF -DLEVELDB_INSTALL=OFF -DCMAKE_BUILD_RPATH=FALSE -DCMAKE_SKIP_INSTALL_RPATH=FALSE -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE -DCMAKE_INSTALL_RPATH="." -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=FALSE -DHAVE_SNAPPY=ON
-make -j4
+cmake --build . -j4
 cp include .. -rp
 cp libleveldb.* ../../../lib/ -rp
 cd ../..
@@ -98,7 +98,7 @@ cd brpc
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INCLUDE_PATH="../gflags/include;../protobuf/src;../leveldb/include" -DCMAKE_LIBRARY_PATH="../../lib/" -DPROTOBUF_PROTOC_EXECUTABLE="../../../bin/protoc" -DProtobuf_PROTOC_EXECUTABLE="../../../bin/protoc" -DCMAKE_BUILD_RPATH=FALSE -DCMAKE_SKIP_INSTALL_RPATH=FALSE -DCMAKE_BUILD_WITH_INSTALL_RPATH=TRUE -DCMAKE_INSTALL_RPATH="./:./libs:../libs:./depends:../depends" -DCMAKE_INSTALL_RPATH_USE_LINK_PATH=FALSE
-make -j4
+cmake --build . -j4
 cp output/include .. -rp
 cp output/lib/libbrpc.* ../../../lib/ -rp
 cd ../..
@@ -121,7 +121,7 @@ cd tinyxml2/
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make -j4
+cmake --build . -j4
 cp libtinyxml2.* ../../../lib/ -rp
 cd ../..
 }
@@ -142,7 +142,7 @@ cd curlpp
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make -j4
+cmake --build . -j4
 cp libcurlpp.* ../../../lib/ -rp
 cd ../..
 }
@@ -153,7 +153,7 @@ cd xlnt
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make -j4
+cmake --build . -j4
 cp source/libxlnt.so* ../../../lib/ -rp
 cd ../..
 }
@@ -164,7 +164,7 @@ cd fmt
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DFMT_TEST=OFF -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make -j4
+cmake --build . -j4
 cp libfmt.a ../../../lib/ -rp
 #cp libfmt.so* ../../../lib/ -rp
 cd ../..
@@ -177,7 +177,7 @@ cd recastnavigation
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make -j4
+cmake --build . -j4
 cp Recast/libRecast.so* ../../../lib/ -rp
 cp Detour/libDetour.so* ../../../lib/ -rp
 cp DetourCrowd/libDetourCrowd.so* ../../../lib/ -rp
@@ -191,7 +191,7 @@ cd box2d
 mkdir -p build
 cd build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
-make -j4
+cmake --build . -j4
 cp src/libbox2d.a ../../../lib/ -rp
 cd ../..
 }
@@ -212,9 +212,19 @@ cd cryptopp
 mkdir -p cmake_build
 cd cmake_build
 CC=${CC_COMPILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} BUILD_OS=linux BUILD_MODE=native cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTING=OFF -DDISABLE_ASM=ON
-make -j4
+cmake --build . -j4
 cp libcryptopp.* ../../../lib/ -rp
 cd ../..
+}
+
+
+lz4()
+{
+cd lz4/build/cmake
+CC=${CC_COMILER} CXX=${CXX_COMPILER} CFLAGS=${CC_FLAGS} CXXFLAGS=${CXX_FLAGS} LD_FLAG=${LINK_FLAGS} cmake . -DLZ4_BUILD_CLI=OFF -DLZ4_BUILD_LEGACY_LZ4C=OFF -DBUILD_STATIC_LIBS=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build . -j4
+cp liblz4.a ../../../../lib/ -rp
+cd ../../..
 }
 
 $1;

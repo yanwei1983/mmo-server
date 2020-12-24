@@ -2,16 +2,15 @@
     "configurations": [
         {
             "name": "Linux",
-            
             "defines": [],
-            "cStandard": "c11",
+            "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64",
             "compilerPath": "/usr/bin/clang++-9",
             "configurationProvider": "ms-vscode.cmake-tools",
             "includePath": [
                 "${workspaceFolder}/server-code/src/**",
-                "${workspaceFolder}/server-code/core/**"        
+                "${workspaceFolder}/server-code/core/**"
             ],
             "browse": {
                 "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
@@ -25,9 +24,31 @@
                     "/usr/include/linux/",
                     "/usr/include/"
                 ]
-            }
+            },
+            "compileCommands": "${workspaceFolder}/server-code/build/compile_commands.json"
             
-            
+        },
+        {
+            "name": "Win32",
+            "defines": [],
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64",
+            "compilerPath": "c:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.24.28314/bin/Hostx64/x64/cl.exe",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "includePath": [
+                "${workspaceFolder}/server-code/src/**",
+                "${workspaceFolder}/server-code/core/**"
+            ],
+            "browse": {
+                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+                "path": [
+                    "${workspaceFolder}/server-code/src/**",
+                    "${workspaceFolder}/server-code/core/**",
+                    "${workspaceFolder}/server-code/depends/src/**"
+                ]
+            },
+            "compileCommands": ""
         }
     ],
     "version": 4

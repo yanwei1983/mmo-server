@@ -424,7 +424,7 @@ public:
     static T Clamp(T val, T minval, T maxval)
     {
         assert(minval < maxval && "Invalid clamp range");
-        return std::max(std::min(val, maxval), minval);
+        return std::max<T>(std::min<T>(val, maxval), minval);
     }
 
     export_lua static inline float Tan(const Radian& fValue, bool useTables = false)
@@ -515,9 +515,9 @@ public:
         }
 
     private:
-        static constexpr int32_t          m_TrigTableFactor = nTrigTableSize / TWO_PI;
-        std::array<float, nTrigTableSize> m_SinTable;
-        std::array<float, nTrigTableSize> m_TanTable;
+        static constexpr float m_TrigTableFactor = nTrigTableSize / TWO_PI;
+        std::array<float, nTrigTableSize> m_SinTable        = {};
+        std::array<float, nTrigTableSize> m_TanTable        = {};
     };
     using TRIG_TABLE_t = CTrigTable<4096>;
     static inline const TRIG_TABLE_t& TRIG_TABLE()

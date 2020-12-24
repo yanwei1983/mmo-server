@@ -1,0 +1,5 @@
+
+ADD_SUBDIRECTORY(imgui_comm)
+IF(NOT WIN32)
+ADD_SUBDIRECTORY(imgui_server)
+ENDIF()

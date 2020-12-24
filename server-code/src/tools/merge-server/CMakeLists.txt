@@ -23,7 +23,7 @@ TARGET_LINK_LIBRARIES(merge-server
  crypto
  z
  ${JEMALLOC_LIB_NAME}
- dl
- pthread)
+ ${LIB_PTHREAD}
+)
 
 cotire(merge-server)

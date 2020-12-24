@@ -6,7 +6,9 @@
 #include <memory>
 #include <thread>
 
+#ifdef __linux__
 #include <unistd.h>
+#endif
 
 #include "BaseCode.h"
 #include "LockfreeQueue.h"
@@ -23,8 +25,13 @@ public:
                   on_thread_event_function_t&& on_thread_create_func  = on_thread_event_function_t(),
                   on_thread_event_function_t&& on_thread_finish_func  = on_thread_event_function_t());
     ~CNormalThread();
-    uint32_t GetTid() const { return m_tid; }
-    void     SetTid(uint32_t val) { m_tid = val; }
+#ifdef WIN32
+    HANDLE GetTid() const { return m_tid; }
+    void   SetTid(HANDLE val) { m_tid = val; }
+#else
+    uint32_t          GetTid() const { return m_tid; }
+    void              SetTid(uint32_t val) { m_tid = val; }
+#endif
 
     void Stop();
     void Join();
@@ -39,8 +46,11 @@ private:
     int32_t           m_nWorkIntervalMS;
     std::atomic<bool> m_bStop    = false;
     std::atomic<bool> m_bIsReady = false;
-    uint32_t          m_tid;
-
+#ifdef WIN32
+    HANDLE m_tid;
+#else
+    uint32_t  m_tid;
+#endif
     std::string m_ThreadName;
 
     on_thread_event_function_t m_funcThreadProcess;
@@ -119,7 +129,11 @@ private:
 
 inline int32_t get_cur_thread_id()
 {
+#ifdef WIN32
+    return GetCurrentThreadId();
+#else
     constexpr int32_t ___NR_gettid = 186;
     return (int32_t)syscall(___NR_gettid);
+#endif
 }
 #endif /* THREAD_H */

@@ -7,6 +7,19 @@
 
 #include "export_lua.h"
 
+#ifdef WIN32
+
+    
+
+    #define sleep(sec)   Sleep(sec * 1000)
+    #define msleep(msec) Sleep(msec)
+    void usleep(unsigned long usec);
+#else
+    #include <unistd.h>
+    #define msleep(msec) usleep(msec * 1000)
+#endif
+
+
 constexpr time_t ONE_MINUS_SEC = 60;
 constexpr time_t ONE_HOUR_SEC  = 60 * ONE_MINUS_SEC;
 constexpr time_t ONE_DAY_SEC   = 24 * ONE_HOUR_SEC;

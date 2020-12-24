@@ -36,7 +36,8 @@ void export_to_lua(lua_State* L, void* pManager)
 RobotClientManager::RobotClientManager(uint32_t nRobStart, uint32_t nRobAmount, const std::string& lua_file_name)
     : m_pNetMsgProcess(std::make_unique<CNetMSGProcess>())
 {
-    m_pEventManager.reset(CEventManager::CreateNew(GetEVBase(), false));
+    m_pNetworkService.reset(CNetworkService::CreateNew());
+    m_pEventManager.reset(CEventManager::CreateNew(m_pNetworkService->GetEVBase(), false));
 
     m_pScriptManager.reset(CLUAScriptManager::CreateNew("script", export_to_lua, this, "robot_client", lua_file_name.c_str(), false));
     m_pScriptManager->_ExecScript<void>("main", nRobStart, nRobAmount);
@@ -51,20 +52,31 @@ RobotClientManager::RobotClientManager(uint32_t nRobStart, uint32_t nRobAmount, 
     param.bPersist  = true;
 
     m_pEventManager->ScheduleEvent(param, m_EventScriptGC);
+
+
+    m_pNetworkService->StartIOThread("client_IO");
 }
 
 RobotClientManager::~RobotClientManager()
 {
-    BreakLoop();
-    JoinIOThread();
+    if(m_pNetworkService)
+    {
+        m_pNetworkService->BreakLoop();
+        m_pNetworkService->JoinIOThread();
+        
+    }
     m_setClient.clear();
-    Destroy();
+    if(m_pNetworkService)
+    {
+        m_pNetworkService->Destroy();
+        m_pNetworkService.reset();
+    }
 }
 
 RobotClientPtr RobotClientManager::ConnectServer(const char* addr, int32_t port)
 {
     RobotClientPtr pClient = std::make_shared<RobotClient>(this);
-    auto           pSocket = AsyncConnectTo(addr, port, pClient);
+    auto           pSocket = m_pNetworkService->AsyncConnectTo(addr, port, pClient);
     if(pSocket.expired())
     {
         return nullptr;

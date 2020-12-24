@@ -9,6 +9,7 @@
 
 #include "export_lua.h"
 
+#ifdef __linux__
 inline FILE* fopen_s(FILE** fp, const char* path, const char* mode)
 {
     if(fp == nullptr)
@@ -16,6 +17,11 @@ inline FILE* fopen_s(FILE** fp, const char* path, const char* mode)
     *fp = std::fopen(path, mode);
     return *fp;
 }
+
+#else
+#include<Shlwapi.h>
+
+#endif
 
 constexpr unsigned char CODE_UTF_LEAD_0 = 0xefU;
 constexpr unsigned char CODE_UTF_LEAD_1 = 0xbbU;
@@ -32,11 +38,14 @@ inline void skip_utf8_bom(FILE* fp)
         fseek(fp, 0, SEEK_SET);
 }
 
+#ifdef __linux__
+
 export_lua inline bool scan_dir(const std::string&                                                 parent_path,
                                 const std::string&                                                 path,
                                 bool                                                               bRecursive,
                                 const std::function<void(const std::string&, const std::string&)>& func)
 {
+
     std::string cur_dir = parent_path + "/" + path;
     DIR*        dp      = opendir(cur_dir.c_str());
     if(dp == nullptr)
@@ -72,6 +81,16 @@ export_lua inline bool scan_dir(const std::string&                              
 
     return true;
 }
+#else
+export_lua inline bool scan_dir(const std::string&                                                 parent_path,
+                                const std::string&                                                 path,
+                                bool                                                               bRecursive,
+                                const std::function<void(const std::string&, const std::string&)>& func)
+{
+    return false;
+}
+
+#endif
 
 inline void fixPath(std::string& path)
 {

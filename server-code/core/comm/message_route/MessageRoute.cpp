@@ -37,7 +37,7 @@ void ReleaseMessageRoute()
 }
 
 CMessageRoute::CMessageRoute()
-    : m_pNetworkService(std::make_unique<CNetworkService>())
+    : m_pNetworkService(CNetworkService::CreateNew())
 {
     m_pNetworkService->StartIOThread("MessageRoute");
     LOGDEBUG("MessageRoute Create.");

@@ -50,7 +50,7 @@ public:
 public:
     virtual void OnDisconnected();
     virtual void OnClosing();
-    virtual void OnRecvData(byte* pBuffer, size_t len);
+    virtual void OnRecvData(CNetworkMessage&& recv_msg);
     virtual void OnRecvTimeout(bool& bReconnect);
 
 public:
@@ -62,6 +62,7 @@ public:
     static void _OnSendOK(bufferevent* b, void* ctx);
     static void _OnCheckAllSendOK(bufferevent* b, void* ctx);
     static void _OnSocketEvent(bufferevent*, short, void* ctx);
+    void        _SendAllMsg();
 
 public:
     CNetworkService* GetService() const { return m_pService; }
@@ -108,7 +109,7 @@ protected:
         CNetworkMessage send_msg;
     };
 
-    void _SendAllMsg();
+    
     void PostSend();
 
 protected:

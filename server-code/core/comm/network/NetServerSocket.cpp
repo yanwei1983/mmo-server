@@ -96,7 +96,7 @@ void CServerSocket::_OnError(const std::string& what)
 
         m_nReconnectTimes--;
         if(m_pReconnectEvent == nullptr)
-            m_pReconnectEvent = event_new(m_pService->GetEVBase(), -1, 0, _OnReconnect, this);
+            m_pReconnectEvent = event_new(m_pService->GetEVBase(), -1, 0, &CServerSocket::_OnReconnect, this);
         struct timeval reconnet_dealy = {5, 0};
         event_add(m_pReconnectEvent, &reconnet_dealy);
         SetStatus(NSS_WAIT_RECONNECT);
@@ -117,7 +117,7 @@ void CServerSocket::_OnError(const std::string& what)
     __LEAVE_FUNCTION
 }
 
-void CServerSocket::_OnReconnect(int32_t fd, short what, void* ctx)
+void CServerSocket::_OnReconnect(evutil_socket_t fd, short what, void* ctx)
 {
     __ENTER_FUNCTION
 
@@ -139,7 +139,7 @@ void CServerSocket::_OnSocketConnectorEvent(bufferevent* b, short what, void* ct
     auto           shared_socket = pSocket->shared_from_this();
     if(what == BEV_EVENT_CONNECTED)
     {
-        int32_t fd = bufferevent_getfd(b);
+        auto fd = bufferevent_getfd(b);
         evutil_make_socket_nonblocking(fd);
         pSocket->set_sock_nodely();
         pSocket->set_sock_quickack();
@@ -202,16 +202,16 @@ void CServerSocket::OnConnectFailed()
     __LEAVE_FUNCTION
 }
 
-void CServerSocket::OnRecvData(byte* pBuffer, size_t len)
+void CServerSocket::OnRecvData(CNetworkMessage&& recv_msg)
 {
     __ENTER_FUNCTION
-    MSG_HEAD* pHeader = (MSG_HEAD*)pBuffer;
+    MSG_HEAD* pHeader = recv_msg.GetMsgHead();
     if(pHeader->msg_cmd == COMMON_CMD_INTERRUPT)
     {
         //对端主动断开,不要重连了
         SetReconnectTimes(0);
         SetReconnect(false);
     }
-    CNetSocket::OnRecvData(pBuffer, len);
+    CNetSocket::OnRecvData(std::move(recv_msg));
     __LEAVE_FUNCTION
 }

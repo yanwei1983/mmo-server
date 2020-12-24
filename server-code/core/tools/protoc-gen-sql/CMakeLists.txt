@@ -17,8 +17,7 @@ TARGET_LINK_LIBRARIES(protoc-gen-sql
  protobuf
  libsql_options_static.a
  fmt
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 #cotire(protoc-gen-sql)
 

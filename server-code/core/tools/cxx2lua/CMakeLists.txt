@@ -20,8 +20,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${BINARIES_CORE})
 TARGET_LINK_LIBRARIES(cxx2lua
  fmt
  libclang.so
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 
 

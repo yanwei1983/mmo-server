@@ -16,8 +16,8 @@ TARGET_LINK_LIBRARIES(mydb
 	PUBLIC libbasecode.so
 	PRIVATE libmysqlclient.a
 	PRIVATE ssl
-	dl
-	pthread
+	PUBLIC ${LIB_PTHREAD}
 	PRIVATE ${JEMALLOC_LIB_NAME}
+	PRIVATE dl
 )
 cotire(mydb)

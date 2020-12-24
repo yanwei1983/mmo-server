@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.1...3.18)
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
   cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
-
+cmake_policy(SET CMP0091 NEW)
 # Determine if fmt is built as a subproject (using add_subdirectory)
 # or if it is the master project.
 set(MASTER_PROJECT OFF)
@@ -50,7 +50,7 @@ if (MASTER_PROJECT AND NOT CMAKE_BUILD_TYPE)
               "CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 endif ()
 
-project(FMT CXX)
+project(FMT C CXX)
 include(GNUInstallDirs)
 set_verbose(FMT_INC_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE STRING
             "Installation directory for include files, a relative path that "
@@ -138,6 +138,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   endif ()
   set(WERROR_FLAG -Werror)
 endif ()
+ 
 
 if (MSVC)
   set(PEDANTIC_COMPILE_FLAGS /W3)
@@ -159,7 +160,7 @@ if (MASTER_PROJECT AND CMAKE_GENERATOR MATCHES "Visual Studio")
        ".NETFramework\\v4.0")
   file(WRITE run-msbuild.bat "
     ${MSBUILD_SETUP}
-    ${CMAKE_MAKE_PROGRAM} -p:FrameworkPathOverride=\"${netfxpath}\" %*")
+    ${CMAKE_MAKE_PROGRAM} -p:FrameworkPathOverride=\"${netfxpath}\" %*") 
 endif ()
 
 set(strtod_l_headers stdlib.h)

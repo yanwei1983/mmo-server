@@ -42,11 +42,14 @@ using CClientSocketWeakPtr   = std::weak_ptr<CClientSocket>;
 
 class CNetworkService
 {
-public:
     CNetworkService();
+    bool Init(std::function<void()>&& time_out_func = std::function<void()>(), uint32_t time_out_ms = 60 * 60);
+public:
+    CreateNewImpl(CNetworkService);
+    
     virtual ~CNetworkService();
-
     void Destroy();
+public:
     //监听
     evconnlistener* Listen(const std::string& addr, int32_t port, const CNetEventHandlerSharedPtr& pEventHandler);
     bool            EnableListener(evconnlistener* listener, bool bEnable = false);
@@ -60,10 +63,7 @@ public:
 
     void BreakLoop();
     //开启独立的IO线程
-    void StartIOThread(const std::string&      thread_name,
-                       std::function<void()>&& time_out_func = std::function<void()>(),
-                       uint32_t                time_out_ms   = 60 * 60,
-                       const ServiceID&        idService     = 0);
+    void StartIOThread(const std::string& thread_name, const ServiceID& idService = 0);
     void OnIOThreadTimeOut();
 
     //读取IO一次，如果开启了独立IO线程则不需调用
@@ -77,13 +77,12 @@ public:
     size_t                         GetIPCheckNum() const { return m_nIPCheckNum; }
     void                           SetIPCheckNum(size_t val) { m_nIPCheckNum = val; }
     MPSCQueue<CNetworkMessage*>&   _GetMessageQueue() { return m_MessageQueue; }
-
+    
 public:
-    static void accept_conn_cb(evconnlistener*, int32_t fd, struct sockaddr* addr, int32_t socklen, void* arg);
-    static void accept_error_cb(struct evconnlistener*, void* arg);
-    static void http_process_cb(struct evhttp_request* req, void* arg);
-
-    void OnAccept(int32_t fd, struct sockaddr* addr, int32_t, evconnlistener* listener);
+   
+    void OnAccept(evutil_socket_t fd, struct sockaddr* addr, int32_t, evconnlistener* listener);
+    void OnReciveHttp(struct evhttp_request* req);
+    void _ProceseClosingSocket();
 
 public:
     event_base* GetEVBase() const { return m_pBase; }
@@ -115,16 +114,17 @@ public:
     bool                _AllocSocketIdx(const CNetSocketSharedPtr& pSocket);
     void                _ReleaseSocketIdx(const CNetSocketSharedPtr& pSocket);
     CNetSocketSharedPtr QuerySocketByIdx(uint16_t nSocketIdx);
-
+       
 public:
     void JoinIOThread();
 
+public:
+    
 private:
-    void                      _ProceseClosingSocket();
     CNetEventHandlerSharedPtr QueryListenerEventHander(evconnlistener* listener);
 
 protected:
-    event_base*                                        m_pBase;
+    event_base*                                        m_pBase = nullptr;
     std::map<evconnlistener*, CNetEventHandlerWeakPtr> m_setListener;
     struct evhttp*                                     m_pHttpHandle = nullptr;
     std::function<void(struct evhttp_request* req)>    m_funcOnReciveHttp;

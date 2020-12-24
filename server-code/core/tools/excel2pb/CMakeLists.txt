@@ -18,8 +18,7 @@ TARGET_LINK_LIBRARIES(excel2pb
  pb_util
  libfmt.a
  libdata_pack_static.a
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 
 

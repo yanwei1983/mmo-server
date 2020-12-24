@@ -6,6 +6,7 @@
 #include "NetworkDefine.h"
 class CNetSocket;
 using CNetSocketSharedPtr = std::shared_ptr<CNetSocket>;
+class CNetworkMessage;
 
 class CNetEventHandler : public std::enable_shared_from_this<CNetEventHandler>
 {
@@ -34,7 +35,7 @@ public:
     // accept a new client
     virtual void OnAccepted(const CNetSocketSharedPtr&){};
     // receive data
-    virtual void OnRecvData(const CNetSocketSharedPtr&, byte* pBuffer, size_t len){};
+    virtual void OnRecvData(const CNetSocketSharedPtr&, CNetworkMessage&& recv_msg){};
     // recv over time
     virtual void OnRecvTimeout(const CNetSocketSharedPtr&){};
     // WaitReconnect

@@ -9,12 +9,20 @@ MESSAGE(STATUS "cmake_type: (release)")
 ENDIF()
 
 ADD_SUBDIRECTORY(comm)
+ 
+IF (NOT WIN32)
 ADD_SUBDIRECTORY(proto)
 ADD_SUBDIRECTORY(service)
 ADD_SUBDIRECTORY(service_loader)
 
 ADD_SUBDIRECTORY(tools)
 ADD_SUBDIRECTORY(test EXCLUDE_FROM_ALL)
+
+ELSE()
+ADD_SUBDIRECTORY(tools/remote_imgui_client)
+
+endif()
+
 
 
 

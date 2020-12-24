@@ -30,10 +30,8 @@ TARGET_LINK_LIBRARIES(gmproxy_service
  libmyproto.so 
  libservice_comm.so 
  librpcservice_comm.so
- pthread
  brpc
- rt
- dl
+ ${LIB_PTHREAD}
   ${JEMALLOC_LIB_NAME}
 )
 

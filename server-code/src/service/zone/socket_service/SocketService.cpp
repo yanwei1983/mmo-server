@@ -73,7 +73,7 @@ public:
     virtual size_t GetSendPacketSizeMax() const override { return _MAX_MSGSIZE * 1024; }//4M_1Packet
     virtual void OnDisconnected(const CNetSocketSharedPtr& pSocket) override { m_pService->OnDisconnected(pSocket); }
     virtual void OnAccepted(const CNetSocketSharedPtr& pSocket) override { m_pService->OnAccepted(pSocket); }
-    virtual void OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len) override { m_pService->OnRecvData(pSocket, pBuffer, len); }
+    virtual void OnRecvData(const CNetSocketSharedPtr& pSocket, CNetworkMessage&& recv_msg) override { m_pService->OnRecvData(pSocket, std::move(recv_msg)); }
 
     CSocketService* m_pService;
 };
@@ -170,7 +170,7 @@ bool CSocketService::CreateNetworkService()
     __ENTER_FUNCTION
     if(m_pNetworkService)
         return false;
-    m_pNetworkService = std::make_unique<CNetworkService>();
+    m_pNetworkService.reset(CNetworkService::CreateNew());
     return true;
     __LEAVE_FUNCTION
     return true;
@@ -284,7 +284,7 @@ void CSocketService::OnAccepted(const CNetSocketSharedPtr& pSocket)
     __LEAVE_FUNCTION
 }
 
-void CSocketService::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffer, size_t len)
+void CSocketService::OnRecvData(const CNetSocketSharedPtr& pSocket, CNetworkMessage&& recv_msg)
 {
     __ENTER_FUNCTION
     m_nSocketMessageProcess++;
@@ -296,7 +296,7 @@ void CSocketService::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffe
         return;
     }
     // recv msg from client
-    MSG_HEAD* pHead = (MSG_HEAD*)pBuffer;
+    MSG_HEAD* pHead = recv_msg.GetMsgHead();
     if(pHead->msg_cmd < pClient->GetMessageAllowBegin() || pHead->msg_cmd > pClient->GetMessageAllowEnd())
     {
         LOGWARNING("RECV ClientMsg:{} not Allow {}.{}", pHead->msg_cmd, pSocket->GetAddrString(), pSocket->GetPort());
@@ -312,8 +312,9 @@ void CSocketService::OnRecvData(const CNetSocketSharedPtr& pSocket, byte* pBuffe
             if(pClient->GetDestServerPort().IsVaild() == false)
                 return;
             // send to other server
-            CNetworkMessage msg(pBuffer, len, pClient->GetVirtualSocket(), VirtualSocket(pClient->GetDestServerPort(), 0));
-            _SendMsgToZonePort(msg);
+            recv_msg.SetFrom(pClient->GetVirtualSocket());
+            recv_msg.SetTo(VirtualSocket(pClient->GetDestServerPort()));
+            _SendMsgToZonePort(recv_msg);
         }
         break;
     }

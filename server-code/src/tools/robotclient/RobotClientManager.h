@@ -12,7 +12,7 @@
 class CNetMSGProcess;
 class RobotClient;
 using RobotClientPtr = std::shared_ptr<RobotClient>;
-class RobotClientManager : public CNetworkService
+class RobotClientManager
 {
 public:
     RobotClientManager(uint32_t nRobStart, uint32_t nRobAmount, const std::string& lua_file_name);
@@ -50,6 +50,7 @@ public:
     void AddTimedCallback(uint32_t tIntervalMS, const std::string& func_name, bool bPersist);
 
 private:
+    std::unique_ptr<CNetworkService>          m_pNetworkService;
     std::unique_ptr<CNetMSGProcess>           m_pNetMsgProcess;
     std::unique_ptr<CEventManager>            m_pEventManager;
     std::set<RobotClientPtr>                  m_setClient;

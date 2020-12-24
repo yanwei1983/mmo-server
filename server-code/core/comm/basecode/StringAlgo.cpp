@@ -6,8 +6,14 @@
 #include <locale>
 #include <string>
 
+
+#ifdef __linux__
 #include <iconv.h>
-#include <regex.h>
+#else
+#include <direct.h>
+#endif
+
+#include <regex>
 
 #include "BaseCode.h"
 #include "BaseType.h"
@@ -71,8 +77,11 @@ size_t utf8_length(const char* pUTF8, size_t nLen)
     return nRet;
 }
 
+
+#ifdef __linux__
 char* convert_enc(const char* encFrom, const char* encTo, char* pszBuffIn, size_t lenin, char* pszBuffout, size_t lenout)
 {
+    
     iconv_t c_pt;
 
     if((c_pt = iconv_open(encTo, encFrom)) == (iconv_t)-1)
@@ -90,7 +99,15 @@ char* convert_enc(const char* encFrom, const char* encTo, char* pszBuffIn, size_
     iconv_close(c_pt);
     return pszBuffout;
 }
-
+#else
+char* convert_enc(const char* encFrom, const char* encTo, char* pszBuffIn, size_t lenin, char* pszBuffout, size_t lenout)
+{
+    CHECKF(pszBuffIn);
+      
+    int textlen = MultiByteToWideChar( CP_UTF8, 0, pszBuffIn, lenin, (wchar_t*)pszBuffout, lenout/sizeof(wchar_t));
+    return pszBuffout;
+}
+#endif
 /*
 Code Points                    1st Byte   2nd Byte  3rd Byte  4th Byte
                     0aaaaaaa     0aaaaaaa
@@ -222,9 +239,13 @@ std::string get_fullpath(const std::string& szPath)
     constexpr size_t _PATH_MAX = 1024;
 
     char szFull[_PATH_MAX * 2] = {};
+    #ifdef __linux__
     if(NULL == ::getcwd(szFull, _PATH_MAX))
         return "";
-
+    #else
+    if(NULL == ::_getcwd(szFull, _PATH_MAX))
+        return "";
+    #endif
     std::string full_path(szFull);
 
     if(full_path[full_path.size() - 1] != '/')
@@ -317,7 +338,7 @@ public:
         int32_t     nIdx = 1;
         std::string szFileName(filename);
         FILE*       fp = NULL;
-        while(fopen_s(&fp, szFileName.c_str(), "r") != nullptr)
+        while(fopen_s(&fp, szFileName.c_str(), "r") != 0)
         {
             char szLine[1024] = "";
 
@@ -653,7 +674,7 @@ public:
 
         char  szFileName[256] = "regexillegal.txt";
         FILE* fp              = NULL;
-        if(fopen_s(&fp, szFileName, "r") != nullptr)
+        if(fopen_s(&fp, szFileName, "r") != 0)
         {
             char szLine[1024] = "";
             skip_utf8_bom(fp);
@@ -668,16 +689,8 @@ public:
                 }
                 if(nLineSize > 0)
                 {
-                    regex_t regex;
-                    if(0 != regcomp(&regex, szLine, REG_EXTENDED | REG_NOSUB))
-                    {
-                        LOGERROR("Illegal regex patten: {}", szLine);
-                        regfree(&regex);
-                    }
-                    else
-                    {
-                        m_setRegex.push_back(regex);
-                    }
+                    std::regex regex{szLine, std::regex_constants::nosubs | std::regex_constants::extended};
+                    m_setRegex.push_back(std::move(regex));
                 }
             }
             fclose(fp);
@@ -687,12 +700,6 @@ public:
     //////////////////////////////////////////////////////////////////////////
     void Destroy()
     {
-        std::deque<regex_t>::iterator it = m_setRegex.begin();
-        for(; it != m_setRegex.end(); it++)
-        {
-            regex_t& regex = (regex_t&)(*it);
-            regfree(&regex);
-        }
         m_setRegex.clear();
     }
     //////////////////////////////////////////////////////////////////////////
@@ -700,18 +707,18 @@ public:
     {
         if(str.empty())
             return false;
-        std::deque<regex_t>::iterator it = m_setRegex.begin();
-        for(; it != m_setRegex.end(); it++)
+   
+        for(const auto& regex_v: m_setRegex)
         {
-            regex_t& regex = (regex_t&)(*it);
-            if(0 == regexec(&regex, str.c_str(), 0, NULL, 0))
+            std::smatch m;
+            if(std::regex_search(str, m, regex_v) == true)
                 return true;
         }
         return false;
     }
 
 protected:
-    std::deque<regex_t> m_setRegex;
+    std::deque<std::regex> m_setRegex;
 };
 
 /**

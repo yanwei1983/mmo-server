@@ -17,7 +17,6 @@ TARGET_LINK_LIBRARIES(zset_tester
  libbasecode.so
  fmt
  ${JEMALLOC_LIB_NAME}
- dl
- pthread
+ ${LIB_PTHREAD}
 )
 
