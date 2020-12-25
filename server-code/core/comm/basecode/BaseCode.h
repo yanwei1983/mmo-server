@@ -33,6 +33,7 @@
 
 
 #include "BaseType.h"
+#include "LoopHelper.h"
 #include "CheckUtil.h"
 #include "GameMath.h"
 #include "IntUtil.h"

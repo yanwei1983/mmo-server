@@ -685,45 +685,38 @@ void CSkillFSM::AttachStatus(CActor* pOwner, const CSkillType* pSkillType, const
 {
     __ENTER_FUNCTION
     const auto& rowData = pSkillType->GetDataRef();
-    for(int i = 0; i < rowData.detach_status_id_size(); i++)
+    for(const auto& status_id : rowData.detach_status_id())
     {
-        const auto& status_id = rowData.detach_status_id(i);
-        for(size_t i = 0; i < vecTarget.size(); i++)
+        for(auto pActor : vecTarget)
         {
-            CActor* pActor = vecTarget[i];
             pActor->GetStatus()->DetachStatus(status_id);
         }
     }
 
-    for(int i = 0; i < rowData.detach_status_type_size(); i++)
+    for(const auto& status_type : rowData.detach_status_type())
     {
-        const auto& status_type = rowData.detach_status_type(i);
-        for(size_t i = 0; i < vecTarget.size(); i++)
+        for(auto pActor : vecTarget)
         {
-            CActor* pActor = vecTarget[i];
             pActor->GetStatus()->DetachStatusByType(status_type);
         }
     }
 
-    for(int i = 0; i < rowData.detach_status_flag_size(); i++)
+    for(const auto& status_flag : rowData.detach_status_flag())
     {
-        const auto& status_flag = rowData.detach_status_flag(i);
-        for(size_t i = 0; i < vecTarget.size(); i++)
+        for(auto pActor : vecTarget)
         {
-            CActor* pActor = vecTarget[i];
             pActor->GetStatus()->DetachStatusByFlag(status_flag);
         }
     }
 
-    for(int i = 0; i < rowData.attach_status_size(); i++)
+    for(const auto& status_id : rowData.attach_status())
     {
-        const auto& status_id = rowData.attach_status(i);
-        for(size_t i = 0; i < vecTarget.size(); i++)
+        for(auto pActor : vecTarget)
         {
-            CActor* pActor = vecTarget[i];
             pActor->GetStatus()->AttachStatus(status_id, pOwner->GetID());
         }
     }
+
     __LEAVE_FUNCTION
 }
 

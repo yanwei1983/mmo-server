@@ -3,6 +3,7 @@
 #include "IMDataToProto.h"
 #include <algorithm>        // for copy, copy_backward, max
 #include <utility>          // for move
+#include "LoopHelper.h"
 
 IMGuiIOGutter::IMGuiIOGutter()
 {
@@ -86,7 +87,7 @@ bool IMGuiIOGutter::pop(ImGuiIO& io)
         io.KeysDown[k] = true;
     }
 
-    for(int i = 0 ; i < io_data.keymap_size();i++)
+    for(const auto&[i,v] : ipairs_c(io_data.keymap()) )
     {
         io.KeyMap[i] = io_data.keymap(i);
     }
@@ -94,9 +95,10 @@ bool IMGuiIOGutter::pop(ImGuiIO& io)
     io.InputQueueSurrogate = io_data.inputqueuesurrogate();
     
     io.InputQueueCharacters.resize(io_data.inputqueuecharacters_size());
-    for(int i = 0; i < io_data.inputqueuecharacters_size(); i++)
+
+    for(const auto& [i,v] : ipairs_c(io_data.inputqueuecharacters()) )
     {
-        io.InputQueueCharacters[i] = io_data.inputqueuecharacters(i);
+        io.InputQueueCharacters[i] = v;
     }
     return true;
 }
