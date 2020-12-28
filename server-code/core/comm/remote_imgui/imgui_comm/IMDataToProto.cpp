@@ -135,14 +135,14 @@ namespace imdata2proto
             {
                 ImDrawCmd drawcmd;
                 deserialize(drawcmd, v);
-                drawlist.CmdBuffer.push_back(std::move(drawcmd));
+                drawlist.CmdBuffer.push_back(drawcmd);
             }
             drawlist.VtxBuffer.reserve(drawlistdata.vtxbuffer_size());
             for(const auto& v: drawlistdata.vtxbuffer())
             {
                 ImDrawVert drawvert;
                 deserialize(drawvert, v);
-                drawlist.VtxBuffer.push_back(std::move(drawvert));
+                drawlist.VtxBuffer.push_back(drawvert);
             }
             drawlist.IdxBuffer.reserve(drawlistdata.idxbuffer_size());
             for(const auto& v: drawlistdata.idxbuffer())
