@@ -21,7 +21,7 @@ export ASAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_asan
 export LSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_lsan
 export UBSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_ubsan
 export TSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_tsan
-
+export JE_MALLOC_CONF="metadata_thp:auto,thp:default"
 start_scene1()
 {
 ${DIR_file}/binary/shared_scene_1 --worldid=0 --start=SCENE_SERVICE-51,AI_SERVICE-51,AOI_SERVICE-51 --logpath=/data/log/global/shared_scene_1 -d $ext_param

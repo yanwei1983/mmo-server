@@ -23,7 +23,7 @@ export ASAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_asan
 export LSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_lsan
 export UBSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_ubsan
 export TSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_tsan
-
+export JE_MALLOC_CONF="metadata_thp:auto,thp:default"
 start_route()
 {
    ${DIR_file}/binary/route --worldid=0 --start=ROUTE_SERVICE-0 --logpath=/data/log/global/route -d $ext_param
