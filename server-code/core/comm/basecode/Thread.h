@@ -136,4 +136,8 @@ inline int32_t get_cur_thread_id()
     return (int32_t)syscall(___NR_gettid);
 #endif
 }
+
+std::string getProcessID();
+std::string getProcessName();
+
 #endif /* THREAD_H */

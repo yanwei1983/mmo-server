@@ -17,42 +17,7 @@
 #include "BaseCode.h"
 #include "LoggingMgr.h"
 #include "TimeUtil.h"
-
-std::string demangle(const char* name)
-{
-#ifdef _MSC_VER
-	return std::string(name);
-#else
-	// mangled_name
-    //   A NULL-terminated character string containing the name to
-    //   be demangled.
-    // output_buffer:
-    //   A region of memory, allocated with malloc, of *length bytes,
-    //   into which the demangled name is stored. If output_buffer is
-    //   not long enough, it is expanded using realloc. output_buffer
-    //   may instead be NULL; in that case, the demangled name is placed
-    //   in a region of memory allocated with malloc.
-    // length
-    //   If length is non-NULL, the length of the buffer containing the
-    //   demangled name is placed in *length.
-    // status
-    //   *status is set to one of the following values:
-    //    0: The demangling operation succeeded.
-    //   -1: A memory allocation failure occurred.
-    //   -2: mangled_name is not a valid name under the C++ ABI
-    //       mangling rules.
-    //   -3: One of the arguments is invalid.
-    int32_t status = 0;
-    char*   buf    = abi::__cxa_demangle(name, NULL, NULL, &status);
-    if(status == 0)
-    {
-        std::string s(buf);
-        free(buf);
-        return s;
-    }
-    return std::string(name);
-#endif
-}
+#include "Thread.h"
 
 namespace
 {
@@ -109,65 +74,7 @@ namespace
         return symbol;
     }
 
-    std::string getProcessID()
-    {
-        std::string pid      = "0";
-        char        buf[260] = {0};
-#ifdef WIN32
-        uint32_t winPID = GetCurrentProcessId();
-        pid             = fmt::format("{:06u}", winPID);
-#else
-        pid = fmt::format("{:06u}", getpid());
-#endif
-        return pid;
-    }
-
-    std::string getProcessName()
-    {
-        std::string name      = "process";
-        char        buf[1024] = {0};
-#ifdef WIN32
-        if(GetModuleFileNameA(NULL, buf, 259) > 0)
-        {
-            name = buf;
-        }
-        std::string::size_type pos = name.rfind("\\");
-        if(pos != std::string::npos)
-        {
-            name = name.substr(pos + 1, std::string::npos);
-        }
-        pos = name.rfind(".");
-        if(pos != std::string::npos)
-        {
-            name = name.substr(0, pos - 0);
-        }
-
-// #elif defined(LOG4Z_HAVE_LIBPROC)
-// 	proc_name(getpid(), buf, 260);
-// 	name = buf;
-// 	return name;
-// 	;
-#else
-        sprintf(buf, "/proc/%d/cmdline", (int32_t)getpid());
-        FILE* fp = fopen(buf, "rb");
-        if(!fp)
-        {
-            return name;
-        }
-
-        fgets(buf, 1024, fp);
-        name = buf;
-        fclose(fp);
-
-        std::string::size_type pos = name.rfind('/');
-        if(pos != std::string::npos)
-        {
-            name = name.substr(pos + 1, std::string::npos);
-        }
-#endif
-
-        return name;
-    }
+    
 
 } // namespace
 

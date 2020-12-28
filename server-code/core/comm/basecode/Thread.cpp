@@ -292,3 +292,65 @@ bool CWorkerThread::IsRunning() const
 {
     return m_bIsRunning;
 }
+
+
+
+std::string getProcessID()
+{
+    std::string pid      = "0";
+    char        buf[260] = {0};
+#ifdef WIN32
+    uint32_t winPID = GetCurrentProcessId();
+    pid             = fmt::format("{:06u}", winPID);
+#else
+    pid = fmt::format("{:06u}", getpid());
+#endif
+    return pid;
+}
+
+std::string getProcessName()
+{
+    std::string name      = "process";
+    char        buf[1024] = {0};
+#ifdef WIN32
+    if(GetModuleFileNameA(NULL, buf, 259) > 0)
+    {
+        name = buf;
+    }
+    std::string::size_type pos = name.rfind("\\");
+    if(pos != std::string::npos)
+    {
+        name = name.substr(pos + 1, std::string::npos);
+    }
+    pos = name.rfind(".");
+    if(pos != std::string::npos)
+    {
+        name = name.substr(0, pos - 0);
+    }
+
+// #elif defined(LOG4Z_HAVE_LIBPROC)
+// 	proc_name(getpid(), buf, 260);
+// 	name = buf;
+// 	return name;
+// 	;
+#else
+    sprintf(buf, "/proc/%d/cmdline", (int32_t)getpid());
+    FILE* fp = fopen(buf, "rb");
+    if(!fp)
+    {
+        return name;
+    }
+
+    fgets(buf, 1024, fp);
+    name = buf;
+    fclose(fp);
+
+    std::string::size_type pos = name.rfind('/');
+    if(pos != std::string::npos)
+    {
+        name = name.substr(pos + 1, std::string::npos);
+    }
+#endif
+
+    return name;
+}
