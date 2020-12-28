@@ -13,6 +13,8 @@ class IMGuiIOGutter;
 class IMGuiFrameGutter;
 class IMGuiTextureMgr;
 
+struct ImFont;
+
 class CRemoteIMGuiServer
 {
     CRemoteIMGuiServer();
@@ -33,6 +35,8 @@ public:
     CNetworkService* _getNetworkService(){return m_pNetworkService.get();}
     void SetXorZipMode(bool nXorZipMode) {m_nXorZipMode = nXorZipMode;}
     uint32_t GetXorZipMode() const {return m_nXorZipMode;}
+
+    ImFont* GetChineseFont()const {return m_pChineseFont;}
 private:
     void InitFont();
 
@@ -52,5 +56,7 @@ private:
     std::unique_ptr<IMGuiTextureMgr> m_IMGuiTextureMgr;
     bool m_bFrameStop = false;
     uint32_t m_nXorZipMode = 0;
+
+    ImFont* m_pChineseFont = nullptr;
 };
 #endif /* REMOTE_IMGUI_SERVER_H */

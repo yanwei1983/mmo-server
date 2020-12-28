@@ -81,6 +81,8 @@ void CRemoteIMGuiServer::InitFont()
 {
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->AddFontDefault();
+    m_pChineseFont = io.Fonts->AddFontFromFileTTF("res/fonts/chinese.ttf", 20, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+    //m_pChineseFont = io.Fonts->AddFontFromMemoryCompressedTTF(chinese_font_compressed_data, chinese_font_compressed_size, 20, NULL, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
     io.Fonts->Build();
 
     unsigned char * pixels;

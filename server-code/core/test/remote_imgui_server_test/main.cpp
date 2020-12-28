@@ -38,7 +38,9 @@ int main(int argc, char* argv[])
         ImGui::RadioButton("all data", &nXorZipMode, 0); ImGui::SameLine();
         ImGui::RadioButton("xor bin", &nXorZipMode, 1); 
 
-        
+        ImGui::PushFont(pServer->GetChineseFont());
+        ImGui::Text("Chinese:酷酷酷 你不知道的酷");
+        ImGui::PopFont();
         
         ImGui::End();
 
