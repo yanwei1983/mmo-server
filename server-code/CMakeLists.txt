@@ -58,6 +58,8 @@ add_compile_options("-fPIC")
 
 ELSE()
 
+#MSVC
+
 function (cotire)
 endfunction()
 
@@ -67,7 +69,7 @@ add_compile_options("/std:c++latest")
 add_compile_options("-DWIN32_LEAN_AND_MEAN")
 
 SET(USE_JEMALLOC 0)
-
+SET(USE_LIBCXX 0)
 ENDIF()
 
 
@@ -77,6 +79,7 @@ ENDIF()
 IF(NOT CMAKE_CXX_COMPILER MATCHES "clang")
 #gcc/vs
 IF(NOT MSVC)
+#gcc
 add_compile_options("-rdynamic")
 ENDIF()
 
@@ -97,24 +100,37 @@ ELSE()
     SET(CMAKE_RANLIB llvm-ranlib-9)
   endif(LLVM_RANLIB_FOUND)
 
+  add_compile_options("-fno-limit-debug-info")
+
+
 ENDIF()
 
-IF(USE_STATIC_LINK_STD)
-add_compile_options("-static-libstdc++")
-add_compile_options("-static-libgcc")
-ENDIF()
+
 
 IF(USE_LIBCXX)
+
 add_compile_options("-stdlib=libc++")
 IF(USE_LIBFS)
   SET(LIB_FS "c++fs")
 ENDIF()
-ELSE()
+IF(USE_STATIC_LINK_STD)
+add_compile_options("-static-libc++")
+add_compile_options("-static-libgcc")
+add_compile_options("-static-libc++fs")
+ENDIF()
+
+ELSE(USE_LIBCXX)
+
 IF(USE_LIBFS)
   SET(LIB_FS "stdc++fs")
 ENDIF()
-
+IF(USE_STATIC_LINK_STD)
+add_compile_options("-static-libstdc++")
+add_compile_options("-static-libgcc")
+add_compile_options("-static-libstdc++fs")
 ENDIF()
+
+ENDIF(USE_LIBCXX)
 
 macro(try_enable_malloc)
 
