@@ -45,6 +45,7 @@ docker run --rm --privileged=true \
 -e GLOBAL_IP=${GLOBAL_IP} \
 -e GLOBAL_PORT_START=${GLOBAL_PORT_START}  \
 -e GLOBAL_OUT_IP=${GLOBAL_OUT_IP}  \
+-e GLOBAL_OUT_PORT=${GLOBAL_OUT_PORT}  \
 -e GLOBAL_MYSQL_URL=${GLOBAL_MYSQL_URL}  \
 -e SERVERINFO_MYSQL_NAME=${SERVERINFO_MYSQL_NAME} \
 -v /${root_dir}/server-res:/data/mmorpg/server-res \

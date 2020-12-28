@@ -24,9 +24,9 @@ REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 4, 5, 'libaoi_service.s
 #gateway
 REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 8, 1, 'libauth_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+81, '', 0, 0, '0.0.0.0');
 REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 8, 2, 'libauth_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+82, '', 0, 0, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 7, 1, 'libsocket_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+91, '$ENV{ZONE_OUT_IP}', $ENV{OUT_PORT_START}, 0, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 7, 2, 'libsocket_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+92, '$ENV{ZONE_OUT_IP}', $ENV{OUT_PORT_END}, 0, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 7, 1, 'libsocket_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+91, '$ENV{ZONE_OUT_IP}', $ENV{OUT_PORT}, 0, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES ($ENV{ZONE_ID}, 7, 2, 'libsocket_service.so', '$ENV{ZONE_IP}', $ENV{PORT_START}+92, '$ENV{ZONE_OUT_IP}', $ENV{OUT_PORT}, 0, '0.0.0.0');
 
 
 REPLACE INTO `tbld_dbinfo` VALUES ($ENV{ZONE_ID}, '$ENV{ZONE_MYSQL_URL}');
-REPLACE INTO `tbld_serverlist` VALUES ($ENV{ZONE_ID}, '$ENV{ZONE_ID}区', $ENV{ZONE_OPEN_TIME}, 4, '$ENV{ZONE_OUT_IP}:$ENV{OUT_PORT_START};$ENV{ZONE_OUT_IP}:$ENV{OUT_PORT_END}', 0);
+REPLACE INTO `tbld_serverlist` VALUES ($ENV{ZONE_ID}, '$ENV{ZONE_ID}区', $ENV{ZONE_OPEN_TIME}, 4, '$ENV{ZONE_OUT_IP}:$ENV{OUT_PORT_START}', 0);

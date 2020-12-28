@@ -49,8 +49,7 @@ docker run --rm \
 -e ZONE_IP=${ZONE_IP} \
 -e PORT_START=${PORT_START} \
 -e ZONE_OUT_IP=${ZONE_OUT_IP} \
--e OUT_PORT_START=${OUT_PORT_START} \
--e OUT_PORT_END=${OUT_PORT_END} \
+-e OUT_PORT=${OUT_PORT} \
 -e ZONE_MYSQL_URL=${ZONE_MYSQL_URL} \
 -e ZONE_OPEN_TIME=${ZONE_OPEN_TIME} \
 -v /${root_dir}/server-res:/data/mmorpg/server-res \

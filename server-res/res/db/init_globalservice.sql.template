@@ -21,11 +21,11 @@ REPLACE INTO `tbld_servicedetail` VALUES (0, 4, 54, 'libaoi_service.so', '$ENV{G
 REPLACE INTO `tbld_servicedetail` VALUES (0, 4, 55, 'libaoi_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+65, '', 0, 30065, '0.0.0.0');
 
 #后台访问/充值接口
-REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 1, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+111, '$ENV{GLOBAL_OUT_IP}', 18111, 30111, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 2, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+112, '$ENV{GLOBAL_OUT_IP}', 18112, 30112, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 3, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+113, '$ENV{GLOBAL_OUT_IP}', 18113, 30113, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 4, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+114, '$ENV{GLOBAL_OUT_IP}', 18114, 30114, '0.0.0.0');
-REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 5, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+115, '$ENV{GLOBAL_OUT_IP}', 18115, 30115, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 1, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+111, '$ENV{GLOBAL_OUT_IP}', $ENV{GLOBAL_OUT_PORT}, 30111, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 2, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+112, '$ENV{GLOBAL_OUT_IP}', $ENV{GLOBAL_OUT_PORT}, 30112, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 3, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+113, '$ENV{GLOBAL_OUT_IP}', $ENV{GLOBAL_OUT_PORT}, 30113, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 4, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+114, '$ENV{GLOBAL_OUT_IP}', $ENV{GLOBAL_OUT_PORT}, 30114, '0.0.0.0');
+REPLACE INTO `tbld_servicedetail` VALUES (0, 11, 5, 'libgmproxy_service.so', '$ENV{GLOBAL_IP}', $ENV{GLOBAL_PORT_START}+115, '$ENV{GLOBAL_OUT_IP}', $ENV{GLOBAL_OUT_PORT}, 30115, '0.0.0.0');
 
 
 
