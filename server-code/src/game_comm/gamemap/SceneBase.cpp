@@ -99,7 +99,7 @@ bool CSceneBase::EnterMap(CSceneObject* pActor, float fPosX, float fPosY, float 
     if(m_pSceneTree->IsInsideScene(fPosX, fPosY) == false)
     {
         LOGERROR("EnterMap Pos Fail id:{} pos:{},{} scene:{} map:{}", pActor->GetID(), fPosX, fPosY, GetID(), GetMapID());
-        LOGTRACE("CallStack: {}", GetStackTraceString(CallFrameMap(2, 7)));
+        LOGTRACE("CallStack: {}", GetStackTraceString(2, 7));
         return false;
     }
 

@@ -182,7 +182,7 @@ public:
                    m_pFieldInfo->GetFieldName(),
                    m_pFieldInfo->GetFieldType(),
                    nameof::nameof_type<T>());
-        LOGDBERROR("CallStack：{}", GetStackTraceString(CallFrameMap(3, 7)));
+        LOGDBERROR("CallStack：{}", GetStackTraceString(3, 7));
         return false;
     }
 

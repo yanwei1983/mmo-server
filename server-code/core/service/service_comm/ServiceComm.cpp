@@ -301,7 +301,7 @@ bool CServiceCommon::_SendMsgToZonePort(const CNetworkMessage& msg) const
     if(vs.IsVaild() == false)
     {
         LOGWARNING("SendMsgToZonePort fail To Is Not Valild.");
-        LOGWARNING("CallStack：{}", GetStackTraceString(CallFrameMap(2, 7)));
+        LOGWARNING("CallStack：{}", GetStackTraceString(2, 7));
         return false;
     }
     if(GetMessageRoute() && vs.GetServerPort() != m_nServerPort)

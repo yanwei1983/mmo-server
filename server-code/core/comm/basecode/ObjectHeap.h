@@ -8,13 +8,9 @@
 #include <unordered_map>
 
 #include "BaseType.h"
-#include "CallStackDumper.h"
 
 uint64_t get_alloc_from_object_heap();
 
-//#ifdef DEBUG
-//#define HEAP_DEBUG
-//#endif
 
 class CObjectHeap
 {
@@ -34,11 +30,6 @@ protected:
     std::atomic<uint32_t> m_lNumAllocsInHeap;
     std::atomic<uint32_t> m_lMaxAllocsInHeap;
 
-#if defined(HEAP_DEBUG)
-    std::mutex                                 m_mutexDebugInfo;
-    CALLFRAME_NODE*                            m_setCallFrame;
-    std::unordered_map<void*, CALLFRAME_NODE*> m_setDebugInfo;
-#endif
 };
 
 #define OBJECTHEAP_DECLARATION(VAR)                                                                                                        \

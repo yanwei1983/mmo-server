@@ -2,6 +2,7 @@
 
 #include "DBRecord.h"
 #include "MysqlConnection.h"
+#include "CallStackDumper.h"
 
 CDBField::CDBField(CDBRecord* pDBRecord, const CDBFieldInfo* pFieldInfo, char* pVal, uint32_t len)
     : m_pDBRecord(pDBRecord)
@@ -166,7 +167,7 @@ std::string CDBField::GetValString() const
         default:
         {
             LOGDBERROR("mysql field:{}.{} use unknow type.", m_pFieldInfo->GetTableName(), m_pFieldInfo->GetFieldName());
-            LOGDBERROR("CallStack：{}", GetStackTraceString(CallFrameMap(3, 7)));
+            LOGDBERROR("CallStack：{}", GetStackTraceString(3, 7));
             return std::string();
         }
         break;
