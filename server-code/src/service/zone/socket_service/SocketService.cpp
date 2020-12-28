@@ -454,7 +454,7 @@ void CSocketService::OnLogicThreadCreate()
 void CSocketService::OnLogicThreadProc()
 {
     __ENTER_FUNCTION
-    m_pNetworkService->RunOnce();
+    //m_pNetworkService->RunOnce();
 
     CServiceCommon::OnLogicThreadProc();
 

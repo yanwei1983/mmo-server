@@ -144,7 +144,7 @@ void CNormalThread::ThreadFunc()
             std::chrono::milliseconds waitTime = std::chrono::milliseconds(m_nWorkIntervalMS) - costTime;
             if(waitTime.count() > 0)
             {
-                msleep(waitTime.count() * 1000);
+                msleep(waitTime.count());
             }
             else
             {

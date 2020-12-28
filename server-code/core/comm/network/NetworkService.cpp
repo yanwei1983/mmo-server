@@ -261,7 +261,7 @@ evconnlistener* CNetworkService::Listen(const std::string& addr, int32_t port, c
     evconnlistener* pListener = evconnlistener_new_bind(m_pBase,
                                                         &accept_conn_cb,
                                                         this,
-                                                        LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE | LEV_OPT_THREADSAFE,
+                                                        LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE | LEV_OPT_REUSEABLE_PORT | LEV_OPT_THREADSAFE,
                                                         -1,
                                                         answer_ptr->ai_addr,
                                                         answer_ptr->ai_addrlen);

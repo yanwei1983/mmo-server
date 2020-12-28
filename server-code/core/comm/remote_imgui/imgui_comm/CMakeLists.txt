@@ -3,6 +3,7 @@ MESSAGE(STATUS "cmake: remote_imgui_comm")
 # 搜索当前目录下所有文件
 file(GLOB_RECURSE SRCS "*.cc" "*.cpp" "*.c" "*.h" "*.hpp")
 
+set(CMAKE_CXX_CLANG_TIDY "")
 
 # 生成imgui.proto
 PROTOBUF_GENERATE_CPP_NEW(IMGUI_PROTO_SRC IMGUI_PROTO_HEADER ${CMAKE_CURRENT_SOURCE_DIR}  ${CMAKE_CURRENT_SOURCE_DIR}/imgui.proto)

@@ -161,8 +161,6 @@ void sig_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
 //}
 
 
-char** g_argv = nullptr;
-int32_t g_argc = 0;
 int g_child_pid = 0;
 void sig_notify_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
 {
@@ -170,11 +168,11 @@ void sig_notify_term(int32_t signo, siginfo_t* pInfo, void* pVoid)
     std::exit(1);
 }
 
-void create_child_and_watch()
+void create_child_and_watch(int32_t argc, char* argv[])
 {
     do
     {
-        g_child_pid = fork();
+        int g_child_pid = fork();
         if(g_child_pid == 0)
         {
             //setsid();
@@ -183,12 +181,12 @@ void create_child_and_watch()
         else
         {
             pthread_setname_np(pthread_self(), "child_watcher");
-            for(int i = 1; i < g_argc; i++)
+            for(int i = 1; i < argc; i++)
             {
-                auto len = strlen(g_argv[i]);
-                memset((void*)g_argv[i], 0, len);
+                auto len = strlen(argv[i]);
+                memset((void*)argv[i], 0, len);
             }
-            strcpy(g_argv[1],"--watcher");
+            strcpy(argv[1],"--watcher");
             sigset_t unblock_mask;
             sigemptyset(&unblock_mask);
             sigaddset(&unblock_mask, SIGTERM);
@@ -238,8 +236,6 @@ void create_child_and_watch()
 
 int32_t main(int32_t argc, char* argv[])
 {
-    g_argc = argc;
-    g_argv = argv;
     get_opt opt(argc, (const char**)argv);
     //请小心使用daemon/fork,这样会导致在main函数之前创建的线程被干掉
     if(opt.has("--daemon") || opt.has("-d"))
@@ -247,7 +243,9 @@ int32_t main(int32_t argc, char* argv[])
         daemon(1, 1);
         // daemon_init();
         if(opt.has("--watcher"))
-            create_child_and_watch();
+        {
+            create_child_and_watch(argc, argv);
+        }
     }
     // block all sig ,除了SIGFPE和SIGSEGV
     sigset_t block_mask;
