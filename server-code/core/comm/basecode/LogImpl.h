@@ -62,6 +62,7 @@ struct LoggerConfig
     bool     outfile     = true;  // output to file
     bool     monthdir    = false; // create directory per month
     bool     detail_file = false;
+    bool     flush       = false;
     uint32_t limitsize   = 800; // limit file's size, unit Million byte.
 };
 

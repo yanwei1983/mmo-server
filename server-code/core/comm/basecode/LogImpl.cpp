@@ -294,7 +294,11 @@ void CLogManager::writeLog(const LogDataPtr& pLog)
             openLoggerFile(pLog, curLogger, cfg);
             if(curLogger.File)
             {
-                fmt::print(curLogger.File.get(), output_txt);
+                fwrite(output_txt.c_str(), sizeof(char), output_txt.size(), curLogger.File.get());
+                if(cfg.flush)
+                {
+                    fflush(curLogger.File.get());
+                }
                 curLogger.curWriteLen += (uint32_t)output_txt.size();
                 curLogger.logCount++;
                 m_TotalWriteFileCount++;
@@ -306,7 +310,7 @@ void CLogManager::writeLog(const LogDataPtr& pLog)
             FILE* pDetailFile = openLoggerDetailFile(pLog, curLogger, cfg);
             if(pDetailFile)
             {
-                fmt::print(pDetailFile, output_txt);
+                fwrite(output_txt.c_str(), sizeof(char), output_txt.size(), pDetailFile);
                 fclose(pDetailFile);
                 m_TotalWriteFileCount++;
                 m_TotalWriteFileBytes += output_txt.size();

@@ -38,7 +38,7 @@ static bool g_log_start     = false;
 void        BaseCode::InitMonitorLog(const std::string& logname)
 {
     BaseCode::s_monitor_logger =
-        CLogManager::getPtr()->createLogger({.name = logname, .path = std::string(g_logPath) + "/monitor", .fileLine = false});
+        CLogManager::getPtr()->createLogger({.name = logname, .path = std::string(g_logPath) + "/monitor", .fileLine = false, .flush = true});
     LOGDEBUG("InitMonitor:{}", logname);
 }
 
@@ -123,26 +123,23 @@ void BaseCode::InitLog(const std::string& path)
 
     BaseCode::s_network_logger = CLogManager::getPtr()->createLogger({.name = "network", .path = path, .level = getLogDefaultLev("network")});
     BaseCode::s_db_logger      = CLogManager::getPtr()->createLogger({.name = "db", .path = path, .level = getLogDefaultLev("db")});
-    BaseCode::s_stack_logger = CLogManager::getPtr()->createLogger({
-        .name  = "stack",
-        .path  = path,
-        .level = getLogDefaultLev("stack"),
+    BaseCode::s_stack_logger   = CLogManager::getPtr()->createLogger({
+        .name     = "stack",
+        .path     = path,
+        .level    = getLogDefaultLev("stack"),
         .fileLine = false,
+        .flush    = true,
     });
     BaseCode::s_lua_logger     = CLogManager::getPtr()->createLogger({
-        .name  = "lua",
-        .path  = path,
-        .level = getLogDefaultLev("lua"),
-        .fileLine = false
+        .name     = "lua",
+        .path     = path,
+        .level    = getLogDefaultLev("lua"),
+        .fileLine = false,
+        .flush    = true,
     });
-    BaseCode::s_ai_logger  = CLogManager::getPtr()->createLogger({.name = "ai", .path = path, .level = getLogDefaultLev("ai")});
-    BaseCode::s_login_logger = CLogManager::getPtr()->createLogger({.name = "login", .path = path, .level = getLogDefaultLev("login")});
-    BaseCode::s_gm_logger      = CLogManager::getPtr()->createLogger({
-        .name  = "gm",
-        .path  = path,
-        .level = getLogDefaultLev("gm"),
-        .fileLine = false
-    });
+    BaseCode::s_ai_logger      = CLogManager::getPtr()->createLogger({.name = "ai", .path = path, .level = getLogDefaultLev("ai")});
+    BaseCode::s_login_logger   = CLogManager::getPtr()->createLogger({.name = "login", .path = path, .level = getLogDefaultLev("login")});
+    BaseCode::s_gm_logger = CLogManager::getPtr()->createLogger({.name = "gm", .path = path, .level = getLogDefaultLev("gm"), .fileLine = false});
 
     BaseCode::s_aidetail_logger = CLogManager::getPtr()->createLogger(
         {.name = "aidetail", .path = path + "/aidetail", .level = getLogDefaultLev("aidetail"), .fileLine = false, .detail_file = true});
