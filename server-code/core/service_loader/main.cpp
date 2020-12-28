@@ -106,7 +106,7 @@ void destory_all()
         plock.reset();
         BaseCode::StopLog();
         SAFE_DELETE(g_pLoader);
-
+        stop_jemalloc_backgroud_thread();
         ReleaseGlobalSetting();
     }
 }
@@ -336,6 +336,8 @@ int32_t main(int32_t argc, char* argv[])
         exit(0);
     }
     fmt::print("service {} load succ.\n", start_service_set);
+    start_jemalloc_backgroud_thread();
+
     LOGDEBUG("main ThreadID:{}", get_cur_thread_id());
     FILE* pStdOutFile = fopen((logpath + "/stdout.log").c_str(), "w+");
     if(pStdOutFile == NULL)

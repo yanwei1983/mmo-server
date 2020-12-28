@@ -34,7 +34,8 @@ export ASAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_asan
 export LSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_lsan
 export UBSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_ubsan
 export TSAN_OPTIONS=include_if_exists=${DIR_file}/asan_cfg/options_tsan
-export JE_MALLOC_CONF="metadata_thp:auto,background_thread:true,thp:default"
+#export JE_MALLOC_CONF="metadata_thp:auto,background_thread:true,thp:default"
+export JE_MALLOC_CONF="metadata_thp:auto,thp:default"
 start_world()
 {
 ${DIR_file}/binary/z${serverid}_world --worldid=${serverid} --start=WORLD_SERVICE-0 --logpath=/data/log/zone_${serverid}/world -d $ext_param
