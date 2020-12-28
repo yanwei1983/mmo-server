@@ -83,10 +83,10 @@ bool CAOIService::Init(const ServerPort& nServerPort)
         tls_pService = nullptr;
     };
 
-    const ServerAddrInfo* pAddrInfo = GetMessageRoute()->QueryServiceInfo(GetServerPort());
+    const ServerAddrInfo* pAddrInfo = GetMessageRoute()->QueryServiceInfo(nServerPort);
     if(pAddrInfo == nullptr)
     {
-        LOGFATAL("CSocketService::Create QueryServerInfo {} fail", GetServerPort().GetServiceID());
+        LOGFATAL("CAOIService::Create QueryServerInfo {} fail", nServerPort.GetServiceID());
         return false;
     }
 

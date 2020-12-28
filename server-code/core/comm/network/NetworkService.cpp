@@ -704,7 +704,10 @@ void CNetworkService::JoinIOThread()
     __ENTER_FUNCTION
     if(m_pIOThread)
     {
-        m_pIOThread->join();
+        if(m_pIOThread->joinable())
+        {
+            m_pIOThread->join();
+        }
         m_pIOThread.reset();
     }
     __LEAVE_FUNCTION

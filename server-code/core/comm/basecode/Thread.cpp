@@ -57,7 +57,10 @@ void CNormalThread::Join()
 {
     if(m_Thread)
     {
-        m_Thread->join();
+        if(m_Thread->joinable())
+        {
+            m_Thread->join();
+        }
         m_Thread.reset();
     }
 }
@@ -101,8 +104,7 @@ void CNormalThread::ThreadFunc()
     BaseCode::SetNdc(m_ThreadName);
 
 
-#ifdef WIN32
-#else
+#ifdef __linux
     //允许线程处理SUSPEND_SIG和RESUME_SIG
     sigset_t unblock_mask;
     sigemptyset(&unblock_mask);
@@ -247,7 +249,10 @@ void CWorkerThread::Join(bool bWaitAllJobFinish)
 {
     if(m_Thread)
     {
-        m_Thread->join();
+        if(m_Thread->joinable())
+        {
+            m_Thread->join();
+        }
         m_Thread.reset();
         if(bWaitAllJobFinish)
         {

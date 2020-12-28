@@ -19,7 +19,7 @@ set_target_properties(aoi_service PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
 #指定库输出路径
 SET(LIBRARY_OUTPUT_PATH ${LIBRARIES})
-ADD_DEPENDENCIES(aoi_service basecode network mydb myproto service_comm gamemap)
+ADD_DEPENDENCIES(aoi_service basecode network mydb myproto service_comm gamemap remote_imgui_server)
 # 指定额外的链接库
 TARGET_LINK_LIBRARIES(aoi_service
  libbasecode.so
@@ -27,6 +27,7 @@ TARGET_LINK_LIBRARIES(aoi_service
  libmyproto.so 
  libservice_comm.so 
  libgamemap.so 
+ remote_imgui_server
  ${LIB_PTHREAD}
  ${JEMALLOC_LIB_NAME}
 )
