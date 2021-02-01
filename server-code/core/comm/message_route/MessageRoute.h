@@ -23,15 +23,14 @@ class CMysqlConnection;
 //如果MessagePort使用的是Remote端口,那么就会连接到远端并使用Socket发送到另外的Exe上
 //也就说, Service直接的连接通道是双通道的
 
-class CMessageRoute : public NoncopyableT<CMessageRoute>, public CreateNewT<CMessageRoute>
+class CMessageRoute : public NoncopyableT<CMessageRoute>
 {
-    friend class CreateNewT<CMessageRoute>;
     CMessageRoute();
-
+    bool Init() { return true; }
 public:
     virtual ~CMessageRoute();
-    bool Init() { return true; }
-
+    
+    CreateNewImpl(CMessageRoute);
     WorldID_t GetWorldID() const { return m_nWorldID; }
     void      SetWorldID(WorldID_t val) { m_nWorldID = val; }
     void      Destroy();

@@ -81,7 +81,7 @@ protected:
             for(size_t i = 0; i < result_ptr->get_num_row(); i++)
             {
                 auto db_record_ptr = result_ptr->fetch_row(false);
-                T*   pData         = T::CreateNew(std::move(db_record_ptr));
+                T*   pData         = CreateNew<T>(std::move(db_record_ptr));
                 if(pData == nullptr)
                 {
                     return false;
@@ -106,7 +106,7 @@ protected:
 
         for(const auto& cfg: vecData)
         {
-            T* pData = T::CreateNew(cfg);
+            T* pData = CreateNew<T>(cfg);
             if(pData == nullptr)
             {
                 return false;
@@ -193,7 +193,14 @@ public:
     }
 
     Iterator GetIter() const { return Iterator(m_setData); }
-
+    template<class Func>
+    void foreach(Func&& func) const
+    {
+        for(const auto& [k,v] : m_setData)
+        {
+            func(k,v);
+        }
+    }
 public:
     virtual void Clear() override
     {
@@ -308,7 +315,14 @@ public:
     }
 
     Iterator GetIter() const { return Iterator(m_setData); }
-
+    template<class Func>
+    void foreach(Func&& func) const
+    {
+        for(const auto& [k,v] : m_setData)
+        {
+            func(k,v);
+        }
+    }
 public:
     virtual void Clear() override
     {

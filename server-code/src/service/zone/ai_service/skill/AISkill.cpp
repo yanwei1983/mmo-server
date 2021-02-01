@@ -50,7 +50,7 @@ CAISkillSet::~CAISkillSet()
 void CAISkillSet::AddSkill(uint32_t idSkill)
 {
     __ENTER_FUNCTION
-    auto pSkilLData = CAISkillData::CreateNew(idSkill);
+    auto pSkilLData = CreateNew<CAISkillData>(idSkill);
     if(pSkilLData)
         m_setSkill[idSkill] = pSkilLData;
 

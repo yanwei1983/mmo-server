@@ -1188,7 +1188,7 @@ public:
       }
     }
 
-    _stacktrace.resize(std::min(_stacktrace.size(), skip_n_firsts() + depth));
+    _stacktrace.resize(std::min<size_t>(_stacktrace.size(), skip_n_firsts() + depth));
     return size();
   }
 
@@ -4075,6 +4075,7 @@ private:
                         const ResolvedTrace::SourceLoc &source_loc,
                         void *addr = nullptr) {
     os << indent << "Source \"" << source_loc.filename << "\", line "
+    os << indent << "Source \"" << source_loc.filename << ":"
        << source_loc.line << ", in " << source_loc.function;
 
     if (address && addr != nullptr) {

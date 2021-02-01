@@ -40,7 +40,7 @@ bool CGuildManager::Init()
 
             if(del_time != 0)
             {
-                std::unique_ptr<CGuild> pGuild = CGuild::CreateNew(std::move(db_record_ptr));
+                std::unique_ptr<CGuild> pGuild = CreateNew<CGuild>(std::move(db_record_ptr));
                 if(pGuild)
                 {
                     m_setGuild.emplace(pGuild->GetGuildID(), std::move(pGuild));
@@ -96,7 +96,7 @@ bool CGuildManager::CreateGuild(const std::string& strGuildName, const GuildMemb
     uint64_t idGuild = pDBRecord->Field(TBLD_GUILD::ID);
     LOGINFO("CGuildManager: CreateGuild Succ. guild_id:{}, guildname:{}", idGuild, strGuildName);
 
-    std::unique_ptr<CGuild> pGuild(CGuild::CreateNew(std::move(pDBRecord)));
+    std::unique_ptr<CGuild> pGuild(CreateNew<CGuild>(std::move(pDBRecord)));
     CHECKF(pGuild);
     m_setGuildByName.emplace(pGuild->GetGuildName(), idGuild);
     m_setGuild.emplace(pGuild->GetGuildID(), std::move(pGuild));

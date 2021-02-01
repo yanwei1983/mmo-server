@@ -105,9 +105,78 @@
         "value-traits": "cpp",
         "queue": "cpp",
         "stack": "cpp",
-        "*.txx": "cpp"
+        "*.txx": "cpp",
+        "cholesky": "cpp",
+        "cholmodsupport": "cpp",
+        "core": "cpp",
+        "eigenvalues": "cpp",
+        "geometry": "cpp",
+        "householder": "cpp",
+        "iterativelinearsolvers": "cpp",
+        "jacobi": "cpp",
+        "lu": "cpp",
+        "metissupport": "cpp",
+        "orderingmethods": "cpp",
+        "pastixsupport": "cpp",
+        "pardisosupport": "cpp",
+        "qr": "cpp",
+        "qtalignedmalloc": "cpp",
+        "spqrsupport": "cpp",
+        "svd": "cpp",
+        "sparse": "cpp",
+        "sparsecholesky": "cpp",
+        "sparsecore": "cpp",
+        "sparselu": "cpp",
+        "sparseqr": "cpp",
+        "stddeque": "cpp",
+        "stdlist": "cpp",
+        "stdvector": "cpp",
+        "superlusupport": "cpp",
+        "umfpacksupport": "cpp",
+        "adolcforward": "cpp",
+        "autodiff": "cpp",
+        "bvh": "cpp",
+        "tensorsymmetry": "cpp",
+        "threadpool": "cpp",
+        "eulerangles": "cpp",
+        "iterativesolvers": "cpp",
+        "kroneckerproduct": "cpp",
+        "levenbergmarquardt": "cpp",
+        "matrixfunctions": "cpp",
+        "nonlinearoptimization": "cpp",
+        "numericaldiff": "cpp",
+        "openglsupport": "cpp",
+        "polynomials": "cpp",
+        "sparseextra": "cpp",
+        "specialfunctions": "cpp",
+        "splines": "cpp",
+        "*.def": "cpp"
     },
     
+    "cmake.sourceDirectory": "${workspaceFolder}/server-code/",
+    "cmake.buildDirectory": "${workspaceFolder}/server-code/build",
+    "cmake.buildEnvironment": {
+        "CXX": "clang++-9",
+        "CC": "clang-9",
+        "CCACHE_SLOPPINESS": "pch_defines,time_macros",
+        "NINJA_STATUS": "\"[%p/%f/%t %e] \""
+    },
+    "cmake.configureEnvironment": {
+        "USE_ASAN": "ON",
+        "USE_TSAN": "OFF",
+        "USE_UBSAN": "ON",
+        "TIDY": "ON",
+        "USE_JEMALLOC":"ON",
+        "CMAKE_EXPORT_COMPILE_COMMANDS":"YES"
+    },
+    "cmake.platform": "x64",
+    "cmake.ctest.parallelJobs": 4,
+    "cmake.generator": "Ninja",
+    "cmake.parallelJobs": 4,
+
+    
+    "terminal.integrated.copyOnSelection": true,
+
     "gitlens.codeLens.enabled":false,
     "gitlens.currentLine.enabled":false,
     "gitlens.hovers.enabled":false,
@@ -130,30 +199,13 @@
         "--query-driver=/usr/bin/clang++-9",
         "--log=verbose"
     ],
+   
     "clang-format.executable": "clang-format-9",
     "clang.executable": "clang++-9",
     "clang.cxxflags": [
         "-std=c++17"
     ],
-    "terminal.integrated.copyOnSelection": true,
 
-    "cmake.sourceDirectory": "${workspaceFolder}/server-code/",
-    "cmake.buildDirectory": "${workspaceFolder}/server-code/build",
-    "cmake.buildEnvironment": {
-        "CXX": "clang++-9",
-        "CC": "clang-9",
-        "CCACHE_SLOPPINESS": "pch_defines,time_macros",
-        "NINJA_STATUS": "\"[%p/%f/%t %e] \""
-    },
-    "cmake.configureEnvironment": {
-        "USE_ASAN": "OFF",
-        "USE_TSAN": "OFF",
-        "USE_UBSAN": "OFF",
-        "TIDY": "OFF",
-        "USE_JEMALLOC":"OFF",
-        "CMAKE_EXPORT_COMPILE_COMMANDS":"YES"
-    },
-    "cmake.platform": "x64",
    
 
     "C_Cpp.experimentalFeatures": "Enabled",
@@ -162,11 +214,8 @@
     "C_Cpp.intelliSenseCacheSize": 5120,
     "C_Cpp.vcpkg.enabled": false,
     "C_Cpp.intelliSenseEngineFallback": "Enabled",
-   
-
-
-
-    "C_Cpp.default.intelliSenseMode": "clang-x64",
     "C_Cpp.intelliSenseEngine": "Tag Parser",
-    "C_Cpp.workspaceParsingPriority": "low",
+    "C_Cpp.errorSquiggles": "Disabled",
+
+
 }

@@ -159,4 +159,44 @@ struct overloaded_t : Ts...
 template<class... Ts>
 overloaded_t(Ts...)->overloaded_t<Ts...>;
 
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+template<class Tuple>
+struct unpack_warp_t 
+{
+  Tuple&& tuple;
+  using count = std::tuple_size<std::remove_reference_t<Tuple>>;
+  using indexes = std::make_index_sequence<count{}>;
+ 
+  template<class F, std::size_t...Is>
+  decltype(auto) _unpacker(F&& f, std::index_sequence<Is...>) 
+  {
+    return f( std::get<Is>(std::forward<Tuple>(tuple))... ); 
+  }
+
+  template<class F>
+  decltype(auto) unpack( F&& f )
+  {
+    return _unpacker( std::forward<F>(f), indexes{} );
+  }
+};
+
+template<class Tuple, class F>
+decltype(auto) unpack(Tuple&& tuple, F&& f ) 
+{
+    unpack_warp_t<Tuple> unpack_warp{std::forward<Tuple>(tuple)};
+    return unpack_warp.unpack(std::forward<F>(f));
+}
+
+/*
+for(const auto& pair_v : map_val)
+{
+    unpack(pair_v, [](auto& x, auto&y)
+    {
+    });
+}
+*/
+
 #endif /* TUPLEHELPER_H */

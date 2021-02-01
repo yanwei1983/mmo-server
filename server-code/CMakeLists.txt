@@ -64,9 +64,13 @@ function (cotire)
 endfunction()
 
 add_compile_options("-D__FILENAME__=__FILE__")
+add_compile_options("-D_AMD64_")
 add_compile_options("/utf-8")
 add_compile_options("/std:c++latest")
 add_compile_options("-DWIN32_LEAN_AND_MEAN")
+add_compile_options(/wd4251) 
+add_compile_options(/wd4996) 
+add_compile_options(/wd4101)
 
 SET(USE_JEMALLOC 0)
 SET(USE_LIBCXX 0)
@@ -263,6 +267,7 @@ include_directories(${PROJECT_SOURCE_DIR}/core/comm/mydb/)
 include_directories(${PROJECT_SOURCE_DIR}/core/service/comm/)
 include_directories(${PROJECT_SOURCE_DIR}/core/service/service_comm/)
 include_directories(${PROJECT_SOURCE_DIR}/core/service/rpcservice_comm/)
+include_directories(${PROJECT_SOURCE_DIR}/core/comm/remote_imgui/)
 include_directories(${PROJECT_SOURCE_DIR}/core/comm/remote_imgui/imgui_comm/)
 include_directories(${PROJECT_SOURCE_DIR}/core/comm/remote_imgui/imgui_server/)
 
@@ -323,18 +328,22 @@ cmake_policy(SET CMP0058 NEW)
 
 add_custom_target(gen_all_lua)
 
-MESSAGE(STATUS "Build Core...")
-ADD_SUBDIRECTORY(core obj/core/)
+
+
 
 IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-MESSAGE(STATUS "Build Debug...")
 SET(CMAKE_BUILD_TYPE Debug)
 message(STATUS "CMAKE_CXX_FLAGS:" ${CMAKE_CXX_FLAGS_DEBUG})
+MESSAGE(STATUS "Build Core...")
+ADD_SUBDIRECTORY(core obj/core/debug)
+MESSAGE(STATUS "Build Debug...")
 ADD_SUBDIRECTORY(src obj/debug)
 ELSE()
-MESSAGE(STATUS "Build Release...")
 SET(CMAKE_BUILD_TYPE Release)
 message(STATUS "CMAKE_CXX_FLAGS:" ${CMAKE_CXX_FLAGS_RELEASE})
+MESSAGE(STATUS "Build Core...")
+ADD_SUBDIRECTORY(core obj/core/release)
+MESSAGE(STATUS "Build Release...")
 ADD_SUBDIRECTORY(src obj/release)
 ENDIF()
 

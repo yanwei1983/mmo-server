@@ -1,0 +1,19 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "remote_imgui_client.exe",           
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/server-code/bin/remote_imgui_client.exe",
+            "args": ["--addr=192.168.211.61","--port=12345"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/server-code/bin/",
+            "environment": [],
+            "externalConsole": false
+        }
+    ]
+}

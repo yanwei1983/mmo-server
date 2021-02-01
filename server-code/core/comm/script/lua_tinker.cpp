@@ -20,6 +20,10 @@
 #define I64_FMT "ll"
 #endif
 
+extern "C" {
+#include "lstate.h"
+}
+
 namespace lua_tinker
 {
     void set_error_callback(lua_State* L, error_call_back_fn fn)
@@ -203,6 +207,33 @@ int32_t create_class(lua_State* L)
     return 1;
 }
 
+
+static int _my_print (lua_State *L)
+{
+    int n = lua_gettop(L); /* number of arguments */
+    int i;
+    lua_getglobal(L, "tostring");
+    std::string result;
+    for(i = 1; i <= n; i++)
+    {
+        const char* s;
+        size_t      l;
+        lua_pushvalue(L, -1); /* function to be called */
+        lua_pushvalue(L, i);  /* value to print */
+        lua_call(L, 1, 1);
+        s = lua_tolstring(L, -1, &l); /* get result */
+        if(s == NULL)
+            return luaL_error(L, "'tostring' must return a string to 'print'");
+        if(i > 1)
+            result += "\t";
+        result.append(s, l);
+        lua_pop(L, 1); /* pop result */
+    }
+    result+= "\n";
+    lua_tinker::print_error(L, result.c_str());
+    return 0;
+}
+
 void lua_tinker::init(lua_State* L)
 {
     init_shared_ptr(L);
@@ -210,6 +241,7 @@ void lua_tinker::init(lua_State* L)
     init_close_callback(L);
 
     lua_register(L, "lua_create_class", create_class);
+    lua_register(L, "__my_print", _my_print);
     set_error_callback(L, &on_error);
 }
 
@@ -302,6 +334,8 @@ int32_t lua_tinker::on_error(lua_State* L)
 
     return 0;
 }
+
+
 
 /*---------------------------------------------------------------------------*/
 void lua_tinker::print_error(lua_State* L, const char* fmt, ...)

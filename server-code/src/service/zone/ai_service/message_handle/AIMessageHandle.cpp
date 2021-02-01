@@ -95,7 +95,7 @@ ON_MSG(CAIService, SC_SKILL_STUN)
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
-    pActor->OnCastSkillFinish(msg.stun_ms());
+    pActor->OnCastSkillFinish(msg.skill_id(), msg.stun_ms());
     __LEAVE_FUNCTION
 }
 
@@ -104,7 +104,7 @@ ON_MSG(CAIService, SC_SKILL_BREAK)
     __ENTER_FUNCTION
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
-    pActor->OnCastSkillFinish(0);
+    pActor->OnCastSkillFinish(msg.skill_id(), 0);
     __LEAVE_FUNCTION
 }
 
@@ -181,13 +181,13 @@ ON_SERVERMSG(CAIService, ActorCreate)
     {
         case ACT_MONSTER:
         {
-            pActor = CAIMonster::CreateNew(msg);
+            pActor = CreateNew<CAIMonster>(msg);
             LOGACTORDEBUG(pActor->GetID(), "Create AIMonster id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;
         case ACT_PLAYER:
         {
-            pActor = CAIPlayer::CreateNew(msg);
+            pActor = CreateNew<CAIPlayer>(msg);
             LOGACTORDEBUG(pActor->GetID(), "Create AIPlayer id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;
@@ -235,7 +235,7 @@ ON_SERVERMSG(CAIService, ActorCastSkill_Fail)
     CAIActor* pActor = AIActorManager()->QueryActor(msg.actor_id());
     CHECK(pActor);
 
-    pActor->OnCastSkillFinish();
+    pActor->OnCastSkillFinish(msg.skill_id(), 0);
     __LEAVE_FUNCTION
 }
 

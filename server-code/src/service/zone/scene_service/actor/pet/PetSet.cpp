@@ -40,7 +40,7 @@ bool CPetSet::Init(CPlayer* pOwner)
         for(size_t i = 0; i < result_ptr->get_num_row(); i++)
         {
             auto  row               = result_ptr->fetch_row(true);
-            CPet* pPet              = CPet::CreateNew(this, std::move(row));
+            CPet* pPet              = CreateNew<CPet>(this, std::move(row));
             m_setPet[pPet->GetID()] = pPet;
         }
     }

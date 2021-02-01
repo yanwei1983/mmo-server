@@ -30,7 +30,7 @@ CStoragePackage* CPlayer::GetStroagePackage()
     __ENTER_FUNCTION
     if(m_pStoragePackage == nullptr)
     {
-        m_pStoragePackage.reset(CStoragePackage::CreateNew(this, ITEMPOSITION_STORAGE, GetStrogeMaxSize()));
+        m_pStoragePackage.reset(CreateNew<CStoragePackage>(this, ITEMPOSITION_STORAGE, GetStrogeMaxSize()));
         CHECKF(m_pStoragePackage);
         m_pStoragePackage->SendAllItemInfo();
     }

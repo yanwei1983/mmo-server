@@ -334,6 +334,7 @@ message SC_SKILL_BREAK
 	option (cmd).sc_cmd = CMD_SC_SKILL_BREAK;
 	uint64 scene_idx	= 1;
 	uint64 actor_id = 2;
+	uint32 skill_id = 3;
 };
 
 message CS_SKILL_CHGTARGETPOS

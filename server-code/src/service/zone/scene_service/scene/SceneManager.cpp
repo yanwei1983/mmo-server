@@ -58,7 +58,7 @@ CPhase* CSceneManager::CreatePhase(uint16_t idMap, uint16_t idPhaseType, uint64_
     else
     {
         SceneIdx idxScene(SceneService()->GetZoneID(), idMap, 0);
-        CScene*  pScene = CScene::CreateNew(idxScene, idPhaseType, idPhase);
+        CScene*  pScene = CreateNew<CScene>(idxScene, idPhaseType, idPhase);
 
         m_mapScene[idMap] = pScene;
 
@@ -78,7 +78,7 @@ CScene* CSceneManager::_CreateStaticScene(uint16_t idMap)
 
     SceneIdx idxScene(SceneService()->GetZoneID(), idMap, 0);
     CHECKF(QueryScene(idMap) == nullptr);
-    CScene* pScene = CScene::CreateNew(idMap, 0, 0);
+    CScene* pScene = CreateNew<CScene>(idMap, 0, 0);
 
     m_mapScene[idMap] = pScene;
 

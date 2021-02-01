@@ -397,6 +397,7 @@ message ActorCastSkill_Fail
 {
     option (server_cmd).id = MsgID_ActorCastSkill_Fail;
     uint64 actor_id = 1;
+    uint32 skill_id  = 2;
 };
 
 message ActorSetHide

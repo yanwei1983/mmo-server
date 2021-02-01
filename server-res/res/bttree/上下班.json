@@ -1,0 +1,255 @@
+{
+    "m_rootnode_id": 100100,
+    "root_node": {
+        "child": [
+            {
+                "child": [
+                    {
+                        "desc": "移动到上班地点",
+                        "id": 100300,
+                        "pos": {
+                            "x": 344.0,
+                            "y": 5.0
+                        },
+                        "script_onenter": [
+                            "local target_pos = CPos2D(20,20);",
+                            "\tai:SetTargetPos(target_pos);",
+                            "actor:MoveToTarget(target_pos);"
+                        ],
+                        "script_onupdate": [
+                            "if IsNearTarget(actor:GetPos(), ai:GetTargetPos()) then",
+                            "\treturn BT.Status.SUCCESS;",
+                            "end",
+                            "\treturn BT.Status.RUNNING;"
+                        ],
+                        "type": "ActionNode"
+                    },
+                    {
+                        "desc": "上班",
+                        "id": 100400,
+                        "pos": {
+                            "x": 344.0,
+                            "y": 101.0
+                        },
+                        "script_onenter": [
+                            "actor:StartWork(30);"
+                        ],
+                        "script_onupdate": [
+                            "if actor:IsFinishWork() then",
+                            "\treturn BT.Status.SUCCESS;",
+                            "end",
+                            "return BT.Status.RUNNING;"
+                        ],
+                        "type": "ActionNode"
+                    }
+                ],
+                "desc": "上班",
+                "id": 100200,
+                "pos": {
+                    "x": 232.0,
+                    "y": 5.0
+                },
+                "type": "SequenceNode"
+            },
+            {
+                "child": [
+                    {
+                        "child": [
+                            {
+                                "desc": "移动到家",
+                                "id": 100700,
+                                "pos": {
+                                    "x": 454.0,
+                                    "y": 239.0
+                                },
+                                "script_onenter": [
+                                    "local target_pos = CPos2D(50,50);",
+                                    "ai:SetTargetPos(target_pos);",
+                                    "actor:MoveToTarget(target_pos);"
+                                ],
+                                "script_onupdate": [
+                                    "if IsNearTarget(actor:GetPos(), ai:GetTargetPos()) then",
+                                    "    return BT.Status.SUCCESS;",
+                                    "end",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "type": "ActionNode"
+                            },
+                            {
+                                "desc": "休息",
+                                "id": 100800,
+                                "pos": {
+                                    "x": 454.0,
+                                    "y": 335.0
+                                },
+                                "script_onenter": [
+                                    "actor:Sleep(30);"
+                                ],
+                                "script_onupdate": [
+                                    "if actor:IsFinishSleep() then",
+                                    "    return BT.Status.SUCCESS;",
+                                    "end",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "回家",
+                        "id": 100600,
+                        "pos": {
+                            "x": 342.0,
+                            "y": 239.0
+                        },
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "child": [
+                                    {
+                                        "desc": "身上礼物数量少于5",
+                                        "id": 101100,
+                                        "pos": {
+                                            "x": 561.0,
+                                            "y": 441.0
+                                        },
+                                        "script_onupdate": [
+                                            "if actor:GetPackage():GetItemCount(100005) >= 5 then",
+                                            "    return BT.Status.FAILURE;",
+                                            "end",
+                                            "return BT.Status.SUCCESS;"
+                                        ],
+                                        "type": "ConditionNode"
+                                    },
+                                    {
+                                        "child": [
+                                            {
+                                                "desc": "移动到商店",
+                                                "id": 101300,
+                                                "pos": {
+                                                    "x": 673.0,
+                                                    "y": 537.0
+                                                },
+                                                "script_onenter": [
+                                                    "local target_pos = CPos2D(100,100);",
+                                                    "ai:SetTargetPos(target_pos);",
+                                                    "actor:MoveToTarget(target_pos);"
+                                                ],
+                                                "script_onupdate": [
+                                                    "if IsNearTarget(actor:GetPos(), ai:GetTargetPos()) then",
+                                                    " return BT.Status.SUCCESS;",
+                                                    "end",
+                                                    "return BT.Status.RUNNING;"
+                                                ],
+                                                "type": "ActionNode"
+                                            },
+                                            {
+                                                "desc": "购买礼物",
+                                                "id": 101400,
+                                                "pos": {
+                                                    "x": 673.0,
+                                                    "y": 633.0
+                                                },
+                                                "script_onenter": [
+                                                    "actor:BuyItem(100005, 10);"
+                                                ],
+                                                "script_onupdate": [
+                                                    "return BT.Status.SUCCESS;"
+                                                ],
+                                                "type": "ActionNode"
+                                            }
+                                        ],
+                                        "desc": "去买礼物",
+                                        "id": 101200,
+                                        "pos": {
+                                            "x": 561.0,
+                                            "y": 537.0
+                                        },
+                                        "type": "SequenceNode"
+                                    }
+                                ],
+                                "desc": "去买礼物",
+                                "id": 101000,
+                                "pos": {
+                                    "x": 449.0,
+                                    "y": 441.0
+                                },
+                                "type": "SequenceNode"
+                            },
+                            {
+                                "child": [
+                                    {
+                                        "desc": "移动到女友家",
+                                        "id": 101600,
+                                        "pos": {
+                                            "x": 560.0,
+                                            "y": 662.0
+                                        },
+                                        "script_onenter": [
+                                            "local target_pos = CPos2D(150,150);",
+                                            "ai:SetTargetPos(target_pos);",
+                                            "actor:MoveToTarget(target_pos);"
+                                        ],
+                                        "script_onupdate": [
+                                            "if IsNearTarget(actor:GetPos(), ai:GetTargetPos()) then",
+                                            "    return BT.Status.SUCCESS;",
+                                            "end",
+                                            "return BT.Status.RUNNING;"
+                                        ],
+                                        "type": "ActionNode"
+                                    },
+                                    {
+                                        "desc": "约会",
+                                        "id": 101700,
+                                        "pos": {
+                                            "x": 560.0,
+                                            "y": 758.0
+                                        },
+                                        "script_onenter": [
+                                            "actor:Date();"
+                                        ],
+                                        "script_onupdate": [
+                                            "if actor:IsFinishDate() then",
+                                            "    return BT.Status.SUCCESS;",
+                                            "end",
+                                            "return BT.Status.RUNNING;"
+                                        ],
+                                        "type": "ActionNode"
+                                    }
+                                ],
+                                "desc": "去女友家",
+                                "id": 101500,
+                                "pos": {
+                                    "x": 448.0,
+                                    "y": 662.0
+                                },
+                                "type": "SequenceNode"
+                            }
+                        ],
+                        "desc": "去女友家",
+                        "id": 100900,
+                        "pos": {
+                            "x": 337.0,
+                            "y": 441.0
+                        },
+                        "type": "SequenceNode"
+                    }
+                ],
+                "desc": "下班",
+                "id": 100500,
+                "pos": {
+                    "x": 230.0,
+                    "y": 239.0
+                },
+                "type": "SelectorNode"
+            }
+        ],
+        "desc": "root",
+        "id": 100100,
+        "pos": {
+            "x": 100.0,
+            "y": 100.0
+        },
+        "type": "BTTree"
+    }
+}

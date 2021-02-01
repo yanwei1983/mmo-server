@@ -66,7 +66,7 @@ bool CRemoteIMGuiServer::Init(const std::string& addr, int32_t port)
     m_IMGuiIOGutter = std::make_unique<IMGuiIOGutter>();
     m_IMGuiFrameGutter = std::make_unique<IMGuiFrameGutter>();
     m_IMGuiTextureMgr = std::make_unique<IMGuiTextureMgr>();
-    m_pNetworkService.reset( CNetworkService::CreateNew() );
+    m_pNetworkService.reset( CreateNew<CNetworkService>() );
     CHECKF(m_pNetworkService.get());
     CHECKF(m_pNetworkService->Listen(addr, port, m_pEventHandler));
 

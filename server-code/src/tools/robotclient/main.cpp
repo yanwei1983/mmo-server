@@ -12,22 +12,6 @@
 #include "event2/thread.h"
 #include "get_opt.h"
 
-void log_cb(int32_t severity, const char* msg)
-{
-    LOGNETERROR("{}", msg);
-}
-
-struct NetworkGInit
-{
-    NetworkGInit()
-    {
-        event_enable_debug_mode();
-        evthread_use_pthreads();
-        event_set_log_callback(log_cb);
-        // LOGNETDEBUG("{}", "CNetworkService GInit");
-    }
-} const G_NetworkGInit;
-
 void ProtobufLogHandler(google::protobuf::LogLevel level, const char* file, int32_t line, const std::string& msg)
 {
     LOGERROR("PBError: {} in {}:{}", msg.c_str(), file, line);

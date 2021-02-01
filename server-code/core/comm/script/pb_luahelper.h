@@ -15,18 +15,21 @@ namespace pb_luahelper
     {
         static std::atomic<uint32_t> s_nCount;
         ProtobufMessageWarp(const std::string& strMessageType)
-            : m_pMessage(pb_util::NewProtoMessage(strMessageType))
+            : m_pMessage(pb_util::NewProtoMessage(strMessageType), pb_util::DelProtoMessage)
+        {
+            s_nCount++;
+        }
+        ProtobufMessageWarp(const ProtobufMessageWarp& rht)
+            : m_pMessage(rht.m_pMessage)
         {
             s_nCount++;
         }
         ~ProtobufMessageWarp()
         {
-            pb_util::DelProtoMessage(m_pMessage);
-            m_pMessage = nullptr;
             s_nCount--;
         }
 
-        void set(const std::string& key, const std::string& val) { pb_util::SetMessageData(m_pMessage, key, val); }
+        void set(const std::string& key, const std::string& val) { pb_util::SetMessageData(m_pMessage.get(), key, val); }
 
         static int32_t meta_get(lua_State* L)
         {
@@ -56,17 +59,17 @@ namespace pb_luahelper
             const std::string&   key   = lua_tinker::detail::read<const std::string&>(L, 2);
             if(pWarp)
             {
-                return PushMessageDataToLua(L, pWarp->m_pMessage, key);
+                return PushMessageDataToLua(L, pWarp->m_pMessage.get(), key);
             }
 
             return 0;
         }
 
-        static google::protobuf::Message* GetProtobufMessagePtr(ProtobufMessageWarp* pWarp) { return pWarp->m_pMessage; }
+        static google::protobuf::Message* GetProtobufMessagePtr(ProtobufMessageWarp* pWarp) { return pWarp->m_pMessage.get(); }
 
         static size_t GetProtobufFieldSize(ProtobufMessageWarp* pWarp, const std::string& key)
         {
-            google::protobuf::Message*               pThisRow   = pWarp->m_pMessage;
+            google::protobuf::Message*               pThisRow   = pWarp->m_pMessage.get();
             const google::protobuf::FieldDescriptor* pFieldDesc = nullptr;
             if(pb_util::FindFieldInMessage(key, pThisRow, pFieldDesc) == false)
                 return 0;
@@ -74,7 +77,7 @@ namespace pb_luahelper
             return pThisRow->GetReflection()->FieldSize(*pThisRow, pFieldDesc);
         }
 
-        google::protobuf::Message* m_pMessage;
+        std::shared_ptr<google::protobuf::Message> m_pMessage;
     };
 
     struct ConstProtobufMessageWarp
@@ -82,6 +85,11 @@ namespace pb_luahelper
         static std::atomic<uint32_t> s_nCount;
         ConstProtobufMessageWarp(const google::protobuf::Message& msg)
             : m_MsgRef(msg)
+        {
+            s_nCount++;
+        }
+        ConstProtobufMessageWarp(const ConstProtobufMessageWarp& rht)
+            :m_MsgRef(rht.m_MsgRef)
         {
             s_nCount++;
         }
@@ -130,6 +138,12 @@ namespace pb_luahelper
         ConstRepeatedProtobufMessageWarp(const google::protobuf::Message* pMessage, const google::protobuf::FieldDescriptor* pFieldDesc)
             : m_pMessage(pMessage)
             , m_pFieldDesc(pFieldDesc)
+        {
+            s_nCount++;
+        }
+        ConstRepeatedProtobufMessageWarp(const ConstRepeatedProtobufMessageWarp& rht)
+            : m_pMessage(rht.m_pMessage)
+            , m_pFieldDesc(rht.m_pFieldDesc)
         {
             s_nCount++;
         }

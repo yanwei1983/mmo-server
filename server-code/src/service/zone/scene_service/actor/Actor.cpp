@@ -52,9 +52,9 @@ CActor::~CActor() {}
 bool CActor::Init()
 {
     __ENTER_FUNCTION
-    m_pStatusSet.reset(CActorStatusSet::CreateNew(this));
+    m_pStatusSet.reset(CreateNew<CActorStatusSet>(this));
     CHECKF(m_pStatusSet.get());
-    m_SkillFSM.reset(CSkillFSM::CreateNew(this));
+    m_SkillFSM.reset(CreateNew<CSkillFSM>(this));
     CHECKF(m_SkillFSM.get());
     m_ActorAttrib = std::make_unique<CActorAttrib>();
     CHECKF(m_ActorAttrib.get());

@@ -28,7 +28,7 @@ CAOIPhase* CAOIScene::CreatePhase(const SceneIdx& idxScene, uint64_t idPhase)
     auto pMap = MapManager()->QueryMap(m_idMap);
     CHECKF(pMap);
     auto       pPhaseData = pMap->GetPhaseDataById(idPhase);
-    CAOIPhase* pPhase     = CAOIPhase::CreateNew(this, idxScene, idPhase, pPhaseData);
+    CAOIPhase* pPhase     = CreateNew<CAOIPhase>(this, idxScene, idPhase, pPhaseData);
     CHECKF(pPhase);
     m_pPhaseSet[idPhase].reset(pPhase);
     m_pPhaseSetByIdx[idxScene.GetPhaseIdx()] = pPhase;
@@ -40,7 +40,7 @@ CAOIPhase* CAOIScene::CreatePhase(const SceneIdx& idxScene, uint64_t idPhase)
 CAOIPhase* CAOIScene::CreatePhase(const SceneIdx& idxScene, uint64_t idPhase, const Cfg_Phase* pPhaseData)
 {
     __ENTER_FUNCTION
-    CAOIPhase* pPhase = CAOIPhase::CreateNew(this, idxScene, idPhase, pPhaseData);
+    CAOIPhase* pPhase = CreateNew<CAOIPhase>(this, idxScene, idPhase, pPhaseData);
     CHECKF(pPhase);
     m_pPhaseSet[idPhase].reset(pPhase);
     m_pPhaseSetByIdx[idxScene.GetPhaseIdx()] = pPhase;

@@ -162,7 +162,7 @@ void SetGMProxyServicePtr(CGMProxyService* ptr)
 
 extern "C" __attribute__((visibility("default"))) IService* ServiceCreate(WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx)
 {
-    return CGMProxyService::CreateNew(ServerPort{idWorld, idServiceType, idServiceIdx});
+    return CreateNewRelease<CGMProxyService>(ServerPort{idWorld, idServiceType, idServiceIdx});
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -222,7 +222,7 @@ bool CGMProxyService::Init(const ServerPort& nServerPort)
             LOGFATAL("CGMProxyService QueryServerInfo {} fail", GetServerPort().GetServiceID());
             return false;
         }
-        m_pRPCService.reset(CRPCService::CreateNew(GetServerPort().GetServiceID()));
+        m_pRPCService.reset(CreateNew<CRPCService>(GetServerPort().GetServiceID()));
         CHECKF(m_pRPCService.get());
         CHECKF(
             m_pRPCService->StartRPCServer(pAddrInfo->publish_port, pAddrInfo->debug_port, true, new ProxyServiceImpl(this, pAddrInfo->debug_port)));

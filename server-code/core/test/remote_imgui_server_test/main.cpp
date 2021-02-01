@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     auto addr = opt["--addr"];
     auto port =opt["--port"];
     int nPort = atoi(port.c_str());
-    auto pServer = CRemoteIMGuiServer::CreateNew(addr, nPort);
+    auto pServer = CreateNew<CRemoteIMGuiServer>(addr, nPort);
     CHECKF(pServer);
     printf("server start!\r\n");
     //test

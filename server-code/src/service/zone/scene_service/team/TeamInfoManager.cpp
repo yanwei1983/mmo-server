@@ -102,7 +102,7 @@ bool CTeamInfoManager::Init()
 CTeamInfo* CTeamInfoManager::OnCreateTeam(uint64_t idTeam, uint64_t idLeader)
 {
     __ENTER_FUNCTION
-    auto pTeam = CTeamInfo::CreateNew(idTeam, idLeader);
+    auto pTeam = CreateNew<CTeamInfo>(idTeam, idLeader);
     CHECKF(pTeam);
     m_setTeam[idTeam] = pTeam;
     return pTeam;

@@ -70,6 +70,9 @@ namespace
     {
         unblock_signal(SIGSEGV);
         auto stack_string = GetStackTraceString(2);
+        if(stack_string.empty())
+            stack_string = "can't get stacktrace";
+            
         if(BaseCode::IsLogRunning())
             LOGERROR(stack_string);
         else

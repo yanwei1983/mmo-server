@@ -3,41 +3,61 @@
 
 #include "CheckUtil.h"
 
-#define CreateNewImpl(Type)                                     \
-    template<typename... Args>                                  \
-    static inline Type* CreateNew(Args&&... args)               \
-    {                                                           \
-        Type* newT = nullptr;                                   \
-        __ENTER_FUNCTION                                        \
-        {                                                       \
-            newT = new Type();                                  \
-            if(newT && newT->Init(std::forward<Args>(args)...)) \
-            {                                                   \
-                return newT;                                    \
-            }                                                   \
-        }                                                       \
-        __LEAVE_FUNCTION                                        \
-        SAFE_DELETE(newT);                                      \
-        return nullptr;                                         \
+
+template<class Type>
+struct CreateNewImpl
+{
+public:
+    template<typename... Args>                                  
+    static inline Type* CreateNew(Args&&... args)               
+    {                                                           
+        Type* newT = nullptr;                                   
+        __ENTER_FUNCTION                                        
+        {                                                       
+            newT = new Type();                                  
+            if(newT && newT->Init(std::forward<Args>(args)...)) 
+            {                                                   
+                return newT;                                    
+            }                                                   
+        }                                                       
+        __LEAVE_FUNCTION                                        
+        SAFE_DELETE(newT);                                     
+        return nullptr;                                         
     }
 
-#define CreateNewRealeaseImpl(Type)                             \
-    template<typename... Args>                                  \
-    static inline Type* CreateNew(Args&&... args)               \
-    {                                                           \
-        Type* newT = nullptr;                                   \
-        __ENTER_FUNCTION                                        \
-        {                                                       \
-            newT = new Type();                                  \
-            if(newT && newT->Init(std::forward<Args>(args)...)) \
-            {                                                   \
-                return newT;                                    \
-            }                                                   \
-        }                                                       \
-        __LEAVE_FUNCTION                                        \
-        SAFE_RELEASE(newT);                                     \
-        return nullptr;                                         \
+    template<typename... Args>                                  
+    static inline Type* CreateNewRelease(Args&&... args)               
+    {                                                           
+        Type* newT = nullptr;                                   
+        __ENTER_FUNCTION                                        
+        {                                                       
+            newT = new Type();                                  
+            if(newT && newT->Init(std::forward<Args>(args)...)) 
+            {                                                   
+                return newT;                                    
+            }                                                   
+        }                                                       
+        __LEAVE_FUNCTION                                        
+        SAFE_RELEASE(newT);                                     
+        return nullptr;                                         
     }
+};
+
+template<typename Type, typename... Args>                                              
+static inline Type* CreateNew(Args&&... args)                           
+{                                                                       
+    return CreateNewImpl<Type>::CreateNew(std::forward<Args>(args)...); 
+}
+
+template<typename Type, typename... Args>                                                     
+static inline Type* CreateNewRelease(Args&&... args)                                  
+{                                                                              
+    return CreateNewImpl<Type>::CreateNewRelease(std::forward<Args>(args)...); 
+}
+
+#define CreateNewImpl(Type) friend struct CreateNewImpl<Type>;
+
+#define CreateNewRealeaseImpl(Type) friend struct CreateNewImpl<Type>;
 
 template<class Type>
 class NoncopyableT
@@ -49,33 +69,6 @@ protected:
 public:
     NoncopyableT(const NoncopyableT&) = delete;
     const NoncopyableT& operator=(const NoncopyableT&) = delete;
-};
-
-template<class Type>
-class CreateNewT
-{
-public:
-    CreateNewT() {}
-    virtual ~CreateNewT() {}
-
-    template<typename... Args>
-    static inline Type* CreateNew(Args&&... args)
-    {
-        Type* newT = nullptr;
-        __ENTER_FUNCTION
-        {
-            newT = new Type();
-            if(newT && newT->Init(std::forward<Args>(args)...))
-            {
-                return newT;
-            }
-        }
-        __LEAVE_FUNCTION
-        SAFE_DELETE(newT);
-        return nullptr;
-    }
-
-private:
 };
 
 class Noncopyable

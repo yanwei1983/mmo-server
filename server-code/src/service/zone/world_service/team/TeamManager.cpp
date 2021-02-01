@@ -35,7 +35,7 @@ CTeam* CTeamManager::CreateTeam(uint64_t idTeam, OBJID idLeader)
     CHECKF(pUser->GetTeamID() == 0);
 
     CHECKF(QueryTeam(idTeam) == nullptr);
-    CTeam* pTeam = CTeam::CreateNew(idTeam, idLeader);
+    CTeam* pTeam = CreateNew<CTeam>(idTeam, idLeader);
     CHECKF(pTeam);
     m_setTeam[idTeam] = pTeam;
 

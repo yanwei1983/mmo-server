@@ -34,7 +34,7 @@ CAOIScene* CAOISceneManager::CreateScene(uint16_t idMap)
     auto pMap = MapManager()->QueryMap(idMap);
     CHECKF(pMap);
 
-    CAOIScene* pScene = CAOIScene::CreateNew(idMap);
+    CAOIScene* pScene = CreateNew<CAOIScene>(idMap);
     CHECKF(pScene);
 
     m_mapScene[idMap] = pScene;

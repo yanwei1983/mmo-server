@@ -8,7 +8,7 @@
 class CAIScene;
 class CAIPhase;
 
-class CAISceneManager : public NoncopyableT<CAISceneManager>
+export_lua class CAISceneManager : public NoncopyableT<CAISceneManager>
 {
     CAISceneManager();
     bool Init(uint32_t idZone);
@@ -23,8 +23,8 @@ public:
 
     CAIScene* CreateScene(uint16_t idMap);
 
-    CAIScene* QueryScene(const SceneIdx& idxScene);
-    CAIPhase* QueryPhase(const SceneIdx& idxScene);
+    export_lua CAIScene* QueryScene(const SceneIdx& idxScene);
+    export_lua CAIPhase* QueryPhase(const SceneIdx& idxScene);
     void      OnTimer();
 
 protected:

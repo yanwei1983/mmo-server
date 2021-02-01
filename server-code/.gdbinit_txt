@@ -17,7 +17,9 @@ set print array-indexes on
  
 # 每行打印一个结构体成员
 set print pretty on
- 
+
+set print element 0
+set pagination off 
  
 # 保存断点
 define savebp

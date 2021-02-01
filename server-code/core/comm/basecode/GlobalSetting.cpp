@@ -11,7 +11,7 @@ CGlobalSetting*        GetGlobalSetting()
 void CreateGlobalSetting()
 {
     if(g_pGlobalSetting == nullptr)
-        g_pGlobalSetting = CGlobalSetting::CreateNew();
+        g_pGlobalSetting = CreateNew<CGlobalSetting>();
 }
 
 void ReleaseGlobalSetting()

@@ -237,7 +237,7 @@ void CLoadingThread::OnThreadProcess()
         if(pCurData->nPorcessType == LPT_LOADING)
         {
             m_nLoadingCount--;
-            CPlayer* pPlayer = CPlayer::CreateNew(pCurData->idPlayer, pCurData->socket);
+            CPlayer* pPlayer = CreateNew<CPlayer>(pCurData->idPlayer, pCurData->socket);
             //如果当前处理的这个需要被cancle
             if(pPlayer == nullptr)
             {

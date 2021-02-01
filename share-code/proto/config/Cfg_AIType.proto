@@ -11,8 +11,8 @@ message Cfg_AIType
 		float  idle_randomwalk_step_min = 5;  // idle时,随机移动单步距离
 		float  idle_randomwalk_step_max = 6;  // idle时,随机移动单步距离
 		float  idle_randomwalk_range	= 7;  //随机移动最大范围,出了范围,走回原始点
-		float  attack_pursue_selfrange	= 8;  //最大追击距离,自己超出范围,回到原始点
-		float  attack_target_range		= 9;  //最大目标距离,超出后,放弃目标
+		float  battle_range				= 8;  //最大追击距离,自己超出范围,回到原始点
+		float  target_range				= 9;  //最大目标距离,超出后,放弃目标
 		float  search_enemy_range		= 10; //最大索敌距离
 		float  search_enemy_ms_min		= 11; //索敌间隔
 		float  search_enemy_ms_max		= 12; //索敌间隔
@@ -29,5 +29,7 @@ message Cfg_AIType
 		uint32			follow_path	 = 23; //巡逻路径编号
 		uint32			script_id	 = 24; //脚本id
 		bool			ai_debug	 = 25; //是否打开调试信息输出
+		bytes			bt_file      = 26; //行为树文件名
+		uint32			tick_lev     = 27; //tick_lev
 
 }

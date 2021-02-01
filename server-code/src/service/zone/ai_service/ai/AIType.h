@@ -12,6 +12,7 @@ enum AIType
     AITYPE_ACTIVE  = 2, //主动
 };
 
+
 class CAIType : public NoncopyableT<CAIType>
 {
     CAIType() {}

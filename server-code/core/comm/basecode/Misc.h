@@ -119,7 +119,7 @@ private:                                             \
     std::unique_ptr<class T> m_p##T;
 
 #define DEFINE_CONFIG_LOAD(T)                                           \
-    m_p##T.reset(T::CreateNew(GetCfgFilePath() + T::GetCfgFileName())); \
+    m_p##T.reset(CreateNew<T>(GetCfgFilePath() + T::GetCfgFileName())); \
     CHECKF(m_p##T.get());
 
 #endif /* MISC_H */

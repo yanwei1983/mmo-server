@@ -64,7 +64,7 @@ void SetSceneServicePtr(CSceneService* pZone)
 
 extern "C" __attribute__((visibility("default"))) IService* ServiceCreate(WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx)
 {
-    return CSceneService::CreateNew(ServerPort{idWorld, idServiceType, idServiceIdx});
+    return CreateNewRelease<CSceneService>(ServerPort{idWorld, idServiceType, idServiceIdx});
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -149,24 +149,24 @@ bool CSceneService::Init(const ServerPort& nServerPort)
     DEFINE_CONFIG_LOAD(CAchievementTypeSet);
     DEFINE_CONFIG_LOAD(CNpcTypeSet);
 
-    m_pMapManager.reset(CMapManager::CreateNew(GetZoneID()));
+    m_pMapManager.reset(CreateNew<CMapManager>(GetZoneID()));
     CHECKF(m_pMapManager.get());
-    m_pActorManager.reset(CActorManager::CreateNew());
+    m_pActorManager.reset(CreateNew<CActorManager>());
     CHECKF(m_pActorManager.get());
-    m_pTeamInfoManager.reset(CTeamInfoManager::CreateNew());
+    m_pTeamInfoManager.reset(CreateNew<CTeamInfoManager>());
     CHECKF(m_pTeamInfoManager.get());
-    m_pGMManager.reset(CGMManager::CreateNew(pGlobalDB.get()));
+    m_pGMManager.reset(CreateNew<CGMManager>(pGlobalDB.get()));
     CHECKF(m_pGMManager.get());
 
     //脚本加载
     extern void export_to_lua(lua_State*, void*);
-    m_pScriptManager.reset(CLUAScriptManager::CreateNew(std::string("ZoneScript") + std::to_string(GetZoneID()),
+    m_pScriptManager.reset(CreateNew<CLUAScriptManager>(std::string("ZoneScript") + std::to_string(GetZoneID()),
                                                         &export_to_lua,
                                                         (void*)this,
                                                         "res/script/zone_service"));
 
     //必须要晚于MapManger和ActorManager
-    m_pSceneManager.reset(CSceneManager::CreateNew(GetZoneID()));
+    m_pSceneManager.reset(CreateNew<CSceneManager>(GetZoneID()));
     CHECKF(m_pSceneManager.get());
 
     RegisterAllMsgProcess<CSceneService>(GetNetMsgProcess());
@@ -175,11 +175,11 @@ bool CSceneService::Init(const ServerPort& nServerPort)
     {
         //共享型Zone是没有自己的数据的
 
-        m_pSystemVarSet.reset(CSystemVarSet::CreateNew());
+        m_pSystemVarSet.reset(CreateNew<CSystemVarSet>());
         CHECKF(m_pSystemVarSet.get());
     }
 
-    m_pLoadingThread.reset(CLoadingThread::CreateNew(this));
+    m_pLoadingThread.reset(CreateNew<CLoadingThread>(this));
     CHECKF(m_pLoadingThread.get());
 
     if(IsSharedZone())

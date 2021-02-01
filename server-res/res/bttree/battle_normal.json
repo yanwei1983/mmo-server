@@ -1,0 +1,560 @@
+{
+    "m_rootnode_id": 100100,
+    "root_node": {
+        "child": [
+            {
+                "child": [
+                    {
+                        "child": [
+                            {
+                                "desc": "切换主目标",
+                                "id": 100500,
+                                "pos": {
+                                    "x": 234.0,
+                                    "y": 150.0
+                                },
+                                "script_onenter": [
+                                    "local main_target = ai:GetMainTargetID();",
+                                    "local top_hate_id = ai:GetTopHateID();",
+                                    "if main_target == top_hate_id then",
+                                    "\treturn BT.Status.SUCCESS;",
+                                    "end",
+                                    "local main_hate = ai:GetHate(main_target);",
+                                    "local top_hate = ai:GetHate(top_hate_id);",
+                                    "if top_hate > main_hate * 1.5 then",
+                                    "      ai:SetMainTargetID(top_hate_id);",
+                                    "end",
+                                    "return BT.Status.SUCCESS;"
+                                ],
+                                "type": "ActionNode"
+                            },
+                            {
+                                "child": [
+                                    {
+                                        "child": [
+                                            {
+                                                "desc": "记录",
+                                                "id": 100900,
+                                                "pos": {
+                                                    "x": 536.0,
+                                                    "y": 150.0
+                                                },
+                                                "script_onenter": [
+                                                    "local actor = ctx:GetActor();",
+                                                    "local ctx_table = ctx:data_table();",
+                                                    "ctx_table.record_pos = actor:GetPos()",
+                                                    "return BT.Status.SUCCESS"
+                                                ],
+                                                "type": "ActionNode"
+                                            }
+                                        ],
+                                        "desc": "是否没有记录点",
+                                        "id": 100700,
+                                        "pos": {
+                                            "x": 412.0,
+                                            "y": 150.0
+                                        },
+                                        "script_onenter": [
+                                            "local ctx_table = ctx:data_table();",
+                                            "if ctx_table.record_pos == nil then",
+                                            "\treturn BT.Status.SUCCESS",
+                                            "end",
+                                            "return BT.Status.FAILURE"
+                                        ],
+                                        "type": "SequenceNode"
+                                    },
+                                    {
+                                        "child": [
+                                            {
+                                                "desc": "逃跑",
+                                                "id": 101200,
+                                                "pos": {
+                                                    "x": 678.0,
+                                                    "y": 265.0
+                                                },
+                                                "script_onenter": [
+                                                    "local actor = ctx:GetActor();",
+                                                    "local target = ai:GetMainTarget()",
+                                                    "local ctx_table = ctx:data_table();",
+                                                    "ctx_table.target_dir = actor:GetPos() - target:GetPos();",
+                                                    "ctx_table.target_dis = ctx_table.target_dir:normalise();",
+                                                    "local target_pos = target:GetPos() + ctx_table.target_dir * ai:GetEscapeRange();",
+                                                    "ai:MoveTo(target_pos);",
+                                                    "ctx_table.last_escape_time = now();"
+                                                ],
+                                                "script_onupdate": [
+                                                    "if ai:IsNearTargetPos() then",
+                                                    "\treturn BT.Status.SUCCESS;",
+                                                    "end",
+                                                    "ai:MoveToTarget();",
+                                                    "return BT.Status.RUNNING;"
+                                                ],
+                                                "type": "ActionNode"
+                                            }
+                                        ],
+                                        "desc": "自身血量低于百分之20且10秒内没跑过",
+                                        "id": 101000,
+                                        "pos": {
+                                            "x": 412.0,
+                                            "y": 265.0
+                                        },
+                                        "script_onenter": [
+                                            "local actor = ctx:GetActor();",
+                                            "local self_hp_p = actor:GetHP() / actor:GetHPMax();",
+                                            "local ctx_table = ctx:data_table();",
+                                            "if self_hp_p < 0.2 then",
+                                            "    if ctx_table.last_escape_time == nil or ctx_table.last_escape_time < (now() + 10) then",
+                                            "\t\treturn BT.Status.SUCCESS;",
+                                            "\tend",
+                                            "end",
+                                            "return BT.Status.FAILURE;"
+                                        ],
+                                        "type": "SequenceNode"
+                                    },
+                                    {
+                                        "child": [
+                                            {
+                                                "desc": "选择技能",
+                                                "id": 101500,
+                                                "pos": {
+                                                    "x": 550.0,
+                                                    "y": 380.0
+                                                },
+                                                "script_onenter": [
+                                                    "local pTarget = ai:GetMainTarget();",
+                                                    "ai:ChooseSkill(pTarget);",
+                                                    "return BT.Status.SUCCESS;"
+                                                ],
+                                                "type": "ActionNode"
+                                            }
+                                        ],
+                                        "desc": "是否没有选择技能",
+                                        "id": 101300,
+                                        "pos": {
+                                            "x": 412.0,
+                                            "y": 380.0
+                                        },
+                                        "script_onenter": [
+                                            "if ai:GetCurSkillID() == 0 then",
+                                            "\treturn BT.Status.SUCCESS;",
+                                            "else",
+                                            "\treturn BT.Status.FAILURE;",
+                                            "end"
+                                        ],
+                                        "type": "SequenceNode"
+                                    },
+                                    {
+                                        "child": [
+                                            {
+                                                "child": [
+                                                    {
+                                                        "desc": "释放技能",
+                                                        "id": 101900,
+                                                        "pos": {
+                                                            "x": 660.0,
+                                                            "y": 495.0
+                                                        },
+                                                        "script_onenter": [
+                                                            "ai:CastSkill();",
+                                                            "return BT.Status.RUNNING;"
+                                                        ],
+                                                        "script_onupdate": [
+                                                            "if ai:IsSkillFinish() then",
+                                                            "\treturn BT.Status.SUCCESS;",
+                                                            "end",
+                                                            "return BT.Status.RUNNING;"
+                                                        ],
+                                                        "type": "ActionNode"
+                                                    },
+                                                    {
+                                                        "desc": "等待N秒",
+                                                        "id": 102000,
+                                                        "pos": {
+                                                            "x": 742.0,
+                                                            "y": 495.0
+                                                        },
+                                                        "script_onenter": [
+                                                            "ai:Wait(ai:GetAttackWaitTime())",
+                                                            "return BT.Status.RUNNING;"
+                                                        ],
+                                                        "script_onupdate": [
+                                                            "if ai:IsWaitFinish() then",
+                                                            "\treturn BT.Status.SUCCESS;",
+                                                            "end",
+                                                            "return BT.Status.RUNNING;"
+                                                        ],
+                                                        "type": "ActionNode"
+                                                    }
+                                                ],
+                                                "desc": "距离可以释放当前技能",
+                                                "id": 101700,
+                                                "pos": {
+                                                    "x": 494.0,
+                                                    "y": 495.0
+                                                },
+                                                "script_onenter": [
+                                                    "if ai:IsTargetLost( ai:GetMainTargetID()) == true then",
+                                                    "\treturn BT.Status.FAILURE;",
+                                                    "end",
+                                                    "local actor = ctx:GetActor();",
+                                                    "local target = ai:GetMainTarget()",
+                                                    "local ctx_table = ctx:data_table();",
+                                                    "ctx_table.target_dir = actor:GetPos() - target:GetPos();",
+                                                    "ctx_table.target_dis = ctx_table.target_dir:normalise();",
+                                                    "if ai:IsInSkillCastRange( ctx_table.target_dis ) == false  then",
+                                                    "\treturn BT.Status.FAILURE;",
+                                                    "else",
+                                                    "\treturn BT.Status.SUCCESS;",
+                                                    "end"
+                                                ],
+                                                "type": "SequenceNode"
+                                            },
+                                            {
+                                                "desc": "朝施放点移动",
+                                                "id": 102100,
+                                                "pos": {
+                                                    "x": 494.0,
+                                                    "y": 610.0
+                                                },
+                                                "script_onenter": [
+                                                    "if ai:IsTargetLost( ai:GetMainTargetID()) == true then",
+                                                    "\treturn BT.Status.FAILURE;",
+                                                    "end",
+                                                    "local ctx_table = ctx:data_table();",
+                                                    "local target = ai:GetMainTarget()",
+                                                    "local dis = ai:GetSkillCastRange();",
+                                                    "local target_pos = target:GetPos() + ctx_table.target_dir * dis;",
+                                                    "ai:MoveTo(target_pos);",
+                                                    "return BT.Status.RUNNING;"
+                                                ],
+                                                "script_onupdate": [
+                                                    "if ai:IsTargetLost(ai:GetMainTargetID()) == true then",
+                                                    "\treturn BT.Status.FAILURE;",
+                                                    "end",
+                                                    "if ai:IsNearTargetPos() then",
+                                                    "\treturn BT.Status.SUCCESS;",
+                                                    "end",
+                                                    "ai:MoveToTarget();",
+                                                    "return BT.Status.RUNNING;"
+                                                ],
+                                                "type": "ActionNode"
+                                            }
+                                        ],
+                                        "desc": "",
+                                        "id": 101600,
+                                        "pos": {
+                                            "x": 412.0,
+                                            "y": 495.0
+                                        },
+                                        "type": "SelectorNode"
+                                    }
+                                ],
+                                "desc": "",
+                                "id": 100600,
+                                "pos": {
+                                    "x": 330.0,
+                                    "y": 150.0
+                                },
+                                "type": "SelectorNode"
+                            }
+                        ],
+                        "desc": "有目标",
+                        "id": 100300,
+                        "pos": {
+                            "x": 152.0,
+                            "y": 150.0
+                        },
+                        "script_onenter": [
+                            "local actor = ctx:GetActor();",
+                            "local target_id = ai:GetMainTargetID() ;",
+                            "if(target_id ~= 0) then",
+                            "\tif ai:IsTargetLost(target_id) == false then",
+                            "\t\treturn BT.Status.SUCCESS;",
+                            "\tend",
+                            "end",
+                            "return BT.Status.FAILURE;"
+                        ],
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "返回记录点",
+                                "id": 102400,
+                                "pos": {
+                                    "x": 262.0,
+                                    "y": 706.0
+                                },
+                                "script_onenter": [
+                                    "local ctx_table = ctx:data_table();",
+                                    "if ctx_table.record_pos ~= nil then",
+                                    "\tai:MoveTo(ctx_table.record_pos)",
+                                    "\tctx_table.record_pos = nil;",
+                                    "\treturn BT.Status.RUNNING;",
+                                    "end",
+                                    "return BT.Status.FAILURE;"
+                                ],
+                                "script_onupdate": [
+                                    "if ai:IsNearTargetPos() then",
+                                    "\treturn BT.Status.SUCCESS;",
+                                    "end",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "超过战斗范围",
+                        "id": 102200,
+                        "pos": {
+                            "x": 152.0,
+                            "y": 706.0
+                        },
+                        "script_onenter": [
+                            "local actor = ctx:GetActor();",
+                            "local ctx_table = ctx:data_table();",
+                            "if ctx_table.record_pos == nil then",
+                            "\t\treturn BT.Status.FAILURE;",
+                            "end",
+                            "local dis = GameMath.distance(ctx_table.record_pos, actor:GetPos());",
+                            "if dis > ai:GetBattleRange() then",
+                            "\treturn BT.Status.SUCCESS;",
+                            "else",
+                            "\treturn BT.Status.FAILURE;",
+                            "end"
+                        ],
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "搜索目标",
+                                "id": 102700,
+                                "pos": {
+                                    "x": 234.0,
+                                    "y": 821.0
+                                },
+                                "script_onenter": [
+                                    "ai:FindNextEnemy();",
+                                    "local ctx_table = ctx:data_table();",
+                                    "ctx_table.search_enemy_cd_time = now() + ai:GetSearchEnemyTime();",
+                                    "local target_id = ai:GetMainTargetID() ;",
+                                    "if(target_id ~= 0) then",
+                                    "\treturn BT.Status.SUCCESS;",
+                                    "end",
+                                    "return BT.Status.FAILURE;"
+                                ],
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "索敌冷却",
+                        "id": 102500,
+                        "pos": {
+                            "x": 152.0,
+                            "y": 821.0
+                        },
+                        "script_onenter": [
+                            "local ctx_table = ctx:data_table();",
+                            "if ctx_table.search_enemy_cd_time == nil then",
+                            "\treturn BT.Status.SUCCESS",
+                            "end",
+                            "local now_time = now();",
+                            "if ctx_table.search_enemy_cd_time > now_time then",
+                            "\treturn BT.Status.SUCCESS",
+                            "end",
+                            "return BT.Status.FAILURE"
+                        ],
+                        "type": "SequenceNode"
+                    }
+                ],
+                "desc": "战斗",
+                "id": 100200,
+                "pos": {
+                    "x": 70.0,
+                    "y": 150.0
+                },
+                "type": "SelectorNode"
+            },
+            {
+                "child": [
+                    {
+                        "child": [
+                            {
+                                "desc": "移动到下一个巡逻路径点",
+                                "id": 103100,
+                                "pos": {
+                                    "x": 248.0,
+                                    "y": 936.0
+                                },
+                                "script_onenter": [
+                                    "ai:MoveTo(ai:GetCurPratolPos());",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "script_onupdate": [
+                                    "if ai:IsNearTargetPos() then",
+                                    "\tai:NextPratol();",
+                                    "\treturn BT.Status.SUCCESS;",
+                                    "end",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "type": "ActionNode"
+                            },
+                            {
+                                "desc": "等待N秒",
+                                "id": 103200,
+                                "pos": {
+                                    "x": 428.0,
+                                    "y": 936.0
+                                },
+                                "script_onenter": [
+                                    "ai:Wait(ai:GetCurPatrolWaitTime())",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "script_onupdate": [
+                                    "if ai:IsWaitFinish() then",
+                                    "\treturn BT.Status.SUCCESS;",
+                                    "end",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "",
+                        "id": 103000,
+                        "pos": {
+                            "x": 166.0,
+                            "y": 936.0
+                        },
+                        "type": "SequenceNode"
+                    }
+                ],
+                "desc": "有巡逻路径",
+                "id": 102800,
+                "pos": {
+                    "x": 70.0,
+                    "y": 936.0
+                },
+                "script_onenter": [
+                    "if ai:GetPatrolSize() == 0 then",
+                    "\treturn BT.Status.FAILURE;",
+                    "else",
+                    "\treturn BT.Status.SUCCESS;",
+                    "end"
+                ],
+                "type": "SequenceNode"
+            },
+            {
+                "child": [
+                    {
+                        "child": [
+                            {
+                                "desc": "休眠",
+                                "id": 103600,
+                                "pos": {
+                                    "x": 276.0,
+                                    "y": 1051.0
+                                },
+                                "script_onenter": [
+                                    "ai:SetAISleep(true)",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "script_onupdate": [
+                                    "if ai:IsAISleep() == true then",
+                                    "\treturn BT.Status.RUNNING;",
+                                    "end",
+                                    "return BT.Status.SUCCESS;"
+                                ],
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "范围内没有敌人",
+                        "id": 103400,
+                        "pos": {
+                            "x": 152.0,
+                            "y": 1051.0
+                        },
+                        "script_onenter": [
+                            "local actor = ctx:GetActor();",
+                            "if actor:GetCurrentViewPlayerCount() == 0 then",
+                            "\treturn BT.Status.SUCCESS;",
+                            "else",
+                            "   return BT.Status.FAILURE;",
+                            "end"
+                        ],
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "随机移动",
+                                "id": 103900,
+                                "pos": {
+                                    "x": 277.0,
+                                    "y": 1166.0
+                                },
+                                "script_onenter": [
+                                    "ai:RandomWalk();"
+                                ],
+                                "script_onupdate": [
+                                    "if ai:IsNearTargetPos() then",
+                                    "\treturn BT.Status.SUCCESS;",
+                                    "end",
+                                    "ai:MoveToTarget();",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "type": "ActionNode"
+                            },
+                            {
+                                "desc": "等待N秒",
+                                "id": 104000,
+                                "pos": {
+                                    "x": 359.0,
+                                    "y": 1166.0
+                                },
+                                "script_onenter": [
+                                    "local random_wait_time = ai:GetRandomWalkIdleWaitTime()",
+                                    "ai:Wait( random_wait_time )",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "script_onupdate": [
+                                    "if ai:IsWaitFinish() then",
+                                    "\treturn BT.Status.SUCCESS;",
+                                    "end",
+                                    "return BT.Status.RUNNING;"
+                                ],
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "是否随机移动",
+                        "id": 103700,
+                        "pos": {
+                            "x": 152.0,
+                            "y": 1166.0
+                        },
+                        "script_onenter": [
+                            "if ai:GetRandomWalkRange() == 0 then",
+                            "\treturn BT.Status.FAILURE;",
+                            "else",
+                            "\treturn BT.Status.SUCCESS;",
+                            "end"
+                        ],
+                        "type": "SequenceNode"
+                    }
+                ],
+                "desc": "IDLE",
+                "id": 103300,
+                "pos": {
+                    "x": 70.0,
+                    "y": 1051.0
+                },
+                "type": "SequenceNode"
+            }
+        ],
+        "desc": "",
+        "id": 100100,
+        "pos": {
+            "x": -9.0,
+            "y": 150.0
+        },
+        "type": "BTTree"
+    }
+}

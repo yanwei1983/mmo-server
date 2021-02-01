@@ -30,7 +30,7 @@ void SetAOIServicePtr(CAOIService* ptr)
 
 extern "C" __attribute__((visibility("default"))) IService* ServiceCreate(WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx)
 {
-    return CAOIService::CreateNew(ServerPort{idWorld, idServiceType, idServiceIdx});
+    return CreateNewRelease<CAOIService>(ServerPort{idWorld, idServiceType, idServiceIdx});
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -96,16 +96,16 @@ bool CAOIService::Init(const ServerPort& nServerPort)
         BaseCode::SetNdc(oldNdc);
     };
 
-    m_pMapManager.reset(CMapManager::CreateNew(GetZoneID()));
+    m_pMapManager.reset(CreateNew<CMapManager>(GetZoneID()));
     CHECKF(m_pMapManager.get());
 
-    m_pAOISceneManager.reset(CAOISceneManager::CreateNew(GetZoneID()));
+    m_pAOISceneManager.reset(CreateNew<CAOISceneManager>(GetZoneID()));
     CHECKF(m_pAOISceneManager.get());
-    m_pAOIActorManager.reset(CAOIActorManager::CreateNew());
+    m_pAOIActorManager.reset(CreateNew<CAOIActorManager>());
     CHECKF(m_pAOIActorManager.get());
 
 
-    m_pRemoteIMGui.reset(CRemoteIMGuiServer::CreateNew(pAddrInfo->bind_addr, pAddrInfo->debug_port));
+    m_pRemoteIMGui.reset(CreateNew<CRemoteIMGuiServer>(pAddrInfo->bind_addr, pAddrInfo->debug_port));
     CHECKF(m_pRemoteIMGui.get())
 
     RegisterAllMsgProcess<CAOIService>(GetNetMsgProcess());

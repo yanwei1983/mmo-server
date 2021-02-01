@@ -60,7 +60,7 @@ bool CMonster::Init(uint32_t idMonsterType, OBJID idOwner, uint32_t idGen, uint6
 
     ScriptManager()->TryExecScript<void>(SCRIPT_MONSTER, m_pType->GetScriptID(), "OnBorn", this);
 
-    m_pCDSet.reset(CCoolDownSet::CreateNew());
+    m_pCDSet.reset(CreateNew<CCoolDownSet>());
     CHECKF(m_pCDSet.get());
 
     return true;

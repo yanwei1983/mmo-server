@@ -55,7 +55,7 @@ bool CPhase::Init(CScene* pScene, const SceneIdx& idxScene, uint64_t idPhase, co
     CHECKF(pScene);
     m_idPhase = idPhase;
     m_pScene  = pScene;
-    m_pMapValSet.reset(CMapValSet::CreateNew(this));
+    m_pMapValSet.reset(CreateNew<CMapValSet>(this));
     CHECKF(CSceneBase::Init(idxScene, MapManager()));
     if(pPhaseData)
     {
@@ -167,7 +167,7 @@ void CPhase::ClearAllCllback()
 CNpc* CPhase::CreateNpc(uint32_t idNpcType, const CPos2D& pos, float face)
 {
     __ENTER_FUNCTION
-    CNpc* pNpc = CNpc::CreateNew(idNpcType);
+    CNpc* pNpc = CreateNew<CNpc>(idNpcType);
     if(pNpc)
     {
         EnterMap(pNpc, pos.x, pos.y, face);
@@ -182,7 +182,7 @@ CNpc* CPhase::CreateNpc(uint32_t idNpcType, const CPos2D& pos, float face)
 CMonster* CPhase::CreateMonster(const CreateMonsterParam& param)
 {
     __ENTER_FUNCTION
-    CMonster* pMonster = CMonster::CreateNew(param.idMonsterType, param.idOwner, param.idGen, param.idPhase, param.idCamp);
+    CMonster* pMonster = CreateNew<CMonster>(param.idMonsterType, param.idOwner, param.idGen, param.idPhase, param.idCamp);
     if(pMonster)
     {
         // notify ai

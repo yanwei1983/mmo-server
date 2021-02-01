@@ -22,7 +22,7 @@ struct MonsterGenData
 
 class CAIPhase;
 class CGameMap;
-class CMonsterGenerator : public NoncopyableT<CMonsterGenerator>
+export_lua class CMonsterGenerator : public NoncopyableT<CMonsterGenerator>
 {
     CMonsterGenerator();
 
@@ -33,15 +33,15 @@ public:
     ~CMonsterGenerator();
 
 public:
-    void            Generator();
-    void            ActiveAll(bool bActive);
-    void            ActiveGen(uint32_t idGen, bool bActive);
-    void            KillAllGen();
-    void            KillGen(uint32_t idGen);
-    void            GenOnce(uint32_t idGen, uint64_t idPhase = 0);
-    MonsterGenData* QueryGen(uint32_t idGen);
-    void            OnMonsterBorn(CAIMonster* pMonster);
-    void            OnMonsterDead(CAIMonster* pMonster);
+    export_lua void ActiveAll(bool bActive);
+    export_lua void ActiveGen(uint32_t idGen, bool bActive);
+    export_lua void KillAllGen();
+    export_lua void KillGen(uint32_t idGen);
+    export_lua void GenOnce(uint32_t idGen, uint64_t idPhase = 0);
+
+    export_lua MonsterGenData* QueryGen(uint32_t idGen);
+    void                       OnMonsterBorn(CAIMonster* pMonster);
+    void                       OnMonsterDead(CAIMonster* pMonster);
 
 private:
     void OnGenTimer(MonsterGenData* pData);

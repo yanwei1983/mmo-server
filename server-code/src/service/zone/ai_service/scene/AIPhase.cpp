@@ -28,8 +28,8 @@ bool CAIPhase::Init(CAIScene* pScene, const SceneIdx& idxScene, uint64_t idPhase
     m_idPhase = idPhase;
     CHECKF(CSceneBase::Init(idxScene, MapManager()));
 
-    m_MonsterGen.reset(CMonsterGenerator::CreateNew(this));
-    m_pAIGroupManager.reset(CAIGroupManager::CreateNew(this));
+    m_MonsterGen.reset(CreateNew<CMonsterGenerator>(this));
+    m_pAIGroupManager.reset(CreateNew<CAIGroupManager>(this));
     if(pPhaseData)
     {
         uint16_t idPhaseLink = pPhaseData->link_phase();

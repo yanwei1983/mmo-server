@@ -43,7 +43,7 @@ void SetWorldServicePtr(CWorldService* ptr)
 
 extern "C" __attribute__((visibility("default"))) IService* ServiceCreate(WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx)
 {
-    return CWorldService::CreateNew(ServerPort{idWorld, idServiceType, idServiceIdx});
+    return CreateNewRelease<CWorldService>(ServerPort{idWorld, idServiceType, idServiceIdx});
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -101,11 +101,11 @@ bool CWorldService::Init(const ServerPort& nServerPort)
     };
 
     m_UIDFactory.Init(GetServerPort().GetWorldID(), WORLD_SERVICE_UID);
-    m_pAccountManager.reset(CAccountManager::CreateNew(this));
+    m_pAccountManager.reset(CreateNew<CAccountManager>(this));
     CHECKF(m_pAccountManager.get());
-    m_pUserManager.reset(CUserManager::CreateNew());
+    m_pUserManager.reset(CreateNew<CUserManager>());
     CHECKF(m_pUserManager.get());
-    m_pTeamManager.reset(CTeamManager::CreateNew());
+    m_pTeamManager.reset(CreateNew<CTeamManager>());
     CHECKF(m_pTeamManager.get());
 
     RegisterAllMsgProcess<CWorldService>(GetNetMsgProcess());
@@ -132,13 +132,13 @@ bool CWorldService::Init(const ServerPort& nServerPort)
     DEFINE_CONFIG_LOAD(CUserAttrSet);
     DEFINE_CONFIG_LOAD(CBornPosSet);
 
-    m_pMapManager.reset(CMapManager::CreateNew(0));
+    m_pMapManager.reset(CreateNew<CMapManager>(0));
     CHECKF(m_pMapManager.get());
 
-    m_pGMManager.reset(CGMManager::CreateNew(pGlobalDB.get()));
+    m_pGMManager.reset(CreateNew<CGMManager>(pGlobalDB.get()));
     CHECKF(m_pGMManager.get());
 
-    m_pSystemVarSet.reset(CSystemVarSet::CreateNew());
+    m_pSystemVarSet.reset(CreateNew<CSystemVarSet>());
     CHECKF(m_pSystemVarSet.get());
 
     //设置等待哪些服ready

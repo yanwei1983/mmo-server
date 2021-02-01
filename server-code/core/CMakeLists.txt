@@ -1,13 +1,5 @@
 #SET(CMAKE_BUILD_TYPE Debug)
 
-IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-message(STATUS "CMAKE_CXX_FLAGS:" ${CMAKE_CXX_FLAGS_DEBUG})
-MESSAGE(STATUS "cmake_type: (debug)")
-ELSE()
-message(STATUS "CMAKE_CXX_FLAGS:" ${CMAKE_CXX_FLAGS_RELEASE})
-MESSAGE(STATUS "cmake_type: (release)")
-ENDIF()
-
 ADD_SUBDIRECTORY(comm)
  
 IF (NOT WIN32)
@@ -20,6 +12,7 @@ ADD_SUBDIRECTORY(test EXCLUDE_FROM_ALL)
 
 ELSE()
 ADD_SUBDIRECTORY(tools/remote_imgui_client)
+ADD_SUBDIRECTORY(tools/bttree_editor)
 
 endif()
 

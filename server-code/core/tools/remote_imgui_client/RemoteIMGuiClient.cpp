@@ -105,7 +105,7 @@ bool          CRemoteIMGuiClient::Init(const std::string& addr, int32_t port)
 
     m_IMGuiFrameGutter = std::make_unique<IMGuiFrameGutter>();
     //m_IMGuiFrameGutter->loadFromFile("e:/frame_dump.bin");
-    m_pNetworkService.reset(CNetworkService::CreateNew());
+    m_pNetworkService.reset(CreateNew<CNetworkService>());
     CHECKF(m_pNetworkService.get());
     m_pNetworkService->AsyncConnectTo(addr, port, m_pEventHandler, true);
 

@@ -137,19 +137,18 @@ private:
 };
 
 //! base macro.
-#define ZLOG_STREAM(id, level, file, line, log)                                         \
-    do                                                                                  \
-    {                                                                                   \
-        if(CLogManager::getPtr()->prePushLog(id, level))                                \
-        {                                                                               \
-            auto __pLog = CLogManager::getPtr()->makeLogData(id, level, 0, file, line); \
-            if(__pLog)                                                                  \
-            {                                                                           \
-                __pLog->content = log;                                                  \
-                CLogManager::getPtr()->pushLog(__pLog);                                 \
-            }                                                                           \
-        }                                                                               \
-    } while(0)
+template<class ... Args>
+inline void ZLOG_STREAM(uint32_t id, uint32_t level, const char* file, uint32_t line, const std::string& log)                                                                                                               
+{
+    if(CLogManager::getPtr()->prePushLog(id, level) == false)
+        return;
+
+    auto __pLog = CLogManager::getPtr()->makeLogData(id, level, 0, file, line);
+    if(__pLog == nullptr)
+        return;
+    __pLog->content = log;
+    CLogManager::getPtr()->pushLog(__pLog);
+} 
 
 //! fast macro
 #define ZLOG_TRACE(id, log) ZLOG_STREAM(id, LOG_LEVEL_TRACE, __FILE_NAME__, __LINE__, log)
@@ -170,50 +169,68 @@ private:
 #define ZLOGF(log) ZLOG_FATAL(LOG_MAIN_LOGGER_ID, log)
 
 //! format input log.
+template<class ... Args>
+inline void ZLOG_FORMAT(uint32_t id,uint32_t level,const char* file,uint32_t line, const std::string& logformat, Args&& ... args)
+{
+    if(CLogManager::getPtr()->prePushLog(id, level) == false)
+        return;
 
-#define ZLOG_FORMAT(id, level, file, line, logformat, ...)                              \
-    do                                                                                  \
-    {                                                                                   \
-        if(CLogManager::getPtr()->prePushLog(id, level))                                \
-        {                                                                               \
-            auto __pLog = CLogManager::getPtr()->makeLogData(id, level, 0, file, line); \
-            if(__pLog)                                                                  \
-            {                                                                           \
-                try                                                                     \
-                {                                                                       \
-                    __pLog->content = fmt::format(logformat, ##__VA_ARGS__);            \
-                    CLogManager::getPtr()->pushLog(__pLog);                             \
-                }                                                                       \
-                catch(fmt::format_error & e)                                            \
-                {                                                                       \
-                    __pLog->content = fmt::format("format_error:%s", e.what());         \
-                    CLogManager::getPtr()->pushLog(__pLog);                             \
-                }                                                                       \
-            }                                                                           \
-        }                                                                               \
-    } while(0)
+    auto __pLog = CLogManager::getPtr()->makeLogData(id, level, 0, file, line);
+    if(__pLog == nullptr)
+        return;
 
-#define ZLOG_FORMAT_DETAIL(expr, id, level, detail_id, file, line, logformat, ...)              \
-    do                                                                                          \
-    {                                                                                           \
-        if(expr && CLogManager::getPtr()->prePushLog(id, level))                                \
-        {                                                                                       \
-            auto __pLog = CLogManager::getPtr()->makeLogData(id, level, detail_id, file, line); \
-            if(__pLog)                                                                          \
-            {                                                                                   \
-                try                                                                             \
-                {                                                                               \
-                    __pLog->content = fmt::format(logformat, ##__VA_ARGS__);                    \
-                    CLogManager::getPtr()->pushLog(__pLog);                                     \
-                }                                                                               \
-                catch(fmt::format_error & e)                                                    \
-                {                                                                               \
-                    __pLog->content = fmt::format("format_error:%s", e.what());                 \
-                    CLogManager::getPtr()->pushLog(__pLog);                                     \
-                }                                                                               \
-            }                                                                                   \
-        }                                                                                       \
-    } while(0)
+    if constexpr(sizeof...(args) == 0)
+    {
+        __pLog->content = logformat;
+        CLogManager::getPtr()->pushLog(__pLog);
+    }
+    else
+    {
+        try
+        {
+            __pLog->content = fmt::format(logformat, std::forward<Args>(args)...);
+            CLogManager::getPtr()->pushLog(__pLog);
+        }
+        catch(fmt::format_error& e)
+        {
+            __pLog->content = fmt::format("format_error:{} fmt:{}", e.what(), logformat);
+            CLogManager::getPtr()->pushLog(__pLog);
+        }
+    }
+}
+
+template<class ... Args>
+inline void ZLOG_FORMAT_DETAIL(bool expr, uint32_t id, uint32_t level, uint64_t detail_id, const char* file,uint32_t line, const std::string& logformat, Args&& ... args)
+{
+    if(expr == false)
+        return;
+    if(CLogManager::getPtr()->prePushLog(id, level) == false)
+        return;
+
+    auto __pLog = CLogManager::getPtr()->makeLogData(id, level, detail_id, file, line);
+    if(__pLog == nullptr)
+        return;
+
+    if constexpr(sizeof...(args) == 0)
+    {
+        __pLog->content = logformat;
+        CLogManager::getPtr()->pushLog(__pLog);
+    }
+    else
+    {
+        try
+        {
+            __pLog->content = fmt::format(logformat, std::forward<Args>(args)...);
+            CLogManager::getPtr()->pushLog(__pLog);
+        }
+        catch(fmt::format_error& e)
+        {
+            __pLog->content = fmt::format("format_error:{} fmt:{}", e.what(), logformat);
+            CLogManager::getPtr()->pushLog(__pLog);
+        }
+    }
+}
+
 
 //! format string
 #define ZLOGFMT_TRACE(id, fmt, ...) ZLOG_FORMAT(id, LOG_LEVEL_TRACE, __FILE_NAME__, __LINE__, fmt, ##__VA_ARGS__)

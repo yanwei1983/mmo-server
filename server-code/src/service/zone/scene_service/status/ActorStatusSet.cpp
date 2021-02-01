@@ -35,7 +35,7 @@ bool CActorStatusSet::Init(CActor* pActor)
         for(size_t i = 0; i < pResult->get_num_row(); i++)
         {
             auto          row     = pResult->fetch_row(true);
-            CActorStatus* pStatus = CActorStatus::CreateNew(m_pOwner, std::move(row));
+            CActorStatus* pStatus = CreateNew<CActorStatus>(m_pOwner, std::move(row));
             if(pStatus)
             {
                 _AddStatus(pStatus);
@@ -171,7 +171,7 @@ bool CActorStatusSet::AttachStatus(const AttachStatusInfo& info)
     else
     {
         //创建一个新的
-        pStatus = CActorStatus::CreateNew(m_pOwner, info);
+        pStatus = CreateNew<CActorStatus>(m_pOwner, info);
         _AddStatus(pStatus);
     }
 

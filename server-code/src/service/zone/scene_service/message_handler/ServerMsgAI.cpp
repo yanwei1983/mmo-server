@@ -100,6 +100,7 @@ ON_SERVERMSG(CSceneService, ActorCastSkill)
     {
         ServerMSG::ActorCastSkill_Fail send_msg;
         send_msg.set_actor_id(msg.actor_id());
+        send_msg.set_skill_id(msg.skill_id());
         SceneService()->SendProtoMsgToAIService(send_msg);
     }
 

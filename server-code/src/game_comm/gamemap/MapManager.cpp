@@ -64,13 +64,13 @@ bool CMapManager::Init(uint16_t idZone)
                 }
                 else
                 {
-                    pMapData = CMapData::CreateNew(iter.idmapdata());
+                    pMapData = CreateNew<CMapData>(iter.idmapdata());
                     CHECKF(pMapData);
                     m_vecMapData[pMapData->GetMapTemplateID()].reset(pMapData);
                 }
             }
 
-            CGameMap* pGameMap = CGameMap::CreateNew(this, iter, pMapData);
+            CGameMap* pGameMap = CreateNew<CGameMap>(this, iter, pMapData);
             if(pGameMap == nullptr)
             {
                 return false;

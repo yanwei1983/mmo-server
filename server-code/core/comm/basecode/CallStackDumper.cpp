@@ -23,7 +23,7 @@ std::string GetStackTraceString(int skip, int depth)
     Printer printer;
     printer.address = true;
     printer.reverse = false;
-
+    printer.snippet = true;
 
     std::stringstream os;
     printer.print(st, os);

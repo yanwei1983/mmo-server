@@ -39,7 +39,7 @@ bool CPlayerTask::Init(CPlayer* pPlayer)
         for(size_t i = 0; i < pResult->get_num_row(); i++)
         {
             auto             row       = pResult->fetch_row(true);
-            CPlayerTaskData* pTaskData = CPlayerTaskData::CreateNew(std::move(row));
+            CPlayerTaskData* pTaskData = CreateNew<CPlayerTaskData>(std::move(row));
             if(pTaskData == nullptr)
             {
                 LOGERROR("load player {} task:{} fail", m_pOwner->GetID(), i);
@@ -171,7 +171,7 @@ bool CPlayerTask::AcceptTask(uint32_t idTask, bool bChkCondition /*= true*/, boo
         }
 
         // 创建新任务记录
-        pData = CPlayerTaskData::CreateNew(m_pOwner, idTask);
+        pData = CreateNew<CPlayerTaskData>(m_pOwner, idTask);
         CHECKF(pData);
         m_setTask[idTask] = pData;
     }

@@ -80,6 +80,8 @@ namespace BaseCode
     ZLOG_FORMAT_DETAIL(expr, BaseCode::s_skilldetail_logger, LOG_LEVEL_DEBUG, actor_id, __FILE_NAME__, __LINE__, fmtr, ##__VA_ARGS__)
 #define LOGAIDEBUG(expr, actor_id, fmtr, ...) \
     ZLOG_FORMAT_DETAIL(expr, BaseCode::s_aidetail_logger, LOG_LEVEL_DEBUG, actor_id, __FILE_NAME__, __LINE__, fmtr, ##__VA_ARGS__)
+#define LOGAITRACE(expr, actor_id, fmtr, ...) \
+    ZLOG_FORMAT_DETAIL(expr, BaseCode::s_aidetail_logger, LOG_LEVEL_TRACE, actor_id, __FILE_NAME__, __LINE__, fmtr, ##__VA_ARGS__)
 
 #define LOGNETDEBUG(...) ZLOGFMT_DEBUG(BaseCode::s_network_logger, ##__VA_ARGS__)
 #define LOGNETINFO(...)  ZLOGFMT_INFO(BaseCode::s_network_logger, ##__VA_ARGS__)

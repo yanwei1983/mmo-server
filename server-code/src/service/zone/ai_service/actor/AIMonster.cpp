@@ -69,7 +69,7 @@ void CAIMonster::OnBorn()
     static_cast<CAIPhase*>(GetCurrentScene())->GetMonsterGen().OnMonsterBorn(this);
     if(m_pAIType)
     {
-        m_pAI = CActorAI::CreateNew(this, m_pAIType);
+        m_pAI = CreateNew<CActorAI>(this, m_pAIType);
     }
 }
 
@@ -95,10 +95,10 @@ bool CAIMonster::IsEnemy(CSceneObject* pTarget) const
     return false;
 }
 
-void CAIMonster::OnCastSkillFinish(uint32_t stun_ms)
+void CAIMonster::OnCastSkillFinish(uint32_t skill_id, uint32_t stun_ms)
 {
     if(m_pAI)
     {
-        m_pAI->ToSkillFinish(stun_ms);
+        m_pAI->OnCastSkillFinish(skill_id, stun_ms);
     }
 }

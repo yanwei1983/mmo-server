@@ -19,7 +19,7 @@ CMarketService*                     MarketService()
 
 extern "C" __attribute__((visibility("default"))) IService* ServiceCreate(WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx)
 {
-    return CMarketService::CreateNew(ServerPort{idWorld, idServiceType, idServiceIdx});
+    return CreateNewRelease<CMarketService>(ServerPort{idWorld, idServiceType, idServiceIdx});
 }
 
 //////////////////////////////////////////////////////////////////////////

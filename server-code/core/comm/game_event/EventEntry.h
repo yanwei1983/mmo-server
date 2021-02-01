@@ -54,6 +54,7 @@ public:
     bool     IsWaitTrigger() const;
     bool     IsVaild() const;
 
+    void     SetWait(bool bWait){m_bWaitPush = bWait;}
 private:
     bool CreateEvTimer(event_base* base);
 
@@ -68,6 +69,7 @@ private:
     event*            m_pevTimer = nullptr;
     uint32_t          m_evType;
     uint32_t          m_evManagerType;
+    bool              m_bWaitPush;
     friend class CEventManager;
 };
 using CEventEntrySharedPtr = std::shared_ptr<CEventEntry>;

@@ -21,7 +21,7 @@ public:
 
     const CSkillType* GetSkillType() const;
     uint32_t          GetSkillTypeID() const;
-
+    
 private:
     uint32_t          m_idSkill    = 0;
     const CSkillType* m_pSkillType = nullptr;
@@ -29,7 +29,7 @@ private:
 };
 
 class CAIMonster;
-class CAISkillSet
+export_lua class CAISkillSet
 {
 public:
     CAISkillSet();
@@ -37,9 +37,9 @@ public:
 
     void AddSkill(uint32_t idSkill);
 
-    bool CastSkill(CAISkillData* pSkill);
+    export_lua bool CastSkill(CAISkillData* pSkill);
 
-    CAISkillData* ChooseSkill(const SkillFAM* pSkillFAM, double dist, double self_hp, double self_mp, double target_hp) const;
+    export_lua CAISkillData* ChooseSkill(const SkillFAM* pSkillFAM, double dist, double self_hp, double self_mp, double target_hp) const;
     void          OnCastSkill(uint32_t idSkill);
 
 private:

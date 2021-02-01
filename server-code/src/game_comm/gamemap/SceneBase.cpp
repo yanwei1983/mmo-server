@@ -32,7 +32,7 @@ bool CSceneBase::InitSceneTree(const CPos2D& vBasePos, float fWidth, float fHeig
     {
         return false;
     }
-    CSceneTree* pSceneTree = CSceneTree::CreateNew(m_pMap, vBasePos, fWidth, fHeight, nTileGridRange, bDynamicSetLev);
+    CSceneTree* pSceneTree = CreateNew<CSceneTree>(m_pMap, vBasePos, fWidth, fHeight, nTileGridRange, bDynamicSetLev);
     CHECKF(pSceneTree);
     m_pSceneTree.reset(pSceneTree);
 

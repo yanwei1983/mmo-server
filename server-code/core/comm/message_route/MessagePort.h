@@ -34,17 +34,16 @@ public:
     virtual void OnPortRecvTimeout(const CNetSocketSharedPtr&) {}
 };
 
-class CMessagePort : public CNetEventHandler, public NoncopyableT<CMessagePort>, public CreateNewT<CMessagePort>
+class CMessagePort : public CNetEventHandler, public NoncopyableT<CMessagePort>
 {
-    friend class CreateNewT<CMessagePort>;
     CMessagePort();
-
+    bool Init(const ServerPort& nServerPort, CMessageRoute* pRoute);
 public:
     virtual ~CMessagePort();
     void Destroy();
-
+    CreateNewImpl(CMessagePort);
 public:
-    bool Init(const ServerPort& nServerPort, CMessageRoute* pRoute);
+    
 
 public:
     virtual size_t GetSendPacketSizeMax() const override { return _MAX_MSGSIZE * 1024; }//4M_1Packet

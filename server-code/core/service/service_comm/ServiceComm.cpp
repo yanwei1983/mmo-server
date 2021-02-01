@@ -53,9 +53,9 @@ bool CServiceCommon::Init(const ServerPort& nServerPort, bool bEventManagerPause
     m_nServerPort    = nServerPort;
     m_ServiceName    = ::GetServiceName(nServerPort.GetServiceID());
     m_pNetMsgProcess = std::make_unique<CNetMSGProcess>();
-    m_pEventManager.reset(CEventManager::CreateNew(nullptr, bEventManagerPause));
+    m_pEventManager.reset(CreateNew<CEventManager>(nullptr, bEventManagerPause));
     CHECKF(m_pEventManager.get());
-    m_pMonitorMgr.reset(CMonitorMgr::CreateNew());
+    m_pMonitorMgr.reset(CreateNew<CMonitorMgr>());
     CHECKF(m_pMonitorMgr.get());
     return true;
     __LEAVE_FUNCTION

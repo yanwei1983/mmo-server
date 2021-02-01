@@ -23,6 +23,7 @@
 #include "ScriptCallBackType.h"
 #include "ScriptManager.h"
 #include "server_msg/server_side.pb.h"
+#include "BehaviorTree.h"
 
 static thread_local CAIService* tls_pService;
 CAIService*                     AIService()
@@ -36,7 +37,7 @@ void SetAIServicePtr(CAIService* ptr)
 
 extern "C" __attribute__((visibility("default"))) IService* ServiceCreate(WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx)
 {
-    return CAIService::CreateNew(ServerPort{idWorld, idServiceType, idServiceIdx});
+    return CreateNewRelease<CAIService>(ServerPort{idWorld, idServiceType, idServiceIdx});
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -95,25 +96,39 @@ bool CAIService::Init(const ServerPort& nServerPort)
         BaseCode::SetNdc(oldNdc);
     };
     extern void export_to_lua(lua_State*, void*);
-    m_pScriptManager.reset(CLUAScriptManager::CreateNew(std::string("AIScript") + std::to_string(GetServerPort().GetServiceID()),
+    m_pScriptManager.reset(CreateNew<CLUAScriptManager>(std::string("AIScript") + std::to_string(GetServerPort().GetServiceID()),
                                                         &export_to_lua,
                                                         (void*)this,
                                                         "res/script/ai_service",
                                                         "main.lua",
                                                         true));
 
-    m_pMapManager.reset(CMapManager::CreateNew(GetZoneID()));
+    m_pMapManager.reset(CreateNew<CMapManager>(GetZoneID()));
     CHECKF(m_pMapManager.get());
-
+    
     DEFINE_CONFIG_LOAD(CTargetFAMSet);
     DEFINE_CONFIG_LOAD(CSkillFAMSet);
     DEFINE_CONFIG_LOAD(CSkillTypeSet);
     DEFINE_CONFIG_LOAD(CAITypeSet);
     DEFINE_CONFIG_LOAD(CMonsterTypeSet);
 
-    m_pAISceneManager.reset(CAISceneManager::CreateNew(GetZoneID()));
+    std::unordered_set<std::string> all_bt_file;
+    AITypeSet()->foreach([&all_bt_file](const auto& k, const auto& ptr)
+    {
+        if(ptr->GetDataRef().bt_file().empty() == false)
+        {
+            all_bt_file.emplace(ptr->GetDataRef().bt_file());
+        }
+    });
+
+    m_pBTManager.reset(CreateNew<BT::BTManager>("res/bttree", ScriptManager()->GetRawPtr(), all_bt_file) );
+    CHECKF(m_pBTManager.get());
+
+        
+
+    m_pAISceneManager.reset(CreateNew<CAISceneManager>(GetZoneID()));
     CHECKF(m_pAISceneManager.get());
-    m_pAIActorManager.reset(CAIActorManager::CreateNew());
+    m_pAIActorManager.reset(CreateNew<CAIActorManager>());
     CHECKF(m_pAIActorManager.get());
 
     RegisterAllMsgProcess<CAIService>(GetNetMsgProcess());

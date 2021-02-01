@@ -24,7 +24,7 @@ CMessageRoute*        GetMessageRoute()
 void CreateMessageRoute()
 {
     if(g_pMessageRoute == nullptr)
-        g_pMessageRoute = CMessageRoute::CreateNew();
+        g_pMessageRoute = CreateNew<CMessageRoute>();
 }
 
 void ReleaseMessageRoute()
@@ -37,7 +37,7 @@ void ReleaseMessageRoute()
 }
 
 CMessageRoute::CMessageRoute()
-    : m_pNetworkService(CNetworkService::CreateNew())
+    : m_pNetworkService(CreateNew<CNetworkService>())
 {
     m_pNetworkService->StartIOThread("MessageRoute");
     LOGDEBUG("MessageRoute Create.");
@@ -536,7 +536,7 @@ CMessagePortSharedPtr CMessageRoute::_ConnectRemoteServer(const ServerPort& nSer
     CMessagePortSharedPtr& pMessagePort = m_setMessagePort[nServerPort];
     if(pMessagePort == nullptr)
     {
-        pMessagePort.reset(CMessagePort::CreateNew(nServerPort, this));
+        pMessagePort.reset(CreateNew<CMessagePort>(nServerPort, this));
     }
     else
     {
@@ -661,7 +661,7 @@ CMessagePortSharedPtr CMessageRoute::_ListenMessagePort(const ServerPort& nServe
         return pMessagePort;
     }
 
-    pMessagePort.reset(CMessagePort::CreateNew(nServerPort, this));
+    pMessagePort.reset(CreateNew<CMessagePort>(nServerPort, this));
     pMessagePort->SetLocalPort(true);
     if(m_pNetworkService->Listen(info.bind_addr.c_str(), info.route_port, pMessagePort) == nullptr)
     {

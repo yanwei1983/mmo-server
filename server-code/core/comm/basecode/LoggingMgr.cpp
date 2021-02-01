@@ -94,7 +94,7 @@ int32_t getLogDefaultLev(const char* logger_name)
 {
     __ENTER_FUNCTION
     auto pSetting = GetGlobalSetting();
-    CHECKF(pSetting);
+    CHECK_RET(pSetting, LOG_LEVEL_FATAL);
     const auto& json        = pSetting->GetData();
     const auto& log_setting = json["debug"]["log_default_lev"];
 

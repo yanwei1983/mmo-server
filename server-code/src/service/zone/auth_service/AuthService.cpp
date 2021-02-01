@@ -26,7 +26,7 @@ void SetAuthServicePtr(CAuthService* ptr)
 
 extern "C" __attribute__((visibility("default"))) IService* ServiceCreate(WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx)
 {
-    return CAuthService::CreateNew(ServerPort{idWorld, idServiceType, idServiceIdx});
+    return CreateNewRelease<CAuthService>(ServerPort{idWorld, idServiceType, idServiceIdx});
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -68,10 +68,10 @@ bool CAuthService::Init(const ServerPort& nServerPort)
     auto pGlobalDB = ConnectGlobalDB(GetMessageRoute()->GetServerInfoDB());
     CHECKF(pGlobalDB.get());
 
-    m_pAuthManager.reset(CAuthManager::CreateNew(this));
+    m_pAuthManager.reset(CreateNew<CAuthManager>(this));
     CHECKF(m_pAuthManager.get());
 
-    m_pGMManager.reset(CGMManager::CreateNew(pGlobalDB.get()));
+    m_pGMManager.reset(CreateNew<CGMManager>(pGlobalDB.get()));
     CHECKF(m_pGMManager.get());
 
     //注册消息

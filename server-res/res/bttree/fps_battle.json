@@ -1,0 +1,631 @@
+{
+    "m_rootnode_id": 100100,
+    "root_node": {
+        "child": [
+            {
+                "child": [
+                    {
+                        "desc": "1米内有机车",
+                        "id": 100300,
+                        "pos": {
+                            "x": 100.0,
+                            "y": 169.0
+                        },
+                        "type": "ConditionNode"
+                    },
+                    {
+                        "desc": "上车",
+                        "id": 100400,
+                        "pos": {
+                            "x": 204.0,
+                            "y": 169.0
+                        },
+                        "type": "ActionNode"
+                    }
+                ],
+                "desc": "尝试驾驶",
+                "id": 100200,
+                "pos": {
+                    "x": 18.0,
+                    "y": 169.0
+                },
+                "type": "SequenceNode"
+            },
+            {
+                "child": [
+                    {
+                        "child": [
+                            {
+                                "desc": "己方人数<3",
+                                "id": 100700,
+                                "pos": {
+                                    "x": 168.0,
+                                    "y": 282.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "desc": "敌方人数>30",
+                                "id": 100800,
+                                "pos": {
+                                    "x": 266.0,
+                                    "y": 282.0
+                                },
+                                "type": "ConditionNode"
+                            }
+                        ],
+                        "desc": "任意",
+                        "id": 100600,
+                        "pos": {
+                            "x": 100.0,
+                            "y": 282.0
+                        },
+                        "type": "SelectorNode"
+                    },
+                    {
+                        "desc": "撤退",
+                        "id": 100900,
+                        "pos": {
+                            "x": 100.0,
+                            "y": 395.0
+                        },
+                        "type": "ActionNode"
+                    }
+                ],
+                "desc": "尝试撤退",
+                "id": 100500,
+                "pos": {
+                    "x": 18.0,
+                    "y": 282.0
+                },
+                "type": "SequenceNode"
+            },
+            {
+                "child": [
+                    {
+                        "child": [
+                            {
+                                "desc": "前方15米内敌方人数大于4",
+                                "id": 101200,
+                                "pos": {
+                                    "x": 168.0,
+                                    "y": 491.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "desc": "扔手雷",
+                                "id": 101300,
+                                "pos": {
+                                    "x": 357.0,
+                                    "y": 491.0
+                                },
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "手雷",
+                        "id": 101100,
+                        "pos": {
+                            "x": 100.0,
+                            "y": 491.0
+                        },
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "前方5米己方人数大于2",
+                                "id": 101500,
+                                "pos": {
+                                    "x": 168.0,
+                                    "y": 604.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "desc": "火力掩护",
+                                "id": 101600,
+                                "pos": {
+                                    "x": 335.0,
+                                    "y": 604.0
+                                },
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "掩护",
+                        "id": 101400,
+                        "pos": {
+                            "x": 100.0,
+                            "y": 604.0
+                        },
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "2米内有重要物资",
+                                "id": 101800,
+                                "pos": {
+                                    "x": 168.0,
+                                    "y": 717.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "desc": "守卫据点",
+                                "id": 101900,
+                                "pos": {
+                                    "x": 300.0,
+                                    "y": 717.0
+                                },
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "守卫",
+                        "id": 101700,
+                        "pos": {
+                            "x": 100.0,
+                            "y": 717.0
+                        },
+                        "type": "SequenceNode"
+                    }
+                ],
+                "desc": "尝试反击",
+                "id": 101000,
+                "pos": {
+                    "x": 18.0,
+                    "y": 491.0
+                },
+                "type": "SelectorNode"
+            },
+            {
+                "child": [
+                    {
+                        "desc": "队长死亡",
+                        "id": 102100,
+                        "pos": {
+                            "x": 100.0,
+                            "y": 830.0
+                        },
+                        "type": "ConditionNode"
+                    },
+                    {
+                        "desc": "撤退",
+                        "id": 102200,
+                        "pos": {
+                            "x": 182.0,
+                            "y": 830.0
+                        },
+                        "type": "ActionNode"
+                    }
+                ],
+                "desc": "队长死亡",
+                "id": 102000,
+                "pos": {
+                    "x": 18.0,
+                    "y": 830.0
+                },
+                "type": "SequenceNode"
+            },
+            {
+                "child": [
+                    {
+                        "child": [
+                            {
+                                "desc": "前方15米内敌人数量大于4",
+                                "id": 102500,
+                                "pos": {
+                                    "x": 154.0,
+                                    "y": 943.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "desc": "扔手雷",
+                                "id": 102600,
+                                "pos": {
+                                    "x": 343.0,
+                                    "y": 943.0
+                                },
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "手雷",
+                        "id": 102400,
+                        "pos": {
+                            "x": 86.0,
+                            "y": 943.0
+                        },
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "弹夹子弹数量大于10",
+                                "id": 102800,
+                                "pos": {
+                                    "x": 168.0,
+                                    "y": 1056.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "desc": "取出弹夹",
+                                "id": 102900,
+                                "pos": {
+                                    "x": 321.0,
+                                    "y": 1056.0
+                                },
+                                "type": "ActionNode"
+                            },
+                            {
+                                "desc": "重装弹夹",
+                                "id": 103000,
+                                "pos": {
+                                    "x": 403.0,
+                                    "y": 1056.0
+                                },
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "重装弹药",
+                        "id": 102700,
+                        "pos": {
+                            "x": 86.0,
+                            "y": 1056.0
+                        },
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "1米内有敌人且人数小于2",
+                                "id": 103200,
+                                "pos": {
+                                    "x": 168.0,
+                                    "y": 1169.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "desc": "近身格斗",
+                                "id": 103300,
+                                "pos": {
+                                    "x": 349.0,
+                                    "y": 1169.0
+                                },
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "近身格斗",
+                        "id": 103100,
+                        "pos": {
+                            "x": 86.0,
+                            "y": 1169.0
+                        },
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "前方10米外敌人数量大于1",
+                                "id": 103500,
+                                "pos": {
+                                    "x": 154.0,
+                                    "y": 1282.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "child": [
+                                    {
+                                        "desc": "开火",
+                                        "id": 103700,
+                                        "pos": {
+                                            "x": 419.0,
+                                            "y": 1282.0
+                                        },
+                                        "type": "ActionNode"
+                                    }
+                                ],
+                                "desc": "重复3次",
+                                "id": 103600,
+                                "pos": {
+                                    "x": 343.0,
+                                    "y": 1282.0
+                                },
+                                "type": "DecoratorNode"
+                            }
+                        ],
+                        "desc": "开枪",
+                        "id": 103400,
+                        "pos": {
+                            "x": 86.0,
+                            "y": 1282.0
+                        },
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "child": [
+                                    {
+                                        "child": [
+                                            {
+                                                "desc": "前方15米敌人数量小于10",
+                                                "id": 104100,
+                                                "pos": {
+                                                    "x": 290.0,
+                                                    "y": 1395.0
+                                                },
+                                                "type": "ConditionNode"
+                                            },
+                                            {
+                                                "desc": "火力压制",
+                                                "id": 104200,
+                                                "pos": {
+                                                    "x": 472.0,
+                                                    "y": 1395.0
+                                                },
+                                                "type": "ActionNode"
+                                            }
+                                        ],
+                                        "desc": "压制",
+                                        "id": 104000,
+                                        "pos": {
+                                            "x": 222.0,
+                                            "y": 1395.0
+                                        },
+                                        "type": "SequenceNode"
+                                    },
+                                    {
+                                        "child": [
+                                            {
+                                                "desc": "前方15米内敌人数量大于4",
+                                                "id": 104400,
+                                                "pos": {
+                                                    "x": 290.0,
+                                                    "y": 1508.0
+                                                },
+                                                "type": "ConditionNode"
+                                            },
+                                            {
+                                                "desc": "扔手雷",
+                                                "id": 104500,
+                                                "pos": {
+                                                    "x": 479.0,
+                                                    "y": 1508.0
+                                                },
+                                                "type": "ActionNode"
+                                            }
+                                        ],
+                                        "desc": "手雷",
+                                        "id": 104300,
+                                        "pos": {
+                                            "x": 222.0,
+                                            "y": 1508.0
+                                        },
+                                        "type": "SequenceNode"
+                                    }
+                                ],
+                                "desc": "前哨",
+                                "id": 103900,
+                                "pos": {
+                                    "x": 154.0,
+                                    "y": 1395.0
+                                },
+                                "type": "SelectorNode"
+                            },
+                            {
+                                "child": [
+                                    {
+                                        "desc": "2米内队友数量大于3",
+                                        "id": 104700,
+                                        "pos": {
+                                            "x": 222.0,
+                                            "y": 1621.0
+                                        },
+                                        "type": "ConditionNode"
+                                    },
+                                    {
+                                        "desc": "视线内敌方数量==0",
+                                        "id": 104800,
+                                        "pos": {
+                                            "x": 375.0,
+                                            "y": 1621.0
+                                        },
+                                        "type": "ConditionNode"
+                                    },
+                                    {
+                                        "desc": "搜索角落",
+                                        "id": 104900,
+                                        "pos": {
+                                            "x": 523.0,
+                                            "y": 1621.0
+                                        },
+                                        "type": "ActionNode"
+                                    }
+                                ],
+                                "desc": "搜索",
+                                "id": 104600,
+                                "pos": {
+                                    "x": 154.0,
+                                    "y": 1621.0
+                                },
+                                "type": "SequenceNode"
+                            },
+                            {
+                                "child": [
+                                    {
+                                        "desc": "30米内敌人数量==0",
+                                        "id": 105100,
+                                        "pos": {
+                                            "x": 222.0,
+                                            "y": 1734.0
+                                        },
+                                        "type": "ConditionNode"
+                                    },
+                                    {
+                                        "desc": "调查环境",
+                                        "id": 105200,
+                                        "pos": {
+                                            "x": 371.0,
+                                            "y": 1734.0
+                                        },
+                                        "type": "ActionNode"
+                                    }
+                                ],
+                                "desc": "调查",
+                                "id": 105000,
+                                "pos": {
+                                    "x": 154.0,
+                                    "y": 1734.0
+                                },
+                                "type": "SequenceNode"
+                            }
+                        ],
+                        "desc": "搜索",
+                        "id": 103800,
+                        "pos": {
+                            "x": 86.0,
+                            "y": 1395.0
+                        },
+                        "type": "SelectorNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "2米内有重要物资",
+                                "id": 105400,
+                                "pos": {
+                                    "x": 154.0,
+                                    "y": 1847.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "desc": "守卫据点",
+                                "id": 105500,
+                                "pos": {
+                                    "x": 286.0,
+                                    "y": 1847.0
+                                },
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "守卫",
+                        "id": 105300,
+                        "pos": {
+                            "x": 86.0,
+                            "y": 1847.0
+                        },
+                        "type": "SequenceNode"
+                    }
+                ],
+                "desc": "交战",
+                "id": 102300,
+                "pos": {
+                    "x": 18.0,
+                    "y": 943.0
+                },
+                "type": "SelectorNode"
+            },
+            {
+                "child": [
+                    {
+                        "child": [
+                            {
+                                "desc": "尸体弹痕小于2",
+                                "id": 105800,
+                                "pos": {
+                                    "x": 168.0,
+                                    "y": 1960.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "child": [
+                                    {
+                                        "desc": "扫射",
+                                        "id": 106000,
+                                        "pos": {
+                                            "x": 396.0,
+                                            "y": 1960.0
+                                        },
+                                        "type": "ActionNode"
+                                    },
+                                    {
+                                        "desc": "点射",
+                                        "id": 106100,
+                                        "pos": {
+                                            "x": 457.0,
+                                            "y": 1960.0
+                                        },
+                                        "type": "ActionNode"
+                                    }
+                                ],
+                                "desc": "随机选择射击",
+                                "id": 105900,
+                                "pos": {
+                                    "x": 286.0,
+                                    "y": 1960.0
+                                },
+                                "type": "SequenceNode"
+                            }
+                        ],
+                        "desc": "射击尸体",
+                        "id": 105700,
+                        "pos": {
+                            "x": 86.0,
+                            "y": 1960.0
+                        },
+                        "type": "SequenceNode"
+                    },
+                    {
+                        "child": [
+                            {
+                                "desc": "尸体弹痕大于2",
+                                "id": 106300,
+                                "pos": {
+                                    "x": 168.0,
+                                    "y": 2073.0
+                                },
+                                "type": "ConditionNode"
+                            },
+                            {
+                                "desc": "搜索尸体上的物品",
+                                "id": 106400,
+                                "pos": {
+                                    "x": 286.0,
+                                    "y": 2073.0
+                                },
+                                "type": "ActionNode"
+                            }
+                        ],
+                        "desc": "搜索尸体",
+                        "id": 106200,
+                        "pos": {
+                            "x": 86.0,
+                            "y": 2073.0
+                        },
+                        "type": "SequenceNode"
+                    }
+                ],
+                "desc": "战后",
+                "id": 105600,
+                "pos": {
+                    "x": 18.0,
+                    "y": 1960.0
+                },
+                "type": "SelectorNode"
+            }
+        ],
+        "desc": "root",
+        "id": 100100,
+        "pos": {
+            "x": -149.0,
+            "y": 717.0
+        },
+        "type": "BTTree"
+    }
+}

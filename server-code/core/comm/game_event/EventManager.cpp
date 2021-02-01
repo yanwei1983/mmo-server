@@ -201,6 +201,7 @@ const std::unordered_map<uint32_t, uint32_t>& CEventManager::GetCountEntryByType
 void CEventManager::PushWait(const CEventEntrySharedPtr& pEntry)
 {
     {
+        pEntry->SetWait(true);
         m_setWaitEntry.insert(CEventEntryWeakPtr{pEntry});
     }
 
@@ -249,7 +250,7 @@ void CEventManager::ScheduleWait()
 
         if(nRet == 0)
         {
-            AddRunningEventCount();
+            pEntry->SetWait(false);
             continue;
         }
 
@@ -293,17 +294,7 @@ void CEventManager::SubEventCount()
 
 size_t CEventManager::GetRunningEventCount()
 {
-    return m_nRunningEventCount;
-}
-
-void CEventManager::AddRunningEventCount()
-{
-    m_nRunningEventCount++;
-}
-
-void CEventManager::SubRunningEventCount()
-{
-    m_nRunningEventCount--;
+    return event_base_get_num_events(m_pBase, EVENT_BASE_COUNT_ADDED);
 }
 
 bool CEventManager::RemoveWait(const CEventEntrySharedPtr& pEntry)

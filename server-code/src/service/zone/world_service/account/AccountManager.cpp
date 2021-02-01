@@ -69,7 +69,7 @@ void CAccountManager::Login(const VirtualSocket& vs, const std::string& openid)
         bKicked = true;
     }
 
-    CAccount* pAccount = CAccount::CreateNew(openid, vs);
+    CAccount* pAccount = CreateNew<CAccount>(openid, vs);
     CHECK(pAccount);
     LOGLOGIN("Actor:{} StartLogin", openid.c_str());
 

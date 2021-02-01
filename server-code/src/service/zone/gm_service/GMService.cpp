@@ -107,7 +107,7 @@ void SetGMServicePtr(CGMService* ptr)
 
 extern "C" __attribute__((visibility("default"))) IService* ServiceCreate(WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx)
 {
-    return CGMService::CreateNew(ServerPort{idWorld, idServiceType, idServiceIdx});
+    return CreateNewRelease<CGMService>(ServerPort{idWorld, idServiceType, idServiceIdx});
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -171,7 +171,7 @@ bool CGMService::Init(const ServerPort& nServerPort)
             LOGFATAL("CGMService QueryServerInfo {} fail", GetServerPort().GetServiceID());
             return false;
         }
-        m_pRPCService.reset(CRPCService::CreateNew(GetServerPort().GetServiceID()));
+        m_pRPCService.reset(CreateNew<CRPCService>(GetServerPort().GetServiceID()));
         CHECKF(m_pRPCService.get());
         CHECKF(m_pRPCService->AddRPCService(new Game::GM_ServiceImpl(this)));
         CHECKF(m_pRPCService->StartRPCServer(pAddrInfo->publish_port, pAddrInfo->debug_port));

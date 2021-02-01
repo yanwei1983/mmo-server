@@ -68,6 +68,7 @@ void CAIActor::CastSkill(uint32_t idSkill, OBJID idTarget)
     msg.set_skill_id(idSkill);
 
     AIService()->SendProtoMsgToScene(msg);
+    LOGACTORDEBUG(GetID(), "CastSkill {} Target: {}", idSkill, idTarget);
     __LEAVE_FUNCTION
 }
 
@@ -89,6 +90,7 @@ void CAIActor::FlyTo(const Vector2& posTarget)
     msg.set_y(posTarget.y);
     AIService()->SendProtoMsgToScene(msg);
 
+    LOGACTORDEBUG(GetID(), "From {} FlyTo {} {}", m_Pos, msg.x(), msg.y());
     __LEAVE_FUNCTION
 }
 

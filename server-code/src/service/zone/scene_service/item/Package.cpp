@@ -43,7 +43,7 @@ bool CPackage::Init(CPlayer* pOwner, uint32_t nPackageType, uint32_t nMaxSize)
         for(size_t i = 0; i < pResult->get_num_row(); i++)
         {
             auto   row   = pResult->fetch_row(true);
-            CItem* pItem = CItem::CreateNew(std::move(row));
+            CItem* pItem = CreateNew<CItem>(std::move(row));
             if(pItem)
             {
                 auto it_find = m_setItem.find(pItem->GetGrid());
@@ -199,11 +199,11 @@ bool CPackage::AwardItem(uint32_t idItemType, uint32_t nAmount, uint32_t dwFlag 
             if(nAmount < pItemType->GetPileLimit())
             {
                 CItem* pItem =
-                    CItem::CreateNew(SceneService()->GetGameDB(m_pOwner->GetWorldID()), m_pOwner->GetID(), idItemType, nAmount, dwFlag, m_nPosition);
+                    CreateNew<CItem>(SceneService()->GetGameDB(m_pOwner->GetWorldID()), m_pOwner->GetID(), idItemType, nAmount, dwFlag, m_nPosition);
                 AddItem(pItem, SYNC_TRUE, false, true);
                 break;
             }
-            CItem* pItem = CItem::CreateNew(SceneService()->GetGameDB(m_pOwner->GetWorldID()),
+            CItem* pItem = CreateNew<CItem>(SceneService()->GetGameDB(m_pOwner->GetWorldID()),
                                             m_pOwner->GetID(),
                                             idItemType,
                                             pItemType->GetPileLimit(),
@@ -513,7 +513,7 @@ bool CPackage::SplitItem(uint32_t nGrid1, uint32_t nGrid2, uint32_t nSplitNum)
     info.nNum      = nSplitNum;
     auto pDB       = SceneService()->GetGameDB(m_pOwner->GetWorldID());
     CHECKF(pDB);
-    CItem* pNewItem = CItem::CreateNew(pDB, info);
+    CItem* pNewItem = CreateNew<CItem>(pDB, info);
     CHECKF(pNewItem);
     if(!AddItem(pNewItem, SYNC_TRUE, false, false))
     {

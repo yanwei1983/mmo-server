@@ -6,7 +6,7 @@ namespace ServerMSG
     class ActorCreate;
 }
 
-class CAIPlayer : public CAIActor
+export_lua class CAIPlayer : public CAIActor
 {
     CAIPlayer();
     bool Init(const ServerMSG::ActorCreate& msg);

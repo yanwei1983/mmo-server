@@ -63,7 +63,6 @@ void CEventEntry::Cancel()
         if(m_pevTimer)
         {
             event_del(m_pevTimer);
-            m_pManager->SubRunningEventCount();
         }
         m_pCallBack = nullptr;
     }
@@ -77,6 +76,8 @@ bool CEventEntry::IsCanceled() const
 
 bool CEventEntry::IsWaitTrigger() const
 {
+    if(m_bWaitPush)
+        return true;
     if(m_pevTimer)
     {
         return evtimer_pending(m_pevTimer, NULL) != 0;
@@ -96,7 +97,6 @@ void CEventEntry::Clear()
     if(IsWaitTrigger())
     {
         event_del(m_pevTimer);
-        m_pManager->SubRunningEventCount();
     }
     m_pCallBack = nullptr;
     __LEAVE_FUNCTION
@@ -136,7 +136,9 @@ bool CEventEntry::CreateEvTimer(event_base* base)
             base,
             -1,
             (m_bPersist) ? EV_PERSIST : 0,
-            [](int32_t, short, void* ctx) {
+            [](int32_t, short, void* ctx) 
+            {
+                __ENTER_FUNCTION
                 CEventEntry* pEntry = (CEventEntry*)ctx;
                 if(pEntry == nullptr || pEntry->m_pCallBack == nullptr)
                     return;
@@ -154,6 +156,7 @@ bool CEventEntry::CreateEvTimer(event_base* base)
                         // pEntry is deleted
                     }
                 }
+                __LEAVE_FUNCTION
             },
             this);
     }
@@ -170,12 +173,14 @@ void CEventEntry::Trigger()
     if(m_pCallBack)
     {
         auto call_back = m_pCallBack;
+        __ENTER_FUNCTION
         call_back();
+        __LEAVE_FUNCTION
     }
 
     if(m_bPersist == false)
     {
-        m_pManager->SubRunningEventCount();
+        
     }
     __LEAVE_FUNCTION
 }

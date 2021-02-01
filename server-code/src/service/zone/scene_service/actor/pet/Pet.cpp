@@ -37,7 +37,7 @@ bool CPet::Init(CPetSet* pPetSet, CDBRecordPtr&& pRecord)
     CHECKF(m_pType);
     m_ActorAttrib->SetBase(m_pType->GetAbility());
 
-    m_pCDSet.reset(CCoolDownSet::CreateNew());
+    m_pCDSet.reset(CreateNew<CCoolDownSet>());
     CHECKF(m_pCDSet.get());
 
     RecalcAttrib(true, false);

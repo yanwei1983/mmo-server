@@ -7,7 +7,8 @@
 class CAIMonster;
 class CAIPlayer;
 class CAISkillSet;
-class CAIActor : public CSceneObject
+
+export_lua class CAIActor : public CSceneObject
 {
 public:
     CAIActor();
@@ -51,7 +52,7 @@ public:
     export_lua void         MoveToTarget(const Vector2& posTarget);
     export_lua void         FlyTo(const Vector2& posTarget);
     export_lua void         CastSkill(uint32_t idSkill, OBJID idTarget);
-    export_lua virtual void OnCastSkillFinish(uint32_t stun_ms = 0) {}
+    export_lua virtual void OnCastSkillFinish(uint32_t skill_id, uint32_t stun_ms = 0) {}
 
 public:
     virtual void OnDead() {}

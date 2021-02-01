@@ -72,13 +72,13 @@ ON_SERVERMSG(CAOIService, ActorCreate)
     {
         case ACT_PLAYER:
         {
-            pActor = CAOIPlayer::CreateNew(msg);
+            pActor = CreateNew<CAOIPlayer>(msg);
             LOGACTORDEBUG(pActor->GetID(), "Create AOIPlayer id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;
         default:
         {
-            pActor = CAOIActor::CreateNew(msg);
+            pActor = CreateNew<CAOIActor>(msg);
             LOGACTORDEBUG(pActor->GetID(), "Create AOIActor id:{} ptr:{:p}", pActor->GetID(), (void*)pActor);
         }
         break;

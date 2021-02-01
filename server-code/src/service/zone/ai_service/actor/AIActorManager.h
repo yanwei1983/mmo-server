@@ -9,7 +9,7 @@ class CAIActor;
 class CAIMonster;
 class CAIPlayer;
 
-class CAIActorManager : public NoncopyableT<CAIActorManager>
+export_lua class CAIActorManager : public NoncopyableT<CAIActorManager>
 {
     CAIActorManager();
     bool Init();

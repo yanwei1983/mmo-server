@@ -79,7 +79,7 @@ CPhase* CScene::CreatePhase(uint16_t idPhaseType, const Cfg_Phase* pPhaseData, u
     }
     auto     idxPhase = m_DynaIDPool.get();
     SceneIdx newSceneIdx(SceneService()->GetZoneID(), m_idMap, idxPhase);
-    pPhase = CPhase::CreateNew(this, newSceneIdx, idPhase, pPhaseData);
+    pPhase = CreateNew<CPhase>(this, newSceneIdx, idPhase, pPhaseData);
     CHECKF(pPhase);
     m_setPhase[idPhase].reset(pPhase);
     m_setPhaseByIdx[idxPhase] = pPhase;

@@ -39,8 +39,7 @@ public:
     void   AddEventCount();
     void   SubEventCount();
     size_t GetRunningEventCount();
-    void   AddRunningEventCount();
-    void   SubRunningEventCount();
+
 
     const std::unordered_map<uint32_t, uint32_t>& GetCountEntryByManagerType();
     const std::unordered_map<uint32_t, uint32_t>& GetCountEntryByType();
@@ -54,16 +53,17 @@ protected:
 
 protected:
 protected:
-    event_base*                                                       m_pBase              = nullptr;
-    bool                                                              m_bOwnBase           = false;
-    std::atomic<size_t>                                               m_nEventCount        = 0;
-    std::atomic<size_t>                                               m_nRunningEventCount = 0;
+    event_base*         m_pBase       = nullptr;
+    bool                m_bOwnBase    = false;
+    std::atomic<size_t> m_nEventCount = 0;
+
     std::map<uint32_t, struct timeval>                                m_mapCommonTimeVal;
     std::set<CEventEntryWeakPtr, std::owner_less<CEventEntryWeakPtr>> m_ManagedEntry;
     std::set<CEventEntryWeakPtr, std::owner_less<CEventEntryWeakPtr>> m_setWaitEntry;
-    std::unordered_set<CEventEntrySharedPtr>                          m_AllEntry;
-    std::unordered_map<uint32_t, uint32_t>                            m_CountEntryByManagerType;
-    std::unordered_map<uint32_t, uint32_t>                            m_CountEntryByType;
+
+    std::unordered_set<CEventEntrySharedPtr> m_AllEntry;
+    std::unordered_map<uint32_t, uint32_t>   m_CountEntryByManagerType;
+    std::unordered_map<uint32_t, uint32_t>   m_CountEntryByType;
 
     struct event*     m_pScheduleWaitEvent = nullptr;
     std::atomic<bool> m_bPause             = false;

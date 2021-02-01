@@ -18,7 +18,7 @@
 
 extern "C" __attribute__((visibility("default"))) IService* ServiceCreate(WorldID_t idWorld, ServiceType_t idServiceType, ServiceIdx_t idServiceIdx)
 {
-    return CSocketService::CreateNew(ServerPort{idWorld, idServiceType, idServiceIdx});
+    return CreateNewRelease<CSocketService>(ServerPort{idWorld, idServiceType, idServiceIdx});
 }
 
 CGameClient::CGameClient()
@@ -170,7 +170,7 @@ bool CSocketService::CreateNetworkService()
     __ENTER_FUNCTION
     if(m_pNetworkService)
         return false;
-    m_pNetworkService.reset(CNetworkService::CreateNew());
+    m_pNetworkService.reset(CreateNew<CNetworkService>());
     return true;
     __LEAVE_FUNCTION
     return true;

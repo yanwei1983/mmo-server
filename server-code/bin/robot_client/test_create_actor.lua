@@ -98,7 +98,7 @@ function main(start_idx, max_players)
 	print("enter main start:",start_idx, " to ", start_idx+max_players-1)
 	for i=start_idx,max_players+start_idx-1 do
 		local ip = "172.28.1.254";
-		local port_list = {18031,18032};
+		local port_list = {18031};
 		local port = port_list[random_uint32_range(1,#port_list)];
 		print("connect to ", ip, port);
 		local pClient = robot_manager:ConnectServer(ip,port);

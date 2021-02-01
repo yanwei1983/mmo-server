@@ -118,10 +118,36 @@ export_lua inline bool HasFlag(uint32_t flag, uint32_t mask)
     return (flag & mask) != 0;
 }
 
+
+export_lua inline uint32_t GetBitCount(uint32_t u)
+{
+    u = (u & 0x55555555) + ((u >> 1) & 0x55555555);
+    u = (u & 0x33333333) + ((u >> 2) & 0x33333333);
+    u = (u & 0x0F0F0F0F) + ((u >> 4) & 0x0F0F0F0F);
+    u = (u & 0x00FF00FF) + ((u >> 8) & 0x00FF00FF);
+    u = (u & 0x0000FFFF) + ((u >> 16) & 0x0000FFFF);
+    return u;
+    
+}
+
+export_lua inline uint32_t GetBitCount64(uint64_t x)
+{
+    x = (x & 0x5555555555555555ULL) + ((x >> 1) & 0x5555555555555555ULL);
+    x = (x & 0x3333333333333333ULL) + ((x >> 2) & 0x3333333333333333ULL);
+    x = (x & 0x0F0F0F0F0F0F0F0FULL) + ((x >> 4) & 0x0F0F0F0F0F0F0F0FULL);
+    return (x * 0x0101010101010101ULL) >> 56;
+}
+
 template<typename EnumType>
 auto enum_to(EnumType e)
 {
     return static_cast<std::underlying_type_t<EnumType> >(e);
+}
+
+template<typename EnumType>
+EnumType to_enum(std::underlying_type_t<EnumType> e)
+{
+    return static_cast<EnumType>(e);
 }
 
 #endif /* INTUTIL_H */

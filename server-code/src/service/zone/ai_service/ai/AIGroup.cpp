@@ -64,7 +64,7 @@ CAIGroup* CAIGroupManager::GetGroup(uint32_t group_id)
         return it->second.get();
     }
 
-    CAIGroup* pGroup = CAIGroup::CreateNew(group_id, m_pScene);
+    CAIGroup* pGroup = CreateNew<CAIGroup>(group_id, m_pScene);
     CHECKF(pGroup);
     std::unique_ptr<CAIGroup> group_ptr(pGroup);
     m_setGroup.emplace(group_id, std::move(group_ptr));

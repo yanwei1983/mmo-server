@@ -4,7 +4,9 @@ MESSAGE(STATUS "cmake: network")
 file(GLOB_RECURSE SRCS "*.cc" "*.cpp" "*.c" "*.h" "*.hpp")
 
 
-
+IF(WIN32)
+add_compile_options(/wd4267) 
+ENDIF(WIN32)
 
 # 生成库文件
 ADD_LIBRARY(network SHARED ${SRCS})

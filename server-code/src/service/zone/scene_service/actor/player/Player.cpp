@@ -75,34 +75,34 @@ bool CPlayer::Init(OBJID idPlayer, const VirtualSocket& socket)
     CHECKF(CActor::Init());
 
     //初始化其他模块
-    m_pCommonDataSet.reset(CCommonDataSet::CreateNew(this));
+    m_pCommonDataSet.reset(CreateNew<CCommonDataSet>(this));
     CHECKF(m_pCommonDataSet.get());
 
-    m_pDataCountSet.reset(CDataCountSet::CreateNew(this));
+    m_pDataCountSet.reset(CreateNew<CDataCountSet>(this));
     CHECKF(m_pDataCountSet.get());
 
-    m_pPetSet.reset(CPetSet::CreateNew(this));
+    m_pPetSet.reset(CreateNew<CPetSet>(this));
     CHECKF(m_pPetSet.get());
 
-    m_pUserSkillManager.reset(CPlayerSkillManager::CreateNew(this));
+    m_pUserSkillManager.reset(CreateNew<CPlayerSkillManager>(this));
     CHECKF(m_pUserSkillManager.get());
 
-    m_pCDSet.reset(CPlayerCoolDownSet::CreateNew(this));
+    m_pCDSet.reset(CreateNew<CPlayerCoolDownSet>(this));
     CHECKF(m_pCDSet.get());
 
-    m_pBag.reset(CPackage::CreateNew(this, ITEMPOSITION_BAG, GetBagMaxSize()));
+    m_pBag.reset(CreateNew<CPackage>(this, ITEMPOSITION_BAG, GetBagMaxSize()));
     CHECKF(m_pBag.get());
 
-    m_pEquipmentSet.reset(CEquipment::CreateNew(this));
+    m_pEquipmentSet.reset(CreateNew<CEquipment>(this));
     CHECKF(m_pEquipmentSet.get());
 
-    m_pTaskSet.reset(CPlayerTask::CreateNew(this));
+    m_pTaskSet.reset(CreateNew<CPlayerTask>(this));
     CHECKF(m_pTaskSet.get());
 
-    m_pAchievement.reset(CPlayerAchievement::CreateNew(this));
+    m_pAchievement.reset(CreateNew<CPlayerAchievement>(this));
     CHECKF(m_pAchievement.get());
 
-    m_pPlayerDialog.reset(CPlayerDialog::CreateNew(this));
+    m_pPlayerDialog.reset(CreateNew<CPlayerDialog>(this));
     CHECKF(m_pPlayerDialog.get());
     LOGACTORDEBUG(GetID(), "CPlayer::InitSucc");
     return true;

@@ -17,7 +17,7 @@ int main(int argc, char* argv[])
 {
     get_opt opt(argc, (const char**)argv);
     BaseCode::InitLog("./log");
-    std::unique_ptr<CRemoteIMGuiClient> pClient(CRemoteIMGuiClient::CreateNew(opt["--addr"], atoi(opt["--port"].c_str()) ));
+    std::unique_ptr<CRemoteIMGuiClient> pClient(CreateNew<CRemoteIMGuiClient>(opt["--addr"], atoi(opt["--port"].c_str()) ));
     
     while(pClient->OnTimer() == true)
     {

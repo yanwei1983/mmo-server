@@ -38,6 +38,7 @@ public:
     void FullGC();
 
 public:
+    lua_State* GetRawPtr()const {return m_pLua;}
     int32_t GetLuaGCStep() const { return m_nLuaGCStep; }
     void    SetLuaGCStep(int32_t val) { m_nLuaGCStep = val; }
     int32_t GetLuaGCStepTick() const { return m_nLuaGCStepTick; }
@@ -207,8 +208,7 @@ void InitRegisterFunction(lua_State* L)
    lua_tinker::def(L, "InitNpc", &InitNpc);
    lua_tinker::def(L, "InitSceneService", &InitSceneService);
 }
-
-LUAScriptManager::CreateNew(&InitRegisterFunction);
+ CreateNew<LUAScriptManager>(&InitRegisterFunction);
 
 */
 /*

@@ -53,7 +53,7 @@ CUser* CUserManager::CreateUser(CAccount* pAccount, ST_ROLE_INFO* pInfo)
         LOGERROR(" CUserManager::CreateUser  {} twice !!!!!!", pInfo->GetID());
         return pUser;
     }
-    pUser = CUser::CreateNew(pAccount, pInfo);
+    pUser = CreateNew<CUser>(pAccount, pInfo);
     if(pUser == nullptr)
     {
         LOGERROR(" CUserManager::CreateUser  {} fail !!!!!!", pInfo->GetID());

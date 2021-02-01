@@ -30,7 +30,7 @@ bool CPlayerSkillManager::Init(CPlayer* pOwner)
         {
             auto row = pResult->fetch_row(true);
 
-            CSkillData* pData = CSkillData::CreateNew(m_pOwner, std::move(row));
+            CSkillData* pData = CreateNew<CSkillData>(m_pOwner, std::move(row));
             if(pData)
             {
                 m_setSkillData[pData->GetSkillSort()].reset(pData);
@@ -70,7 +70,7 @@ bool CPlayerSkillManager::LearnSkill(uint32_t idSkillSort)
     }
 
     //学习技能
-    CSkillData* pData = CSkillData::CreateNew(m_pOwner, idSkillSort, 1);
+    CSkillData* pData = CreateNew<CSkillData>(m_pOwner, idSkillSort, 1);
     if(pData)
     {
         m_setSkillData[pData->GetSkillSort()].reset(pData);

@@ -43,7 +43,7 @@ bool CEquipment::Init(CPlayer* pPlayer)
         for(size_t i = 0; i < pResult->get_num_row(); i++)
         {
             auto   row   = pResult->fetch_row(true);
-            CItem* pItem = CItem::CreateNew(std::move(row));
+            CItem* pItem = CreateNew<CItem>(std::move(row));
             if(pItem)
             {
                 auto it_find = m_setItem.find(pItem->GetGrid());

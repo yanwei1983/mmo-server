@@ -11,8 +11,12 @@ class CAIActorManager;
 class CAISceneManager;
 class CMapManager;
 class CLUAScriptManager;
+namespace BT
+{
+    class BTManager;
+}
 
-class CAIService : public IService, public CServiceCommon
+export_lua class CAIService : public IService, public CServiceCommon
 {
     CAIService();
     bool Init(const ServerPort& nServerPort);
@@ -36,10 +40,10 @@ public:
 
 public:
     CLUAScriptManager* GetScriptManager() const { return m_pScriptManager.get(); }
-    CAISceneManager*   GetAISceneManager() const { return m_pAISceneManager.get(); }
-    CAIActorManager*   GetAIActorManager() const { return m_pAIActorManager.get(); }
+    export_lua CAISceneManager*   GetAISceneManager() const { return m_pAISceneManager.get(); }
+    export_lua CAIActorManager*   GetAIActorManager() const { return m_pAIActorManager.get(); }
     CMapManager*       GetMapManager() const { return m_pMapManager.get(); }
-
+    BT::BTManager*     GetBTManager() const { return m_pBTManager.get(); }
 private:
     CMyTimer m_tLastDisplayTime;
 
@@ -47,6 +51,7 @@ private:
     std::unique_ptr<CAISceneManager>   m_pAISceneManager;
     std::unique_ptr<CAIActorManager>   m_pAIActorManager;
     std::unique_ptr<CMapManager>       m_pMapManager;
+    std::unique_ptr<BT::BTManager>     m_pBTManager;
 
 public:
     //配置文件
@@ -75,6 +80,10 @@ inline auto AISceneManager()
 inline auto AIActorManager()
 {
     return AIService()->GetAIActorManager();
+}
+inline auto BTManager()
+{
+    return AIService()->GetBTManager();
 }
 inline auto NetMsgProcess()
 {

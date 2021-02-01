@@ -75,7 +75,7 @@ bool GameMath::Intersection::pointInTri3D(const Vector3& p, const Vector3& a, co
     v2 = p - c;
 
     dot[2]     = v1.crossProduct(v2).dotProduct(normal);
-    zeroDot[2] = Math::FloatEqual(dot[2], 0.0f, 1e-3);
+    zeroDot[2] = Math::FloatEqual(dot[2], 0.0f, 1e-3f);
     // Compare signs (ignore colinear / coincident points)
     if((!zeroDot[0] && !zeroDot[2] && Math::Sign(dot[0]) != Math::Sign(dot[2])) ||
        (!zeroDot[1] && !zeroDot[2] && Math::Sign(dot[1]) != Math::Sign(dot[2])))

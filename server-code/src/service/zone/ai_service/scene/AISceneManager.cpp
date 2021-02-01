@@ -34,7 +34,7 @@ CAIScene* CAISceneManager::CreateScene(uint16_t idMap)
     auto pMap = MapManager()->QueryMap(idMap);
     CHECKF(pMap);
 
-    CAIScene* pScene = CAIScene::CreateNew(idMap);
+    CAIScene* pScene = CreateNew<CAIScene>(idMap);
     CHECKF(pScene);
 
     m_mapScene[idMap] = pScene;

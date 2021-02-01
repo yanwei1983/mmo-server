@@ -86,7 +86,7 @@ bool CGuild::Init(CDBRecordPtr&& pDBRecord)
         {
             auto db_record_ptr = result_ptr->fetch_row(true);
 
-            CGuildMemberInfo* pMemberInfo = CGuildMemberInfo::CreateNew(std::move(db_record_ptr));
+            CGuildMemberInfo* pMemberInfo = CreateNew<CGuildMemberInfo>(std::move(db_record_ptr));
             if(pMemberInfo)
             {
                 m_setMemberInfo.emplace(pMemberInfo->get_member_id(), pMemberInfo);
@@ -217,7 +217,7 @@ CGuildMemberInfo* CGuild::CreateMemberInfo(OBJID idMember, uint32_t nRank, const
 
     db_record_ptr->Update();
 
-    CGuildMemberInfo* pMemberInfo = CGuildMemberInfo::CreateNew(std::move(db_record_ptr));
+    CGuildMemberInfo* pMemberInfo = CreateNew<CGuildMemberInfo>(std::move(db_record_ptr));
     return pMemberInfo;
 
     __LEAVE_FUNCTION
@@ -255,7 +255,7 @@ bool CGuild::AddMemberOffline(OBJID idMember, uint32_t nRank, const GuildMemberI
         row->Field(TBLD_GUILD_MEMBERINFO::LAST_LOGOUT_TIME) = 0;
         row->Update();
 
-        pMemberInfo = CGuildMemberInfo::CreateNew(std::move(row));
+        pMemberInfo = CreateNew<CGuildMemberInfo>(std::move(row));
     }
     else
     {
@@ -273,7 +273,7 @@ bool CGuild::AddMemberOffline(OBJID idMember, uint32_t nRank, const GuildMemberI
         row->Field(TBLD_GUILD_MEMBERINFO::LAST_LOGIN_TIME)  = 0;
         row->Field(TBLD_GUILD_MEMBERINFO::LAST_LOGOUT_TIME) = 0;
         row->Update();
-        pMemberInfo = CGuildMemberInfo::CreateNew(std::move(row));
+        pMemberInfo = CreateNew<CGuildMemberInfo>(std::move(row));
     }
 
     CHECKF(pMemberInfo);
