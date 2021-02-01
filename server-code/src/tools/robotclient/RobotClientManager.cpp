@@ -36,10 +36,10 @@ void export_to_lua(lua_State* L, void* pManager)
 RobotClientManager::RobotClientManager(uint32_t nRobStart, uint32_t nRobAmount, const std::string& lua_file_name)
     : m_pNetMsgProcess(std::make_unique<CNetMSGProcess>())
 {
-    m_pNetworkService.reset(CNetworkService::CreateNew());
-    m_pEventManager.reset(CEventManager::CreateNew(m_pNetworkService->GetEVBase(), false));
+    m_pNetworkService.reset(CreateNew<CNetworkService>());
+    m_pEventManager.reset(CreateNew<CEventManager>(m_pNetworkService->GetEVBase(), false));
 
-    m_pScriptManager.reset(CLUAScriptManager::CreateNew("script", export_to_lua, this, "robot_client", lua_file_name.c_str(), false));
+    m_pScriptManager.reset(CreateNew<CLUAScriptManager>("script", export_to_lua, this, "robot_client", lua_file_name.c_str(), false));
     m_pScriptManager->_ExecScript<void>("main", nRobStart, nRobAmount);
 
     CEventEntryCreateParam param;
