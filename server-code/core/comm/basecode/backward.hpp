@@ -4258,7 +4258,7 @@ public:
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
 
     std::set_terminate(&terminator);
-    std::set_unexpected(&terminator);
+    //std::set_unexpected(&terminator);
     _set_purecall_handler(&terminator);
     _set_invalid_parameter_handler(&invalid_parameter_handler);
   }
