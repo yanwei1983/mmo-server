@@ -20,8 +20,8 @@ public:
         for(int i = 0; i < virtual_node_count; i++)
         {
             uint64_t value = MakeUINT64(node_id,i);
-            auto key = hash::MurmurHash3::shash((char*)&value, sizeof(uint64_t)/sizeof(char), m_seed);
-            m_nodes.emplace(key, node_id);
+            auto key = hash64(value);
+            m_nodes.try_emplace(key, node_id);
         }
     }
 
@@ -36,7 +36,7 @@ public:
         for(int i = 0; i < virtual_node_count; i++)
         {
             uint64_t value = MakeUINT64(node_id,i);
-            auto key = hash::MurmurHash3::shash((char*)&value, sizeof(uint64_t)/sizeof(char), m_seed);
+            auto key = hash64(value);
             auto it = m_nodes.find(key);
             if(it == m_nodes.end())
                 continue;
@@ -55,12 +55,19 @@ public:
             return -1;
         std::hash<std::decay_t<T>> hasher;
         auto hash_value = hasher(key);
-        auto hash_key = hash::MurmurHash3::shash((char*)&hash_value, sizeof(uint64_t)/sizeof(char), m_seed);
+        auto hash_key = hash64(hash_value);
         auto it = m_nodes.lower_bound(hash_key);
         if(it != m_nodes.end())
             return it->second;
         return m_nodes.begin()->second;
         
+    }
+
+private:
+    uint32_t hash64(uint64_t hash_value) const
+    {
+        auto hash_key = hash::MurmurHash3::shash((char*)&hash_value, sizeof(uint64_t)/sizeof(char), m_seed);
+        return hash_key;
     }
 private:
     using node_id_t = uint32_t;
