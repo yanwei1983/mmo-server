@@ -153,7 +153,7 @@ void BTTreeEditor::OnShow()
     ImGui::Text("Keys mods: %s%s%s%s", io.KeyCtrl ? "CTRL " : "", io.KeyShift ? "SHIFT " : "", io.KeyAlt ? "ALT " : "", io.KeySuper ? "SUPER " : "");
 
 
-    std::string create_node_menu_name = fmt::format("{}_create_node", m_editor_name);
+    std::string create_node_menu_name = attempt_format("{}_create_node", m_editor_name);
 
     const bool open_popup =
         ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && imnodes::IsEditorHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right);

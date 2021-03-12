@@ -221,12 +221,13 @@ struct TBLD_ITEM
                             "  `addition_lev` int unsigned NOT NULL DEFAULT '0' COMMENT '强化等级'",
                             DB_FIELD_TYPE_LONG_UNSIGNED,
                             false),
-            std::make_tuple("extra"));
+            std::make_tuple("extra", "  `extra` blob COMMENT '额外信息'", DB_FIELD_TYPE_BLOB, false));
     }
 
-    using field_type_t = type_list<uint64_t, uint64_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t>;
+    using field_type_t =
+        type_list<uint64_t, uint64_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, std::string>;
 
-    static constexpr size_t field_count() { return 11; }
+    static constexpr size_t field_count() { return 12; }
 
     static constexpr auto keys_info()
     {

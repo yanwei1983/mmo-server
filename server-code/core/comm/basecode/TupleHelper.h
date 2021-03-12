@@ -3,6 +3,7 @@
 
 #include <tuple>
 #include <type_traits>
+#include <optional>
 
 #if(defined(_MSVC_LANG) && _MSVC_LANG < 201402L) || ((!defined(_MSVC_LANG)) && __cplusplus < 201402L)
 namespace std
@@ -159,7 +160,23 @@ struct overloaded_t : Ts...
 template<class... Ts>
 overloaded_t(Ts...)->overloaded_t<Ts...>;
 
+/*
+overloaded_t overload
+{
+    [&fn, &value, &field_name_tuple](auto member_ptr)
+    {
+        // invoke(fn, FieldName, MemberPtr);
+        fn(field_name_tuple, value.*(member_ptr));
+    },
+    [&fn, &value, &field_name_tuple](auto member_ptr, auto tag) 
+    {
+        // invoke(fn, FieldName, MemberPtr, tag);
+        fn(field_name_tuple, value.*(member_ptr), tag);
+    }
+};
 
+std::apply(overload, member_ptr_tuple);
+*/
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -198,5 +215,13 @@ for(const auto& pair_v : map_val)
     });
 }
 */
+
+
+template<class ... Args>
+auto make_option_tuple(Args&& ... args)
+{
+    auto tuple = std::make_tuple(std::forward<Args>(args)...);
+    return std::optional<decltype(tuple)>(std::move(tuple));
+}
 
 #endif /* TUPLEHELPER_H */

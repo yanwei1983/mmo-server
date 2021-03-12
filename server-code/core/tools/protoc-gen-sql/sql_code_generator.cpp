@@ -13,6 +13,7 @@
 #include <google/protobuf/stubs/strutil.h>
 
 #include "sql_options/sql_options.pb.h"
+#include "AttempUtil.h"
 
 std::string StripProto(const std::string& filename)
 {
@@ -107,7 +108,22 @@ const char* PrimitiveTypeName(const google::protobuf::FieldDescriptor* field_des
         case FieldDescriptor::TYPE_MESSAGE:
             return NULL;
         case FieldDescriptor::TYPE_BYTES:
-            return "blob";
+        {
+            const auto& options   = field_desc->options();
+            const auto& extension = options.GetExtension(sql);
+            if(extension.size() > 0 && extension.size() <= 65535)
+            {
+                return "blob";
+            }
+            else if(extension.size() > 16*1024*1024)
+            {
+                return "longblob";
+            }
+            else
+            {
+                return "mediumblob";
+            }
+        }
         case FieldDescriptor::TYPE_ENUM:
             return "int";
 
@@ -149,34 +165,43 @@ std::string FieldSize(const google::protobuf::FieldDescriptor* field)
 {
     const auto& options   = field->options();
     const auto& extension = options.GetExtension(sql);
-    if(extension.size() > 0)
+
+    using namespace google::protobuf;
+    switch(field->type())
     {
-        return fmt::format("({})", extension.size());
-    }
-    else
-    {
-        using namespace google::protobuf;
-        switch(field->type())
+        case FieldDescriptor::TYPE_STRING:
         {
-            case FieldDescriptor::TYPE_DOUBLE:
-                return "(24,6)";
-            case FieldDescriptor::TYPE_FLOAT:
-                return "(24,6)";
-            case FieldDescriptor::TYPE_FIXED64:
-            case FieldDescriptor::TYPE_SFIXED64:
-            case FieldDescriptor::TYPE_INT64:
-            case FieldDescriptor::TYPE_UINT64:
-            case FieldDescriptor::TYPE_SINT64:
-            case FieldDescriptor::TYPE_FIXED32:
-            case FieldDescriptor::TYPE_SFIXED32:
-            case FieldDescriptor::TYPE_INT32:
-            case FieldDescriptor::TYPE_UINT32:
-            case FieldDescriptor::TYPE_SINT32:
-            case FieldDescriptor::TYPE_BOOL:
-            case FieldDescriptor::TYPE_ENUM:
-            default:
-                return "";
+            if(extension.size() > 0)
+                return attempt_format("({})", extension.size());
         }
+        break;
+        case FieldDescriptor::TYPE_DOUBLE:
+        {
+            return "(24,6)";
+        }
+        break;
+        case FieldDescriptor::TYPE_FLOAT:
+        {
+            return "(24,6)";
+        }
+        break;
+        case FieldDescriptor::TYPE_FIXED64:
+        case FieldDescriptor::TYPE_SFIXED64:
+        case FieldDescriptor::TYPE_INT64:
+        case FieldDescriptor::TYPE_UINT64:
+        case FieldDescriptor::TYPE_SINT64:
+        case FieldDescriptor::TYPE_FIXED32:
+        case FieldDescriptor::TYPE_SFIXED32:
+        case FieldDescriptor::TYPE_INT32:
+        case FieldDescriptor::TYPE_UINT32:
+        case FieldDescriptor::TYPE_SINT32:
+        case FieldDescriptor::TYPE_BOOL:
+        case FieldDescriptor::TYPE_ENUM:
+        default:
+        {
+            return "";
+        }
+        break;
     }
 
     return "";
@@ -300,7 +325,7 @@ std::string Comment(const google::protobuf::FieldDescriptor* field)
     google::protobuf::ReplaceCharacters(&comments, "\r", ' ');
     google::protobuf::StripWhitespace(&comments);
     if(comments.empty() == false)
-        return fmt::format(" COMMENT '{}'", comments);
+        return attempt_format(" COMMENT '{}'", comments);
     return comments;
 }
 
@@ -351,7 +376,7 @@ void PrintMessage(const google::protobuf::Descriptor& message_descriptor, google
             unique_list[k].push_back(name_str);
         }
 
-        std::string str = fmt::format("  `{name}` {type}{size}{unsigned}{utf8}{notnull}{default}{auto_inc}{comment},\n",
+        std::string str = attempt_format("  `{name}` {type}{size}{unsigned}{utf8}{notnull}{default}{auto_inc}{comment},\n",
                                       fmt::arg("name", name_str),
                                       fmt::arg("type", type_str),
                                       fmt::arg("size", size_str),
@@ -366,17 +391,17 @@ void PrintMessage(const google::protobuf::Descriptor& message_descriptor, google
 
     std::vector<std::string> key_str_list;
     {
-        std::string key_str = fmt::format("  PRIMARY KEY ({})", string_concat(primary_key_list, ",", "`", "`"));
+        std::string key_str = attempt_format("  PRIMARY KEY ({})", string_concat(primary_key_list, ",", "`", "`"));
         key_str_list.emplace_back(std::move(key_str));
     }
     for(const auto& [k, vecList]: unique_list)
     {
-        std::string key_str = fmt::format("  UNIQUE KEY `{}` ({})", k, string_concat(vecList, ",", "`", "`"));
+        std::string key_str = attempt_format("  UNIQUE KEY `{}` ({})", k, string_concat(vecList, ",", "`", "`"));
         key_str_list.emplace_back(std::move(key_str));
     }
     for(const auto& [k, vecList]: keys_list)
     {
-        std::string key_str = fmt::format("  KEY `{}` ({})", k, string_concat(vecList, ",", "`", "`"));
+        std::string key_str = attempt_format("  KEY `{}` ({})", k, string_concat(vecList, ",", "`", "`"));
         key_str_list.emplace_back(std::move(key_str));
     }
 

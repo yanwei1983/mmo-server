@@ -10,6 +10,7 @@
 
 #include "StringAlgo.h"
 #include "get_opt.h"
+#include "AttempUtil.h"
 
 int main(int argc, char** argv)
 {
@@ -139,125 +140,135 @@ int main(int argc, char** argv)
 
                     std::string field_name_UP = upper_cast_copy(field_type_data.field_name);
                     fields_enum_list += field_name_UP + ",//" + field_type_data.field_comment + "\n";
+
+
+                    std::string field_type;
+                    std::string field_bits;
+                    bool bUnsigned = false;
                     //  `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
                     if(std::regex_search(field_type_data.field_type, field_match, std::regex{R"((.*)\((.*)\)(.*))"}))
                     {
-                        std::string field_type = field_match[1];
-                        std::string field_bits = field_match[2];
-                        bool        bUnsigned  = field_match.size() > 2 && lower_cast_copy(trim_copy(field_match[3])) == "unsigned";
-                        std::string field_type_cpp;
-                        std::string field_type_enum;
-                        if(field_type == "float")
-                        {
-                            field_type_cpp  = "float ";
-                            field_type_enum = "DB_FIELD_TYPE_FLOAT";
-                        }
-                        else if(field_type == "double")
-                        {
-                            field_type_cpp  = "double ";
-                            field_type_enum = "DB_FIELD_TYPE_DOUBLE";
-                        }
-                        else if(field_type == "varchar")
-                        {
-                            if(field_bits.empty())
-                            {
-                                field_type_cpp  = "std::string ";
-                                field_type_enum = "DB_FIELD_TYPE_VARCHAR";
-                            }
-                            else
-                            {
-                                field_type_cpp  = "char[" + field_bits + "] ";
-                                field_type_enum = "DB_FIELD_TYPE_VARCHAR";
-                            }
-                        }
-                        else if(field_type == "blob")
-                        {
-                            field_type_cpp  = "std::string ";
-                            field_type_enum = "DB_FIELD_TYPE_BLOB";
-                        }
-
-                        field_type_cpp_list.push_back(field_type_cpp);
-                        field_tuple += ",\"" + vec_match_field_sql[i] + "\"";
-                        field_tuple += "," + field_type_enum;
-
-                        if(PriKeys.find(field_type_data.field_name) != PriKeys.end())
-                            field_tuple += ",true";
-                        else
-                            field_tuple += ",false";
+                        field_type = field_match[1];
+                        field_bits = field_match[2];
+                        bUnsigned  = field_match.size() > 2 && lower_cast_copy(trim_copy(field_match[3])) == "unsigned";
                     }
                     else if(std::regex_search(field_type_data.field_type, field_match, std::regex{R"((.*) (.*))"}))
                     {
-                        std::string field_type = field_match[1];
-                        bool        bUnsigned  = field_match.size() > 1 && lower_cast_copy(trim_copy(field_match[2])) == "unsigned";
-                        std::string field_type_cpp;
-                        std::string field_type_enum;
-                        if(field_type == "bigint")
+                        field_type = field_match[1];
+                        bUnsigned  = field_match.size() > 1 && lower_cast_copy(trim_copy(field_match[2])) == "unsigned";
+                    }
+                    else
+                    {
+                        field_type = field_type_data.field_type;
+                    }
+
+
+                    std::string field_type_cpp;
+                    std::string field_type_enum;
+                    if(field_type == "bigint")
+                    {
+                        if(bUnsigned)
                         {
-                            if(bUnsigned)
-                            {
-                                field_type_cpp  = "uint64_t ";
-                                field_type_enum = "DB_FIELD_TYPE_LONGLONG_UNSIGNED";
-                            }
-                            else
-                            {
-                                field_type_cpp  = "int64_t ";
-                                field_type_enum = "DB_FIELD_TYPE_LONGLONG";
-                            }
+                            field_type_cpp  = "uint64_t ";
+                            field_type_enum = "DB_FIELD_TYPE_LONGLONG_UNSIGNED";
                         }
-                        else if(field_type == "int")
+                        else
                         {
-                            if(bUnsigned)
-                            {
-                                field_type_cpp  = "uint32_t ";
-                                field_type_enum = "DB_FIELD_TYPE_LONG_UNSIGNED";
-                            }
-                            else
-                            {
-                                field_type_cpp  = "int32_t ";
-                                field_type_enum = "DB_FIELD_TYPE_LONG";
-                            }
+                            field_type_cpp  = "int64_t ";
+                            field_type_enum = "DB_FIELD_TYPE_LONGLONG";
                         }
-                        else if(field_type == "smallint")
+                    }
+                    else if(field_type == "int")
+                    {
+                        if(bUnsigned)
                         {
-                            if(bUnsigned)
-                            {
-                                field_type_cpp  = "uint16_t ";
-                                field_type_enum = "DB_FIELD_TYPE_SHORT_UNSIGNED";
-                            }
-                            else
-                            {
-                                field_type_cpp  = "int16_t ";
-                                field_type_enum = "DB_FIELD_TYPE_SHORT";
-                            }
+                            field_type_cpp  = "uint32_t ";
+                            field_type_enum = "DB_FIELD_TYPE_LONG_UNSIGNED";
                         }
-                        else if(field_type == "tinyint")
+                        else
                         {
-                            if(bUnsigned)
-                            {
-                                field_type_cpp  = "uint8_t ";
-                                field_type_enum = "DB_FIELD_TYPE_TINY_UNSIGNED";
-                            }
-                            else
-                            {
-                                field_type_cpp  = "int8_t ";
-                                field_type_enum = "DB_FIELD_TYPE_TINY";
-                            }
+                            field_type_cpp  = "int32_t ";
+                            field_type_enum = "DB_FIELD_TYPE_LONG";
                         }
-                        else if(field_type == "blob")
+                    }
+                    else if(field_type == "smallint")
+                    {
+                        if(bUnsigned)
+                        {
+                            field_type_cpp  = "uint16_t ";
+                            field_type_enum = "DB_FIELD_TYPE_SHORT_UNSIGNED";
+                        }
+                        else
+                        {
+                            field_type_cpp  = "int16_t ";
+                            field_type_enum = "DB_FIELD_TYPE_SHORT";
+                        }
+                    }
+                    else if(field_type == "tinyint")
+                    {
+                        if(bUnsigned)
+                        {
+                            field_type_cpp  = "uint8_t ";
+                            field_type_enum = "DB_FIELD_TYPE_TINY_UNSIGNED";
+                        }
+                        else
+                        {
+                            field_type_cpp  = "int8_t ";
+                            field_type_enum = "DB_FIELD_TYPE_TINY";
+                        }
+                    }
+                    else if(field_type == "float")
+                    {
+                        field_type_cpp  = "float ";
+                        field_type_enum = "DB_FIELD_TYPE_FLOAT";
+                    }
+                    else if(field_type == "double")
+                    {
+                        field_type_cpp  = "double ";
+                        field_type_enum = "DB_FIELD_TYPE_DOUBLE";
+                    }
+                    else if(field_type == "varchar")
+                    {
+                        if(field_bits.empty())
                         {
                             field_type_cpp  = "std::string ";
-                            field_type_enum = "DB_FIELD_TYPE_BLOB";
+                            field_type_enum = "DB_FIELD_TYPE_VARCHAR";
                         }
-
-                        field_type_cpp_list.push_back(field_type_cpp);
-                        field_tuple += ",\"" + vec_match_field_sql[i] + "\"";
-                        field_tuple += "," + field_type_enum;
-
-                        if(PriKeys.find(field_type_data.field_name) != PriKeys.end())
-                            field_tuple += ",true";
                         else
-                            field_tuple += ",false";
+                        {
+                            field_type_cpp  = "char[" + field_bits + "] ";
+                            field_type_enum = "DB_FIELD_TYPE_VARCHAR";
+                        }
                     }
+                    else if(field_type == "blob")
+                    {
+                        field_type_cpp  = "std::string ";
+                        field_type_enum = "DB_FIELD_TYPE_BLOB";
+                    }
+                    else if(field_type == "mediumblob")
+                    {
+                        field_type_cpp  = "std::string ";
+                        field_type_enum = "DB_FIELD_TYPE_BLOB";
+                    }
+                    else if(field_type == "longblob")
+                    {
+                        field_type_cpp  = "std::string ";
+                        field_type_enum = "DB_FIELD_TYPE_BLOB";
+                    }
+                    else 
+                    {
+                        field_type_cpp  = "std::string ";
+                        field_type_enum = "DB_FIELD_TYPE_UNKNOWN";
+                    }
+
+                    field_type_cpp_list.push_back(field_type_cpp);
+                    field_tuple += ",\"" + vec_match_field_sql[i] + "\"";
+                    field_tuple += "," + field_type_enum;
+
+                    if(PriKeys.find(field_type_data.field_name) != PriKeys.end())
+                        field_tuple += ",true";
+                    else
+                        field_tuple += ",false";
                 }
             }
 
@@ -305,10 +316,10 @@ struct {0}
             vec_key_typle_str.reserve(Keys.size());
             for(const auto& [key, value]: Keys)
             {
-                vec_key_typle_str.push_back(fmt::format("std::make_tuple(\"{}\", \"{}\")", key, value));
+                vec_key_typle_str.push_back(attempt_format("std::make_tuple(\"{}\", \"{}\")", key, value));
             }
 
-            std::string szBuf = fmt::format(field_output_format,
+            std::string szBuf = attempt_format(field_output_format,
                                             table_name_UP,
                                             table_name,
                                             fields_enum_list,
@@ -331,7 +342,7 @@ struct {0}
     {
         std::string out_file_name_UP     = upper_cast_copy(out_file_name);
         std::string table_name_tuple_str = string_concat(table_name_list, ",", "", "");
-        table_list_str                   = fmt::format("\nusing {}_TABLE_LIST = type_list<{}>;\n", out_file_name_UP, table_name_tuple_str);
+        table_list_str                   = attempt_format("\nusing {}_TABLE_LIST = type_list<{}>;\n", out_file_name_UP, table_name_tuple_str);
     }
     {
         static std::string output_format    = R"(
@@ -347,12 +358,12 @@ struct {0}
             )";
         std::string        output_file_name = out_dir + out_file_name + ".h";
         std::ofstream      output_file(output_file_name);
-        output_file << fmt::format(output_format, out_file_name, output_header, table_list_str);
+        output_file << attempt_format(output_format, out_file_name, output_header, table_list_str);
         output_file.close();
         std::cout << output_file_name << " write succ." << std::endl;
         if(opt.has("--format"))
         {
-            system(fmt::format("{} -i {}", opt["--format"], out_dir + out_file_name + ".h").c_str());
+            system(attempt_format("{} -i {}", opt["--format"], out_dir + out_file_name + ".h").c_str());
         }
     }
 }

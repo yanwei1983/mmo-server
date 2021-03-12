@@ -7,6 +7,7 @@
 
 #include "BaseType.h"
 #include "LogImpl.h"
+#include "AttempUtil.h"
 
 struct NDC
 {
@@ -21,13 +22,13 @@ namespace BaseCode
     template<typename... Args>
     void MyLogMsg(const char* pszName, bool logData, const char* pSrcFile, int32_t line, const char* fmt, Args&&... args)
     {
-        MyLogMsgX(pszName, logData, pSrcFile, line, fmt::format(fmt, std::forward<Args>(args)...).c_str());
+        MyLogMsgX(pszName, logData, pSrcFile, line, attempt_format(fmt, std::forward<Args>(args)...).c_str());
     }
 
     template<typename... Args>
     void PrintfError(const char* fmt, Args&&... args)
     {
-        std::cerr << fmt::format(fmt, std::forward<Args>(args)...) << std::endl;
+        std::cerr << attempt_format(fmt, std::forward<Args>(args)...) << std::endl;
     }
 } // namespace BaseCode
 
@@ -103,7 +104,7 @@ namespace BaseCode
 #define LOGERROR(...)   ZLOGFMT_ERROR(BaseCode::s_error_logger, ##__VA_ARGS__)
 #define LOGFATAL(msg, ...)                                     \
     {                                                          \
-        std::string err_str = fmt::format(msg, ##__VA_ARGS__); \
+        std::string err_str = attempt_format(msg, ##__VA_ARGS__); \
         ZLOG_FATAL(BaseCode::s_fatal_logger, err_str);         \
         fmt::print(stderr, "{}\n", err_str);                   \
     }

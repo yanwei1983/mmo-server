@@ -118,7 +118,7 @@ bool CWorldService::Init(const ServerPort& nServerPort)
     _ConnectGameDB(GetWorldID(), GetMessageRoute()->GetServerInfoDB());
     CHECKF(m_pGameDB.get());
     m_nCurPlayerMaxID       = GetDefaultPlayerID(GetWorldID());
-    auto result_playercount = m_pGameDB->UnionQuery(fmt::format(FMT_STRING("SELECT ifnull(max(id),{}) as id FROM tbld_player"), m_nCurPlayerMaxID));
+    auto result_playercount = m_pGameDB->UnionQuery(attempt_format(FMT_STRING("SELECT ifnull(max(id),{}) as id FROM tbld_player"), m_nCurPlayerMaxID));
     if(result_playercount && result_playercount->get_num_row() == 1)
     {
         auto row_result = result_playercount->fetch_row(false);
@@ -340,18 +340,18 @@ void CWorldService::OnLogicThreadProc()
     {
         std::string buf =
             std::string("\n======================================================================") +
-            fmt::format(FMT_STRING("\nMessageProcess:{}"), GetMessageProcess()) +
-            fmt::format(FMT_STRING("\nEvent:{}\tActive:{}\tMem:{}"),
+            attempt_format(FMT_STRING("\nMessageProcess:{}"), GetMessageProcess()) +
+            attempt_format(FMT_STRING("\nEvent:{}\tActive:{}\tMem:{}"),
                         EventManager()->GetEventCount(),
                         EventManager()->GetRunningEventCount(),
                         get_thread_memory_allocted()) +
-            fmt::format(FMT_STRING("\nAccount:{}\tWait:{}"), AccountManager()->GetAccountSize(), AccountManager()->GetWaitAccountSize());
+            attempt_format(FMT_STRING("\nAccount:{}\tWait:{}"), AccountManager()->GetAccountSize(), AccountManager()->GetWaitAccountSize());
 
         auto check_func = [&buf](const ServerPort& serverport) {
             auto pMessagePort = GetMessageRoute()->QueryMessagePort(serverport, false);
             if(pMessagePort && pMessagePort->GetWriteBufferSize() > 0)
             {
-                buf += fmt::format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),
+                buf += attempt_format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),
                                    pMessagePort->GetServerPort().GetServiceID(),
                                    pMessagePort->GetWriteBufferSize());
             }

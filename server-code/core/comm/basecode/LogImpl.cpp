@@ -197,7 +197,7 @@ namespace
 
         if(cfg.monthdir)
         {
-            path += fmt::format("{:%Y_/%m/}", t);
+            path += attempt_format("{:%Y_/%m/}", t);
         }
 
         if(!isDirectory(path))
@@ -205,7 +205,7 @@ namespace
             createRecursionDir(path);
         }
 
-        path += fmt::format("/{}_{:%Y%m%d}_{:03}.log", name, t, info.curFileIndex);
+        path += attempt_format("/{}_{:%Y%m%d}_{:03}.log", name, t, info.curFileIndex);
         using file_ptr_type = decltype(info.File);
         info.File           = file_ptr_type{fopen(path.c_str(), "a+"), &std::fclose};
 
@@ -221,7 +221,7 @@ namespace
         {
             createRecursionDir(path);
         }
-        path += fmt::format("/{}.log", pLog->detail);
+        path += attempt_format("/{}.log", pLog->detail);
         return std::fopen(path.c_str(), "a+");
 
         __LEAVE_FUNCTION_NO_LOG

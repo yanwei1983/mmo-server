@@ -444,15 +444,15 @@ void CSceneService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(), get_thread_memory_allocted());
-        buf += fmt::format(FMT_STRING("\nEvent:{}\tActive:{}"), EventManager()->GetEventCount(), EventManager()->GetRunningEventCount());
+                          attempt_format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(), get_thread_memory_allocted());
+        buf += attempt_format(FMT_STRING("\nEvent:{}\tActive:{}"), EventManager()->GetEventCount(), EventManager()->GetRunningEventCount());
 
         for(const auto& [k, v]: EventManager()->GetCountEntryByManagerType())
         {
             auto result = magic_enum::enum_cast<EventManagerType>(k);
             if(result)
             {
-                buf += fmt::format(FMT_STRING("\nManagerType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
+                buf += attempt_format(FMT_STRING("\nManagerType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
             }
         }
         for(const auto& [k, v]: EventManager()->GetCountEntryByType())
@@ -460,16 +460,16 @@ void CSceneService::OnLogicThreadProc()
             auto result = magic_enum::enum_cast<GameEventType>(k);
             if(result)
             {
-                buf += fmt::format(FMT_STRING("\nEvType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
+                buf += attempt_format(FMT_STRING("\nEvType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
             }
         }
 
-        buf += fmt::format(FMT_STRING("\nUser:{}\tMonster:{}"), ActorManager()->GetUserCount(), ActorManager()->GetMonsterCount()) +
-               fmt::format(FMT_STRING("\nLoading:{}\tSaveing:{}\tReady:{}"),
+        buf += attempt_format(FMT_STRING("\nUser:{}\tMonster:{}"), ActorManager()->GetUserCount(), ActorManager()->GetMonsterCount()) +
+               attempt_format(FMT_STRING("\nLoading:{}\tSaveing:{}\tReady:{}"),
                            GetLoadingThread()->GetLoadingCount(),
                            GetLoadingThread()->GetSaveingCount(),
                            GetLoadingThread()->GetReadyCount()) +
-               fmt::format(FMT_STRING("\nScene:{}\tDynaScene:{}"), SceneManager()->GetSceneCount(), SceneManager()->GetDynaSceneCount());
+               attempt_format(FMT_STRING("\nScene:{}\tDynaScene:{}"), SceneManager()->GetSceneCount(), SceneManager()->GetDynaSceneCount());
 
         SceneManager()->ForEach([&buf](CScene* pScene) {
             size_t player_count = 0;
@@ -481,7 +481,7 @@ void CSceneService::OnLogicThreadProc()
                 actor_count += pPhase->GetActorCount();
             });
 
-            buf += fmt::format("\nScene: {} - PhaseCount:{}-{}\tPlayer:{}\tActor:{}",
+            buf += attempt_format("\nScene: {} - PhaseCount:{}-{}\tPlayer:{}\tActor:{}",
                                pScene->GetMapID(),
                                pScene->GetStaticPhaseCount(),
                                phase_count,
@@ -494,7 +494,7 @@ void CSceneService::OnLogicThreadProc()
             auto pMessagePort = GetMessageRoute()->QueryMessagePort(serverport, false);
             if(pMessagePort && pMessagePort->GetWriteBufferSize() > 0)
             {
-                buf += fmt::format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),
+                buf += attempt_format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),
                                    pMessagePort->GetServerPort().GetServiceID(),
                                    pMessagePort->GetWriteBufferSize());
             }

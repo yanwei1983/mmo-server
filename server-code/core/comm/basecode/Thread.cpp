@@ -306,9 +306,9 @@ std::string getProcessID()
     char        buf[260] = {0};
 #ifdef WIN32
     uint32_t winPID = GetCurrentProcessId();
-    pid             = fmt::format("{:06u}", winPID);
+    pid             = attempt_format("{:06u}", winPID);
 #else
-    pid = fmt::format("{:06u}", getpid());
+    pid = attempt_format("{:06u}", getpid());
 #endif
     return pid;
 }

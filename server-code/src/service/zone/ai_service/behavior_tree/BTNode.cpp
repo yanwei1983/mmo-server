@@ -65,7 +65,7 @@ function this_ainode.OnEnter(ctx,node)
 {}
 end
             )";
-            m_script_onenter_lua = fmt::format(fmt_str_enter, script_onenter);
+            m_script_onenter_lua = attempt_format(fmt_str_enter, script_onenter);
         }
         if(script_onleave.empty() == false)
         {
@@ -76,7 +76,7 @@ function this_ainode.OnLeave(state,ctx,node)
 {}
 end
             )";
-            m_script_onleave_lua = fmt::format(fmt_str_leave, script_onleave);
+            m_script_onleave_lua = attempt_format(fmt_str_leave, script_onleave);
         }
         if(script_onupdate.empty() == false)
         {
@@ -87,7 +87,7 @@ function this_ainode.OnUpdate(ctx,node)
 {}
 end
             )";
-            m_script_onupdate_lua = fmt::format(fmt_str_update, script_onupdate);
+            m_script_onupdate_lua = attempt_format(fmt_str_update, script_onupdate);
         }
 
         if(m_script_onenter_lua.empty() == false || m_script_onleave_lua.empty() == false || m_script_onupdate_lua.empty() == false)
@@ -106,7 +106,7 @@ return function (name,...)
 end
             )";
 
-            m_Script = fmt::format(fmt_str, m_Desc, m_script_onenter_lua, m_script_onleave_lua, m_script_onupdate_lua);
+            m_Script = attempt_format(fmt_str, m_Desc, m_script_onenter_lua, m_script_onleave_lua, m_script_onupdate_lua);
             //将脚本转化为lua_function
             m_ScriptFunc = lua_tinker::dostring<lua_tinker::lua_function_ref>(m_pLua, m_Script, m_Script.c_str());
         }

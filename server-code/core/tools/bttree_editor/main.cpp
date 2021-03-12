@@ -54,7 +54,7 @@ static void ShowMenuFile()
             if (ImGui::MenuItem("New", "Ctrl+N")) 
             {
                 int32_t editor_id = editor_idx++;
-                auto tree_editor = std::make_unique<BTTreeEditor>(editor_id, fmt::format("Untitled-{}", editor_id));
+                auto tree_editor = std::make_unique<BTTreeEditor>(editor_id, attempt_format("Untitled-{}", editor_id));
                 tree_editor->OnInit();
                 tree_editor_list.emplace_back(std::move(tree_editor));
             }

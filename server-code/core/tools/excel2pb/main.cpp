@@ -236,7 +236,7 @@ int main(int argc, char** argv)
             if(debug_txt.empty() == false)
                 debug_txt += ",\n";
             debug_txt += std::string_view{json_txt.c_str(), json_txt.size() - 2};
-            debug_txt += fmt::format(",\"__debug\":\"file:{} sheet:{} line:{}  \"\n}} ", execl_file_name, title, y + 1);
+            debug_txt += attempt_format(",\"__debug\":\"file:{} sheet:{} line:{}  \"\n}} ", execl_file_name, title, y + 1);
         }
 
         pb_util::SaveToBinaryFile(output, out_file_name.c_str());

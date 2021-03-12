@@ -63,7 +63,7 @@ void CAccount::ReloadActorInfo()
     m_setActorInfo.clear();
 
     auto pDB        = WorldService()->GetGameDB();
-    auto result_ptr = pDB->QueryCond<TBLD_PLAYER>(fmt::format(FMT_STRING("openid=\'{}\' and del_time=0"), m_openid));
+    auto result_ptr = pDB->QueryCond<TBLD_PLAYER>(attempt_format(FMT_STRING("openid=\'{}\' and del_time=0"), m_openid));
     if(result_ptr)
     {
         for(size_t i = 0; i < result_ptr->get_num_row(); i++)
@@ -270,7 +270,7 @@ void CAccount::DelActor(size_t nIdx)
         {
             //强行设定伴侣的MateID = 0;
             auto pDB = WorldService()->GetGameDB();
-            pDB->AsyncExec(fmt::format(FMT_STRING("UPDATE {} SET mate_id=0,mate_name='' WHERE id={} LIMIT 1"), TBLD_PLAYER::table_name(), idMate));
+            pDB->AsyncExec(attempt_format(FMT_STRING("UPDATE {} SET mate_id=0,mate_name='' WHERE id={} LIMIT 1"), TBLD_PLAYER::table_name(), idMate));
         }
         //发送邮件
     }

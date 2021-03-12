@@ -46,7 +46,7 @@ struct DBCond
     KEY_T key;
           operator std::string() const
     {
-        std::string result = fmt::format(FMT_STRING("{}={}"), DBFieldHelp<TABLE_T, KEY_IDX>::GetFieldName(), key);
+        std::string result = attempt_format(FMT_STRING("{}={}"), DBFieldHelp<TABLE_T, KEY_IDX>::GetFieldName(), key);
         return result;
     }
 };
@@ -88,7 +88,7 @@ public:
     template<class TABLE_T, class DB_COND_T>
     CMysqlResultPtr QueryCond(DB_COND_T&& cond)
     {
-        std::string sql = fmt::format(FMT_STRING("SELECT * FROM {} WHERE {}"), TABLE_T::table_name(), std::forward<DB_COND_T>(cond));
+        std::string sql = attempt_format(FMT_STRING("SELECT * FROM {} WHERE {}"), TABLE_T::table_name(), std::forward<DB_COND_T>(cond));
         return Query(TABLE_T::table_name(), sql);
     }
 
@@ -98,7 +98,7 @@ public:
         std::vector<std::string> cond_vec;
         (cond_vec.emplace_back(std::forward<DB_COND_T>(conds)), ...);
         std::string cond_str = string_concat(cond_vec, " AND ", "", "");
-        std::string sql      = fmt::format(FMT_STRING("SELECT * FROM {} WHERE {}"), TABLE_T::table_name(), cond_str);
+        std::string sql      = attempt_format(FMT_STRING("SELECT * FROM {} WHERE {}"), TABLE_T::table_name(), cond_str);
         return Query(TABLE_T::table_name(), sql);
     }
 
@@ -106,14 +106,14 @@ public:
     CMysqlResultPtr QueryKey(KEY_T key)
     {
         std::string sql =
-            fmt::format(FMT_STRING("SELECT * FROM {} WHERE {}={}"), TABLE_T::table_name(), DBFieldHelp<TABLE_T, KEY_IDX>::GetFieldName(), key);
+            attempt_format(FMT_STRING("SELECT * FROM {} WHERE {}={}"), TABLE_T::table_name(), DBFieldHelp<TABLE_T, KEY_IDX>::GetFieldName(), key);
         return Query(TABLE_T::table_name(), sql);
     }
 
     template<class TABLE_T, uint32_t KEY_IDX, class KEY_T>
     CMysqlResultPtr QueryKeyLimit(KEY_T key, uint32_t limit)
     {
-        std::string sql = fmt::format(FMT_STRING("SELECT * FROM {} WHERE {}={} LIMIT {}"),
+        std::string sql = attempt_format(FMT_STRING("SELECT * FROM {} WHERE {}={} LIMIT {}"),
                                       TABLE_T::table_name(),
                                       DBFieldHelp<TABLE_T, KEY_IDX>::GetFieldName(),
                                       key,

@@ -20,6 +20,7 @@ namespace pb_util
     bool LoadFromJsonTxt(const std::string& jsonTxt, google::protobuf::Message& pbm);
     bool SaveToJsonTxt(const google::protobuf::Message& pbm, std::string& jsonTxt);
 
+
     bool                       SetMessageData(google::protobuf::Message* pPBMessage, const std::string& field_name, const std::string& data);
     bool                       AddMessageData(google::protobuf::Message* pPBMessage, const std::string& field_name, const std::string& data);
     bool                       JoinMessageData(google::protobuf::Message* pPBMessage, const std::string& field_name, const std::string& data);

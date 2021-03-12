@@ -41,7 +41,7 @@ bool DumpStackFile(int skip, int depth)
 {
     std::string txt = GetStackTraceString(skip+1,depth);
 
-    std::string szLogName = fmt::format("{}_hangup_{}.log", getProcessName(), getProcessID());
+    std::string szLogName = attempt_format("{}_hangup_{}.log", getProcessName(), getProcessID());
 
     FILE* fp = fopen(szLogName.c_str(), "a+");
     if(nullptr == fp)

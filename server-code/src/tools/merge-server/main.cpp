@@ -52,7 +52,7 @@ void normal_insert(std::string& merge_sql, CMysqlConnection* pGameDBSrc, const s
             LOGERROR("table:{} dump:{} error.", table_name, i);
             ::abort();
         }
-        merge_sql += fmt::format("{};\n", insert_sql);
+        merge_sql += attempt_format("{};\n", insert_sql);
     }
 }
 

@@ -55,9 +55,9 @@ namespace
 
         std::string szLogName;
         if(logData)
-            szLogName = fmt::format("{}/{}_{:%Y-%m-%d}.log", g_logPath, pszName, localtime_c);
+            szLogName = attempt_format("{}/{}_{:%Y-%m-%d}.log", g_logPath, pszName, localtime_c);
         else
-            szLogName = fmt::format("{}/{}.log", g_logPath, pszName);
+            szLogName = attempt_format("{}/{}.log", g_logPath, pszName);
 
         FILE* fp = fopen(szLogName.c_str(), "a+");
         return {fp, localtime_c};

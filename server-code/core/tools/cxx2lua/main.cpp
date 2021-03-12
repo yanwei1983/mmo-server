@@ -14,6 +14,7 @@
 
 #include "StringAlgo.h"
 #include "get_opt.h"
+#include "AttempUtil.h"
 
 std::set<std::string> g_export_class_name;
 
@@ -1985,7 +1986,7 @@ int main(int argc, char** argv)
 
         if(opt.has("--format"))
         {
-            system(fmt::format("{} -i {}", opt["--format"], temp_filename).c_str());
+            system(attempt_format("{} -i {}", opt["--format"], temp_filename).c_str());
         }
 
         std::fstream output_file_read(output_filename.c_str(), std::ios_base::in | std::ios_base::out);

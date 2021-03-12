@@ -29,7 +29,7 @@ namespace
         return arena;
     }
 
-    inline void arena_free(unsigned arena) { je_mallctl(fmt::format("arena.{}.destroy", arena).c_str(), 0, 0, 0, 0); }
+    inline void arena_free(unsigned arena) { je_mallctl(attempt_format("arena.{}.destroy", arena).c_str(), 0, 0, 0, 0); }
 
 } // namespace
 #endif

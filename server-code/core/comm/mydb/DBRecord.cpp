@@ -221,7 +221,7 @@ std::string CDBRecord::BuildDeleteSQL()
     if(m_strPriKeyBuf.empty() || m_TableName.empty())
         return std::string();
     else
-        return fmt::format(FMT_STRING("DELETE FROM {} WHERE {} LIMIT 1"), m_TableName, m_strPriKeyBuf);
+        return attempt_format(FMT_STRING("DELETE FROM {} WHERE {} LIMIT 1"), m_TableName, m_strPriKeyBuf);
     __LEAVE_FUNCTION
     return std::string();
 }
@@ -253,7 +253,7 @@ std::string CDBRecord::BuildUpdateSQL()
     if(szKeyBuf.empty() || m_strPriKeyBuf.empty() || m_TableName.empty())
         return std::string();
     else
-        return fmt::format(FMT_STRING("UPDATE {} SET {} WHERE {} LIMIT 1"), m_TableName, szKeyBuf, m_strPriKeyBuf);
+        return attempt_format(FMT_STRING("UPDATE {} SET {} WHERE {} LIMIT 1"), m_TableName, szKeyBuf, m_strPriKeyBuf);
     __LEAVE_FUNCTION
     return std::string();
 }
@@ -283,7 +283,7 @@ std::string CDBRecord::DumpInsertSQL() const
     if(szKeyNameBuf.empty() || szKeyValBuf.empty() || m_TableName.empty())
         return std::string();
     else
-        return fmt::format(FMT_STRING("INSERT INTO {} ({}) VALUES ({}) "), m_TableName, szKeyNameBuf, szKeyValBuf);
+        return attempt_format(FMT_STRING("INSERT INTO {} ({}) VALUES ({}) "), m_TableName, szKeyNameBuf, szKeyValBuf);
     __LEAVE_FUNCTION
     return std::string();
 }
@@ -319,7 +319,7 @@ std::string CDBRecord::BuildInsertSQL()
     if(szKeyNameBuf.empty() || szKeyValBuf.empty() || m_TableName.empty())
         return std::string();
     else
-        return fmt::format(FMT_STRING("INSERT INTO {} ({}) VALUES ({}) "), m_TableName, szKeyNameBuf, szKeyValBuf);
+        return attempt_format(FMT_STRING("INSERT INTO {} ({}) VALUES ({}) "), m_TableName, szKeyNameBuf, szKeyValBuf);
     __LEAVE_FUNCTION
     return std::string();
 }

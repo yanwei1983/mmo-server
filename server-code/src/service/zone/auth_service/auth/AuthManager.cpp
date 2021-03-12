@@ -64,7 +64,7 @@ bool CAuthManager::Auth(const std::string& openid, const std::string& auth, cons
 
             using namespace curlpp::Options;
             request.setOpt(Url(AUTH_URL));
-            std::string post_data = fmt::format(FMT_STRING("open_id={}&auth={}"), openid_, auth_);
+            std::string post_data = attempt_format(FMT_STRING("open_id={}&auth={}"), openid_, auth_);
             request.setOpt(PostFields(post_data));
             request.perform();
 

@@ -11,7 +11,7 @@ bool CAISkillData::Init(uint32_t idSkill)
 {
     m_idSkill    = idSkill;
     m_pSkillType = SkillTypeSet()->QueryObj(idSkill);
-    CHECKF_M(m_pSkillType, fmt::format(FMT_STRING("Skill {} Not Find"), idSkill).c_str());
+    CHECKF_M(m_pSkillType, attempt_format(FMT_STRING("Skill {} Not Find"), idSkill).c_str());
 
     return true;
 }

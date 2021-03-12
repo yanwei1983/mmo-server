@@ -461,22 +461,22 @@ void CSocketService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================");
-        buf += fmt::format(FMT_STRING("\nClient:{}\tNotAuth:{}"), m_setVirtualSocket.size(), m_NonAuthClientCount);
-        buf += fmt::format(FMT_STRING("\nServerMsgProcess:{}\tSocketMsgRecv:{}\tMem:{}"),
+        buf += attempt_format(FMT_STRING("\nClient:{}\tNotAuth:{}"), m_setVirtualSocket.size(), m_NonAuthClientCount);
+        buf += attempt_format(FMT_STRING("\nServerMsgProcess:{}\tSocketMsgRecv:{}\tMem:{}"),
                            GetMessageProcess(),
                            m_nSocketMessageProcess,
                            get_thread_memory_allocted());
-        buf += fmt::format(FMT_STRING("\nRecvTotal:{}\tRecvAvg:{}"),
+        buf += attempt_format(FMT_STRING("\nRecvTotal:{}\tRecvAvg:{}"),
                            GetNetworkService()->GetRecvBPS().GetTotal(),
                            GetNetworkService()->GetRecvBPS().GetAvgBPS());
-        buf += fmt::format(FMT_STRING("\nSendTotal:{}\tSendAvg:{}"),
+        buf += attempt_format(FMT_STRING("\nSendTotal:{}\tSendAvg:{}"),
                            GetNetworkService()->GetSendBPS().GetTotal(),
                            GetNetworkService()->GetSendBPS().GetAvgBPS());
 
         GetMessageRoute()->ForEach([&buf](auto pMessagePort) {
             if(pMessagePort && pMessagePort->GetWriteBufferSize())
             {
-                buf += fmt::format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),
+                buf += attempt_format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"),
                                    pMessagePort->GetServerPort().GetServiceID(),
                                    pMessagePort->GetWriteBufferSize());
             }

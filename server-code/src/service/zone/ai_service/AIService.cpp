@@ -165,15 +165,15 @@ void CAIService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(), get_thread_memory_allocted());
-        buf += fmt::format(FMT_STRING("\nEvent:{}\tActive:{}"), EventManager()->GetEventCount(), EventManager()->GetRunningEventCount());
+                          attempt_format(FMT_STRING("\nMessageProcess:{}\tMem:{}"), GetMessageProcess(), get_thread_memory_allocted());
+        buf += attempt_format(FMT_STRING("\nEvent:{}\tActive:{}"), EventManager()->GetEventCount(), EventManager()->GetRunningEventCount());
 
         for(const auto& [k, v]: EventManager()->GetCountEntryByManagerType())
         {
             auto result = magic_enum::enum_cast<EventManagerType>(k);
             if(result)
             {
-                buf += fmt::format(FMT_STRING("\nManagerType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
+                buf += attempt_format(FMT_STRING("\nManagerType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
             }
         }
         for(const auto& [k, v]: EventManager()->GetCountEntryByType())
@@ -181,14 +181,14 @@ void CAIService::OnLogicThreadProc()
             auto result = magic_enum::enum_cast<GameEventType>(k);
             if(result)
             {
-                buf += fmt::format(FMT_STRING("\nEvType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
+                buf += attempt_format(FMT_STRING("\nEvType:{}\tCount:{}"), magic_enum::enum_name(result.value()), v);
             }
         }
 
         auto pMessagePort = GetMessageRoute()->QueryMessagePort(GetSceneServerPort(), false);
         if(pMessagePort)
         {
-            buf += fmt::format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"), GetZoneID(), pMessagePort->GetWriteBufferSize());
+            buf += attempt_format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"), GetZoneID(), pMessagePort->GetWriteBufferSize());
         }
         LOGMONITOR("{}", buf.c_str());
         m_pMonitorMgr->Print();

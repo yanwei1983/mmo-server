@@ -9,6 +9,8 @@
 #include "DBField.h"
 #include "DBRecord.h"
 
+#include "ProtobuffUtil.h"
+
 namespace DB2PB
 {
     template<class PROTO_T, class DBRecord_T>
@@ -100,6 +102,37 @@ namespace DB2PB
             }
         }
     }
+
+    template<class DBField_t>
+    void LinkProtoWithJsonTxt(DBField_t& field, google::protobuf::Message& proto)
+    {
+        std::string json_txt = field;
+        if(json_txt.empty() == false)
+            pb_util::LoadFromJsonTxt(json_txt, proto);
+            
+        field.BindGetValString([&proto]()
+        {
+            std::string jsonTxt;
+            pb_util::SaveToJsonTxt(proto, jsonTxt);
+            return jsonTxt;
+        });
+    }
+
+    template<class DBField_t>
+    void LinkProtoWithBinary(DBField_t& field, google::protobuf::Message& proto)
+    {
+        std::string binary_txt = field;
+        if(binary_txt.empty() == false)
+            proto.ParseFromString(binary_txt);
+            
+        field.BindGetValString([&proto]()
+        {
+            std::string binary_txt;
+            proto.SerializeToString(&binary_txt);
+            return binary_txt;
+        });
+    }
+
 }; // namespace DB2PB
 
 template<class PROTO_T>

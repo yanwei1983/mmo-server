@@ -9,7 +9,7 @@ struct MysqlTableCheck
     static bool CheckTable(CMysqlConnection* pDB)
     {
         __ENTER_FUNCTION
-        auto result = pDB->UnionQuery(fmt::format("SHOW CREATE TABLE {}", T::table_name()));
+        auto result = pDB->UnionQuery(attempt_format("SHOW CREATE TABLE {}", T::table_name()));
         if(result == nullptr)
         {
             LOGDBFATAL("GameDB Check Error, table:{} not find in mysql", T::table_name());
@@ -110,11 +110,11 @@ struct MysqlTableCheck
     {
         auto key_name      = std::get<0>(key_info);
         auto key_field_str = std::get<1>(key_info);
-        auto result        = pDB->UnionQuery(fmt::format("SHOW INDEX FROM {} WHERE Key_name='{}'", TableType::table_name(), key_name));
+        auto result        = pDB->UnionQuery(attempt_format("SHOW INDEX FROM {} WHERE Key_name='{}'", TableType::table_name(), key_name));
         if(result == nullptr)
         {
             // add
-            auto sql = fmt::format("ALTER TABLE {} ADD INDEX {}({})", TableType::table_name(), key_name, key_field_str);
+            auto sql = attempt_format("ALTER TABLE {} ADD INDEX {}({})", TableType::table_name(), key_name, key_field_str);
             CHECKF(pDB->SyncExec(sql));
         }
         else
@@ -170,7 +170,7 @@ struct MysqlTableCheck
     static bool CheckTableAndFix(CMysqlConnection* pDB)
     {
         __ENTER_FUNCTION
-        auto result = pDB->UnionQuery(fmt::format("SHOW CREATE TABLE {}", T::table_name()));
+        auto result = pDB->UnionQuery(attempt_format("SHOW CREATE TABLE {}", T::table_name()));
         if(result == nullptr)
         {
             CHECKF(pDB->SyncExec(T::create_sql()));
@@ -235,12 +235,12 @@ struct MysqlTableCheck
             auto pInfo_DDL = pFieldInfo_DDL->find_field(pInfo_MYSQL->GetFieldName());
             if(pInfo_DDL == nullptr)
             {
-                auto sql = fmt::format("ALTER TABLE {} DROP COLUMN {}", T::table_name(), pInfo_MYSQL->GetFieldName());
+                auto sql = attempt_format("ALTER TABLE {} DROP COLUMN {}", T::table_name(), pInfo_MYSQL->GetFieldName());
                 CHECKF(pDB->SyncExec(sql));
             }
             else if(pInfo_DDL->GetFieldType() != pInfo_MYSQL->GetFieldType())
             {
-                auto sql = fmt::format("ALTER TABLE {} MODIFY COLUMN {}", T::table_name(), pInfo_DDL->GetFieldSql());
+                auto sql = attempt_format("ALTER TABLE {} MODIFY COLUMN {}", T::table_name(), pInfo_DDL->GetFieldSql());
                 CHECKF(pDB->SyncExec(sql));
             }
         }
@@ -259,7 +259,7 @@ struct MysqlTableCheck
             {
                 if(i == 0)
                 {
-                    auto sql = fmt::format("ALTER TABLE {} ADD COLUMN {} FIRST", T::table_name(), pInfo_DDL->GetFieldSql());
+                    auto sql = attempt_format("ALTER TABLE {} ADD COLUMN {} FIRST", T::table_name(), pInfo_DDL->GetFieldSql());
                     CHECKF(pDB->SyncExec(sql));
                 }
                 const CDBFieldInfo* pInfo_DDL_before = pFieldInfo_DDL->get(i - 1);
@@ -269,7 +269,7 @@ struct MysqlTableCheck
                     return false;
                 }
                 auto sql =
-                    fmt::format("ALTER TABLE {} ADD COLUMN {} AFTER {}", T::table_name(), pInfo_DDL->GetFieldSql(), pInfo_DDL_before->GetFieldName());
+                    attempt_format("ALTER TABLE {} ADD COLUMN {} AFTER {}", T::table_name(), pInfo_DDL->GetFieldSql(), pInfo_DDL_before->GetFieldName());
                 CHECKF(pDB->SyncExec(sql));
             }
         }

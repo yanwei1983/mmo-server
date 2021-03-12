@@ -254,7 +254,7 @@ void CNetSocket::_OnReceive(bufferevent* b)
             for(size_t i = 0; i < m_nLastCMDSize; i++)
             {
                 unsigned char v = m_ReadBuff[i];
-                data += fmt::format(FMT_STRING("{0:x} "), v);
+                data += attempt_format(FMT_STRING("{0:x} "), v);
             }
             LOGNETDEBUG("{}", data.c_str());
             _OnError("_OnReceive Fail");

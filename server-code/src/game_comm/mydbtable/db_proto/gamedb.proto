@@ -37,7 +37,7 @@ message tbld_datacount
     uint64 data_num        = 5;                                             //累计计数
     uint32 next_reset_time = 6;                                             //下一次重置的时间戳
 }
-
+ 
 message tbld_global_mail
 {
     uint64 id = 1 [(sql).primary_key = "idx_id", (sql).auto_increment = true]; // id
@@ -50,7 +50,7 @@ message tbld_global_mail
     string content     = 7 [(sql).size = 1024];              //邮件内容
     uint64 filter_type = 8;                                  //玩家过滤条件
     uint64 filter_data = 9;                                  //玩家过滤条件
-    bytes  attach_data = 10;                                 //附件数据json
+    bytes  attach_data = 10 [(sql).size = 4096];            //附件数据json
 }
 
 message tbld_item
@@ -68,7 +68,7 @@ message tbld_item
     uint32 dura         = 9;  //当前耐久
     uint32 dura_limit   = 10; //耐久上限
     uint32 addition_lev = 11; //强化等级
-    bytes  extra        = 12; //额外信息
+    bytes  extra        = 12 [(sql).size = 4096]; //额外信息
 }
 
 message tbld_mail

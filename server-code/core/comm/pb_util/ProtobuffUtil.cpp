@@ -149,13 +149,13 @@ namespace pb_util
                     pFieldDesc = pThisRow->GetDescriptor()->FindFieldByName(real_name.data());
                     if(pFieldDesc == nullptr)
                     {
-                        throw std::runtime_error{fmt::format("realname:{} not find in {}", real_name, pThisRow->GetDescriptor()->name())};
+                        throw std::runtime_error{attempt_format("realname:{} not find in {}", real_name, pThisRow->GetDescriptor()->name())};
                         return false;
                     }
                     if(pFieldDesc->is_repeated() && pFieldDesc->type() != google::protobuf::FieldDescriptor::TYPE_MESSAGE)
                     {
                         throw std::runtime_error{
-                            fmt::format("realname:{} in {} is repeated and not a message\n", real_name, pThisRow->GetDescriptor()->name())};
+                            attempt_format("realname:{} in {} is repeated and not a message\n", real_name, pThisRow->GetDescriptor()->name())};
                         return false;
                     }
                     auto array_idx = atoi(array_str.data());
@@ -173,7 +173,7 @@ namespace pb_util
             pFieldDesc = pThisRow->GetDescriptor()->FindFieldByName(name.data());
             if(pFieldDesc == nullptr)
             {
-                throw std::runtime_error{fmt::format("{} not find in {}\n", name, pThisRow->GetDescriptor()->name())};
+                throw std::runtime_error{attempt_format("{} not find in {}\n", name, pThisRow->GetDescriptor()->name())};
                 return false;
             }
 
@@ -320,7 +320,7 @@ namespace pb_util
                     auto pEnumVal = pFieldDesc->enum_type()->FindValueByName(data);
                     if(pEnumVal == nullptr)
                     {
-                        throw std::runtime_error{fmt::format("can't convert {} to {}\n", data, field_name)};
+                        throw std::runtime_error{attempt_format("can't convert {} to {}\n", data, field_name)};
                         return false;
                     }
                     pThisRow->GetReflection()->SetEnum(pThisRow, pFieldDesc, pEnumVal);

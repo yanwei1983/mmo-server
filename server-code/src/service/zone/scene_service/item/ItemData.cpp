@@ -5,21 +5,19 @@
 #include "Player.h"
 #include "SceneService.h"
 #include "gamedb.h"
-OBJECTHEAP_IMPLEMENTATION(CItemData, s_heap);
+#include "DB2PB.h"
 
-std::string SaveItemExtraToJson(const std::unique_ptr<ItemExtraData>& extraData)
-{
-    std::string jsonTxt;
-    pb_util::SaveToJsonTxt(*extraData, jsonTxt);
-    return jsonTxt;
-}
+OBJECTHEAP_IMPLEMENTATION(CItemData, s_heap);
 
 CItemData::CItemData()
     : m_ExtraData(std::make_unique<ItemExtraData>())
 {
 }
 
-CItemData::~CItemData() {}
+CItemData::~CItemData() 
+{
+
+}
 
 bool CItemData::Init(CDBRecordPtr&& pRes)
 {
@@ -34,9 +32,7 @@ bool CItemData::Init(CDBRecordPtr&& pRes)
         return false;
     }
 
-    std::string jsonTxt = m_pRecord->Field(TBLD_ITEM::EXTRA);
-    pb_util::LoadFromJsonTxt(jsonTxt, *m_ExtraData);
-    m_pRecord->Field(TBLD_ITEM::EXTRA).BindGetValString(std::bind(&SaveItemExtraToJson, std::cref(m_ExtraData)));
+    DB2PB::LinkProtoWithJsonTxt(m_pRecord->Field(TBLD_ITEM::EXTRA), *m_ExtraData);
 
     uint32_t nAddition = GetAddition();
     if(nAddition > 0)
@@ -61,9 +57,7 @@ bool CItemData::Init(CMysqlConnection* pDB, OBJID idItem)
     m_pRecord = pResult->fetch_row();
     CHECKF(m_pRecord != nullptr);
 
-    std::string jsonTxt = m_pRecord->Field(TBLD_ITEM::EXTRA);
-    pb_util::LoadFromJsonTxt(jsonTxt, *m_ExtraData);
-    m_pRecord->Field(TBLD_ITEM::EXTRA).BindGetValString(std::bind(&SaveItemExtraToJson, std::cref(m_ExtraData)));
+    DB2PB::LinkProtoWithJsonTxt(m_pRecord->Field(TBLD_ITEM::EXTRA), *m_ExtraData);
 
     m_pType = ItemTypeSet()->QueryObj(GetType());
     if(!m_pType)
@@ -113,7 +107,7 @@ bool CItemData::Init(CMysqlConnection* pDB, ST_ITEMINFO& info)
     if(m_pRecord->Update() == false)
         return false;
 
-    m_pRecord->Field(TBLD_ITEM::EXTRA).BindGetValString(std::bind(&SaveItemExtraToJson, std::cref(m_ExtraData)));
+    DB2PB::LinkProtoWithJsonTxt(m_pRecord->Field(TBLD_ITEM::EXTRA), *m_ExtraData);
     uint32_t nAddition = GetAddition();
     if(nAddition > 0)
     {
@@ -144,7 +138,7 @@ bool CItemData::Init(CMysqlConnection* pDB, uint64_t idPlayer, uint32_t idItemTy
     m_pRecord->Field(TBLD_ITEM::POSITION) = nPosition;
     m_pRecord->Field(TBLD_ITEM::FLAG)     = dwFlag;
 
-    m_pRecord->Field(TBLD_ITEM::EXTRA).BindGetValString(std::bind(&SaveItemExtraToJson, std::cref(m_ExtraData)));
+    DB2PB::LinkProtoWithJsonTxt(m_pRecord->Field(TBLD_ITEM::EXTRA), *m_ExtraData);
     return true;
     __LEAVE_FUNCTION
     return false;
@@ -165,7 +159,7 @@ bool CItemData::DelRecordStatic(CMysqlConnection* pDB, OBJID idItem)
 {
     __ENTER_FUNCTION
     CHECKF(pDB);
-    pDB->SyncExec(fmt::format(FMT_STRING("DELETE FROM {} WHERE id={}"), TBLD_ITEM::table_name(), idItem));
+    pDB->SyncExec(attempt_format(FMT_STRING("DELETE FROM {} WHERE id={}"), TBLD_ITEM::table_name(), idItem));
     __LEAVE_FUNCTION
     return false;
 }

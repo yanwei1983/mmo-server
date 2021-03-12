@@ -9,7 +9,7 @@ message tbld_gmlist
     string openid = 2 [(sql).size = 255];                                          // openid
     uint32 gmlev  = 3;                                                             // gm等级
 }
-
+ 
 message tbld_globalvar
 {
     uint32 key        = 1 [(sql).primary_key = "idx_id"]; // key

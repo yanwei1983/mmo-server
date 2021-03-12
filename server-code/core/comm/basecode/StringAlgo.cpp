@@ -362,7 +362,7 @@ public:
             }
 
             fclose(fp);
-            szFileName = fmt::format("pingbi/pingbi{}.txt", nIdx++);
+            szFileName = attempt_format("pingbi/pingbi{}.txt", nIdx++);
         }
     }
 

@@ -189,12 +189,12 @@ void CMessageRoute::_ReadServerIPList(WorldID_t nNewWorldID)
         else
         {
             //某个特定World启动了, 只需要读取该World数据
-            SQL = fmt::format("SELECT * FROM tbld_servicedetail WHERE worldid={}", nNewWorldID);
+            SQL = attempt_format("SELECT * FROM tbld_servicedetail WHERE worldid={}", nNewWorldID);
         }
     }
     else
     {
-        SQL = fmt::format(FMT_STRING("SELECT * FROM tbld_servicedetail WHERE worldid={} OR worldid=0"), GetWorldID());
+        SQL = attempt_format(FMT_STRING("SELECT * FROM tbld_servicedetail WHERE worldid={} OR worldid=0"), GetWorldID());
     }
     auto result = m_pServerInfoDB->Query(TBLD_SERVICEDETAIL::table_name(), SQL);
     CHECK_M(result, "ServerInfoDB can't query tbld_servicedetail");

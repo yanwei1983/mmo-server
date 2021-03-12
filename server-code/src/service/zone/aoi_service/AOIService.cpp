@@ -137,11 +137,11 @@ void CAOIService::OnLogicThreadProc()
     if(m_tLastDisplayTime.ToNextTime())
     {
         std::string buf = std::string("\n======================================================================") +
-                          fmt::format(FMT_STRING("\tMem:{}"), get_thread_memory_allocted());
+                          attempt_format(FMT_STRING("\tMem:{}"), get_thread_memory_allocted());
         auto pMessagePort = GetMessageRoute()->QueryMessagePort(GetSceneServerPort(), false);
         if(pMessagePort)
         {
-            buf += fmt::format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"), GetZoneID(), pMessagePort->GetWriteBufferSize());
+            buf += attempt_format(FMT_STRING("\nMsgPort:{}\tSendBuff:{}"), GetZoneID(), pMessagePort->GetWriteBufferSize());
         }
         LOGMONITOR("{}", buf.c_str());
         m_pMonitorMgr->Print();

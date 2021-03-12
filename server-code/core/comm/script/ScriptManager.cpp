@@ -126,7 +126,7 @@ bool CLUAScriptManager::Init(const std::string& name,
         std::string               load_path = table.get<std::string>("path");
         table.set("path", load_path + ";./" + search_path + "/?.lua");
 
-        lua_tinker::dofile(m_pLua, fmt::format("{}/{}", search_path, m_main_file_name).c_str());
+        lua_tinker::dofile(m_pLua, attempt_format("{}/{}", search_path, m_main_file_name).c_str());
         m_search_path = std::string("./") + search_path;
     }
     else

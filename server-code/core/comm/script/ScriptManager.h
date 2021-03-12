@@ -60,7 +60,7 @@ public:
             return RVal();
         if(IsRegisted(idScriptType, idScript) == false)
             return RVal();
-        std::string funcName = fmt::format("{}[{}].{}", ScriptTypeToName(idScriptType), idScript, FuncName);
+        std::string funcName = attempt_format("{}[{}].{}", ScriptTypeToName(idScriptType), idScript, FuncName);
 
         return _ExecScript<RVal>(funcName.c_str(), std::forward<Args>(args)...);
         __LEAVE_FUNCTION
